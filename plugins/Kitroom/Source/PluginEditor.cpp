@@ -4,19 +4,15 @@ namespace
 {
 dd::gui::Palette kitroomPalette()
 {
-    dd::gui::Palette p;
-    p.background = juce::Colour (0xff0d0b0a);
-    p.panel      = juce::Colour (0xff171412);
-    p.panelEdge  = juce::Colour (0xff2c2622);
-    p.track      = juce::Colour (0xff2e2925);
-    p.accent     = juce::Colour (0xffe8a33d);   // brass
-    p.accent2    = juce::Colour (0xffc9774a);   // copper
+    dd::gui::Palette p;   // dark brown matte hardware; highlights only from the sunset set
+    p.accent = dd::gui::sunset::orange;
+    p.accent2 = dd::gui::sunset::amber;
     return p;
 }
 
-const juce::Colour kMicAccent  { 0xffe8a33d };
-const juce::Colour kBusAccent  { 0xffc9774a };
-const juce::Colour kFeelAccent { 0xff8fb3a0 };
+const juce::Colour kMicAccent  = dd::gui::sunset::orange;
+const juce::Colour kBusAccent  = dd::gui::sunset::red;
+const juce::Colour kFeelAccent = dd::gui::sunset::yellow;
 
 using dd::gui::Knob;
 } // namespace
@@ -55,24 +51,24 @@ KitroomEditor::Content::Content (KitroomProcessor& p)
 void KitroomEditor::Content::paint (juce::Graphics& g)
 {
     const auto pal = kitroomPalette();
-    g.setGradientFill (juce::ColourGradient (juce::Colour (0xff1a1410), 0.0f, 0.0f,
-                                             pal.background, 0.0f, (float) getHeight() * 0.5f, false));
-    g.fillAll();
+    dd::gui::paintBackdrop (g, getLocalBounds(), pal);
 
-    auto head = getLocalBounds().removeFromTop (12 + 64).reduced (16, 0).withTrimmedTop (12);
-    auto logo = head.removeFromLeft (300);
-    g.setColour (pal.text);
-    g.setFont (dd::gui::LookAndFeel::font (34.0f, true).withExtraKerningFactor (0.06f));
-    g.drawText ("KITROOM", logo.removeFromTop (40), juce::Justification::bottomLeft);
-    g.setColour (pal.accent);
-    g.setFont (dd::gui::LookAndFeel::font (11.0f, true).withExtraKerningFactor (0.25f));
-    g.drawText ("LIVE DRUM KIT  /  MULTI-MIC", logo.removeFromTop (18), juce::Justification::topLeft);
+    // Wordmark with a 70s sunset stripe band running off it.
+    auto head = getLocalBounds().removeFromTop (12 + 64).reduced (16, 0).withTrimmedTop (12).toFloat();
+    auto logo = head.removeFromLeft (300.0f);
+    const auto wordFont = dd::gui::LookAndFeel::display (40.0f).withExtraKerningFactor (0.04f);
+    const float wordW = juce::GlyphArrangement::getStringWidth (wordFont, "KITROOM");
+    auto wordRow = logo.removeFromTop (42.0f);
+    dd::gui::drawPrinted (g, "KITROOM", wordRow, pal.text, wordFont, juce::Justification::bottomLeft);
+    dd::gui::paintSunsetStripes (g, { wordRow.getX() + wordW + 12.0f, wordRow.getBottom() - 21.0f, 300.0f - wordW - 24.0f, 12.0f });
+    dd::gui::drawPrinted (g, "LIVE DRUM KIT  /  MULTI-MIC", logo.removeFromTop (18.0f), pal.accent2,
+                          dd::gui::LookAndFeel::font (12.0f, true).withExtraKerningFactor (0.3f), juce::Justification::topLeft);
 
-    auto right = head.removeFromRight (170);
-    g.setColour (pal.dim);
-    g.setFont (dd::gui::LookAndFeel::font (11.0f));
-    g.drawText (juce::String ("ddeonmadeit  v") + DD_PLUGIN_VERSION, right.removeFromTop (32), juce::Justification::bottomRight);
-    g.drawText ("click a piece to edit it", right, juce::Justification::topRight);
+    auto right = head.removeFromRight (170.0f);
+    const auto small = dd::gui::LookAndFeel::font (12.0f);
+    dd::gui::drawPrinted (g, juce::String ("ddeonmadeit  v") + DD_PLUGIN_VERSION, right.removeFromTop (32.0f), pal.dim, small,
+                          juce::Justification::bottomRight);
+    dd::gui::drawPrinted (g, "click a piece to edit it", right, pal.dim, small, juce::Justification::topRight);
 }
 
 void KitroomEditor::Content::resized()

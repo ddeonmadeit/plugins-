@@ -12,9 +12,12 @@ namespace
 
     void drawTitle (juce::Graphics& g, const juce::Component& c, const juce::String& title, juce::Rectangle<int> r)
     {
-        g.setColour (paletteOf (c).dim);
-        g.setFont (LookAndFeel::font (10.5f, true));
-        g.drawFittedText (title.toUpperCase(), r, juce::Justification::centred, 1, 0.8f);
+        const auto f = LookAndFeel::font (10.5f, true).withExtraKerningFactor (0.07f);
+        const auto text = title.toUpperCase();
+        // Squeeze long titles instead of truncating them, like hand-fitted panel lettering.
+        const float w = juce::GlyphArrangement::getStringWidth (f, text);
+        const float squeeze = w > (float) r.getWidth() - 2.0f ? ((float) r.getWidth() - 2.0f) / w : 1.0f;
+        drawPrinted (g, text, r.toFloat(), paletteOf (c).dim, f.withHorizontalScale (squeeze), juce::Justification::centred);
     }
 }
 
@@ -59,8 +62,9 @@ void Knob::paint (juce::Graphics& g)
 {
     auto r = getLocalBounds();
     drawTitle (g, *this, title, r.removeFromTop (16));
-    g.setColour (slider.isMouseOverOrDragging() ? paletteOf (*this).text : paletteOf (*this).text.withAlpha (0.8f));
-    g.setFont (LookAndFeel::font (11.5f));
+    const auto& pal = paletteOf (*this);
+    g.setColour (slider.isMouseOverOrDragging() ? pal.text.interpolatedWith (pal.accent2, 0.5f) : pal.text.withAlpha (0.85f));
+    g.setFont (LookAndFeel::font (12.0f));
     g.drawFittedText (valueText, r.removeFromBottom (18), juce::Justification::centred, 1, 0.7f);
 }
 
@@ -129,19 +133,14 @@ void Panel::place (int col, int row, int colSpan, int rowSpan)
 void Panel::paint (juce::Graphics& g)
 {
     const auto& pal = paletteOf (*this);
-    const auto r = getLocalBounds().toFloat().reduced (0.5f);
-    g.setColour (pal.panel);
-    g.fillRoundedRectangle (r, 8.0f);
-    g.setColour (pal.panelEdge);
-    g.drawRoundedRectangle (r, 8.0f, 1.0f);
+    paintFaceplate (g, getLocalBounds().toFloat(), pal);
 
-    auto head = getLocalBounds().removeFromTop (kTitleH).reduced (kPad + 2, 0);
-    g.setColour (accent);
-    g.fillRoundedRectangle (head.removeFromLeft (3).toFloat().withSizeKeepingCentre (3.0f, 11.0f), 1.5f);
-    head.removeFromLeft (7);
-    g.setColour (pal.text);
-    g.setFont (LookAndFeel::font (12.5f, true));
-    g.drawText (title.toUpperCase(), head, juce::Justification::centredLeft);
+    // Title: a lit jewel lamp in the section's colour, then the name printed on the plate.
+    auto head = getLocalBounds().removeFromTop (kTitleH + 2).withTrimmedLeft (18).withTrimmedRight (18).toFloat();
+    paintLamp (g, { head.getX() + 4.0f, head.getCentreY() + 1.0f }, 3.2f, accent, 1.0f);
+    head.removeFromLeft (14.0f);
+    drawPrinted (g, title.toUpperCase(), head.translated (0.0f, 1.0f), pal.text,
+                 LookAndFeel::font (13.0f, true).withExtraKerningFactor (0.1f), juce::Justification::centredLeft);
 }
 
 void Panel::resized()

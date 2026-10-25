@@ -4,8 +4,8 @@ namespace
 {
 dd::gui::Palette palette()
 {
-    dd::gui::Palette p;
-    p.accent = juce::Colour (0xff3fd0c9); // pick this plugin's identity colour
+    dd::gui::Palette p;   // house style: dark brown matte; highlights only from dd::gui::sunset
+    p.accent = dd::gui::sunset::orange;   // pick this plugin's identity colour from the sunset set
     return p;
 }
 } // namespace
@@ -53,10 +53,9 @@ __NAME__Editor::~__NAME__Editor() { setLookAndFeel (nullptr); }
 
 void __NAME__Editor::paint (juce::Graphics& g)
 {
-    g.fillAll (lnf.palette().background);
-    g.setColour (lnf.palette().text);
-    g.setFont (dd::gui::LookAndFeel::font (24.0f, true));
-    g.drawText ("__NAME__", getLocalBounds().removeFromTop (56).reduced (14, 0), juce::Justification::centredLeft);
+    dd::gui::paintBackdrop (g, getLocalBounds(), lnf.palette());
+    dd::gui::drawPrinted (g, juce::String ("__NAME__").toUpperCase(), getLocalBounds().removeFromTop (56).reduced (14, 0).toFloat(),
+                          lnf.palette().text, dd::gui::LookAndFeel::display (28.0f), juce::Justification::centredLeft);
 }
 
 void __NAME__Editor::resized()

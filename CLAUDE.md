@@ -32,7 +32,9 @@ modules/dd_dsp            header-only DSP: PolyBLEP/unison osc, ZDF ladder, SVF,
                           glue comp, oversampled clipper
 modules/dd_core           PresetManager (JSON factory + user presets), param <-> JSON helpers,
                           replaceStateExactly(), ScopeBuffer (lock-free audio -> UI)
-modules/dd_gui            LookAndFeel/Palette, Knob/Choice/Toggle, grid Panel, PresetBar, Scope
+modules/dd_gui            house look (see "Visual style"): LookAndFeel/Palette + sunset colours, Knob/Choice/Toggle,
+                          grid Panel, PresetBar, CRT Scope, surfaces (backdrop, faceplate, inset, lamp, screw,
+                          grain, sunset stripes), embedded Barlow Condensed font (fonts/, SIL OFL)
 plugins/<Name>/           one plugin: CMakeLists.txt, Source/, Presets/<CATEGORY>/NN_Name.json, qa.json,
                           site.json (tagline, description, accent, highlights, installTips for the download page),
                           optional library/ (sample library builder) and README-mac.txt (zip README notes)
@@ -86,6 +88,20 @@ libfreetype-dev, libfontconfig1-dev, xvfb; Python: numpy, scipy, soundfile, matp
 - Code style follows JUCE: 4 spaces, `func (args)` with a space, braces on new lines, sparse comments that
   explain why. Build must stay warning-free under `juce_recommended_warning_flags`.
 - Don't commit `build/`, `qa-out/`, `dist/`.
+
+## Visual style (owner's brief: every plugin)
+
+Dark brown **matte**, grainy, realistic **vintage analog hardware**. The **only** highlight colours are warm
+sunset tones: `dd::gui::sunset::red / ember / orange / amber / yellow`. No blue, green, teal, purple or neon.
+Text is cream print (`Palette::text`) or faded tan (`Palette::dim`).
+
+- Editors paint `dd::gui::paintBackdrop` (grain + vignette), sections are `dd::gui::Panel` faceplates (screws,
+  jewel lamp in the section colour), displays/menus are recessed insets with amber text, knobs are
+  bakelite with a knurled skirt and a lit scale arc. Wordmark: `LookAndFeel::display()` + `paintSunsetStripes`.
+- Use `LookAndFeel::font()` / `display()` for all text (embedded font, identical on macOS and Linux) and
+  `drawPrinted()` for text on faceplates.
+- Drawn scenes (Kitroom's kit) follow the same light: dark room, warm tungsten spotlights from above,
+  film grain and vignette, crisp labels on top.
 
 ## Quality bar (what "done" means for a plugin)
 

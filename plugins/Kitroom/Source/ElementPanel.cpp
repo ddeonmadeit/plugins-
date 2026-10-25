@@ -2,7 +2,7 @@
 
 namespace
 {
-const juce::Colour kAccent { 0xffe8a33d };
+const juce::Colour kAccent = dd::gui::sunset::orange;
 constexpr int kKnobW = 64, kKnobH = 84;
 }
 
@@ -154,28 +154,20 @@ void ElementPanel::paint (juce::Graphics& g)
     if (auto* lf = dynamic_cast<dd::gui::LookAndFeel*> (&getLookAndFeel()))
         pal = lf->palette();
 
-    auto r = getLocalBounds().toFloat().reduced (0.5f);
-    g.setColour (pal.panel);
-    g.fillRoundedRectangle (r, 8.0f);
-    g.setColour (pal.panelEdge);
-    g.drawRoundedRectangle (r, 8.0f, 1.0f);
-
+    dd::gui::paintFaceplate (g, getLocalBounds().toFloat(), pal);
     if (slot < 0)
         return;
-    g.setColour (pal.text);
-    g.setFont (dd::gui::LookAndFeel::font (24.0f, true).withExtraKerningFactor (0.04f));
-    g.drawText (juce::String (kr::slots()[(size_t) slot].name).toUpperCase(), 18, 12, 240, 34, juce::Justification::centredLeft);
 
-    g.setColour (pal.dim);
-    g.setFont (dd::gui::LookAndFeel::font (10.5f, true));
-    g.drawText ("SOUNDS  /  KEYS (FL NAMES)", 18, 58, 200, 16, juce::Justification::centredLeft);
-    g.setFont (dd::gui::LookAndFeel::font (11.0f));
-    g.drawFittedText (credit, juce::Rectangle<int> (18, getHeight() - 26, getWidth() - 36, 18), juce::Justification::centredLeft, 1);
+    dd::gui::paintLamp (g, { 24.0f, 30.0f }, 4.0f, kAccent, proc.isSlotLoading (slot) ? 0.35f : 1.0f);
+    dd::gui::drawPrinted (g, juce::String (kr::slots()[(size_t) slot].name).toUpperCase(), { 36.0f, 12.0f, 220.0f, 34.0f }, pal.text,
+                          dd::gui::LookAndFeel::display (26.0f).withExtraKerningFactor (0.05f), juce::Justification::centredLeft);
+    dd::gui::drawPrinted (g, "SOUNDS  /  KEYS (FL NAMES)", { 18.0f, 58.0f, 200.0f, 16.0f }, pal.dim,
+                          dd::gui::LookAndFeel::font (10.5f, true).withExtraKerningFactor (0.07f), juce::Justification::centredLeft);
+    dd::gui::drawPrinted (g, credit, juce::Rectangle<int> (18, getHeight() - 28, getWidth() - 36, 18).toFloat(), pal.dim,
+                          dd::gui::LookAndFeel::font (11.5f), juce::Justification::centredLeft);
     if (proc.isSlotLoading (slot))
-    {
-        g.setColour (kAccent);
-        g.drawText ("loading samples...", getWidth() - 200, 46, 182, 14, juce::Justification::centredRight);
-    }
+        dd::gui::drawPrinted (g, "loading samples...", { (float) getWidth() - 200.0f, 46.0f, 182.0f, 14.0f }, pal.accent2,
+                              dd::gui::LookAndFeel::font (12.0f), juce::Justification::centredRight);
 }
 
 void ElementPanel::resized()

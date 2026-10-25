@@ -35,4 +35,10 @@ description: JUCE 9 / CMake API details and pitfalls already hit in this repo (c
   `const auto scope = fifo.write (1)` inside a processor that has a `scope` member. Name them `w` / `rd`.
 - An `AudioProcessor` that streams samples should honour `isNonRealtime()` (wait for loads): FL's export
   and offline bounces render faster than real time and would otherwise skip notes.
+- Embedded fonts: `juce_add_binary_data (dd_fonts ...)` in the root CMakeLists, linked into every plugin and
+  harness by `dd_add_plugin`; dd_gui includes `<DDFonts.h>` behind `__has_include`. Load once with
+  `Typeface::createSystemTypefaceFor (data, size)` and build fonts as `juce::Font (juce::FontOptions (tf).withHeight (h))`.
+  `getTypefaceForFont` only affects the *default* LookAndFeel, so route every font through `LookAndFeel::font()`.
+- Static lighting / texture masks (film grain, Kitroom's spotlight darkness) are computed once into a
+  `juce::Image` with `BitmapData` and drawn each paint; per-pixel work in `paint()` is too slow at 30 fps.
 

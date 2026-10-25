@@ -4,17 +4,17 @@ namespace
 {
 dd::gui::Palette subGritPalette()
 {
-    dd::gui::Palette p;
-    p.accent = juce::Colour (0xffff5a1f);   // flame orange
-    p.accent2 = juce::Colour (0xffffb020);  // 808 amber
+    dd::gui::Palette p;   // dark brown matte hardware; highlights only from the sunset set
+    p.accent = dd::gui::sunset::orange;
+    p.accent2 = dd::gui::sunset::amber;
     return p;
 }
 
-const juce::Colour kSourceAccent { 0xffffb020 };
-const juce::Colour kToneAccent   { 0xffff5a1f };
-const juce::Colour kDirtAccent   { 0xffff2d55 };
-const juce::Colour kFxAccent     { 0xff9d7bff };
-const juce::Colour kModAccent    { 0xff3fd0c9 };
+const juce::Colour kSourceAccent = dd::gui::sunset::yellow;
+const juce::Colour kToneAccent   = dd::gui::sunset::orange;
+const juce::Colour kDirtAccent   = dd::gui::sunset::red;
+const juce::Colour kFxAccent     = dd::gui::sunset::amber;
+const juce::Colour kModAccent    = dd::gui::sunset::ember;
 
 using dd::gui::Knob;
 using dd::gui::Choice;
@@ -135,39 +135,27 @@ SubGritEditor::Content::Content (SubGritProcessor& p)
     addAndMakeVisible (presetBar);
     for (auto* c : { &body808, &oscA, &oscB, &lfo, &filter, &env, &voice, &eq, &dirt, &fx, &output, &scopePanel })
         addAndMakeVisible (c);
-
-    // Static film-grain texture for the background (drawn once, cached).
-    grain = juce::Image (juce::Image::ARGB, 256, 256, true);
-    juce::Random rnd (808);
-    for (int y = 0; y < 256; ++y)
-        for (int x = 0; x < 256; ++x)
-            if (rnd.nextFloat() < 0.18f)
-                grain.setPixelAt (x, y, juce::Colours::white.withAlpha (rnd.nextFloat() * 0.035f));
 }
 
 void SubGritEditor::Content::paint (juce::Graphics& g)
 {
     const auto pal = subGritPalette();
-    g.setGradientFill (juce::ColourGradient (juce::Colour (0xff141010), 0.0f, 0.0f,
-                                             pal.background, 0.0f, (float) getHeight() * 0.6f, false));
-    g.fillAll();
-    g.setTiledImageFill (grain, 0, 0, 1.0f);
-    g.fillRect (getLocalBounds());
+    dd::gui::paintBackdrop (g, getLocalBounds(), pal);
 
-    // Wordmark
-    auto head = getLocalBounds().removeFromTop (12 + 64).reduced (16, 0).withTrimmedTop (12);
-    auto logo = head.removeFromLeft (300);
-    g.setColour (pal.text);
-    g.setFont (dd::gui::LookAndFeel::font (34.0f, true).withExtraKerningFactor (0.06f));
-    g.drawText ("SUBGRIT", logo.removeFromTop (40), juce::Justification::bottomLeft);
-    g.setColour (pal.accent);
-    g.setFont (dd::gui::LookAndFeel::font (11.0f, true).withExtraKerningFactor (0.25f));
-    g.drawText ("808 + DIRT BASS ENGINE", logo.removeFromTop (18), juce::Justification::topLeft);
+    // Wordmark with a 70s sunset stripe band running off it.
+    auto head = getLocalBounds().removeFromTop (12 + 64).reduced (16, 0).withTrimmedTop (12).toFloat();
+    auto logo = head.removeFromLeft (300.0f);
+    const auto wordFont = dd::gui::LookAndFeel::display (40.0f).withExtraKerningFactor (0.04f);
+    const float wordW = juce::GlyphArrangement::getStringWidth (wordFont, "SUBGRIT");
+    auto wordRow = logo.removeFromTop (42.0f);
+    dd::gui::drawPrinted (g, "SUBGRIT", wordRow, pal.text, wordFont, juce::Justification::bottomLeft);
+    dd::gui::paintSunsetStripes (g, { wordRow.getX() + wordW + 12.0f, wordRow.getBottom() - 21.0f, 300.0f - wordW - 24.0f, 12.0f });
+    dd::gui::drawPrinted (g, "808 + DIRT BASS ENGINE", logo.removeFromTop (18.0f), pal.accent2,
+                          dd::gui::LookAndFeel::font (12.0f, true).withExtraKerningFactor (0.3f), juce::Justification::topLeft);
 
-    auto right = getLocalBounds().removeFromTop (12 + 64).reduced (16, 0).withTrimmedTop (12).removeFromRight (160);
-    g.setColour (pal.dim);
-    g.setFont (dd::gui::LookAndFeel::font (11.0f));
-    g.drawText (juce::String ("ddeonmadeit  v") + DD_PLUGIN_VERSION, right, juce::Justification::centredRight);
+    auto right = head.removeFromRight (160.0f);
+    dd::gui::drawPrinted (g, juce::String ("ddeonmadeit  v") + DD_PLUGIN_VERSION, right, pal.dim,
+                          dd::gui::LookAndFeel::font (12.0f), juce::Justification::centredRight);
 }
 
 void SubGritEditor::Content::resized()

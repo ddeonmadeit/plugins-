@@ -86,7 +86,7 @@ function(dd_add_plugin target)
     target_link_libraries(${target}
         PRIVATE
             ${preset_lib}
-            dd_dsp dd_core dd_gui
+            dd_dsp dd_core dd_gui dd_fonts
             juce::juce_audio_utils
             juce::juce_dsp
         PUBLIC
@@ -105,7 +105,7 @@ function(dd_add_plugin target)
         target_link_libraries(${target}_Harness
             PRIVATE
                 ${preset_lib}
-                dd_dsp dd_core dd_gui
+                dd_dsp dd_core dd_gui dd_fonts
                 juce::juce_audio_processors
                 juce::juce_audio_formats
                 juce::juce_dsp

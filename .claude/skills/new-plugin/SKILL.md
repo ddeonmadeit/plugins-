@@ -51,7 +51,9 @@ Check: `$H stress` clean, `$H render` sounds right in `analyze.py`.
 ## 4. UI
 
 Build the editor from `dd::gui::Panel` grids (`add<Knob>`, `add<Choice>`, `add<Toggle>`, `place()` for spans).
-Give the plugin its own `Palette` accent. For big UIs copy SubGrit's scaled `Content` component pattern
+Follow the house style in CLAUDE.md ("Visual style"): dark brown matte vintage hardware, accents only from
+`dd::gui::sunset` (one per section), `paintBackdrop` behind everything, wordmark in `LookAndFeel::display()`
+with `paintSunsetStripes`. The template already does this. For big UIs copy SubGrit's scaled `Content` component pattern
 (fixed base size, `setTransform`, aspect-locked resizing, zoom stored in state).
 
 Check: `xvfb-run -a -s "-screen 0 2560x1600x24" $H snapshot --out ui.png` and *look at the image*.

@@ -22,3 +22,7 @@ THEN, IN FL STUDIO
   The plug-in appears under Generators. Drag it into the Channel Rack.
   If it is not found, make sure the folders above are listed under
   "Plugin search paths" in Manage plugins, then scan again.
+
+CREDITS
+  Interface font: Barlow Condensed, Copyright 2017 The Barlow Project Authors,
+  SIL Open Font License 1.1 (https://openfontlicense.org).

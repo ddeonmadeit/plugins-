@@ -34,6 +34,7 @@ private:
         float shellH;                    // drums only
         juce::Point<float> label;        // centre of the name/key pill
         juce::Path hit;                  // mouse hit area
+        juce::Path outline;              // silhouette for selection and hit glow
     };
 
     void timerCallback() override;
@@ -41,6 +42,7 @@ private:
     juce::Colour finishFor (int slot) const;
 
     void drawRoom (juce::Graphics&) const;
+    void drawSpotlights (juce::Graphics&);
     void drawStand (juce::Graphics&, float x, float top, float bottom, bool tripod) const;
     void drawDrum (juce::Graphics&, const Piece&, float glow) const;
     void drawKick (juce::Graphics&, const Piece&, float glow) const;
@@ -50,5 +52,6 @@ private:
     KitroomProcessor& proc;
     std::vector<Piece> pieces;            // back to front
     std::array<float, kr::kNumSlots> flash {};
+    juce::Image darkness;                 // static light mask: black except where the spots fall
     int hover = -1;
 };
