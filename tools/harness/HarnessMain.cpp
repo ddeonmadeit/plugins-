@@ -4,7 +4,7 @@
 
       <Plugin>Harness list
       <Plugin>Harness render  --out x.wav [--program N | --preset-file p.json] [--set id=value ...]
-                              [--phrase demo|single|slide|chords] [--sr 48000] [--block 256] [--mono]
+                              [--phrase demo|single|slide|groove|chords] [--sr 48000] [--block 256] [--mono]
       <Plugin>Harness render-all --outdir dir [--phrase demo] [--sr 48000]
       <Plugin>Harness snapshot --out ui.png [--program N] [--scale 1]
       <Plugin>Harness stress  [--seconds 20] [--sr 48000] [--block 128]
@@ -36,6 +36,15 @@ std::vector<Note> phrase (const juce::String& name, double& totalSeconds)
         totalSeconds = 4.0;
         return { { 31, 0.0, 1.1, 110 }, { 38, 1.0, 1.0, 110 },  // overlapping -> glide up
                  { 29, 1.9, 1.2, 110 } };                       // overlapping -> glide down
+    }
+    if (name == "groove")
+    {
+        // Two bars of a 140 BPM trap line in E minor with one legato slide (for listening previews).
+        const double s16 = 60.0 / 140.0 / 4.0;
+        totalSeconds = 34 * s16 + 1.2;
+        auto n = [s16] (int note, double start, double len, int vel) { return Note { note, start * s16, len * s16, vel }; };
+        return { n (28, 0, 5, 115), n (28, 6, 2, 100), n (28, 9, 1.5, 95), n (31, 11, 4, 110), n (35, 14, 2, 110),
+                 n (33, 16, 6, 115), n (33, 22.5, 1, 90), n (26, 24, 3, 110), n (38, 28, 3, 105), n (28, 31, 3, 120) };
     }
     if (name == "chords")
     {

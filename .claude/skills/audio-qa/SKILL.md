@@ -75,3 +75,13 @@ safety clip); rectifier curves need a tracked DC offset or every note thumps.
 Render 3-5 presets at 44.1/48/96 kHz and block sizes 1, 256, 997; LUFS and centroid should match within
 0.1 LU / a few Hz. Differences between block sizes should be < -60 dB (noise generators are the only
 exception: their random sequence legitimately depends on block boundaries).
+
+## Listening previews for the user
+
+The user can't hear anything until the Mac build is installed, so publish previews:
+`$H render-all --phrase groove --outdir qa-out/<Name>/preview` (two bars, 140 BPM, one slide), mix light
+synthesized hats/claps under each render in Python (bass x0.9, gentle tanh safety, 50 ms fade), encode
+with `ffmpeg -b:a 128k`, and publish an Artifact page whose audio files go in the `files` map
+(`audio/p000.mp3` ...), not as data URIs. Group rows by category, show each preset's description and
+real settings as tags, draw waveform peaks precomputed in Python on a canvas with play progress.
+SubGrit's page: https://claude.ai/artifact/DTxARTUxVBPbuiynMGdjh3
