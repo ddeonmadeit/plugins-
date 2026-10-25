@@ -66,5 +66,7 @@ cmake --build build --target MyThing_Harness MyThing_VST3 -j4
 PLUGINVAL=<pluginval> tools/qa/run_qa.sh MyThing
 ```
 
-Then follow `.claude/skills/mac-release/SKILL.md`. The workflow builds every plugin under `plugins/`
-automatically; nothing to add to CI.
+Fill in `plugins/MyThing/site.json` (tagline, description, accent colour, highlights): it drives the
+plugin's card on the download page and its release notes. Then follow `.claude/skills/mac-release/SKILL.md`
+to release it. The workflow builds every plugin under `plugins/` automatically and the download page
+picks it up; nothing to add to CI.

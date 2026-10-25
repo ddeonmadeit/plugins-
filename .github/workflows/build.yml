@@ -1,9 +1,13 @@
 name: Build plugins
 
+# Pushes to any branch: build + QA every plugin, upload installers as an artifact.
+# Tag "<Plugin>-v<version>" (e.g. SubGrit-v1.0.0): build that plugin and publish a GitHub Release.
+# Pushes to main and release tags: rebuild the download site (gh-pages -> ddeonmadeit.github.io/plugins-).
+
 on:
   push:
-    branches: ["**"]
-    tags: ["v*"]
+    branches: ["**", "!gh-pages"]
+    tags: ["*-v*"]
   pull_request:
   workflow_dispatch:
 
@@ -12,7 +16,7 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: write   # needed to attach installers to GitHub Releases on v* tags
+  contents: write   # publish releases and push the gh-pages branch
 
 jobs:
   linux-qa:
@@ -24,7 +28,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y ninja-build xvfb libasound2-dev libx11-dev libxrandr-dev libxinerama-dev \
+          sudo apt-get install -y ninja-build xvfb ffmpeg libasound2-dev libx11-dev libxrandr-dev libxinerama-dev \
             libxcursor-dev libxcomposite-dev libxi-dev libfreetype-dev libfontconfig1-dev libcurl4-openssl-dev \
             python3-numpy python3-scipy python3-soundfile python3-matplotlib
 
@@ -54,6 +58,18 @@ jobs:
             PLUGINVAL=$PWD/pluginval/pluginval tools/qa/run_qa.sh "$p"
           done
 
+      - name: Render previews for the download site
+        run: |
+          for p in $(python3 tools/ci/plugin_meta.py --names); do
+            python3 tools/site/make_previews.py "$p" site-previews
+          done
+
+      - name: Upload previews
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-previews
+          path: site-previews
+
       - name: Upload QA report
         if: always()
         uses: actions/upload-artifact@v4
@@ -73,6 +89,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Pick plugins
+        run: |
+          only=""
+          if [[ "$GITHUB_REF" == refs/tags/*-v* ]]; then
+            plugin="${GITHUB_REF_NAME%-v*}"; version="${GITHUB_REF_NAME##*-v}"
+            declared=$(python3 tools/ci/plugin_meta.py --only "$plugin" | python3 -c "import json,sys; print(json.load(sys.stdin)[0]['version'])")
+            if [[ "$declared" != "$version" ]]; then
+              echo "::error::Tag says $plugin $version but plugins/$plugin/CMakeLists.txt says VERSION $declared"; exit 1
+            fi
+            only="$plugin"
+            echo "DD_ONLY=$plugin" >> "$GITHUB_ENV"
+            echo "RELEASE_PLUGIN=$plugin" >> "$GITHUB_ENV"
+            echo "RELEASE_VERSION=$version" >> "$GITHUB_ENV"
+          fi
+          echo "PLUGINS=$(python3 tools/ci/plugin_meta.py ${only:+--only $only} --names | tr '\n' ' ')" >> "$GITHUB_ENV"
+
       - name: Cache JUCE
         uses: actions/cache@v4
         with:
@@ -88,7 +120,7 @@ jobs:
       - name: Build
         run: |
           targets=""
-          for p in $(python3 tools/ci/plugin_meta.py --names); do targets="$targets ${p}_VST3 ${p}_AU"; done
+          for p in $PLUGINS; do targets="$targets ${p}_VST3 ${p}_AU"; done
           cmake --build build --parallel --target $targets
 
       - name: Sign and package
@@ -115,7 +147,7 @@ jobs:
         run: |
           curl -sSL -o pluginval.zip https://github.com/Tracktion/pluginval/releases/latest/download/pluginval_macOS.zip
           unzip -q pluginval.zip -d pluginval
-          for p in $(python3 tools/ci/plugin_meta.py --names); do
+          for p in $PLUGINS; do
             product=$(python3 -c "import json; print({x['target']: x['product'] for x in json.load(open('dist/plugins.json'))}['$p'])")
             pluginval/pluginval.app/Contents/MacOS/pluginval --strictness-level 8 --validate-in-process \
               --timeout-ms 600000 --validate "build/plugins/$p/${p}_artefacts/Release/VST3/$product.vst3"
@@ -129,10 +161,51 @@ jobs:
             dist/*.pkg
             dist/*.zip
 
-      - name: Attach to GitHub Release
-        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Write release notes
+        if: env.RELEASE_PLUGIN != ''
+        run: python3 tools/site/release_notes.py "$RELEASE_PLUGIN" "$RELEASE_VERSION" > dist/release-notes.md
+
+      - name: Publish GitHub Release
+        if: env.RELEASE_PLUGIN != ''
         uses: softprops/action-gh-release@v2
         with:
+          name: ${{ env.RELEASE_PLUGIN }} ${{ env.RELEASE_VERSION }}
+          body_path: dist/release-notes.md
           files: |
-            dist/*.pkg
-            dist/*.zip
+            dist/${{ env.RELEASE_PLUGIN }}-${{ env.RELEASE_VERSION }}-macOS.pkg
+            dist/${{ env.RELEASE_PLUGIN }}-${{ env.RELEASE_VERSION }}-macOS.zip
+
+  site:
+    name: Download site (GitHub Pages)
+    needs: [linux-qa, macos]
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/'))
+    runs-on: ubuntu-24.04
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download previews
+        uses: actions/download-artifact@v4
+        with:
+          name: site-previews
+          path: site-previews
+
+      - name: Build site from the current releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api "repos/${GITHUB_REPOSITORY}/releases?per_page=100" > releases.json
+          python3 tools/site/build_site.py --releases releases.json --previews site-previews --out _site --repo "$GITHUB_REPOSITORY"
+
+      - name: Publish to gh-pages
+        run: |
+          cd _site
+          git init -q -b gh-pages
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Download site for ${GITHUB_SHA::7}"
+          # Single-commit branch: the page and its audio are regenerated every time, history adds nothing.
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git" gh-pages

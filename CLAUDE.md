@@ -4,6 +4,11 @@ Monorepo for audio plugins (VST3 + AU + Standalone) built with JUCE 9 and CMake.
 uses **FL Studio on macOS**; every plugin must ship as a universal (arm64 + x86_64) VST3 and AU.
 Development happens in a Linux container, and macOS binaries are built by GitHub Actions.
 
+**Download page (permanent): https://ddeonmadeit.github.io/plugins-/**. CI rebuilds it on every push to
+`main` and every release. Every plugin in `plugins/` appears there automatically; its download buttons go
+live once it has a release. Release a plugin with `git tag <Name>-v<version> && git push origin <Name>-v<version>`
+(the version must match `VERSION` in its CMakeLists.txt). Details: `.claude/skills/mac-release/SKILL.md`.
+
 ## Skills (read the matching one before starting)
 
 | Task | Skill |
@@ -25,13 +30,16 @@ modules/dd_dsp            header-only DSP: PolyBLEP/unison osc, ZDF ladder, SVF,
 modules/dd_core           PresetManager (JSON factory + user presets), param <-> JSON helpers,
                           replaceStateExactly(), ScopeBuffer (lock-free audio -> UI)
 modules/dd_gui            LookAndFeel/Palette, Knob/Choice/Toggle, grid Panel, PresetBar, Scope
-plugins/<Name>/           one plugin: CMakeLists.txt, Source/, Presets/<CATEGORY>/NN_Name.json, qa.json
+plugins/<Name>/           one plugin: CMakeLists.txt, Source/, Presets/<CATEGORY>/NN_Name.json, qa.json,
+                          site.json (tagline, description, accent, highlights for the download page)
 templates/plugin/         scaffold used by tools/new_plugin.py (//@SYNTH //@EFFECT blocks)
 tools/harness/            generic headless CLI compiled per plugin (render, snapshot, stress, param-info)
 tools/qa/                 analyze.py (objective audio QA), preset_lint/fill/normalize, run_qa.sh
-tools/ci/                 plugin_meta.py (reads dd_add_plugin args), package_macos.sh
+tools/ci/                 plugin_meta.py (reads dd_add_plugin args + site.json), package_macos.sh
+tools/site/               make_previews.py, build_site.py + template.html (download page), release_notes.py
 packaging/macos/          Install.command + README.txt shipped in the zip
-.github/workflows/        build.yml: Linux QA job + macOS universal build/sign/package/validate
+.github/workflows/        build.yml: Linux QA + previews, macOS universal build/sign/package/validate,
+                          GitHub Release on <Name>-v<ver> tags, download site -> gh-pages
 ```
 
 ## Everyday commands
@@ -82,6 +90,8 @@ libfreetype-dev, libfontconfig1-dev, xvfb; Python: numpy, scipy, soundfile, matp
 2. pluginval strictness 8 passes on Linux (and on macOS in CI), auval passes in CI.
 3. You looked at the UI snapshot and the spectrogram sheet (`qa-out/<Name>/renders/sheet.png`).
 4. The macOS job is green and its artifact contains `<Name>-<ver>-macOS.pkg` and `.zip`.
+5. Released: `<Name>-v<ver>` tag pushed, the Release has both assets, and the download page shows the
+   new version with working links (check https://ddeonmadeit.github.io/plugins-/ after the `site` job).
 
 ## Plugins
 

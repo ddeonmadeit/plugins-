@@ -11,7 +11,8 @@ BUILD="${1:-$ROOT/build}"
 DIST="${2:-$ROOT/dist}"
 mkdir -p "$DIST"
 
-python3 "$ROOT/tools/ci/plugin_meta.py" > "$DIST/plugins.json"
+# DD_ONLY=SubGrit restricts packaging to the plugins built for a release tag.
+python3 "$ROOT/tools/ci/plugin_meta.py" ${DD_ONLY:+--only "$DD_ONLY"} > "$DIST/plugins.json"
 count=$(python3 -c "import json; print(len(json.load(open('$DIST/plugins.json'))))")
 
 for i in $(seq 0 $((count - 1))); do

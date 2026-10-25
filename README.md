@@ -2,6 +2,9 @@
 
 Audio plugins for FL Studio on macOS (VST3 + AU, universal: Apple Silicon and Intel).
 
+**Download: https://ddeonmadeit.github.io/plugins-/** (always the newest version of every plugin,
+with audio previews of the presets).
+
 ## SubGrit: 808 + distorted bass
 
 A bass synth built for grungy, distorted, *still-full* 808s and synth basses, with 58 presets in
@@ -118,8 +121,8 @@ the output is always mono, so it hits the same on club systems and phones.
 
 ### Install (Mac)
 
-1. Get `SubGrit-1.0.0-macOS.pkg` (or the `.zip`) from this repo's **Releases** page, or from the
-   latest **Actions** run of "Build plugins" (artifact `macOS-installers`).
+1. Get the `.pkg` (or the `.zip`) from the [download page](https://ddeonmadeit.github.io/plugins-/)
+   or this repo's **Releases** page.
 2. Double-click the `.pkg`. The first time, macOS says it can't verify the developer: open
    **System Settings > Privacy & Security**, click **Open Anyway**, then run the `.pkg` again.
    *No admin password?* Unzip the `.zip` and run `bash ~/Downloads/SubGrit-1.0.0-macOS/Install.command` in Terminal.
@@ -140,7 +143,8 @@ cmake --build build --target SubGrit_VST3 SubGrit_Standalone   # + SubGrit_AU on
 tools/qa/run_qa.sh SubGrit                                      # offline audio QA
 ```
 
-macOS installers are built by GitHub Actions (`.github/workflows/build.yml`) on every push; tags
-`v*` publish a Release. See `CLAUDE.md` for the repo layout and how to add plugins.
+macOS installers are built by GitHub Actions (`.github/workflows/build.yml`) on every push; a tag like
+`SubGrit-v1.0.0` publishes that plugin's Release and updates the download page. See `CLAUDE.md` for the
+repo layout and how to add plugins.
 
 JUCE is used under the AGPLv3 / JUCE 9 licence terms.
