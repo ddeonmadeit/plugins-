@@ -6,10 +6,10 @@ Development happens in a Linux container, and macOS binaries are built by GitHub
 
 **Download page (permanent): https://ddeonmadeit.github.io/plugins-/**. CI rebuilds it on every push to
 `main` and every release. Every plugin in `plugins/` appears there automatically; its download buttons go
-live once it has a release. Release a plugin by running the "Build plugins" workflow on `main` with input
-`release=<Name>` (`mcp__github__actions_run_trigger`, workflow `build.yml`); it releases the `VERSION` from the
-plugin's CMakeLists.txt and refuses versions already released. Pushing a `<Name>-v<version>` tag also works
-from a normal machine, but this container's git proxy drops tag pushes. Details: `.claude/skills/mac-release/SKILL.md`.
+live once it has a release. **Releasing = version bump**: when a push to `main` contains a plugin whose
+`site.json` has `"publish": true` and whose `VERSION` (in its CMakeLists.txt) has no release yet, CI builds,
+validates and releases it as `<Name>-v<version>`. New plugins start with `"publish": false`; flip it when the
+owner is happy. To ship an update, bump `VERSION` and push. Details: `.claude/skills/mac-release/SKILL.md`.
 
 ## Skills (read the matching one before starting)
 

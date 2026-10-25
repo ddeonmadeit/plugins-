@@ -1,9 +1,11 @@
 name: Build plugins
 
 # Pushes to any branch: build + QA every plugin, upload installers as an artifact.
-# Release a plugin either way (it must have a new VERSION in its CMakeLists.txt):
-#   - Actions tab > Build plugins > Run workflow on main, "release" = SubGrit   (creates tag SubGrit-v<VERSION>)
-#   - or push a tag "<Plugin>-v<version>" (e.g. SubGrit-v1.0.0)
+# Releases (GitHub Release "<Plugin> <version>", tag <Plugin>-v<version>) happen when:
+#   - a push to main contains a plugin with "publish": true in its site.json whose VERSION has no release yet
+#     (so shipping an update = bump VERSION in plugins/<Plugin>/CMakeLists.txt and push), or
+#   - Actions tab > Build plugins > Run workflow on main with release = <Plugin>, or
+#   - a pushed tag "<Plugin>-v<version>".
 # Pushes to main and releases also rebuild the download site (gh-pages -> ddeonmadeit.github.io/plugins-).
 
 on:
@@ -103,28 +105,32 @@ jobs:
           RELEASE_INPUT: ${{ github.event.inputs.release }}
         run: |
           set -eo pipefail
-          only=""; plugin=""; version=""
+          meta() { python3 tools/ci/plugin_meta.py --only "$1" | python3 -c "import json,sys; p=json.load(sys.stdin)[0]; print($2)"; }
+          released() { gh release view "$1" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; }
+          releases=""; only=""
           if [[ "$GITHUB_REF" == refs/tags/*-v* ]]; then
             plugin="${GITHUB_REF_NAME%-v*}"; version="${GITHUB_REF_NAME##*-v}"
-          elif [[ -n "$RELEASE_INPUT" ]]; then
-            plugin="$RELEASE_INPUT"
-          fi
-          if [[ -n "$plugin" ]]; then
             python3 tools/ci/plugin_meta.py --only "$plugin" > /dev/null || { echo "::error::No plugin named '$plugin' in plugins/"; exit 1; }
-            declared=$(python3 tools/ci/plugin_meta.py --only "$plugin" | python3 -c "import json,sys; print(json.load(sys.stdin)[0]['version'])")
-            version="${version:-$declared}"
-            if [[ "$declared" != "$version" ]]; then
-              echo "::error::Tag says $plugin $version but plugins/$plugin/CMakeLists.txt says VERSION $declared"; exit 1
-            fi
-            if [[ -n "$RELEASE_INPUT" ]] && gh release view "$plugin-v$version" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
-              echo "::error::$plugin $version is already released. Bump VERSION in plugins/$plugin/CMakeLists.txt first."; exit 1
-            fi
-            only="$plugin"
-            echo "DD_ONLY=$plugin" >> "$GITHUB_ENV"
-            echo "RELEASE_PLUGIN=$plugin" >> "$GITHUB_ENV"
-            echo "RELEASE_VERSION=$version" >> "$GITHUB_ENV"
+            declared=$(meta "$plugin" "p['version']")
+            [[ "$declared" == "$version" ]] || { echo "::error::Tag says $plugin $version but its CMakeLists.txt says VERSION $declared"; exit 1; }
+            releases="$plugin"; only="$plugin"
+          elif [[ -n "$RELEASE_INPUT" ]]; then
+            python3 tools/ci/plugin_meta.py --only "$RELEASE_INPUT" > /dev/null || { echo "::error::No plugin named '$RELEASE_INPUT' in plugins/"; exit 1; }
+            version=$(meta "$RELEASE_INPUT" "p['version']")
+            ! released "$RELEASE_INPUT-v$version" || { echo "::error::$RELEASE_INPUT $version is already released. Bump VERSION first."; exit 1; }
+            releases="$RELEASE_INPUT"; only="$RELEASE_INPUT"
+          elif [[ "$GITHUB_EVENT_NAME" == push && "$GITHUB_REF" == refs/heads/main ]]; then
+            # Release on version bump: every plugin with "publish": true in site.json whose VERSION has no release yet.
+            for p in $(python3 tools/ci/plugin_meta.py --names); do
+              if [[ "$(meta "$p" "p['site'].get('publish', False)")" == True ]] && ! released "$p-v$(meta "$p" "p['version']")"; then
+                releases="$releases $p"
+              fi
+            done
           fi
+          if [[ -n "$only" ]]; then echo "DD_ONLY=$only" >> "$GITHUB_ENV"; fi
+          echo "RELEASES=$(echo $releases)" >> "$GITHUB_ENV"
           echo "PLUGINS=$(python3 tools/ci/plugin_meta.py ${only:+--only $only} --names | tr '\n' ' ')" >> "$GITHUB_ENV"
+          echo "Building: $(python3 tools/ci/plugin_meta.py ${only:+--only $only} --names | tr '\n' ' ')  Releasing: $(echo ${releases:-nothing})"
 
       - name: Cache JUCE
         uses: actions/cache@v4
@@ -182,21 +188,18 @@ jobs:
             dist/*.pkg
             dist/*.zip
 
-      - name: Write release notes
-        if: env.RELEASE_PLUGIN != ''
-        run: python3 tools/site/release_notes.py "$RELEASE_PLUGIN" "$RELEASE_VERSION" > dist/release-notes.md
-
-      - name: Publish GitHub Release
-        if: env.RELEASE_PLUGIN != ''
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ env.RELEASE_PLUGIN }}-v${{ env.RELEASE_VERSION }}
-          target_commitish: ${{ github.sha }}
-          name: ${{ env.RELEASE_PLUGIN }} ${{ env.RELEASE_VERSION }}
-          body_path: dist/release-notes.md
-          files: |
-            dist/${{ env.RELEASE_PLUGIN }}-${{ env.RELEASE_VERSION }}-macOS.pkg
-            dist/${{ env.RELEASE_PLUGIN }}-${{ env.RELEASE_VERSION }}-macOS.zip
+      - name: Publish GitHub Releases
+        if: env.RELEASES != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eo pipefail
+          for p in $RELEASES; do
+            version=$(python3 tools/ci/plugin_meta.py --only "$p" | python3 -c "import json,sys; print(json.load(sys.stdin)[0]['version'])")
+            python3 tools/site/release_notes.py "$p" "$version" > "dist/$p-notes.md"
+            gh release create "$p-v$version" "dist/$p-$version-macOS.pkg" "dist/$p-$version-macOS.zip" \
+              --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "$p $version" --notes-file "dist/$p-notes.md"
+          done
 
   site:
     name: Download site (GitHub Pages)

@@ -6,8 +6,9 @@ Build the download site (one page listing every plugin in plugins/).
   python3 tools/site/build_site.py --releases releases.json --previews qa-out/site-previews --out _site
 
 Each plugin's download block points at its newest published release tagged "<Plugin>-v<version>"
-with assets "<Plugin>-<version>-macOS.pkg/.zip". Plugins without a release are listed as "not
-released yet". Text comes from plugins/<Plugin>/site.json; previews from tools/site/make_previews.py.
+with assets "<Plugin>-<version>-macOS.pkg/.zip". A plugin with "publish": true but no release yet is
+listed as "not released yet"; unpublished plugins without a release are left off the page.
+Text comes from plugins/<Plugin>/site.json; previews from tools/site/make_previews.py.
 """
 import argparse
 import datetime
@@ -61,10 +62,14 @@ def main():
     site = {"repo": args.repo, "generated": datetime.date.today().isoformat(), "plugins": []}
     for p in plugins:
         s = p.get("site", {})
+        release = latest_release(releases, p["target"])
+        if release is None and not s.get("publish", False):
+            print("%-12s skipped (not published yet)" % p["target"])
+            continue  # work in progress stays off the public page
         entry = {"target": p["target"], "product": p["product"], "kind": p["kind"],
                  "tagline": s.get("tagline", ""), "description": s.get("description", ""),
                  "accent": s.get("accent", "#ff5a1f"), "highlights": s.get("highlights", []),
-                 "release": latest_release(releases, p["target"]), "previews": []}
+                 "release": release, "previews": []}
 
         src = os.path.join(args.previews, p["target"])
         if os.path.exists(os.path.join(src, "entries.json")):
