@@ -1,0 +1,23 @@
+# Build trees
+build/
+build-*/
+cmake-build-*/
+out/
+_deps/
+
+# QA renders (regenerate with tools/qa/run_qa.sh)
+qa-out/
+
+# IDE / OS
+.vscode/
+.idea/
+*.xcodeproj/
+.DS_Store
+compile_commands.json
+
+# Python
+__pycache__/
+*.pyc
+
+# Packaging output
+dist/

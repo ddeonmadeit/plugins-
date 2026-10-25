@@ -1,0 +1,137 @@
+name: Build plugins
+
+on:
+  push:
+    branches: ["**"]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write   # needed to attach installers to GitHub Releases on v* tags
+
+jobs:
+  linux-qa:
+    name: Linux QA (presets, audio analysis, pluginval)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build xvfb libasound2-dev libx11-dev libxrandr-dev libxinerama-dev \
+            libxcursor-dev libxcomposite-dev libxi-dev libfreetype-dev libfontconfig1-dev libcurl4-openssl-dev \
+            python3-numpy python3-scipy python3-soundfile python3-matplotlib
+
+      - name: Cache JUCE
+        uses: actions/cache@v4
+        with:
+          path: build/_deps
+          key: juce-linux-${{ hashFiles('CMakeLists.txt') }}
+
+      - name: Configure
+        run: cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build harnesses and VST3s
+        run: |
+          targets=""
+          for p in $(python3 tools/ci/plugin_meta.py --names); do targets="$targets ${p}_Harness ${p}_VST3"; done
+          cmake --build build --parallel --target $targets
+
+      - name: Get pluginval
+        run: |
+          curl -sSL -o pluginval.zip https://github.com/Tracktion/pluginval/releases/latest/download/pluginval_Linux.zip
+          unzip -q pluginval.zip -d pluginval
+
+      - name: QA every plugin
+        run: |
+          for p in $(python3 tools/ci/plugin_meta.py --names); do
+            PLUGINVAL=$PWD/pluginval/pluginval tools/qa/run_qa.sh "$p"
+          done
+
+      - name: Upload QA report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qa-report
+          path: |
+            qa-out/*/analysis.txt
+            qa-out/*/stress.txt
+            qa-out/*/ui.png
+            qa-out/*/renders/sheet.png
+            qa-out/*/renders/report.json
+            qa-out/*/pluginval.log
+
+  macos:
+    name: macOS universal (VST3 + AU)
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache JUCE
+        uses: actions/cache@v4
+        with:
+          path: build/_deps
+          key: juce-macos-${{ hashFiles('CMakeLists.txt') }}
+
+      - name: Configure (arm64 + x86_64)
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=Release -DDD_BUILD_HARNESS=OFF \
+                -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0
+
+      - name: Build
+        run: |
+          targets=""
+          for p in $(python3 tools/ci/plugin_meta.py --names); do targets="$targets ${p}_VST3 ${p}_AU"; done
+          cmake --build build --config Release --parallel 4 --target $targets
+
+      - name: Sign and package
+        run: tools/ci/package_macos.sh build dist
+
+      - name: Validate Audio Units (auval)
+        run: |
+          mkdir -p ~/Library/Audio/Plug-Ins/Components
+          python3 - <<'PY' > au_list.txt
+          import json
+          for p in json.load(open("dist/plugins.json")):
+              print(p["target"], p["product"], p["au_type"], p["code"], p["manufacturer"])
+          PY
+          while read -r target product type code manu; do
+            ditto "build/plugins/$target/${target}_artefacts/Release/AU/$product.component" "$HOME/Library/Audio/Plug-Ins/Components/$product.component"
+          done < au_list.txt
+          killall -9 AudioComponentRegistrar 2>/dev/null || true
+          sleep 2
+          while read -r target product type code manu; do
+            auval -v "$type" "$code" "$manu"
+          done < au_list.txt
+
+      - name: Validate VST3 (pluginval)
+        run: |
+          curl -sSL -o pluginval.zip https://github.com/Tracktion/pluginval/releases/latest/download/pluginval_macOS.zip
+          unzip -q pluginval.zip -d pluginval
+          for p in $(python3 tools/ci/plugin_meta.py --names); do
+            product=$(python3 -c "import json; print({x['target']: x['product'] for x in json.load(open('dist/plugins.json'))}['$p'])")
+            pluginval/pluginval.app/Contents/MacOS/pluginval --strictness-level 8 --validate-in-process \
+              --timeout-ms 600000 --validate "build/plugins/$p/${p}_artefacts/Release/VST3/$product.vst3"
+          done
+
+      - name: Upload installers
+        uses: actions/upload-artifact@v4
+        with:
+          name: macOS-installers
+          path: |
+            dist/*.pkg
+            dist/*.zip
+
+      - name: Attach to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/*.pkg
+            dist/*.zip
