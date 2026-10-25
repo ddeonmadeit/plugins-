@@ -1,8 +1,10 @@
 name: Build plugins
 
 # Pushes to any branch: build + QA every plugin, upload installers as an artifact.
-# Tag "<Plugin>-v<version>" (e.g. SubGrit-v1.0.0): build that plugin and publish a GitHub Release.
-# Pushes to main and release tags: rebuild the download site (gh-pages -> ddeonmadeit.github.io/plugins-).
+# Release a plugin either way (it must have a new VERSION in its CMakeLists.txt):
+#   - Actions tab > Build plugins > Run workflow on main, "release" = SubGrit   (creates tag SubGrit-v<VERSION>)
+#   - or push a tag "<Plugin>-v<version>" (e.g. SubGrit-v1.0.0)
+# Pushes to main and releases also rebuild the download site (gh-pages -> ddeonmadeit.github.io/plugins-).
 
 on:
   push:
@@ -10,10 +12,16 @@ on:
     tags: ["*-v*"]
   pull_request:
   workflow_dispatch:
+    inputs:
+      release:
+        description: "Plugin to release (e.g. SubGrit). Leave empty to just build."
+        required: false
+        default: ""
 
+# A newer push cancels an older push build of the same branch; release runs are never cancelled.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: ${{ github.event_name == 'push' && !startsWith(github.ref, 'refs/tags/') }}
 
 permissions:
   contents: write   # publish releases and push the gh-pages branch
@@ -90,13 +98,26 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Pick plugins
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_INPUT: ${{ github.event.inputs.release }}
         run: |
-          only=""
+          set -eo pipefail
+          only=""; plugin=""; version=""
           if [[ "$GITHUB_REF" == refs/tags/*-v* ]]; then
             plugin="${GITHUB_REF_NAME%-v*}"; version="${GITHUB_REF_NAME##*-v}"
+          elif [[ -n "$RELEASE_INPUT" ]]; then
+            plugin="$RELEASE_INPUT"
+          fi
+          if [[ -n "$plugin" ]]; then
+            python3 tools/ci/plugin_meta.py --only "$plugin" > /dev/null || { echo "::error::No plugin named '$plugin' in plugins/"; exit 1; }
             declared=$(python3 tools/ci/plugin_meta.py --only "$plugin" | python3 -c "import json,sys; print(json.load(sys.stdin)[0]['version'])")
+            version="${version:-$declared}"
             if [[ "$declared" != "$version" ]]; then
               echo "::error::Tag says $plugin $version but plugins/$plugin/CMakeLists.txt says VERSION $declared"; exit 1
+            fi
+            if [[ -n "$RELEASE_INPUT" ]] && gh release view "$plugin-v$version" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+              echo "::error::$plugin $version is already released. Bump VERSION in plugins/$plugin/CMakeLists.txt first."; exit 1
             fi
             only="$plugin"
             echo "DD_ONLY=$plugin" >> "$GITHUB_ENV"
@@ -169,6 +190,8 @@ jobs:
         if: env.RELEASE_PLUGIN != ''
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ env.RELEASE_PLUGIN }}-v${{ env.RELEASE_VERSION }}
+          target_commitish: ${{ github.sha }}
           name: ${{ env.RELEASE_PLUGIN }} ${{ env.RELEASE_VERSION }}
           body_path: dist/release-notes.md
           files: |
@@ -178,7 +201,7 @@ jobs:
   site:
     name: Download site (GitHub Pages)
     needs: [linux-qa, macos]
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/'))
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/'))
     runs-on: ubuntu-24.04
     concurrency:
       group: pages

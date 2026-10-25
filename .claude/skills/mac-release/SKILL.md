@@ -17,8 +17,9 @@ plugin listed by `tools/ci/plugin_meta.py` (parsed from each `dd_add_plugin()` c
 4. `auval -v aumu|aufx <code> Ddeo` after copying the component to `~/Library/Audio/Plug-Ins/Components`
    and killing `AudioComponentRegistrar`.
 5. pluginval strictness 8 on the VST3.
-6. Upload artifact `macOS-installers`; on a `<Name>-v<version>` tag, publish a GitHub Release named
-   "<Name> <version>" with those two files and notes from `tools/site/release_notes.py`.
+6. Upload artifact `macOS-installers`; in a release run, publish a GitHub Release (tag `<Name>-v<version>`,
+   created by the action) named "<Name> <version>" with those two files and notes from
+   `tools/site/release_notes.py`.
 
 The Linux job runs the full audio QA (`tools/qa/run_qa.sh`) plus pluginval, uploads `qa-report`, and
 renders preset previews (`tools/site/make_previews.py`) as the `site-previews` artifact.
@@ -38,8 +39,11 @@ Fix and push again until both jobs are green.
 
 1. Set `VERSION` in `plugins/<Name>/CMakeLists.txt` (semver; bump it for every release) and fill in
    `plugins/<Name>/site.json`. Commit and push to main; wait for green CI.
-2. `git tag <Name>-v<version> && git push origin <Name>-v<version>` (e.g. `SubGrit-v1.0.1`). The macOS job
-   refuses the tag if it doesn't match `VERSION`.
+2. Start the release run. From the container: `mcp__github__actions_run_trigger` with method `run_workflow`,
+   workflow_id `build.yml`, ref `main`, inputs `{"release": "<Name>"}`. The owner can do the same from the
+   GitHub app or site: Actions > Build plugins > Run workflow > release = <Name>. It releases the `VERSION`
+   in the plugin's CMakeLists.txt and fails if that version already has a release. (Pushing a
+   `<Name>-v<version>` tag also triggers a release, but the container's git proxy drops tag pushes.)
 3. When the run finishes: the Release exists with `<Name>-<version>-macOS.pkg/.zip`, and the download page
    shows the new version. Verify with `curl -sI` on the asset URL (expect 302) and by loading the page.
 

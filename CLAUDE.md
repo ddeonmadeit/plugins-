@@ -6,8 +6,10 @@ Development happens in a Linux container, and macOS binaries are built by GitHub
 
 **Download page (permanent): https://ddeonmadeit.github.io/plugins-/**. CI rebuilds it on every push to
 `main` and every release. Every plugin in `plugins/` appears there automatically; its download buttons go
-live once it has a release. Release a plugin with `git tag <Name>-v<version> && git push origin <Name>-v<version>`
-(the version must match `VERSION` in its CMakeLists.txt). Details: `.claude/skills/mac-release/SKILL.md`.
+live once it has a release. Release a plugin by running the "Build plugins" workflow on `main` with input
+`release=<Name>` (`mcp__github__actions_run_trigger`, workflow `build.yml`); it releases the `VERSION` from the
+plugin's CMakeLists.txt and refuses versions already released. Pushing a `<Name>-v<version>` tag also works
+from a normal machine, but this container's git proxy drops tag pushes. Details: `.claude/skills/mac-release/SKILL.md`.
 
 ## Skills (read the matching one before starting)
 
@@ -90,8 +92,8 @@ libfreetype-dev, libfontconfig1-dev, xvfb; Python: numpy, scipy, soundfile, matp
 2. pluginval strictness 8 passes on Linux (and on macOS in CI), auval passes in CI.
 3. You looked at the UI snapshot and the spectrogram sheet (`qa-out/<Name>/renders/sheet.png`).
 4. The macOS job is green and its artifact contains `<Name>-<ver>-macOS.pkg` and `.zip`.
-5. Released: `<Name>-v<ver>` tag pushed, the Release has both assets, and the download page shows the
-   new version with working links (check https://ddeonmadeit.github.io/plugins-/ after the `site` job).
+5. Released: the Release `<Name>-v<ver>` has both assets, and the download page shows the new version
+   with working links (check https://ddeonmadeit.github.io/plugins-/ after the `site` job).
 
 ## Plugins
 
