@@ -135,6 +135,32 @@ slide on presets with glide; leave gaps for clean re-hits.
 User presets are saved to `~/Music/ddeonmadeit/SubGrit/Presets` (SAVE button; "..." menu reveals
 the folder).
 
+## Kitroom: live acoustic drum kit
+
+A real drum kit, every piece on its own key, recorded with close, overhead and room mics. No
+synthesized or electronic drums: every sound is a multi-mic recording of an acoustic kit (DrumGizmo's
+DRSKit and MuldjordKit, CC BY 4.0), with 10 to 60 velocity layers per articulation and round robin,
+so repeated hits never sound like the same sample.
+
+![Kitroom](docs/kitroom.png)
+
+- **The kit on screen**: click any piece to hear it and edit it. Pieces flash when played and show
+  their key in FL Studio note names.
+- **Swap any piece**: each slot takes any recorded sound of its kind (four kicks including a deadened
+  one, three snares including brushes, three hi-hats, ten toms, five crashes and a china, five rides).
+- **One piano roll**: kick C3, snare D3, sidestick C#3, hi-hat F#3 closed / G#3 pedal / A#3 open / B1
+  half-open, toms C4 / A3 / G3, crashes C#4 / A4, ride D#4, bell F4, china E4 (General MIDI). Any key
+  can be re-learned from your keyboard; "GM keys" resets them.
+- **Mix like a recording**: per piece volume, pan, tune, decay and close / overhead / room mic level;
+  for the kit, the three mic buses, width (lows always mono), glue compressor, clipper, velocity curve
+  and humanize. Close mics follow where each piece sits in the overheads, so the stereo image holds.
+- **17 presets**: STUDIO, LIVE ROOM, VINTAGE (dry 70s, jazz brushes and sticks, Motown), TIGHT (funk,
+  neo soul, punch rock) and BIG (big room, arena, crushed room), loudness-matched.
+
+The installer also puts the sound library (about 230 MB) in
+`/Library/Application Support/ddeonmadeit/Kitroom/Library`. User presets go to
+`~/Music/ddeonmadeit/Kitroom/Presets` and remember the sound chosen for each piece.
+
 ## Building
 
 ```bash

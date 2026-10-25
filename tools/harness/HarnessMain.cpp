@@ -4,7 +4,7 @@
 
       <Plugin>Harness list
       <Plugin>Harness render  --out x.wav [--program N | --preset-file p.json] [--set id=value ...]
-                              [--phrase demo|single|slide|groove|chords] [--sr 48000] [--block 256] [--mono]
+                              [--phrase demo|single|slide|groove|chords|drums|drumvel] [--sr 48000] [--block 256] [--mono]
       <Plugin>Harness render-all --outdir dir [--phrase demo] [--sr 48000]
       <Plugin>Harness snapshot --out ui.png [--program N] [--scale 1]
       <Plugin>Harness stress  [--seconds 20] [--sr 48000] [--block 128]
@@ -45,6 +45,52 @@ std::vector<Note> phrase (const juce::String& name, double& totalSeconds)
         auto n = [s16] (int note, double start, double len, int vel) { return Note { note, start * s16, len * s16, vel }; };
         return { n (28, 0, 5, 115), n (28, 6, 2, 100), n (28, 9, 1.5, 95), n (31, 11, 4, 110), n (35, 14, 2, 110),
                  n (33, 16, 6, 115), n (33, 22.5, 1, 90), n (26, 24, 3, 110), n (38, 28, 3, 105), n (28, 31, 3, 120) };
+    }
+    if (name == "drums")
+    {
+        // Five bars at 96 BPM on the General MIDI drum map: groove with ghost notes and an open hat,
+        // a ride bar with bell accents, a tom fill, then crashes ringing out.
+        const double s16 = 60.0 / 96.0 / 4.0;
+        std::vector<Note> out;
+        auto hit = [&] (int note, double sixteenth, int vel) { out.push_back ({ note, sixteenth * s16, 0.1, vel }); };
+        for (int bar = 0; bar < 2; ++bar)
+        {
+            const int o = bar * 16;
+            for (int k = 0; k < 16; k += 2)
+                hit (bar == 1 && k == 14 ? 46 : 42, o + k, k % 4 == 0 ? 96 : 72);
+            hit (36, o + 0, 112); hit (36, o + 6, 90); hit (36, o + 8, 108);
+            hit (38, o + 4, 115); hit (38, o + 12, 118);
+            hit (38, o + 7, 34); hit (38, o + 15, 28);
+            if (bar == 1) hit (44, o + 16, 70);
+        }
+        for (int k = 0; k < 16; k += 2)
+            hit (k % 4 == 2 ? 53 : 51, 32 + k, k % 4 == 2 ? 88 : 80);
+        hit (36, 32, 110); hit (36, 42, 96); hit (37, 36, 90); hit (37, 44, 95);
+        const int fill[] = { 48, 48, 48, 48, 45, 45, 45, 45, 43, 43, 43, 43, 40, 40, 38, 38 };
+        for (int k = 0; k < 16; ++k)
+            hit (fill[k], 48 + k, 70 + (k % 4) * 12);
+        hit (36, 48, 100); hit (36, 56, 100);
+        hit (36, 64, 120); hit (49, 64, 120); hit (57, 72, 105); hit (52, 76, 100);
+        totalSeconds = 80 * s16 + 3.0;
+        return out;
+    }
+    if (name == "drumvel")
+    {
+        // Every kit piece hit 8 times from soft to hard (velocity response check).
+        const int notes[] = { 36, 38, 40, 37, 42, 46, 44, 48, 45, 43, 49, 57, 51, 53, 52 };
+        std::vector<Note> out;
+        double t = 0.0;
+        for (int note : notes)
+        {
+            for (int i = 0; i < 8; ++i)
+            {
+                out.push_back ({ note, t, 0.1, 16 + i * 16 > 127 ? 127 : 16 + i * 16 });
+                t += 0.45;
+            }
+            t += 0.6;
+        }
+        totalSeconds = t + 2.0;
+        return out;
     }
     if (name == "chords")
     {
@@ -144,6 +190,7 @@ juce::AudioBuffer<float> renderPhrase (juce::AudioProcessor& proc, const juce::S
     const int numIn = isEffect ? proc.getTotalNumInputChannels() : 0;
     const int numBuf = std::max (numIn, numOut);
     proc.setRateAndBufferSizeDetails (sr, block);
+    proc.setNonRealtime (true); // plugins that stream or load samples must finish loading first
     proc.prepareToPlay (sr, block);
     const auto input = isEffect ? effectTestSignal (sr, total) : juce::AudioBuffer<float>();
 
@@ -331,6 +378,7 @@ int cmdSnapshot (juce::AudioProcessor& proc, const Args& a)
     if (a.has ("--program"))
         proc.setCurrentProgram (a.get ("--program").getIntValue());
     proc.setPlayConfigDetails (0, 2, 48000.0, 256);
+    proc.setNonRealtime (true);   // plugins that stream samples finish loading before the picture
     proc.prepareToPlay (48000.0, 256);
 
     // Feed some audio so meters / scopes have something to draw.
@@ -385,6 +433,12 @@ int cmdStress (juce::AudioProcessor& proc, const Args& a)
         proc.setPlayConfigDetails (2, 2, sr, block);
         proc.prepareToPlay (sr, block);
     }
+
+    // One offline block first so sample-streaming plugins have their sounds loaded; the test itself is realtime.
+    proc.setNonRealtime (true);
+    buf.clear();
+    proc.processBlock (buf, midi);
+    proc.setNonRealtime (false);
 
     const auto t0 = std::chrono::steady_clock::now();
     for (int b = 0; b < blocks; ++b)

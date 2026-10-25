@@ -63,3 +63,12 @@ one sentence of what it is plus how to play it ("overlap notes to slide").
 
 Demo phrase target -9.5 LUFS, window -11.0 to -8.0, true peak <= -0.8 dBTP. Slammed presets end up
 with outGain around -5 to -8 dB; clean percussive ones need clip 0.4-0.6 to reach the window.
+
+## Kit presets (Kitroom)
+
+A drum preset = mic balance + tuning + bus processing + which recorded sound sits in each slot. The
+sound choice lives in `"extra": {"kit": {"kick": "drs_kick_dead", ...}}` (PresetManager extra hooks), so
+`preset_fill.py` keeps it. Character comes from: tuning (jazz high, ballad low), Decay (dead 70s toms),
+Close vs Overheads vs Room, glue/clip for density, width. Target -18 LUFS +-2 on the `drums` phrase;
+clean presets are peak-limited (crest ~21 dB), so give quiet ones a little glue rather than gain.
+

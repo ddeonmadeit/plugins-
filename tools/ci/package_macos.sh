@@ -1,14 +1,17 @@
 #!/usr/bin/env bash
 # Sign (ad-hoc) and package every built plugin for macOS.
-#   tools/ci/package_macos.sh [build-dir] [dist-dir]
+#   tools/ci/package_macos.sh [build-dir] [dist-dir] [libraries-dir]
 # Produces, per plugin:
 #   dist/<Plugin>-<version>-macOS.pkg   installer -> /Library/Audio/Plug-Ins/{VST3,Components}
-#   dist/<Plugin>-<version>-macOS.zip   bundles + Install.command + README.txt
+#                                       (+ /Library/Application Support/ddeonmadeit/<Plugin>/Library for sample libraries)
+#   dist/<Plugin>-<version>-macOS.zip   bundles (+ "<Plugin> Library") + Install.command + README.txt
+# README.txt is packaging/macos/README.txt followed by plugins/<Plugin>/README-mac.txt when it exists.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 BUILD="${1:-$ROOT/build}"
 DIST="${2:-$ROOT/dist}"
+LIBS="${3:-$ROOT/libraries}"
 mkdir -p "$DIST"
 
 # DD_ONLY=SubGrit restricts packaging to the plugins built for a release tag.
@@ -36,7 +39,16 @@ for i in $(seq 0 $((count - 1))); do
     rm -rf "$stage"; mkdir -p "$stage"
     ditto "$vst3" "$stage/$product.vst3"
     ditto "$au" "$stage/$product.component"
-    cp "$ROOT/packaging/macos/Install.command" "$ROOT/packaging/macos/README.txt" "$stage/"
+    lib="$LIBS/$target"
+    if [[ -f "$ROOT/plugins/$target/library/build_library.py" ]]; then
+        [[ -f "$lib/catalog.json" ]] || { echo "missing sample library $lib"; exit 1; }
+        ditto "$lib" "$stage/$product Library"
+    fi
+    cp "$ROOT/packaging/macos/Install.command" "$stage/"
+    cat "$ROOT/packaging/macos/README.txt" > "$stage/README.txt"
+    if [[ -f "$ROOT/plugins/$target/README-mac.txt" ]]; then
+        { echo; cat "$ROOT/plugins/$target/README-mac.txt"; } >> "$stage/README.txt"
+    fi
     chmod +x "$stage/Install.command"
     ditto -c -k --keepParent "$stage" "$DIST/$target-$version-macOS.zip"
 
@@ -54,7 +66,13 @@ for i in $(seq 0 $((count - 1))); do
              --version "$version" --install-location "/Library/Audio/Plug-Ins/VST3" "$pk/$target-vst3.pkg"
     pkgbuild --root "$pk/au" --component-plist "$pk/au.plist" --identifier "com.ddeonmadeit.$lower.au" \
              --version "$version" --install-location "/Library/Audio/Plug-Ins/Components" "$pk/$target-au.pkg"
-    productbuild --package "$pk/$target-vst3.pkg" --package "$pk/$target-au.pkg" "$DIST/$target-$version-macOS.pkg"
+    parts=(--package "$pk/$target-vst3.pkg" --package "$pk/$target-au.pkg")
+    if [[ -d "$stage/$product Library" ]]; then
+        pkgbuild --root "$stage/$product Library" --identifier "com.ddeonmadeit.$lower.library" --version "$version" \
+                 --install-location "/Library/Application Support/ddeonmadeit/$product/Library" "$pk/$target-library.pkg"
+        parts+=(--package "$pk/$target-library.pkg")
+    fi
+    productbuild "${parts[@]}" "$DIST/$target-$version-macOS.pkg"
 done
 
 rm -rf "$DIST/stage"

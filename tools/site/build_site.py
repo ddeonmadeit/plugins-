@@ -69,6 +69,7 @@ def main():
         entry = {"target": p["target"], "product": p["product"], "kind": p["kind"],
                  "tagline": s.get("tagline", ""), "description": s.get("description", ""),
                  "accent": s.get("accent", "#ff5a1f"), "highlights": s.get("highlights", []),
+                 "installTips": s.get("installTips", []), "previewNote": s.get("previewNote", ""),
                  "release": release, "previews": []}
 
         src = os.path.join(args.previews, p["target"])

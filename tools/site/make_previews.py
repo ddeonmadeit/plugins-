@@ -5,7 +5,8 @@ Render listening previews of every factory preset of one plugin for the download
   python3 tools/site/make_previews.py <Plugin> <out-dir> [--build-dir build] [--kind SYNTH|EFFECT]
 
 Instruments play the harness "groove" phrase (2 bars, 140 BPM) with light hats and claps mixed
-under them; effects process the harness's built-in test programme. Writes
+under them; effects process the harness's built-in test programme. A plugin's qa.json can override
+this with "previewPhrase" (e.g. "drums") and "previewBacking": false. Writes
 <out-dir>/<Plugin>/pNNN.mp3 and <out-dir>/<Plugin>/entries.json (name, category, description,
 file, waveform peaks). Needs ffmpeg, numpy, scipy, soundfile.
 """
@@ -72,15 +73,21 @@ def main():
         d = json.load(open(f))
         presets[(d.get("category", ""), d["name"])] = d
 
+    qa_path = os.path.join(ROOT, "plugins", args.plugin, "qa.json")
+    qa = json.load(open(qa_path)) if os.path.exists(qa_path) else {}
+    phrase = qa.get("previewPhrase", "groove" if kind == "SYNTH" else "demo")
+    backing = qa.get("previewBacking", kind == "SYNTH")
+
     tmp = tempfile.mkdtemp()
     try:
-        phrase = "groove" if kind == "SYNTH" else "demo"
         subprocess.run([harness, "render-all", "--phrase", phrase, "--outdir", tmp], check=True, stdout=subprocess.DEVNULL)
         entries = []
         for item in json.load(open(os.path.join(tmp, "index.json"))):
             x, sr = sf.read(os.path.join(tmp, item["file"]), always_2d=True)
-            mix = x * 0.9 + (drums(len(x), sr) if kind == "SYNTH" else 0.0)
-            mix = np.tanh(mix * 1.05) / np.tanh(1.05)
+            mix = x
+            if backing:
+                mix = x * 0.9 + drums(len(x), sr)
+                mix = np.tanh(mix * 1.05) / np.tanh(1.05)
             fade = int(0.05 * sr)
             mix[-fade:] *= np.linspace(1, 0, fade)[:, None]
             wav = os.path.join(tmp, "mix.wav")

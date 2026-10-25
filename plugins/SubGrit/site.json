@@ -8,5 +8,8 @@
     "Moog-style ladder filter, glide, release dive, tempo-synced LFO",
     "8 distortion types at 4x oversampling with Sub Keep for heavy-but-full low end",
     "Chorus, delay and space on the top only, so the sub stays mono"
+  ],
+  "installTips": [
+    "Notes play at real pitch: the classic 808 range is C2–C3 in FL's piano roll (or use the Octave knob)."
   ]
 }

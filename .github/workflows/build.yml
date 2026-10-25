@@ -29,11 +29,72 @@ permissions:
   contents: write   # publish releases and push the gh-pages branch
 
 jobs:
+  # Sample-based plugins (plugins/<Name>/library/build_library.py) get their sound library built once,
+  # from the sources it downloads, and cached; QA and the macOS installers restore it from the cache.
+  libraries:
+    name: Sample libraries
+    runs-on: ubuntu-24.04
+    outputs:
+      key: ${{ steps.key.outputs.key }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: key
+        run: echo "key=sample-libraries-v1-${{ hashFiles('plugins/*/library/**') }}" >> "$GITHUB_OUTPUT"
+
+      - id: cache
+        uses: actions/cache/restore@v4
+        with:
+          path: libraries
+          key: ${{ steps.key.outputs.key }}
+          enableCrossOsArchive: true
+          lookup-only: true
+
+      - name: Build sample libraries
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          set -eo pipefail
+          sudo apt-get update
+          sudo apt-get install -y unzip python3-numpy python3-scipy python3-soundfile
+          mkdir -p libraries
+          for builder in plugins/*/library/build_library.py; do
+            [[ -f "$builder" ]] || continue
+            p=$(basename "$(dirname "$(dirname "$builder")")")
+            python3 "$builder" --kits "$RUNNER_TEMP/kits" --out "libraries/$p" --download --discard-kits --jobs 3
+          done
+          du -sh libraries/*
+
+      - name: Save sample libraries
+        if: steps.cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: libraries
+          key: ${{ steps.key.outputs.key }}
+          enableCrossOsArchive: true
+
   linux-qa:
     name: Linux QA (presets, audio analysis, pluginval)
+    needs: libraries
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+
+      - name: Restore sample libraries
+        uses: actions/cache/restore@v4
+        with:
+          path: libraries
+          key: ${{ needs.libraries.outputs.key }}
+          enableCrossOsArchive: true
+          fail-on-cache-miss: true
+
+      - name: Point plugins at their libraries
+        run: |
+          # Kitroom reads $KITROOM_LIBRARY, and so on for any future sample-based plugin.
+          for d in libraries/*/; do
+            [[ -d "$d" ]] || continue
+            p=$(basename "$d")
+            echo "$(echo "$p" | tr '[:lower:]' '[:upper:]')_LIBRARY=$PWD/libraries/$p" >> "$GITHUB_ENV"
+          done
 
       - name: Install dependencies
         run: |
@@ -95,9 +156,26 @@ jobs:
 
   macos:
     name: macOS universal (VST3 + AU)
+    needs: libraries
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
+
+      - name: Restore sample libraries
+        uses: actions/cache/restore@v4
+        with:
+          path: libraries
+          key: ${{ needs.libraries.outputs.key }}
+          enableCrossOsArchive: true
+          fail-on-cache-miss: true
+
+      - name: Point plugins at their libraries
+        run: |
+          for d in libraries/*/; do
+            [[ -d "$d" ]] || continue
+            p=$(basename "$d")
+            echo "$(echo "$p" | tr '[:lower:]' '[:upper:]')_LIBRARY=$PWD/libraries/$p" >> "$GITHUB_ENV"
+          done
 
       - name: Pick plugins
         env:
@@ -151,7 +229,7 @@ jobs:
           cmake --build build --parallel --target $targets
 
       - name: Sign and package
-        run: tools/ci/package_macos.sh build dist
+        run: tools/ci/package_macos.sh build dist libraries
 
       - name: Validate Audio Units (auval)
         run: |

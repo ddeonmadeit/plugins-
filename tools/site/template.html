@@ -150,7 +150,7 @@ function installSteps(p) {
     "The first time, macOS says it can't verify the developer. Open System Settings → Privacy & Security, click Open Anyway, then run the .pkg again.",
     "In FL Studio: Options → Manage plugins → Find more plugins. " + p.product + " appears under " + (p.kind === "SYNTH" ? "Generators" : "Effects") + ".",
   ];
-  if (p.kind === "SYNTH") steps.push("Notes play at real pitch: the classic 808 range is C2–C3 in FL's piano roll (or use the Octave knob).");
+  steps.push(...(p.installTips || []));
   steps.forEach(s => ol.append(el("li", null, s)));
   const alt = el("li");
   alt.innerHTML = "No admin password? Download the .zip, unzip it, and run <code>bash ~/Downloads/" + p.product + "-*-macOS/Install.command</code> in Terminal.";
@@ -162,8 +162,8 @@ function installSteps(p) {
 function presetPlayer(p) {
   const wrap = el("section", "presets");
   wrap.append(el("h3", null, "Hear the presets"));
-  wrap.append(el("p", "note", p.previews.length + " presets, each rendered straight from the plugin" +
-    (p.kind === "SYNTH" ? " on the same two-bar 140 BPM line with light hats and claps." : " on the same test loop.")));
+  wrap.append(el("p", "note", p.previews.length + " presets, each rendered straight from the plugin " +
+    (p.previewNote || (p.kind === "SYNTH" ? "on the same two-bar 140 BPM line with light hats and claps." : "on the same test loop."))));
   const cats = [...new Set(p.previews.map(e => e.category))];
   const chips = el("div", "chips");
   const list = el("div");

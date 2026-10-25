@@ -1,0 +1,18 @@
+{
+  "publish": true,
+  "tagline": "Real acoustic drum kit, every piece on its own key",
+  "description": "Multi-mic recordings of two real drum kits (close, overhead and room mics), played back with velocity layers and round robin so every hit sounds different. Click any piece of the drawn kit to hear it, swap its sound or move its key; record the whole kit into one piano roll.",
+  "accent": "#e8a33d",
+  "highlights": [
+    "Kick, snare with sidestick, hi-hat (closed, half-open, open, pedal), 3 toms, 2 crashes, ride with bell, china",
+    "Swap any piece for another recorded sound of its kind, including a full brushes kit",
+    "Close, overhead and room mics per piece and for the whole kit, plus tune, decay, glue and width",
+    "General MIDI key map shown in FL Studio note names; re-learn any key from your keyboard",
+    "17 kit presets: studio, live room, vintage and jazz, tight funk and soul, big rooms"
+  ],
+  "installTips": [
+    "The .pkg also installs the drum sound library (about 230 MB). With the .zip, Install.command copies it for you.",
+    "Keys (FL names): kick C3, snare D3, sidestick C#3, closed hat F#3, pedal hat G#3, open hat A#3, toms C4 / A3 / G3, crashes C#4 / A4, ride D#4, bell F4, china E4."
+  ],
+  "previewNote": "on the same five-bar 96 BPM groove: ghost notes, open hat, a ride bar, a tom fill and crashes ringing out."
+}

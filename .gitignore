@@ -21,3 +21,6 @@ __pycache__/
 
 # Packaging output
 dist/
+
+# Sample libraries built from downloaded sources (plugins/*/library/build_library.py)
+libraries/

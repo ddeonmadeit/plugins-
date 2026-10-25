@@ -32,6 +32,7 @@ public:
     {
         juce::String name, category, author, description, sortKey;
         juce::var params;
+        juce::var extra;          // plugin-specific state that isn't a parameter (see onApplyExtra)
         bool isFactory = true;
         juce::File file;
     };
@@ -76,6 +77,13 @@ public:
     void readState (const juce::ValueTree& state);
 
     static juce::String sanitiseFileName (const juce::String& name);
+
+    /**
+        Optional hooks for state that isn't a parameter (e.g. which sample sits in a drum slot).
+        Presets carry it under "extra". apply is called with an empty var for "Init".
+    */
+    std::function<void (const juce::var& extra)> onApplyExtra;
+    std::function<juce::var()> onCaptureExtra;
 
 private:
     juce::AudioProcessorValueTreeState& apvts;

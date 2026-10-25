@@ -85,3 +85,16 @@ with `ffmpeg -b:a 128k`, and publish an Artifact page whose audio files go in th
 (`audio/p000.mp3` ...), not as data URIs. Group rows by category, show each preset's description and
 real settings as tags, draw waveform peaks precomputed in Python on a canvas with play progress.
 SubGrit's page: https://claude.ai/artifact/DTxARTUxVBPbuiynMGdjh3
+
+## Drums and other sample players
+
+- Phrases: `--phrase drums` (5 bars of real-drummer groove on the GM map) and `--phrase drumvel`
+  (every kit note at 8 velocities) -> `python3 tools/qa/drum_velocity.py out.wav` prints the attack level
+  per velocity (should follow ~40*log10(vel/127) dB and rise monotonically).
+- Sample plugins load in the background: the harness marks render/snapshot as non-realtime and the
+  processor waits for loads in that mode. Export `KITROOM_LIBRARY` (etc.) or renders are silent.
+- When measuring per-hit levels, subtract the power of what is still ringing just before the hit
+  (cymbal tails otherwise dominate soft hits).
+- After `normalize_presets.py` always rebuild, re-render **and re-analyze** before normalizing again:
+  it reads `report.json`, and a stale report applies the same correction twice.
+

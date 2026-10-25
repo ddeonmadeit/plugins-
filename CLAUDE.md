@@ -18,6 +18,7 @@ owner is happy. To ship an update, bump `VERSION` and push. Details: `.claude/sk
 | Start a new plugin (synth or effect) end to end | `.claude/skills/new-plugin/SKILL.md` |
 | Check how a plugin sounds without ears: render, analyze, fix | `.claude/skills/audio-qa/SKILL.md` |
 | Design bass / 808 / artist-style presets | `.claude/skills/preset-design/SKILL.md` |
+| Sample-based instrument (real drums etc.): sourcing, library pipeline, streaming, shipping samples | `.claude/skills/sample-plugin/SKILL.md` |
 | Build, sign, package and release for macOS / FL Studio | `.claude/skills/mac-release/SKILL.md` |
 | JUCE 9 API gotchas hit so far | `.claude/skills/juce-gotchas/SKILL.md` |
 
@@ -33,15 +34,16 @@ modules/dd_core           PresetManager (JSON factory + user presets), param <->
                           replaceStateExactly(), ScopeBuffer (lock-free audio -> UI)
 modules/dd_gui            LookAndFeel/Palette, Knob/Choice/Toggle, grid Panel, PresetBar, Scope
 plugins/<Name>/           one plugin: CMakeLists.txt, Source/, Presets/<CATEGORY>/NN_Name.json, qa.json,
-                          site.json (tagline, description, accent, highlights for the download page)
+                          site.json (tagline, description, accent, highlights, installTips for the download page),
+                          optional library/ (sample library builder) and README-mac.txt (zip README notes)
 templates/plugin/         scaffold used by tools/new_plugin.py (//@SYNTH //@EFFECT blocks)
 tools/harness/            generic headless CLI compiled per plugin (render, snapshot, stress, param-info)
-tools/qa/                 analyze.py (objective audio QA), preset_lint/fill/normalize, run_qa.sh
-tools/ci/                 plugin_meta.py (reads dd_add_plugin args + site.json), package_macos.sh
+tools/qa/                 analyze.py (objective audio QA), preset_lint/fill/normalize, run_qa.sh, drum_velocity.py
+tools/ci/                 plugin_meta.py (reads dd_add_plugin args + site.json), package_macos.sh (+ sample libraries)
 tools/site/               make_previews.py, build_site.py + template.html (download page), release_notes.py
 packaging/macos/          Install.command + README.txt shipped in the zip
-.github/workflows/        build.yml: Linux QA + previews, macOS universal build/sign/package/validate,
-                          GitHub Release on <Name>-v<ver> tags, download site -> gh-pages
+.github/workflows/        build.yml: sample libraries (built once, cached) -> Linux QA + previews and macOS
+                          universal build/sign/package/validate -> GitHub Release -> download site (gh-pages)
 ```
 
 ## Everyday commands
@@ -100,3 +102,4 @@ libfreetype-dev, libfontconfig1-dev, xvfb; Python: numpy, scipy, soundfile, matp
 | Plugin | Kind | Code | Notes |
 | --- | --- | --- | --- |
 | SubGrit | synth | Sgrt | 808 + distorted bass. 58 presets: TRAVIS, MIKE DEAN, UNTILJAPAN, YE, BOUNCE 808 |
+| Kitroom | synth | Ktrm | Live acoustic drum kit from multi-mic DrumGizmo recordings (CC BY 4.0): drawn kit UI, GM keys, swappable pieces, close/OH/room mics. 17 presets: STUDIO, LIVE ROOM, VINTAGE, TIGHT, BIG. Local QA needs `KITROOM_LIBRARY` (build it with `plugins/Kitroom/library/build_library.py`) |

@@ -23,6 +23,17 @@ shopt -s nullglob
 for b in *.vst3; do install_bundle "$b" "$VST3_DIR"; done
 for b in *.component; do install_bundle "$b" "$AU_DIR"; done
 
+# Sample libraries ("Kitroom Library" -> ~/Library/Application Support/ddeonmadeit/Kitroom/Library).
+for lib in *" Library"; do
+    [[ -d "$lib" ]] || continue
+    dest="$HOME/Library/Application Support/ddeonmadeit/${lib% Library}/Library"
+    rm -rf "$dest"
+    mkdir -p "$(dirname "$dest")"
+    ditto "$lib" "$dest"
+    xattr -dr com.apple.quarantine "$dest" 2>/dev/null || true
+    echo "  installed $dest"
+done
+
 # Make macOS re-scan Audio Units.
 killall -9 AudioComponentRegistrar 2>/dev/null || true
 

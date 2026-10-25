@@ -25,6 +25,11 @@ lines += [
     "",
     "No admin password? Use the .zip: unzip it and run `bash ~/Downloads/%s-%s-macOS/Install.command` in Terminal." % (plugin, version),
     "",
+]
+for t in site.get("installTips", []):
+    lines.append("- " + t)
+lines += [
+    "",
     "Previews of every preset and all other plugins: %s" % SITE_URL,
 ]
 print("\n".join(lines))

@@ -31,3 +31,8 @@ description: JUCE 9 / CMake API details and pitfalls already hit in this repo (c
   on `<Name>_Harness` (no LTO link, ~10 s incremental) and build `_VST3` only for pluginval.
 - Fetching JUCE: use `-DFETCHCONTENT_SOURCE_DIR_JUCE=<checkout>` to avoid re-cloning; the tag lives in the
   root CMakeLists.txt. Read JUCE's BREAKING_CHANGES.md before bumping it.
+- `-Wshadow` (part of the recommended warnings) fires on locals named like members, e.g. a FIFO
+  `const auto scope = fifo.write (1)` inside a processor that has a `scope` member. Name them `w` / `rd`.
+- An `AudioProcessor` that streams samples should honour `isNonRealtime()` (wait for loads): FL's export
+  and offline bounces render faster than real time and would otherwise skip notes.
+

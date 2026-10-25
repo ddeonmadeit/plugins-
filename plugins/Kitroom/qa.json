@@ -1,0 +1,9 @@
+{
+  "categories": ["STUDIO", "LIVE ROOM", "VINTAGE", "TIGHT", "BIG"],
+  "targetLufs": -18.0,
+  "toleranceLu": 2.0,
+  "similarBelow": 0.05,
+  "phrase": "drums",
+  "previewPhrase": "drums",
+  "previewBacking": false
+}

@@ -25,6 +25,7 @@ bool PresetManager::addFactoryPreset (const juce::String& json, const juce::Stri
     p.author      = parsed.getProperty ("author", "").toString();
     p.description = parsed.getProperty ("description", "").toString();
     p.params      = parsed.getProperty ("params", juce::var());
+    p.extra       = parsed.getProperty ("extra", juce::var());
     p.sortKey     = sortKey;
     p.isFactory   = true;
     presets.insert (numFactory++, p);
@@ -76,6 +77,7 @@ void PresetManager::rescanUserPresets()
             p.author = parsed.getProperty ("author", "").toString();
             p.description = parsed.getProperty ("description", "").toString();
             p.params = parsed.getProperty ("params", juce::var());
+            p.extra = parsed.getProperty ("extra", juce::var());
             p.isFactory = false;
             p.file = f;
             p.sortKey = f.getFileName();
@@ -118,6 +120,8 @@ bool PresetManager::loadPreset (int index)
     if (! juce::isPositiveAndBelow (index, presets.size()))
         return false;
     applyParams (presets.getReference (index).params);
+    if (onApplyExtra)
+        onApplyExtra (presets.getReference (index).extra);
     currentIndex = index;
     orphanName.clear();
     sendChangeMessage();
@@ -136,6 +140,8 @@ void PresetManager::loadRelative (int delta)
 void PresetManager::loadInit()
 {
     applyParams (juce::var (new juce::DynamicObject()));
+    if (onApplyExtra)
+        onApplyExtra (juce::var());
     currentIndex = -1;
     orphanName = "Init";
     sendChangeMessage();
@@ -177,6 +183,8 @@ bool PresetManager::saveUserPreset (const juce::String& rawName)
     obj->setProperty ("category", kUserCategory);
     obj->setProperty ("author", "user");
     obj->setProperty ("params", captureParams());
+    if (onCaptureExtra)
+        obj->setProperty ("extra", onCaptureExtra());
 
     const auto file = userDir.getChildFile (sanitiseFileName (name) + ".json");
     if (! file.replaceWithText (juce::JSON::toString (juce::var (obj), false)))

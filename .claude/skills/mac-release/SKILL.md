@@ -62,6 +62,11 @@ users may have linked to; ship a new version instead. Releases made by CI do not
   `/Library/Audio/Plug-Ins/VST3` and `/Library/Audio/Plug-Ins/Components`.
 - No-admin route: unzip, then in Terminal `bash ~/Downloads/<folder>/Install.command`. It copies to
   `~/Library/Audio/Plug-Ins/...` and strips the quarantine flag (unsigned plug-ins with that flag are blocked).
+- Sample-based plugins (Kitroom) also ship their sound library: the `.pkg` installs it to
+  `/Library/Application Support/ddeonmadeit/<Name>/Library`, `Install.command` copies the zip's
+  `<Name> Library` folder to `~/Library/Application Support/...`. CI builds it in the `libraries` job
+  (cached; see `.claude/skills/sample-plugin/SKILL.md`), the macOS job restores it and passes it to
+  `package_macos.sh build dist libraries`.
 - FL Studio: Options > Manage plugins > Find more plugins / Start scan; instruments show under Generators.
   If missing, add the folders above to "Plugin search paths". FL's piano roll names MIDI 60 "C5", so a
   real-pitch 808 lives around FL "C2-C3".

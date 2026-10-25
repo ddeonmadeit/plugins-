@@ -1,0 +1,527 @@
+{
+  "_comment": "Kits and how their DrumGizmo instruments become Kitroom sounds. close = close-mic channels summed (polarity/time auto-aligned to the first); every sound also gets the kit's overheads and room pairs.",
+  "kits": [
+    {
+      "id": "drs",
+      "name": "DRS Kit",
+      "finish": "#9b6534",
+      "dir": "DRSKit",
+      "kitxml": "DRSKit_full.xml",
+      "url": "https://drumgizmo.org/kits/DRSKit/DRSKit2_1.zip",
+      "md5": "8c4d4b61ad9d354b3b845edd5da9c133",
+      "credit": "DRSKit by DrumGizmo.org, recorded on a handcrafted kit lent by Jes Eiler (DRSDrums)",
+      "license": "CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)",
+      "page": "https://drumgizmo.org/wiki/doku.php?id=kits:drskit",
+      "overheads": [
+        "OHL",
+        "OHR"
+      ],
+      "room": [
+        "AmbL",
+        "AmbR"
+      ],
+      "overheadTrimDb": [
+        -1.0,
+        1.0
+      ],
+      "overheadCentreLag": -3,
+      "sounds": [
+        {
+          "id": "drs_kick",
+          "name": "DRS Kick",
+          "category": "kick",
+          "close": [
+            "Kdrum_back",
+            "Kdrum_front"
+          ],
+          "articulations": {
+            "hit": [
+              "Kdrum_without_contact"
+            ]
+          }
+        },
+        {
+          "id": "drs_kick_dead",
+          "name": "DRS Kick (buried beater)",
+          "category": "kick",
+          "close": [
+            "Kdrum_back",
+            "Kdrum_front"
+          ],
+          "articulations": {
+            "hit": [
+              "Kdrum_with_contact"
+            ]
+          }
+        },
+        {
+          "id": "drs_snare",
+          "name": "DRS Snare",
+          "category": "snare",
+          "close": [
+            "Snare_top",
+            "Snare_bottom"
+          ],
+          "articulations": {
+            "center": [
+              "Snare"
+            ],
+            "sidestick": [
+              "Snare_rim"
+            ]
+          }
+        },
+        {
+          "id": "drs_snare_brush",
+          "name": "DRS Snare (brushes)",
+          "category": "snare",
+          "close": [
+            "Snare_top",
+            "Snare_bottom"
+          ],
+          "articulations": {
+            "center": [
+              "Snare_whisker"
+            ]
+          }
+        },
+        {
+          "id": "drs_hihat",
+          "name": "Paiste 602 Hi-Hat",
+          "category": "hihat",
+          "close": [
+            "Hihat"
+          ],
+          "articulations": {
+            "closed": [
+              "Hihat_closed",
+              "Hihat_closed_shank"
+            ],
+            "half": [
+              "Hihat_semi_open"
+            ],
+            "open": [
+              "Hihat_open",
+              "Hihat_open_tip"
+            ],
+            "pedal": [
+              "Hihat_foot"
+            ]
+          }
+        },
+        {
+          "id": "drs_hihat_brush",
+          "name": "Paiste 602 Hi-Hat (brushes)",
+          "category": "hihat",
+          "close": [
+            "Hihat"
+          ],
+          "articulations": {
+            "closed": [
+              "Hihat_closed_whisker"
+            ],
+            "open": [
+              "Hihat_open_whisker"
+            ],
+            "pedal": [
+              "Hihat_foot"
+            ]
+          }
+        },
+        {
+          "id": "drs_tom1",
+          "name": "DRS Rack Tom",
+          "category": "tom",
+          "close": [
+            "Tom1"
+          ],
+          "articulations": {
+            "hit": [
+              "Tom1"
+            ]
+          }
+        },
+        {
+          "id": "drs_tom2",
+          "name": "DRS Floor Tom 1",
+          "category": "tom",
+          "close": [
+            "Tom2"
+          ],
+          "articulations": {
+            "hit": [
+              "Tom2"
+            ]
+          }
+        },
+        {
+          "id": "drs_tom3",
+          "name": "DRS Floor Tom 2",
+          "category": "tom",
+          "close": [
+            "Tom3"
+          ],
+          "articulations": {
+            "hit": [
+              "Tom3"
+            ]
+          }
+        },
+        {
+          "id": "drs_tom1_brush",
+          "name": "DRS Rack Tom (brushes)",
+          "category": "tom",
+          "close": [
+            "Tom1"
+          ],
+          "articulations": {
+            "hit": [
+              "Tom1_whisker"
+            ]
+          }
+        },
+        {
+          "id": "drs_tom2_brush",
+          "name": "DRS Floor Tom 1 (brushes)",
+          "category": "tom",
+          "close": [
+            "Tom2"
+          ],
+          "articulations": {
+            "hit": [
+              "Tom2_whisker"
+            ]
+          }
+        },
+        {
+          "id": "drs_tom3_brush",
+          "name": "DRS Floor Tom 2 (brushes)",
+          "category": "tom",
+          "close": [
+            "Tom3"
+          ],
+          "articulations": {
+            "hit": [
+              "Tom3_whisker"
+            ]
+          }
+        },
+        {
+          "id": "drs_crash_beat",
+          "name": "Paiste Giant Beat Crash",
+          "category": "cymbal",
+          "close": [],
+          "articulations": {
+            "hit": [
+              "Crash_left_tip",
+              "Crash_left_shank"
+            ]
+          }
+        },
+        {
+          "id": "drs_crash_602",
+          "name": "Paiste 602 Crash",
+          "category": "cymbal",
+          "close": [],
+          "articulations": {
+            "hit": [
+              "Crash_right_tip",
+              "Crash_right_shank"
+            ]
+          }
+        },
+        {
+          "id": "drs_crash_beat_brush",
+          "name": "Giant Beat Crash (brushes)",
+          "category": "cymbal",
+          "close": [],
+          "articulations": {
+            "hit": [
+              "Crash_left_whisker"
+            ]
+          }
+        },
+        {
+          "id": "drs_ride",
+          "name": "Paiste 602 Ride",
+          "category": "ride",
+          "close": [
+            "Ride"
+          ],
+          "articulations": {
+            "bow": [
+              "Ride_tip"
+            ],
+            "bell": [
+              "Ride_tip_bell",
+              "Ride_shank_bell"
+            ]
+          }
+        },
+        {
+          "id": "drs_ride_chain",
+          "name": "Paiste 602 Ride + Sizzle Chain",
+          "category": "ride",
+          "close": [
+            "Ride"
+          ],
+          "articulations": {
+            "bow": [
+              "Ride_tip_chain"
+            ],
+            "bell": [
+              "Ride_tip_bell_chain"
+            ]
+          }
+        },
+        {
+          "id": "drs_ride_brush",
+          "name": "Paiste 602 Ride (brushes)",
+          "category": "ride",
+          "close": [
+            "Ride"
+          ],
+          "articulations": {
+            "bow": [
+              "Ride_whisker"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "muldjord",
+      "name": "Muldjord Kit",
+      "finish": "#6b1a22",
+      "dir": "MuldjordKit3",
+      "kitxml": "MuldjordKit3.xml",
+      "url": "https://drumgizmo.org/kits/MuldjordKit/MuldjordKit3.zip",
+      "md5": "8a66a3e90bbf15687b2d34fd355024f2",
+      "credit": "MuldjordKit by Lars Muldjord / DrumGizmo.org (Tama Superstar). Drum samples provided by DrumGizmo.org",
+      "license": "CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)",
+      "page": "https://drumgizmo.org/wiki/doku.php?id=kits:muldjordkit",
+      "overheads": [
+        "OHL",
+        "OHR"
+      ],
+      "room": [
+        "AmbL",
+        "AmbR"
+      ],
+      "overheadTrimDb": [
+        0.0,
+        0.0
+      ],
+      "overheadCentreLag": -12,
+      "sounds": [
+        {
+          "id": "mj_kick_l",
+          "name": "Tama Superstar Kick L",
+          "category": "kick",
+          "close": [
+            "KdrumL"
+          ],
+          "articulations": {
+            "hit": [
+              "KdrumL"
+            ]
+          }
+        },
+        {
+          "id": "mj_kick_r",
+          "name": "Tama Superstar Kick R",
+          "category": "kick",
+          "close": [
+            "KdrumR"
+          ],
+          "articulations": {
+            "hit": [
+              "KdrumR"
+            ]
+          }
+        },
+        {
+          "id": "mj_snare",
+          "name": "Tama Superstar Snare",
+          "category": "snare",
+          "close": [
+            "Snare_top",
+            "Snare_bottom"
+          ],
+          "articulations": {
+            "center": [
+              "Snare"
+            ],
+            "sidestick": [
+              "SnareRest"
+            ]
+          }
+        },
+        {
+          "id": "mj_hihat",
+          "name": "Muldjord Hi-Hat",
+          "category": "hihat",
+          "close": [
+            "Hihat"
+          ],
+          "articulations": {
+            "closed": [
+              "HihatClosed"
+            ],
+            "open": [
+              "HihatOpen"
+            ]
+          }
+        },
+        {
+          "id": "mj_tom1",
+          "name": "Tama Rack Tom 1",
+          "category": "tom",
+          "close": [
+            "Tom1"
+          ],
+          "articulations": {
+            "hit": [
+              "Tom1"
+            ]
+          }
+        },
+        {
+          "id": "mj_tom2",
+          "name": "Tama Rack Tom 2",
+          "category": "tom",
+          "close": [
+            "Tom2"
+          ],
+          "articulations": {
+            "hit": [
+              "Tom2"
+            ]
+          }
+        },
+        {
+          "id": "mj_tom3",
+          "name": "Tama Rack Tom 3",
+          "category": "tom",
+          "close": [
+            "Tom3"
+          ],
+          "articulations": {
+            "hit": [
+              "Tom3"
+            ]
+          }
+        },
+        {
+          "id": "mj_tom4",
+          "name": "Tama Floor Tom",
+          "category": "tom",
+          "close": [
+            "Tom4"
+          ],
+          "articulations": {
+            "hit": [
+              "Tom4"
+            ]
+          }
+        },
+        {
+          "id": "mj_crash_l",
+          "name": "Muldjord Crash L",
+          "category": "cymbal",
+          "close": [],
+          "articulations": {
+            "hit": [
+              "CrashL"
+            ]
+          }
+        },
+        {
+          "id": "mj_crash_r",
+          "name": "Muldjord Crash R",
+          "category": "cymbal",
+          "close": [],
+          "articulations": {
+            "hit": [
+              "CrashR"
+            ]
+          }
+        },
+        {
+          "id": "mj_china",
+          "name": "Muldjord China",
+          "category": "cymbal",
+          "close": [],
+          "articulations": {
+            "hit": [
+              "China"
+            ]
+          }
+        },
+        {
+          "id": "mj_ride_l",
+          "name": "Muldjord Ride L",
+          "category": "ride",
+          "close": [
+            "RideL"
+          ],
+          "articulations": {
+            "bow": [
+              "RideL"
+            ],
+            "bell": [
+              "RideLBell"
+            ]
+          }
+        },
+        {
+          "id": "mj_ride_r",
+          "name": "Muldjord Ride R",
+          "category": "ride",
+          "close": [
+            "RideR"
+          ],
+          "articulations": {
+            "bow": [
+              "RideR"
+            ],
+            "bell": [
+              "RideRBell"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "processing": {
+    "maxSeconds": {
+      "kick": 2.5,
+      "snare": 2.5,
+      "tom": 4.5,
+      "hihat": 6.0,
+      "cymbal": 10.0,
+      "ride": 10.0
+    },
+    "peakTargetDb": {
+      "kick": -2.0,
+      "snare": -2.0,
+      "tom": -3.0,
+      "hihat": -9.0,
+      "cymbal": -6.0,
+      "ride": -8.0
+    },
+    "closeToOverheadRatio": {
+      "kick": 2.2,
+      "snare": 1.8,
+      "tom": 1.8,
+      "hihat": 1.0,
+      "ride": 0.8
+    },
+    "tailFloorDb": -72.0,
+    "alignMaxLagSamples": {
+      "kick": 150,
+      "snare": 40
+    },
+    "maxGainDb": 20.0
+  }
+}

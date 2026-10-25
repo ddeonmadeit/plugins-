@@ -5,7 +5,9 @@ description: Create a new audio plugin (synth or effect) in this repo end to end
 
 # New plugin, end to end
 
-Order matters: each step has a check before the next one starts.
+Order matters: each step has a check before the next one starts. If the plugin must sound like a real
+recorded instrument (acoustic drums, piano, guitar...), read `.claude/skills/sample-plugin/SKILL.md`
+too: it covers sourcing recordings, the sample library pipeline and shipping the library.
 
 ## 1. Scaffold (2 min)
 
@@ -66,8 +68,9 @@ cmake --build build --target MyThing_Harness MyThing_VST3 -j4
 PLUGINVAL=<pluginval> tools/qa/run_qa.sh MyThing
 ```
 
-Fill in `plugins/MyThing/site.json` (tagline, description, accent colour, highlights): it drives the
-plugin's card on the download page and its release notes. Leave `"publish": false` until the owner has
+Fill in `plugins/MyThing/site.json` (tagline, description, accent colour, highlights, optional
+`installTips` and `previewNote`): it drives the plugin's card on the download page and its release
+notes. Plugin-specific notes for the zip's README go in `plugins/MyThing/README-mac.txt`. Leave `"publish": false` until the owner has
 tried it; setting it to true (with an unreleased VERSION) releases it on the next push to main. Then follow `.claude/skills/mac-release/SKILL.md`
 to release it. The workflow builds every plugin under `plugins/` automatically and the download page
 picks it up; nothing to add to CI.
