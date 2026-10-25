@@ -121,7 +121,10 @@ private:
         }
         else
         {
-            const float from = canGlide ? currentPitchOr (note) : (float) note;
+            // Poly: chords never glide (every note would swoop in from the last one); single lines
+            // still slide when the preset glides on every note.
+            const bool polyGlide = canGlide && ! overlapping && settings.glideAlways;
+            const float from = polyGlide ? currentPitchOr (note) : (float) note;
             for (auto& v : voices)
                 if (v.isGateOn() && v.getNote() == note)
                     v.release();

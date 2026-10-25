@@ -4,7 +4,7 @@
 
       <Plugin>Harness list
       <Plugin>Harness render  --out x.wav [--program N | --preset-file p.json] [--set id=value ...]
-                              [--phrase demo|single|slide|groove|chords|pads|drums|drumvel] [--sr 48000] [--block 256] [--mono]
+                              [--phrase demo|single|slide|groove|chords|pads|mixed|drums|drumvel] [--sr 48000] [--block 256] [--mono]
       <Plugin>Harness render-all --outdir dir [--phrase demo] [--sr 48000]
       <Plugin>Harness snapshot --out ui.png [--program N] [--scale 1]
       <Plugin>Harness stress  [--seconds 20] [--sr 48000] [--block 128]
@@ -102,6 +102,30 @@ std::vector<Note> phrase (const juce::String& name, double& totalSeconds)
             for (int note : chords[c])
                 if (note >= 0)
                     out.push_back ({ note, c * 4.0, 3.85, 92 });
+        totalSeconds = 16.0 + 4.0;
+        return out;
+    }
+    if (name == "mixed")
+    {
+        // Everything a pad / keys / pluck patch gets played with, 120 BPM: a held Dm9, an eighth-note
+        // arpeggio over a Bb bass, Fmaj7 stabs into a held chord, then a legato melody.
+        std::vector<Note> out;
+        for (int note : { 50, 57, 60, 64, 65 })
+            out.push_back ({ note, 0.0, 3.85, 92 });
+        out.push_back ({ 46, 4.0, 3.85, 90 });
+        const int arp[8] = { 58, 62, 65, 69, 70, 69, 65, 62 };
+        for (int i = 0; i < 16; ++i)
+            out.push_back ({ arp[i % 8], 4.0 + i * 0.25, 0.22, 80 + (i % 4 == 0 ? 30 : (i * 7) % 20) });
+        for (double t : { 8.0, 8.75, 9.5 })
+            for (int note : { 53, 57, 60, 64 })
+                out.push_back ({ note, t, t < 9.0 ? 0.4 : 2.35, 100 });
+        const std::pair<int, double> melody[5] = { { 69, 0.5 }, { 67, 0.5 }, { 65, 0.5 }, { 64, 1.0 }, { 62, 1.4 } };
+        double t = 12.0;
+        for (auto [note, len] : melody)
+        {
+            out.push_back ({ note, t, len + 0.03, 96 });
+            t += len;
+        }
         totalSeconds = 16.0 + 4.0;
         return out;
     }
@@ -504,6 +528,12 @@ int main (int argc, char* argv[])
 
     const auto cmd = a.raw.isEmpty() ? juce::String ("list") : a.raw[0];
     std::unique_ptr<juce::AudioProcessor> proc (createPluginFilter());
+
+    // Render presets as designed: performance switches ("perf*", e.g. Poly) off unless --perf is given.
+    if (! a.has ("--perf"))
+        for (auto* p : proc->getParameters())
+            if (auto* rp = dynamic_cast<juce::RangedAudioParameter*> (p); rp != nullptr && dd::isPerformanceParam (rp->getParameterID()))
+                rp->setValueNotifyingHost (0.0f);
 
     int rc = 0;
     if (cmd == "list")             rc = cmdList (*proc);

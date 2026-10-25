@@ -119,6 +119,7 @@ const std::array<ParamSpec, (size_t) kNumParams>& table()
         { P::clip,       "clip",       "Clip",         K::Float, 0, 1, 0.2f, 0, U::Percent, nullptr },
         { P::width,      "width",      "Width",        K::Float, 0, 1.5f, 1, 0, U::Percent, nullptr },
         { P::outGain,    "outGain",    "Output",       K::Float, -24, 12, 0, 0, U::Db, nullptr },
+        { P::perfPoly,   "perfPoly",   "Poly Keys",    K::Bool,   0, 1, 1, 0, U::None, nullptr },
     }};
     return t;
 }

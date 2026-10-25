@@ -2,7 +2,7 @@ dd_add_plugin(SubGrit
     PRODUCT_NAME "SubGrit"
     PLUGIN_CODE  Sgrt
     KIND         SYNTH
-    VERSION      1.1.0
+    VERSION      1.2.0
     PRESETS_DIR  Presets
     SOURCES
         Source/PluginProcessor.cpp

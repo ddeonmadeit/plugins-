@@ -18,13 +18,17 @@ $H render-all --outdir qa-out/<Name>/renders                                  # 
 $H stress --seconds 20 [--block 1] [--sr 96000]       # random notes + param jumps + program changes
 xvfb-run -a -s "-screen 0 2560x1600x24" $H snapshot --out ui.png [--program N]
 python3 tools/qa/analyze.py <dir> --sheet --target-lufs -9.5 --tolerance 1.5 --similar 0.2
+python3 tools/qa/variety.py <dir> [<older dir>]         # do the presets play like different instruments?
 tools/qa/run_qa.sh <Name>                              # all of the above, exits non-zero on failure
+$H render --program N --perf --out x.wav               # keep perf* switches (POLY) at their defaults
 ```
 
 Renders are 32-bit float WAV at 48 kHz with the plugin latency removed. Effects get a built-in test
 programme (kick drops, hats, saw chord) on their input automatically.
 The `demo` phrase: long note, two bouncy repeats, an overlapping pair (tests glide), a fast double,
-a final note with tail. `single` is one 55 Hz note (use for harmonic analysis).
+a final note with tail. `single` is one 55 Hz note (use for harmonic analysis). `pads` is four held
+chords; `mixed` (Afterglow) is a held chord, an eighth-note arpeggio, stabs and a legato melody, so pads,
+keys and plucks are all measured fairly. `drums` / `drumvel` are Kitroom grooves.
 
 ## Reading analyze.py
 

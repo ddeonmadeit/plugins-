@@ -48,7 +48,7 @@ private:
     juce::dsp::FFT fft { kFftOrder };
     juce::dsp::WindowingFunction<float> window { (size_t) kFftSize, juce::dsp::WindowingFunction<float>::hann };
     std::array<float, kFftSize * 2> fftData {};
-    std::array<float, kRidge> ridge {}, nearBase {}, farBase {};
+    std::array<float, kRidge> ridge {}, nearBase {}, midBase {}, farBase {};
     std::vector<juce::Point<float>> stars;
     float level = 0.0f, time = 0.0f;
     bool dragging = false, overSun = false;

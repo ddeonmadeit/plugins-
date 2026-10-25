@@ -40,7 +40,8 @@ plugins/<Name>/           one plugin: CMakeLists.txt, Source/, Presets/<CATEGORY
                           optional library/ (sample library builder) and README-mac.txt (zip README notes)
 templates/plugin/         scaffold used by tools/new_plugin.py (//@SYNTH //@EFFECT blocks)
 tools/harness/            generic headless CLI compiled per plugin (render, snapshot, stress, param-info)
-tools/qa/                 analyze.py (objective audio QA), preset_lint/fill/normalize, run_qa.sh, drum_velocity.py
+tools/qa/                 analyze.py (objective audio QA), variety.py (presets = different instruments?),
+                          preset_lint/fill/normalize, run_qa.sh, drum_velocity.py
 tools/ci/                 plugin_meta.py (reads dd_add_plugin args + site.json), package_macos.sh (+ sample libraries)
 tools/site/               make_previews.py, build_site.py + template.html (download page), release_notes.py
 packaging/macos/          Install.command + README.txt shipped in the zip
@@ -82,6 +83,10 @@ libfreetype-dev, libfontconfig1-dev, xvfb; Python: numpy, scipy, soundfile, matp
 - `setStateInformation` must use `dd::replaceStateExactly()` (pluginval fails with plain `replaceState`).
 - Process audio in fixed internal chunks (SubGrit: 64) so oversamplers and smoothers see bounded sizes;
   never assume the host block size.
+- Performance switches (`perf*` ids, e.g. `perfPoly`) belong to the instance, never to presets; see
+  new-plugin skill. Every synth plays chords (POLY switch) even when its presets are mono.
+- Presets must be genuinely different instruments, not one patch with different effects: plan roles per
+  category and check `tools/qa/variety.py` (preset-design skill).
 - Presets: JSON in real units, **every parameter listed** (run `tools/qa/preset_fill.py`), loudness-matched
   through the output gain param (`tools/qa/normalize_presets.py`). File names must be unique across folders
   (binary data uses the bare file name). Category order comes from the processor's `categoryOrder()`.
@@ -100,6 +105,9 @@ Text is cream print (`Palette::text`) or faded tan (`Palette::dim`).
   bakelite with a knurled skirt and a lit scale arc. Wordmark: `LookAndFeel::display()` + `paintSunsetStripes`.
 - Use `LookAndFeel::font()` / `display()` for all text (embedded font, identical on macOS and Linux) and
   `drawPrinted()` for text on faceplates.
+- **No flat, dull or muddy objects** (owner, Afterglow 1.0 feedback): everything has depth (shadows, bevels,
+  sockets, inner shadows, glows), and tones are either deep dark or vibrant sunset, never mid-brown mush.
+  Still matte: soft light, no plastic gloss.
 - Drawn scenes (Kitroom's kit) follow the same light: dark room, warm tungsten spotlights from above,
   film grain and vignette, crisp labels on top.
 
@@ -117,6 +125,6 @@ Text is cream print (`Palette::text`) or faded tan (`Palette::dim`).
 
 | Plugin | Kind | Code | Notes |
 | --- | --- | --- | --- |
-| SubGrit | synth | Sgrt | 808 + distorted bass. 58 presets: TRAVIS, MIKE DEAN, UNTILJAPAN, YE, BOUNCE 808 |
-| Kitroom | synth | Ktrm | Live acoustic drum kit from multi-mic DrumGizmo recordings (CC BY 4.0): drawn kit UI, GM keys, swappable pieces, close/OH/room mics. 17 presets: STUDIO, LIVE ROOM, VINTAGE, TIGHT, BIG. Local QA needs `KITROOM_LIBRARY` (build it with `plugins/Kitroom/library/build_library.py`) |
-| Afterglow | synth | Aglw | Pads / strings / ear candy / soundscapes. Deep two-layer engine (7 sources) + FX, but the panel is macro-first: a sunset "orb" display (Motion / Tone) and 6 macros. 50 presets: TAME IMPALA, MASSIVE ATTACK, BRENT FAIYAZ, MIKE DEAN, TRAVIS SCOTT |
+| SubGrit | synth | Sgrt | 808 + distorted bass, POLY switch. 68 presets: TRAVIS, MIKE DEAN, UNTILJAPAN, YE, YEEZUS, BOUNCE 808 |
+| Kitroom | synth | Ktrm | Live acoustic drum kit from multi-mic DrumGizmo recordings (CC BY 4.0): drawn kit UI, GM keys, swappable pieces, close/OH/room mics, bus drive/crush/tone. 24 presets: STUDIO, LIVE ROOM, VINTAGE, TIGHT, BIG, YEEZUS. Local QA needs `KITROOM_LIBRARY` (build it with `plugins/Kitroom/library/build_library.py`) |
+| Afterglow | synth | Aglw | Pads, keys, plucks, leads, bells, soundscapes. Deep two-layer engine (11 sources incl. pluck, organ, mallet, sync) + Dirt + FX, but the panel is macro-first: a sunset "orb" display (Motion / Tone), 6 macros, POLY switch. 60 presets (each a different role): TAME IMPALA, MASSIVE ATTACK, BRENT FAIYAZ, MIKE DEAN, TRAVIS SCOTT, YEEZUS |

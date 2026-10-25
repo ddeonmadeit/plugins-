@@ -2,7 +2,7 @@
   "name": "Highest Dread",
   "category": "TRAVIS SCOTT",
   "author": "ddeonmadeit",
-  "description": "Dark gritty string drone with a breath on top, crushed and saturated. Hold low chords.",
+  "description": "Dark gritty string drone with a breath on top, saturated and slowly churning. Hold low chords.",
   "params": {
     "aOn": true,
     "aSource": "Strings",
@@ -104,7 +104,7 @@
     "highCut": 18000.0,
     "width": 1.0,
     "glue": 0.15,
-    "outGain": 1.6,
+    "outGain": 4.2,
     "mTone": 0.0,
     "mMotion": 0.0,
     "mSpace": 0.0,
@@ -112,6 +112,11 @@
     "mGrit": 0.0,
     "mSwell": 0.0,
     "mTail": 0.0,
-    "mBlend": 0.0
+    "mBlend": 0.0,
+    "distOn": false,
+    "distType": "Fuzz",
+    "distDrive": 0.4,
+    "distMix": 1.0,
+    "distTone": 0.0
   }
 }

@@ -10,8 +10,8 @@ namespace kitroom
 enum class SP { Volume, Pan, Tune, Decay, Close, Overheads, Room, count };
 constexpr int kSlotParams = (int) SP::count;
 
-/** Master parameters. */
-enum class MP { Close, Overheads, Room, VelCurve, Humanize, Glue, Clip, Width, Output, count };
+/** Master parameters. Append only: ids are permanent and old sessions load the defaults for new ones. */
+enum class MP { Close, Overheads, Room, VelCurve, Humanize, Glue, Clip, Width, Output, Drive, DriveType, Crush, Tone, count };
 constexpr int kMasterParams = (int) MP::count;
 
 juce::String slotParamId (int slot, SP p);

@@ -98,7 +98,8 @@ private:
         const bool overlapping = ! held.empty();
         held.push_back (note);
 
-        const bool canGlide = settings.glideMs > 0.0f && lastPitch >= 0.0f;
+        // Chords never glide in poly (every note would swoop in from the last one); single lines do.
+        const bool canGlide = settings.glideMs > 0.0f && lastPitch >= 0.0f && (mono() || ! overlapping);
         const float from = canGlide ? currentPitchOr (note) : (float) note;
         lastPitch = (float) note;
 

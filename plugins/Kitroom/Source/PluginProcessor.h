@@ -95,6 +95,10 @@ private:
 
     dd::Svf sideLowCut[2];   // LR4 high-pass on the side signal: lows stay mono whatever the rooms do
     dd::GlueCompressor glue;
+    dd::Dirt dirt;           // Drive: industrial distortion on the whole kit (always in the path, so latency is fixed)
+    dd::Crusher crusher;
+    dd::Biquad toneShelf[2];
+    float lastTone = -9.0f;
     dd::Clipper clipper;
     juce::SmoothedValue<float> outGainSm { 1.0f }, widthSm { 1.0f };
     double sr = 44100.0;

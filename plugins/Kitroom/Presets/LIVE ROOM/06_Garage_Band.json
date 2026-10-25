@@ -82,7 +82,11 @@
     "glue": 0.55,
     "clip": 0.3,
     "width": 1.0,
-    "outGain": -6.4
+    "outGain": -6.4,
+    "drive": 0.0,
+    "driveType": "Tube",
+    "crush": 0.0,
+    "tone": 0.0
   },
   "extra": {
     "kit": {

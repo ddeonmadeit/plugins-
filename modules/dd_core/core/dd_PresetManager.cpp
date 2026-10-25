@@ -209,6 +209,8 @@ juce::var captureParameterValues (juce::AudioProcessor& processor)
             continue;
 
         const auto id = rp->getParameterID();
+        if (isPerformanceParam (id))
+            continue;
         if (auto* c = dynamic_cast<juce::AudioParameterChoice*> (rp))
             obj->setProperty (id, c->getCurrentChoiceName());
         else if (auto* b = dynamic_cast<juce::AudioParameterBool*> (rp))
@@ -235,6 +237,8 @@ juce::StringArray applyParameterValues (juce::AudioProcessor& processor, const j
 
         const auto id = rp->getParameterID();
         known.add (id);
+        if (isPerformanceParam (id))
+            continue;
         float norm = rp->getDefaultValue();
 
         if (values.hasProperty (id))
@@ -300,5 +304,14 @@ void PresetManager::readState (const juce::ValueTree& state)
     currentIndex = indexOf (name, cat);
     orphanName = currentIndex < 0 ? name : juce::String();
     sendChangeMessage();
+}
+void keepOldDefault (juce::AudioProcessorValueTreeState& apvts, const juce::ValueTree& savedState,
+                     const juce::String& paramId, float oldValue)
+{
+    for (const auto& child : savedState)
+        if (child.getProperty ("id").toString() == paramId)
+            return;
+    if (auto* p = apvts.getParameter (paramId))
+        p->setValueNotifyingHost (p->convertTo0to1 (oldValue));
 }
 } // namespace dd

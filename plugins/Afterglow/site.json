@@ -1,17 +1,28 @@
 {
   "publish": true,
-  "tagline": "Pads, textures and soundscapes, artist-inspired",
-  "description": "A two-layer synth for pads, strings, ear candy and soundscapes, played from a sunset horizon instead of a wall of knobs: drag the sun for motion and tone, shape the rest with six macros. 50 presets inspired by Tame Impala, Massive Attack, Brent Faiyaz, Mike Dean and Travis Scott.",
+  "tagline": "Pads, keys, plucks and soundscapes, artist-inspired",
+  "description": "A two-layer synth for pads, keys, plucks, leads, bells and soundscapes, played from a sunset horizon instead of a wall of knobs: drag the sun for motion and tone, shape the rest with six macros. 60 presets inspired by Tame Impala, Massive Attack, Brent Faiyaz, Mike Dean, Travis Scott and Yeezus, from bare and soft to extreme.",
   "accent": "#ec7d2e",
   "highlights": [
-    "Seven sources per layer: Juno-style analog, string machine, formant choir, FM glass, electric piano tines, pitched air, sine",
-    "Tape wow and saturation, lo-fi, Juno / Solina ensemble, phaser, dub delay, shimmer reverb, tempo pump and gate",
+    "Eleven sources per layer: Juno-style analog, string machine, formant choir, FM glass, electric piano, pitched air, sine, plucked string, drawbar organ, mallets (marimba, vibes, kalimba, glock, steel) and hard sync",
+    "Dirt (8 distortion types), tape wow and saturation, lo-fi, Juno / Solina ensemble, phaser, dub delay, shimmer reverb, tempo pump and gate",
     "Drag the sun to set Motion and Tone; Swell, Tail, Blend, Grit, Echo and Space reshape any preset",
-    "50 presets: TAME IMPALA, MASSIVE ATTACK, BRENT FAIYAZ, MIKE DEAN, TRAVIS SCOTT"
+    "POLY switch: play chords with any preset, even the mono leads",
+    "60 presets: TAME IMPALA, MASSIVE ATTACK, BRENT FAIYAZ, MIKE DEAN, TRAVIS SCOTT, YEEZUS"
   ],
   "installTips": [
     "Every macro's centre position is the preset as designed: double-click a knob, or the sun, to go back to it.",
     "Pump, gate, delay and synced LFOs follow FL Studio's tempo."
   ],
-  "previewNote": "on the same four-chord progression (Dm9, Bbmaj7, Fmaj7, Am7) at 120 BPM; mono leads play the top line."
+  "previewNote": "on the same 120 BPM phrase: a held Dm9, an arpeggio over Bb, Fmaj7 stabs, then a legato melody.",
+  "whatsNew": {
+    "version": "1.1.0",
+    "items": [
+      "The whole preset bank is redesigned so every preset is its own instrument: harp, harpsichord, nylon guitar, organs, vibes, kalimba, glock, felt keys, talkbox, harmonica, basses, drones and rain, not just pads",
+      "Four new sources: plucked string, drawbar organ, mallets and hard sync",
+      "YEEZUS: 10 new industrial presets, and a new Dirt distortion stage with 8 types",
+      "POLY switch: play chords with any preset",
+      "Deeper look: layered mountains, a blooming sun, glowing lamps and knobs set into the panel"
+    ]
+  }
 }

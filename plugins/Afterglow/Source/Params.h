@@ -37,6 +37,10 @@ enum class P
     // Macros (the front panel): bipolar, 0 = the preset as designed
     mTone, mMotion, mSpace, mEcho, mGrit, mSwell, mTail, mBlend,
 
+    // Added in 1.1 (append only: ids are permanent)
+    distOn, distType, distDrive, distMix, distTone,
+    perfPoly,   // performance switch: belongs to the instance, never to a preset (see dd::isPerformanceParam)
+
     count
 };
 

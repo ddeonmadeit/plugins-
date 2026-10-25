@@ -3,6 +3,10 @@
 namespace dd
 {
 /** Every parameter of `processor` as {id: value} in real units (choices by name, bools as bool). */
+/** Performance parameters (ids starting with "perf", e.g. "perfPoly") belong to the plugin instance,
+    not the sound: presets never apply or capture them, so they survive preset changes. */
+inline bool isPerformanceParam (const juce::String& id) { return id.startsWith ("perf"); }
+
 juce::var captureParameterValues (juce::AudioProcessor& processor);
 
 /** Applies {id: value}; parameters not mentioned are reset to their defaults. Returns unknown ids. */
@@ -14,6 +18,12 @@ juce::StringArray applyParameterValues (juce::AudioProcessor& processor, const j
     wrong; this forces every parameter to exactly what the saved state says.
 */
 void replaceStateExactly (juce::AudioProcessorValueTreeState& apvts, const juce::ValueTree& newState);
+
+/** Call after restoring `savedState`: if it was saved before `paramId` existed, set the parameter to
+    `oldValue` (real units), i.e. how the plugin behaved back then, instead of the new default.
+    Keeps existing projects sounding the same when a new switch defaults to on. */
+void keepOldDefault (juce::AudioProcessorValueTreeState& apvts, const juce::ValueTree& savedState,
+                     const juce::String& paramId, float oldValue);
 
 /**
     Factory presets are JSON files embedded with juce_add_binary_data; user presets are the same JSON

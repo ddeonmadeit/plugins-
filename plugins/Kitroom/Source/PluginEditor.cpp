@@ -25,20 +25,25 @@ KitroomEditor::Content::Content (KitroomProcessor& p)
       mix ("Mix", 6, 3, kMicAccent)
 {
     auto& s = p.apvts;
-    // Left block: mic buses, then the master bus, then playing feel. The scope takes the right half.
+    // Mic buses, then the bus processing, then playing feel; drive type and the scope on the right.
     const std::tuple<const char*, const char*, juce::Colour> knobs[] = {
-        { "masterClose", "Close Mics", kMicAccent }, { "masterOverheads", "Overheads", kMicAccent }, { "masterRoom", "Room", kMicAccent },
-        { "width", "Width", kBusAccent },            { "glue", "Glue", kBusAccent },                 { "clip", "Clip", kBusAccent },
-        { "velCurve", "Velocity", kFeelAccent },     { "humanize", "Humanize", kFeelAccent },        { "outGain", "Output", kBusAccent } };
+        { "masterClose", "Close Mics", kMicAccent }, { "masterOverheads", "Overheads", kMicAccent },
+        { "masterRoom", "Room", kMicAccent },        { "width", "Width", kMicAccent },
+        { "glue", "Glue", kBusAccent },              { "drive", "Drive", kBusAccent },
+        { "crush", "Crush", kBusAccent },            { "clip", "Clip", kBusAccent },
+        { "velCurve", "Velocity", kFeelAccent },     { "humanize", "Humanize", kFeelAccent },
+        { "tone", "Tone", kFeelAccent },             { "outGain", "Output", kFeelAccent } };
     int i = 0;
     for (auto& [id, title, colour] : knobs)
     {
         mix.add<Knob> (s, id, title, colour);
-        mix.place (i % 3, i / 3);
+        mix.place (i % 4, i / 4);
         ++i;
     }
+    mix.add<dd::gui::Choice> (s, "driveType", "Drive Type");
+    mix.place (4, 0, 2, 1);
     mix.add<dd::gui::Scope> (p.scope);
-    mix.place (3, 0, 3, 3);
+    mix.place (4, 1, 2, 2);
 
     kit.onSelect = [this] (int slot) { element.setSlot (slot); };
 

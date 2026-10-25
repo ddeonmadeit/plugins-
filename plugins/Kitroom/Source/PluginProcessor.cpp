@@ -10,7 +10,7 @@ using kitroom::MP;
 
 const juce::StringArray& KitroomProcessor::categoryOrder()
 {
-    static const juce::StringArray order { "STUDIO", "LIVE ROOM", "VINTAGE", "TIGHT", "BIG", "USER" };
+    static const juce::StringArray order { "STUDIO", "LIVE ROOM", "VINTAGE", "TIGHT", "BIG", "YEEZUS", "USER" };
     return order;
 }
 
@@ -187,12 +187,16 @@ void KitroomProcessor::prepareToPlay (double sampleRate, int)
         f.reset();
     }
     glue.prepare (sr);
+    dirt.prepare (sr, kChunk);
+    crusher.reset();
+    for (auto& f : toneShelf) f.reset();
+    lastTone = -9.0f;
     clipper.prepare (sr, kChunk);
     outGainSm.reset (sr, 0.03);
     widthSm.reset (sr, 0.03);
     outGainSm.setCurrentAndTargetValue (dd::dbToGain (params.master (MP::Output)));
     widthSm.setCurrentAndTargetValue (params.master (MP::Width));
-    setLatencySamples (clipper.getLatency());
+    setLatencySamples (dirt.getLatency() + clipper.getLatency());
 }
 
 void KitroomProcessor::handleNote (int note, float velocity)
@@ -317,6 +321,35 @@ void KitroomProcessor::processChunk (float* L, float* R, int n)
 
     float* chans[2] = { L, R };
     juce::dsp::AudioBlock<float> block (chans, 2, (size_t) n);
+
+    // Industrial stage: distortion (the kick's sub partly kept clean), lo-fi crush, then a tilt.
+    {
+        const float drive = params.master (MP::Drive);
+        dd::Dirt::Params dp;
+        dp.type = (dd::DirtType) juce::jlimit (0, 7, (int) std::lround (params.master (MP::DriveType)));
+        dp.drive = drive;
+        dp.bias = 0.3f;
+        dp.mix = std::min (1.0f, drive * 4.0f);   // fades in, so Drive at 0 is the clean kit
+        dp.subKeep = 0.35f;
+        dp.xoverHz = 100.0f;
+        dirt.process (block, dp);
+    }
+    if (const float crush = params.master (MP::Crush); crush > 0.001f)
+        for (int i = 0; i < n; ++i)
+            crusher.process (L[i], R[i], crush);
+    if (const float tone = params.master (MP::Tone); std::abs (tone - lastTone) > 1.0e-3f)
+    {
+        lastTone = tone;
+        for (auto& f : toneShelf)
+            f.set (dd::Biquad::Type::HighShelf, 1400.0f, 0.7071f, tone * 9.0f, sr);
+    }
+    if (std::abs (lastTone) > 0.005f)
+        for (int i = 0; i < n; ++i)
+        {
+            L[i] = toneShelf[0].process (L[i]);
+            R[i] = toneShelf[1].process (R[i]);
+        }
+
     clipper.process (block, params.master (MP::Clip));
 
     for (int i = 0; i < n; ++i)
@@ -330,8 +363,11 @@ void KitroomProcessor::processChunk (float* L, float* R, int n)
             std::fill (R, R + n, 0.0f);
             engine.reset();
             glue.reset();
+            dirt.reset();
             clipper.reset();
             for (auto& f : sideLowCut)
+                f.reset();
+            for (auto& f : toneShelf)
                 f.reset();
             return;
         }

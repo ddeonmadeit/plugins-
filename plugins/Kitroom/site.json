@@ -7,12 +7,20 @@
     "Kick, snare with sidestick, hi-hat (closed, half-open, open, pedal), 3 toms, 2 crashes, ride with bell, china",
     "Swap any piece for another recorded sound of its kind, including a full brushes kit",
     "Close, overhead and room mics per piece and for the whole kit, plus tune, decay, glue and width",
+    "Kit-bus Drive (8 distortion types), bit Crush and Tone, for anything from warm tape to broken industrial",
     "General MIDI key map shown in FL Studio note names; re-learn any key from your keyboard",
-    "17 kit presets: studio, live room, vintage and jazz, tight funk and soul, big rooms"
+    "24 kit presets: studio, live room, vintage and jazz, tight funk and soul, big rooms, Yeezus"
   ],
   "installTips": [
     "The .pkg also installs the drum sound library (about 230 MB). With the .zip, Install.command copies it for you.",
     "Keys (FL names): kick C3, snare D3, sidestick C#3, closed hat F#3, pedal hat G#3, open hat A#3, toms C4 / A3 / G3, crashes C#4 / A4, ride D#4, bell F4, china E4."
   ],
-  "previewNote": "on the same five-bar 96 BPM groove: ghost notes, open hat, a ride bar, a tom fill and crashes ringing out."
+  "previewNote": "on the same five-bar 96 BPM groove: ghost notes, open hat, a ride bar, a tom fill and crashes ringing out.",
+  "whatsNew": {
+    "version": "1.2.0",
+    "items": [
+      "YEEZUS: 7 new kits, from the Black Skinhead floor-tom stomp and bit-crushed On Sight to a bare Rick Rubin kit and a dusty Bound 2 break",
+      "New Drive, Drive Type, Crush and Tone knobs on the kit bus"
+    ]
+  }
 }

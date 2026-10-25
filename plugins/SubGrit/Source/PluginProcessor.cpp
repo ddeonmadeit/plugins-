@@ -9,7 +9,7 @@ using sg::P;
 
 const juce::StringArray& SubGritProcessor::categoryOrder()
 {
-    static const juce::StringArray order { "TRAVIS", "MIKE DEAN", "UNTILJAPAN", "YE", "BOUNCE 808" };
+    static const juce::StringArray order { "TRAVIS", "MIKE DEAN", "UNTILJAPAN", "YE", "YEEZUS", "BOUNCE 808" };
     return order;
 }
 
@@ -171,7 +171,8 @@ void SubGritProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mid
                 bpm = juce::jlimit (30.0, 400.0, *b);
 
     sg::SynthEngine::Settings es;
-    es.mono = params.getInt (P::voiceMode) == 0;
+    // Poly Keys plays chords on any preset; off, the preset's own mode applies (mono 808 slides).
+    es.mono = params.getInt (P::voiceMode) == 0 && ! params.getBool (P::perfPoly);
     es.legato = params.getBool (P::legato);
     es.glideAlways = params.getInt (P::glideMode) == 1;
     es.glideMs = params.get (P::glide);
@@ -383,6 +384,7 @@ void SubGritProcessor::setStateInformation (const void* data, int sizeInBytes)
             dd::replaceStateExactly (apvts, tree);
             presets.readState (tree);
             editorScale = juce::jlimit (0.6f, 1.8f, (float) tree.getProperty ("uiScale", 1.0f));
+            dd::keepOldDefault (apvts, tree, "perfPoly", 0.0f);
         }
     }
 }

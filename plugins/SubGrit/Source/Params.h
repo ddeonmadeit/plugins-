@@ -23,6 +23,7 @@ enum class P
     delayMix, delayDiv, delayFeedback, delayTone, delayPingPong,
     spaceMix, spaceSize,
     glue, clip, width, outGain,
+    perfPoly,   // performance switch: belongs to the instance, never to a preset (see dd::isPerformanceParam)
     count
 };
 

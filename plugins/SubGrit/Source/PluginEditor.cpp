@@ -24,6 +24,7 @@ using dd::gui::Toggle;
 SubGritEditor::Content::Content (SubGritProcessor& p)
     : proc (p),
       presetBar (p.presets),
+      polySwitch (*p.apvts.getParameter ("perfPoly"), "POLY", dd::gui::sunset::amber),
       body808 ("808 Body", 4, 2, kSourceAccent),
       oscA ("Osc A", 4, 2, kSourceAccent),
       oscB ("Osc B", 4, 2, kSourceAccent),
@@ -132,6 +133,8 @@ SubGritEditor::Content::Content (SubGritProcessor& p)
     output.add<Knob> (s, "outGain", "Output", kDirtAccent);
     output.add<Knob> (s, "width", "Width", kDirtAccent);
 
+    polySwitch.setTooltip ("Poly: play chords with any preset. Off: each preset's own mode (mono 808 slides). Stays as you set it when you change presets.");
+    addAndMakeVisible (polySwitch);
     addAndMakeVisible (presetBar);
     for (auto* c : { &body808, &oscA, &oscB, &lfo, &filter, &env, &voice, &eq, &dirt, &fx, &output, &scopePanel })
         addAndMakeVisible (c);
@@ -154,7 +157,7 @@ void SubGritEditor::Content::paint (juce::Graphics& g)
                           dd::gui::LookAndFeel::font (12.0f, true).withExtraKerningFactor (0.3f), juce::Justification::topLeft);
 
     auto right = head.removeFromRight (160.0f);
-    dd::gui::drawPrinted (g, juce::String ("ddeonmadeit  v") + DD_PLUGIN_VERSION, right, pal.dim,
+    dd::gui::drawPrinted (g, juce::String ("ddeonmadeit  v") + DD_PLUGIN_VERSION, right.removeFromBottom (24.0f), pal.dim,
                           dd::gui::LookAndFeel::font (12.0f), juce::Justification::centredRight);
 }
 
@@ -163,6 +166,7 @@ void SubGritEditor::Content::resized()
     auto r = getLocalBounds().reduced (12);
     auto head = r.removeFromTop (64);
     head.removeFromLeft (300);
+    polySwitch.setBounds (head.getRight() - 84, head.getY() + 6, 84, 26);
     head.removeFromRight (170);
     presetBar.setBounds (head.withSizeKeepingCentre (std::min (head.getWidth(), 640), 54));
     r.removeFromTop (8);

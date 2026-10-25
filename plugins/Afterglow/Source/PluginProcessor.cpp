@@ -18,7 +18,7 @@ float motionScale (float m) noexcept { return m < 0.0f ? 1.0f + m : 1.0f + 2.0f 
 
 const juce::StringArray& AfterglowProcessor::categoryOrder()
 {
-    static const juce::StringArray order { "TAME IMPALA", "MASSIVE ATTACK", "BRENT FAIYAZ", "MIKE DEAN", "TRAVIS SCOTT", "USER" };
+    static const juce::StringArray order { "TAME IMPALA", "MASSIVE ATTACK", "BRENT FAIYAZ", "MIKE DEAN", "TRAVIS SCOTT", "YEEZUS", "USER" };
     return order;
 }
 
@@ -53,6 +53,7 @@ void AfterglowProcessor::prepareToPlay (double sampleRate, int)
     sr = sampleRate;
     engine.prepare (sr);
     lfo2.prepare (sr);
+    dirt.prepare (sr, kChunk);
     tape.prepare (sr);
     crusher.reset();
     ensemble.prepare (sr);
@@ -91,7 +92,7 @@ void AfterglowProcessor::prepareToPlay (double sampleRate, int)
     pumpGain = 1.0f;
     freeBeat = hostBeat = 0.0;
     levelFollow = 0.0f;
-    setLatencySamples (clipper.getLatency());
+    setLatencySamples (dirt.getLatency() + clipper.getLatency());
 }
 
 ag::VoiceParams AfterglowProcessor::buildVoiceParams (float lfo2v, double bpm) const
@@ -106,7 +107,7 @@ ag::VoiceParams AfterglowProcessor::buildVoiceParams (float lfo2v, double bpm) c
         auto get = [&] (P aParam) { return params.get (ag::layerParam (l, aParam)); };
         auto& lp = v.layer[(size_t) l];
         lp.on = get (P::aOn) >= 0.5f;
-        lp.source = (ag::Source) juce::jlimit (0, 6, (int) std::lround (get (P::aSource)));
+        lp.source = (ag::Source) juce::jlimit (0, ag::kNumSources - 1, (int) std::lround (get (P::aSource)));
         float level = get (P::aLevel);
         if (l == 0 && blend > 0.0f) level *= 1.0f - blend;
         if (l == 1 && blend < 0.0f) level *= 1.0f + blend;
@@ -218,7 +219,8 @@ void AfterglowProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
         hostBeat = freeBeat;
 
     ag::Engine::Settings es;
-    es.mode = (ag::Engine::Mode) params.getInt (P::voiceMode);
+    // Poly Keys plays chords on any preset; off, the preset's own mode applies (mono / legato leads).
+    es.mode = params.getBool (P::perfPoly) ? ag::Engine::Mode::Poly : (ag::Engine::Mode) params.getInt (P::voiceMode);
     es.glideMs = params.get (P::glide);
     es.bendRange = (float) params.getInt (P::bendRange);
     engine.setSettings (es);
@@ -294,6 +296,22 @@ void AfterglowProcessor::processChunk (float* L, float* R, int n, double bpm)
         const float flutter = std::min (1.0f, params.get (P::tapeFlutter) * k);
         for (int i = 0; i < n; ++i)
             tape.process (L[i], R[i], drive, wow, flutter);
+    }
+
+    {
+        // Dirt: distortion before the modulation effects, like a pedal in front of chorus and phaser.
+        float* chans[2] = { L, R };
+        juce::dsp::AudioBlock<float> block (chans, 2, (size_t) n);
+        dd::Dirt::Params dp;
+        const bool on = params.getBool (P::distOn);
+        dp.type = (dd::DirtType) params.getInt (P::distType);
+        dp.drive = bend01 (params.get (P::distDrive), grit, 1.0f);
+        dp.tone = params.get (P::distTone);
+        dp.bias = 0.35f;
+        dp.mix = on ? params.get (P::distMix) : 0.0f;
+        dp.subKeep = 0.35f;
+        dp.xoverHz = 150.0f;
+        dirt.process (block, dp);
     }
 
     const float lofi = bend01 (params.get (P::lofi), grit, 0.35f);
@@ -428,7 +446,7 @@ void AfterglowProcessor::processChunk (float* L, float* R, int n, double bpm)
             std::fill (L, L + n, 0.0f);
             std::fill (R, R + n, 0.0f);
             engine.reset();
-            tape.reset(); ensemble.reset(); phaser.reset(); delay.reset(); reverb.reset(); shimmerShift.reset();
+            dirt.reset(); tape.reset(); ensemble.reset(); phaser.reset(); delay.reset(); reverb.reset(); shimmerShift.reset();
             shimmerFb = 0.0f;
             glue.reset();
             clipper.reset();
@@ -476,6 +494,7 @@ void AfterglowProcessor::setStateInformation (const void* data, int sizeInBytes)
             dd::replaceStateExactly (apvts, tree);
             presets.readState (tree);
             editorScale = juce::jlimit (0.6f, 1.8f, (float) tree.getProperty ("uiScale", 1.0f));
+            dd::keepOldDefault (apvts, tree, "perfPoly", 0.0f);
         }
 }
 

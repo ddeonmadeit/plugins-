@@ -6,8 +6,7 @@ namespace sunset = dd::gui::sunset;
 const juce::Colour kCream { 0xffeadcc3 };
 const juce::Colour kTan { 0xff9c876e };
 const juce::Colour kNight { 0xff0b0705 };
-const juce::Colour kRidgeNear { 0xff0c0704 };
-const juce::Colour kRidgeFar { 0xff24110a };
+const juce::Colour kRidgeNear { 0xff090503 };
 
 juce::Path ridgePath (const std::array<float, 128>& heights, float x0, float w, float baseY, float scale)
 {
@@ -33,6 +32,8 @@ HorizonView::HorizonView (AfterglowProcessor& p) : proc (p)
         const float x = (float) i;
         nearBase[i] = 0.10f + 0.05f * std::sin (x * 0.071f + 1.3f) + 0.035f * std::sin (x * 0.19f + 0.4f)
                     + 0.015f * std::sin (x * 0.53f + 2.0f);
+        midBase[i] = 0.16f + 0.06f * std::sin (x * 0.058f + 2.6f) + 0.03f * std::sin (x * 0.17f + 3.3f)
+                   + 0.012f * std::sin (x * 0.47f + 0.8f);
         farBase[i] = 0.22f + 0.08f * std::sin (x * 0.045f + 4.1f) + 0.04f * std::sin (x * 0.13f + 1.1f)
                    + 0.02f * std::sin (x * 0.37f);
     }
@@ -142,10 +143,19 @@ void HorizonView::paintSky (juce::Graphics& g, float toneAmount) const
     const float hy = horizonY();
     // The higher (brighter) the sun, the warmer and lighter the sky near the horizon.
     const float lift = 0.5f + 0.5f * toneAmount;
-    juce::ColourGradient sky (kNight, 0.0f, r.getY(), sunset::orange.darker (0.6f - 0.45f * lift), 0.0f, hy, false);
-    sky.addColour (0.45, juce::Colour (0xff1c0b07));
-    sky.addColour (0.78, sunset::red.darker (1.6f - 0.7f * lift));
+    juce::ColourGradient sky (kNight, 0.0f, r.getY(), sunset::amber.darker (0.35f - 0.3f * lift), 0.0f, hy, false);
+    sky.addColour (0.38, juce::Colour (0xff1e0907));
+    sky.addColour (0.66, sunset::red.darker (1.25f - 0.6f * lift));
+    sky.addColour (0.86, sunset::ember.darker (0.75f - 0.45f * lift));
     g.setGradientFill (sky);
+    g.fillRect (r.withBottom (hy + 1.0f));
+
+    // Atmospheric glow sitting on the horizon around the sun, so the light has somewhere to come from.
+    const float sx = sunCentre().x;
+    juce::ColourGradient haze (sunset::orange.withAlpha (0.28f + 0.2f * lift), sx, hy, sunset::red.withAlpha (0.0f),
+                               sx + r.getWidth() * 0.55f, hy, true);
+    haze.addColour (0.35, sunset::ember.withAlpha (0.12f + 0.08f * lift));
+    g.setGradientFill (haze);
     g.fillRect (r.withBottom (hy + 1.0f));
 
     // Long thin clouds drifting across, their undersides lit by the low sun.
@@ -173,10 +183,18 @@ void HorizonView::paintSky (juce::Graphics& g, float toneAmount) const
 void HorizonView::paintSun (juce::Graphics& g, juce::Point<float> c, float rad) const
 {
     // Halo breathes with the output level.
+    // Bloom in two layers: a wide warm corona and a tight hot glow; both breathe with the output level.
     const float glow = 0.22f + 0.55f * juce::jlimit (0.0f, 1.0f, level * 6.0f);
-    g.setGradientFill (juce::ColourGradient (sunset::amber.withAlpha (glow), c.x, c.y,
-                                             sunset::orange.withAlpha (0.0f), c.x + rad * 3.2f, c.y, true));
-    g.fillEllipse (c.x - rad * 3.2f, c.y - rad * 3.2f, rad * 6.4f, rad * 6.4f);
+    juce::ColourGradient corona (sunset::orange.withAlpha (glow * 0.55f), c.x, c.y, sunset::red.withAlpha (0.0f), c.x + rad * 5.0f, c.y, true);
+    corona.addColour (0.3, sunset::ember.withAlpha (glow * 0.25f));
+    g.setGradientFill (corona);
+    g.fillEllipse (c.x - rad * 5.0f, c.y - rad * 5.0f, rad * 10.0f, rad * 10.0f);
+    // The hot glow is a ring hugging the disc, clear inside, so the sky still shows through the cuts.
+    juce::ColourGradient ring (sunset::amber.withAlpha (0.0f), c.x, c.y, sunset::amber.withAlpha (0.0f), c.x + rad * 1.8f, c.y, true);
+    ring.addColour (0.5, sunset::amber.withAlpha (0.0f));
+    ring.addColour (0.58, sunset::amber.withAlpha (0.3f + glow * 0.45f));
+    g.setGradientFill (ring);
+    g.fillEllipse (c.x - rad * 1.8f, c.y - rad * 1.8f, rad * 3.6f, rad * 3.6f);
 
     juce::Graphics::ScopedSaveState state (g);
     g.reduceClipRegion (juce::Rectangle<float> (0.0f, 0.0f, (float) getWidth(), horizonY()).toNearestInt());
@@ -187,10 +205,14 @@ void HorizonView::paintSun (juce::Graphics& g, juce::Point<float> c, float rad) 
         const float h = 1.5f + 1.3f * (float) k;
         g.excludeClipRegion (juce::Rectangle<float> (c.x - rad - 2.0f, y, rad * 2.0f + 4.0f, h).toNearestInt());
     }
-    juce::ColourGradient disc (sunset::yellow.brighter (0.25f), c.x, c.y - rad, sunset::red, c.x, c.y + rad, false);
-    disc.addColour (0.45, sunset::amber);
-    disc.addColour (0.75, sunset::orange);
+    juce::ColourGradient disc (sunset::yellow, c.x, c.y - rad, sunset::red, c.x, c.y + rad, false);
+    disc.addColour (0.4, sunset::amber);
+    disc.addColour (0.7, sunset::orange);
     g.setGradientFill (disc);
+    g.fillEllipse (c.x - rad, c.y - rad, rad * 2.0f, rad * 2.0f);
+    // A white-hot core high in the disc: the sun reads as a ball of light, not a flat sticker.
+    g.setGradientFill (juce::ColourGradient (juce::Colour (0xfffff0c8).withAlpha (0.8f), c.x, c.y - rad * 0.35f,
+                                             sunset::yellow.withAlpha (0.0f), c.x + rad * 0.85f, c.y - rad * 0.35f, true));
     g.fillEllipse (c.x - rad, c.y - rad, rad * 2.0f, rad * 2.0f);
 }
 
@@ -199,38 +221,70 @@ void HorizonView::paintRidges (juce::Graphics& g, juce::Point<float> sun) const
     const float w = (float) getWidth(), hy = horizonY();
     const float scale = hy * 0.55f;
 
-    std::array<float, kRidge> farH {}, nearH {};
+    std::array<float, kRidge> farH {}, midH {}, nearH {};
     for (size_t i = 0; i < kRidge; ++i)
     {
         // Spatially smoothed so the spectrum reads as hills, not bars.
         const float s = (ridge[i > 0 ? i - 1 : 0] + 2.0f * ridge[i] + ridge[std::min (i + 1, (size_t) kRidge - 1)]) * 0.25f;
-        farH[i] = farBase[i] + s * 0.08f;
+        farH[i] = farBase[i] + s * 0.06f;
+        midH[i] = midBase[i] + s * 0.14f;
         nearH[i] = nearBase[i] + s * 0.34f;
     }
 
+    // Three ranges in aerial perspective: the far one hazy and lit by the sky, the near one almost black.
+    // Each fades darker towards its foot, so the slopes have volume instead of reading as cut-outs.
+    const auto fillRange = [&] (const juce::Path& path, juce::Colour top, juce::Colour foot, float peak)
+    {
+        g.setGradientFill (juce::ColourGradient (top, 0.0f, hy - peak * scale, foot, 0.0f, hy, false));
+        g.fillPath (path);
+    };
+    // Valley haze between the ranges: low-lying glow from the sun, so each range stands in front of the next.
+    const auto fog = [&] (float depth, float alpha)
+    {
+        g.setGradientFill (juce::ColourGradient (sunset::ember.withAlpha (0.0f), 0.0f, hy - depth * scale,
+                                                 sunset::ember.withAlpha (alpha), 0.0f, hy, false));
+        g.fillRect (juce::Rectangle<float> (0.0f, hy - depth * scale, w, depth * scale));
+    };
     const auto far = ridgePath (farH, 0.0f, w, hy, scale);
-    g.setColour (kRidgeFar);
-    g.fillPath (far);
-
+    fillRange (far, juce::Colour (0xff5a2212), juce::Colour (0xff2e110a), 0.32f);
+    fog (0.18f, 0.3f);
+    const auto mid = ridgePath (midH, 0.0f, w, hy, scale);
+    fillRange (mid, juce::Colour (0xff2c110a), juce::Colour (0xff150806), 0.24f);
+    fog (0.1f, 0.18f);
     const auto near = ridgePath (nearH, 0.0f, w, hy, scale);
-    g.setColour (kRidgeNear);
-    g.fillPath (near);
+    fillRange (near, juce::Colour (0xff140805), kRidgeNear, 0.2f);
 
     // Rim light: the ridge edges catch the sun, strongest right under it.
-    juce::ColourGradient rim (sunset::orange.withAlpha (0.95f), sun.x, sun.y, sunset::orange.withAlpha (0.0f), sun.x + w * 0.45f, sun.y, true);
-    g.setGradientFill (rim);
-    g.strokePath (near, juce::PathStrokeType (1.6f));
-    rim.multiplyOpacity (0.45f);
+    juce::ColourGradient rim (sunset::amber.withAlpha (1.0f), sun.x, sun.y, sunset::orange.withAlpha (0.0f), sun.x + w * 0.45f, sun.y, true);
+    rim.addColour (0.3, sunset::orange.withAlpha (0.8f));
+    rim.multiplyOpacity (0.35f);
     g.setGradientFill (rim);
     g.strokePath (far, juce::PathStrokeType (1.0f));
+    rim.multiplyOpacity (1.6f);
+    g.setGradientFill (rim);
+    g.strokePath (mid, juce::PathStrokeType (1.2f));
+    rim.multiplyOpacity (1.8f);
+    g.setGradientFill (rim);
+    g.strokePath (near, juce::PathStrokeType (1.8f));
 }
 
 void HorizonView::paintWater (juce::Graphics& g, juce::Point<float> sun, float rad) const
 {
     const auto r = getLocalBounds().toFloat();
     const float hy = horizonY();
-    g.setGradientFill (juce::ColourGradient (juce::Colour (0xff160a06), 0.0f, hy, juce::Colour (0xff040302), 0.0f, r.getBottom(), false));
+    g.setGradientFill (juce::ColourGradient (juce::Colour (0xff2a0f08), 0.0f, hy, juce::Colour (0xff030201), 0.0f, r.getBottom(), false));
     g.fillRect (r.withTop (hy));
+    // A column of reflected light under the sun, brightest at the horizon: a radial glow stretched downwards.
+    {
+        juce::Graphics::ScopedSaveState state (g);
+        g.reduceClipRegion (r.withTop (hy).toNearestInt());
+        const float stretch = 2.4f, colR = rad * 1.4f;
+        g.addTransform (juce::AffineTransform::scale (1.0f, stretch, sun.x, hy));
+        juce::ColourGradient column (sunset::orange.withAlpha (0.34f), sun.x, hy, sunset::red.withAlpha (0.0f), sun.x + colR, hy, true);
+        column.addColour (0.45, sunset::ember.withAlpha (0.14f));
+        g.setGradientFill (column);
+        g.fillEllipse (sun.x - colR, hy - colR, colR * 2.0f, colR * 2.0f);
+    }
 
     // The sun's reflection: broken horizontal strokes that ripple with time and swell with the level.
     const float energy = 0.6f + juce::jlimit (0.0f, 1.0f, level * 5.0f);
@@ -274,10 +328,22 @@ void HorizonView::paintText (juce::Graphics& g) const
         const float bw = juce::GlyphArrangement::getStringWidth (f, text) + 22.0f;
         auto pill = badges.removeFromRight (bw);
         badges.removeFromRight (8.0f);
-        g.setColour (juce::Colour (0xff0b0705).withAlpha (0.75f));
+        // Smoked-glass pill: shadow under it, a lit rim when the layer plays, a reflection across the top.
+        g.setColour (juce::Colours::black.withAlpha (0.45f));
+        g.fillRoundedRectangle (pill.translated (0.0f, 1.5f), 12.0f);
+        g.setGradientFill (juce::ColourGradient (juce::Colour (0xff2a160d).withAlpha (0.92f), 0.0f, pill.getY(),
+                                                 juce::Colour (0xff080403).withAlpha (0.92f), 0.0f, pill.getBottom(), false));
         g.fillRoundedRectangle (pill, 12.0f);
-        g.setColour ((on ? sunset::amber : kTan).withAlpha (on ? 0.7f : 0.35f));
+        if (on)
+        {
+            g.setColour (sunset::amber.withAlpha (0.18f));
+            g.drawRoundedRectangle (pill.expanded (1.5f), 13.5f, 3.0f);
+        }
+        g.setColour ((on ? sunset::amber : kTan).withAlpha (on ? 0.85f : 0.35f));
         g.drawRoundedRectangle (pill.reduced (0.5f), 12.0f, 1.0f);
+        g.setGradientFill (juce::ColourGradient (juce::Colours::white.withAlpha (0.12f), 0.0f, pill.getY(),
+                                                 juce::Colours::transparentWhite, 0.0f, pill.getCentreY(), false));
+        g.fillRoundedRectangle (pill.reduced (2.0f, 1.5f).withHeight (pill.getHeight() * 0.45f), 10.0f);
         g.setColour (on ? kCream : kTan);
         g.setFont (f);
         g.drawText (text, pill, juce::Justification::centred);
@@ -313,8 +379,24 @@ void HorizonView::paint (juce::Graphics& g)
 
     paintText (g);
 
-    g.setGradientFill (juce::ColourGradient (juce::Colours::black.withAlpha (0.6f), 0.0f, 0.0f, juce::Colours::transparentBlack, 0.0f, 14.0f, false));
-    g.fillRect (bounds.withHeight (14.0f));
-    g.setColour (juce::Colours::black.withAlpha (0.85f));
+    // Behind glass: deep inner shadow under the bezel and a faint diagonal reflection.
+    g.setGradientFill (juce::ColourGradient (juce::Colours::black.withAlpha (0.75f), 0.0f, 0.0f, juce::Colours::transparentBlack, 0.0f, 18.0f, false));
+    g.fillRect (bounds.withHeight (18.0f));
+    for (bool left : { true, false })
+    {
+        const float x0 = left ? 0.0f : bounds.getRight(), x1 = left ? 14.0f : bounds.getRight() - 14.0f;
+        g.setGradientFill (juce::ColourGradient (juce::Colours::black.withAlpha (0.45f), x0, 0.0f, juce::Colours::transparentBlack, x1, 0.0f, false));
+        g.fillRect (left ? bounds.withWidth (14.0f) : bounds.withLeft (bounds.getRight() - 14.0f));
+    }
+    juce::Path sheen;
+    sheen.startNewSubPath (bounds.getWidth() * 0.08f, 0.0f);
+    sheen.lineTo (bounds.getWidth() * 0.34f, 0.0f);
+    sheen.lineTo (bounds.getWidth() * 0.18f, bounds.getHeight() * 0.62f);
+    sheen.lineTo (0.0f, bounds.getHeight() * 0.62f);
+    sheen.closeSubPath();
+    g.setGradientFill (juce::ColourGradient (juce::Colours::white.withAlpha (0.045f), 0.0f, 0.0f,
+                                             juce::Colours::transparentWhite, 0.0f, bounds.getHeight() * 0.62f, false));
+    g.fillPath (sheen);
+    g.setColour (juce::Colours::black.withAlpha (0.9f));
     g.drawRoundedRectangle (bounds.reduced (0.5f), 8.0f, 1.5f);
 }

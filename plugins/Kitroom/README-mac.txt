@@ -14,3 +14,7 @@ KITROOM: KEYS AND SOUNDS
 
   Samples: DrumGizmo DRSKit and MuldjordKit (drumgizmo.org), CC BY 4.0. See ATTRIBUTION.txt in the
   library folder.
+
+UPDATING
+  Quit FL Studio, run the new .pkg (it replaces the old version and keeps the sound library up to
+  date), then reopen your project. Kits you already used keep all their settings.

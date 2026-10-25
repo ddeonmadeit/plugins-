@@ -5,24 +5,6 @@
 #include "HorizonView.h"
 #include "PluginProcessor.h"
 
-/** An effect on/off switch drawn as a jewel lamp with its name printed beside it. */
-class LampSwitch : public juce::Component, public juce::SettableTooltipClient
-{
-public:
-    LampSwitch (juce::RangedAudioParameter& p, const juce::String& label, juce::Colour colour);
-
-    void paint (juce::Graphics&) override;
-    void mouseDown (const juce::MouseEvent&) override;
-    void mouseEnter (const juce::MouseEvent&) override { repaint(); }
-    void mouseExit (const juce::MouseEvent&) override  { repaint(); }
-
-private:
-    juce::ParameterAttachment attachment;
-    juce::String label;
-    juce::Colour colour;
-    bool on = false;
-};
-
 class AfterglowEditor : public juce::AudioProcessorEditor
 {
 public:
@@ -46,9 +28,10 @@ private:
     private:
         AfterglowProcessor& proc;
         dd::gui::PresetBar presetBar;
+        dd::gui::LampSwitch polySwitch;
         HorizonView horizon;
         std::vector<std::unique_ptr<dd::gui::Knob>> macros;
-        std::vector<std::unique_ptr<LampSwitch>> switches;
+        std::vector<std::unique_ptr<dd::gui::LampSwitch>> switches;
         juce::Rectangle<int> deck;
     };
 

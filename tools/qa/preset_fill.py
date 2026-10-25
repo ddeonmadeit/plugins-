@@ -26,6 +26,8 @@ def default_value(p):
 def main():
     harness, presets_dir = sys.argv[1], sys.argv[2]
     info = json.loads(subprocess.check_output([harness, "param-info"]).decode())
+    # "perf*" parameters belong to the plugin instance (e.g. the Poly switch), never to a preset.
+    info = [p for p in info if not p["id"].startswith("perf")]
     files = sorted(glob.glob(os.path.join(presets_dir, "**", "*.json"), recursive=True))
     for f in files:
         doc = json.load(open(f))

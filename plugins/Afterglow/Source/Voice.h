@@ -71,7 +71,7 @@ public:
             for (auto& f : svf) f.reset();
         }
         for (int l = 0; l < 2; ++l)
-            layers[(size_t) l].start (vp.layer[(size_t) l], vel);
+            layers[(size_t) l].start (vp.layer[(size_t) l], vel, ! wasActive);
         lfo.retrigger();
         windDrift.reset (rng);
         amp.noteOn();

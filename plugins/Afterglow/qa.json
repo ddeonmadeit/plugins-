@@ -4,12 +4,13 @@
     "MASSIVE ATTACK",
     "BRENT FAIYAZ",
     "MIKE DEAN",
-    "TRAVIS SCOTT"
+    "TRAVIS SCOTT",
+    "YEEZUS"
   ],
   "targetLufs": -14.0,
   "toleranceLu": 3.0,
   "similarBelow": 0.15,
-  "phrase": "pads",
-  "previewPhrase": "pads",
+  "phrase": "mixed",
+  "previewPhrase": "mixed",
   "previewBacking": false
 }

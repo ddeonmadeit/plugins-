@@ -29,7 +29,17 @@ Then add a row to the Plugins table in CLAUDE.md.
 Edit `Source/Params.h` (enum) and `Source/Params.cpp` (table), keeping the same order. Pick real-unit
 ranges, `centre` for log-feel (Hz, ms), and a `Unit` for display. Choice lists: reuse
 `dd::waveNames()`, `dd::dirtTypeNames()`, `dd::divisionNames()`, `dd::Lfo::shapeNames()` where possible.
-IDs are permanent once shipped.
+IDs are permanent once shipped: add new parameters at the end of the table (append only). Choice lists
+may grow at the end (state stores the index, not the normalised value).
+
+**Performance switches** (things the player sets for themselves, like the POLY keys switch) get an id
+starting with `perf`. `dd::isPerformanceParam()` makes PresetManager skip them on load and save, so
+changing presets never flips them; `preset_fill.py` leaves them out and `preset_lint.py` rejects them in
+presets; the harness forces them to 0 (presets render as designed) unless `--perf` is passed. When a new
+parameter must behave differently for sessions saved before it existed (POLY: on for new instances, off
+for old projects), call `dd::keepOldDefault (apvts, tree, "perfPoly", 0.0f)` in `setStateInformation`
+after `replaceStateExactly`. Every synth must be able to play chords: add a POLY `perf` switch if any
+preset is mono (`dd::gui::LampSwitch` in the header, see SubGrit / Afterglow).
 
 ## 3. DSP
 
@@ -53,7 +63,11 @@ Check: `$H stress` clean, `$H render` sounds right in `analyze.py`.
 Build the editor from `dd::gui::Panel` grids (`add<Knob>`, `add<Choice>`, `add<Toggle>`, `place()` for spans).
 Follow the house style in CLAUDE.md ("Visual style"): dark brown matte vintage hardware, accents only from
 `dd::gui::sunset` (one per section), `paintBackdrop` behind everything, wordmark in `LookAndFeel::display()`
-with `paintSunsetStripes`. The template already does this.
+with `paintSunsetStripes`. The template already does this. Owner's rule: **nothing flat, nothing muddy**.
+Every object needs depth (cast shadow, bevel, socket, inner shadow, glow) and every tone is either deep
+dark or vibrant; mid-brown low-contrast fills read as mud. The shared painters already do this (knobs sit
+in sockets with a backlit scale, faceplates cast shadows, lamps bloom); drawn scenes need layers
+(Afterglow: three mountain ranges in aerial perspective, sun bloom, reflection column, glass sheen).
 
 When the owner asks for "not too many knobs" (Omnisphere-like), copy Afterglow's pattern: the engine keeps
 every parameter (presets carry them), the panel shows only bipolar macros (`mTone`, `mSwell` ...: 0 = the

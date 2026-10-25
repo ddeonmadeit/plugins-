@@ -135,25 +135,56 @@ void LookAndFeel::drawRotarySlider (juce::Graphics& g, int x, int y, int w, int 
     g.setColour (pal.track);
     g.strokePath (groove, juce::PathStrokeType (arcW, juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
 
-    if (std::abs (angle - fromAngle) > 0.001f)
+    // Printed scale ticks just outside the groove.
+    for (int i = 0; i <= 10; ++i)
     {
-        juce::Path lit;
-        lit.addCentredArc (c.x, c.y, arcR, arcR, 0.0f, std::min (fromAngle, angle), std::max (fromAngle, angle), true);
-        const auto col = enabled ? accent : pal.dim;
-        g.setColour (col.withAlpha (0.18f));
-        g.strokePath (lit, juce::PathStrokeType (arcW * 2.6f, juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
-        g.setColour (col);
-        g.strokePath (lit, juce::PathStrokeType (arcW * 0.75f, juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
+        const float ta = startAngle + (float) i / 10.0f * (endAngle - startAngle);
+        const float r0 = arcR + arcW * 0.9f, r1 = arcR + arcW * (i % 5 == 0 ? 1.9f : 1.45f);
+        g.setColour (pal.dim.withAlpha (i % 5 == 0 ? 0.55f : 0.3f));
+        g.drawLine (c.x + std::sin (ta) * r0, c.y - std::cos (ta) * r0, c.x + std::sin (ta) * r1, c.y - std::cos (ta) * r1, 1.0f);
     }
 
-    // Knob: soft contact shadow, knurled skirt, matte bakelite cap.
+    const auto col = enabled ? accent : pal.dim;
+    if (std::abs (angle - fromAngle) > 0.001f)
+    {
+        // Backlit scale: a wide soft bloom, a glowing band and a hot filament in the middle.
+        juce::Path lit;
+        lit.addCentredArc (c.x, c.y, arcR, arcR, 0.0f, std::min (fromAngle, angle), std::max (fromAngle, angle), true);
+        const auto stroke = [&] (float width, juce::Colour colour)
+        {
+            g.setColour (colour);
+            g.strokePath (lit, juce::PathStrokeType (width, juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
+        };
+        stroke (arcW * 4.2f, col.withAlpha (0.07f));
+        stroke (arcW * 2.4f, col.withAlpha (0.16f));
+        stroke (arcW * 0.95f, col);
+        stroke (arcW * 0.35f, col.brighter (0.6f).withAlpha (0.9f));
+    }
+    else if (bipolar)
+    {
+        // Centred bipolar knob: a small lit dot marks the detent.
+        const juce::Point<float> d (c.x + std::sin (fromAngle) * arcR, c.y - std::cos (fromAngle) * arcR);
+        g.setColour (col.withAlpha (0.2f));
+        g.fillEllipse (d.x - arcW * 1.3f, d.y - arcW * 1.3f, arcW * 2.6f, arcW * 2.6f);
+        g.setColour (col);
+        g.fillEllipse (d.x - arcW * 0.5f, d.y - arcW * 0.5f, arcW, arcW);
+    }
+
+    // Knob: sunk into a socket, casting a shadow down onto the plate; knurled skirt, matte bakelite cap.
     const float skirtR = arcR - arcW * 1.6f;
     const float capR = skirtR * 0.8f;
-    for (int i = 3; i >= 1; --i)
     {
-        const float sr = skirtR + (float) i * 1.1f;
-        g.setColour (juce::Colours::black.withAlpha (0.16f));
-        g.fillEllipse (c.x - sr, c.y - sr + 2.2f, sr * 2.0f, sr * 2.0f);
+        const float sock = skirtR + arcW * 0.9f;
+        juce::ColourGradient socket (juce::Colours::black.withAlpha (0.75f), c.x, c.y, juce::Colours::transparentBlack, c.x + sock, c.y, true);
+        socket.addColour (skirtR / sock, juce::Colours::black.withAlpha (0.6f));
+        g.setGradientFill (socket);
+        g.fillEllipse (c.x - sock, c.y - sock, sock * 2.0f, sock * 2.0f);
+    }
+    for (int i = 5; i >= 1; --i)
+    {
+        const float sr = skirtR + (float) i * 0.9f;
+        g.setColour (juce::Colours::black.withAlpha (0.12f));
+        g.fillEllipse (c.x - sr, c.y - sr + radius * 0.07f, sr * 2.0f, sr * 2.0f);
     }
 
     g.setGradientFill (juce::ColourGradient (juce::Colour (0xff3a2c22), c.x, c.y - skirtR,
@@ -174,15 +205,25 @@ void LookAndFeel::drawRotarySlider (juce::Graphics& g, int x, int y, int w, int 
     g.setColour (juce::Colours::black.withAlpha (0.6f));
     g.drawEllipse (c.x - skirtR, c.y - skirtR, skirtR * 2.0f, skirtR * 2.0f, 0.8f);
 
-    g.setColour (juce::Colours::black.withAlpha (0.45f));
-    g.fillEllipse (c.x - capR - 0.6f, c.y - capR + 0.4f, (capR + 0.6f) * 2.0f, (capR + 0.6f) * 2.0f);
-    juce::ColourGradient cap (juce::Colour (0xff4b3a2e), c.x - capR * 0.45f, c.y - capR * 0.7f,
-                              juce::Colour (0xff120d09), c.x + capR * 0.55f, c.y + capR * 0.9f, true);
-    cap.addColour (0.45, juce::Colour (0xff2a1f17));
+    g.setColour (juce::Colours::black.withAlpha (0.5f));
+    g.fillEllipse (c.x - capR - 0.8f, c.y - capR + 0.6f, (capR + 0.8f) * 2.0f, (capR + 0.8f) * 2.0f);
+    juce::ColourGradient cap (juce::Colour (0xff4a3527), c.x - capR * 0.45f, c.y - capR * 0.75f,
+                              juce::Colour (0xff080504), c.x + capR * 0.55f, c.y + capR * 0.95f, true);
+    cap.addColour (0.4, juce::Colour (0xff20160f));
     g.setGradientFill (cap);
     g.fillEllipse (c.x - capR, c.y - capR, capR * 2.0f, capR * 2.0f);
-    g.setColour (juce::Colours::white.withAlpha (0.06f));
-    g.drawEllipse (c.x - capR + 0.5f, c.y - capR + 0.5f, capR * 2.0f - 1.0f, capR * 2.0f - 1.0f, 0.8f);
+
+    // Shallow dish in the cap: shaded at the top, catching a little light at the bottom (concave, not domed).
+    const float dishR = capR * 0.72f;
+    g.setGradientFill (juce::ColourGradient (juce::Colours::black.withAlpha (0.38f), c.x, c.y - dishR,
+                                             juce::Colours::white.withAlpha (0.03f), c.x, c.y + dishR, false));
+    g.fillEllipse (c.x - dishR, c.y - dishR, dishR * 2.0f, dishR * 2.0f);
+
+    // Rim: the top edge of the cap catches the light, the bottom edge is lost in shadow.
+    juce::Path rimTop;
+    rimTop.addCentredArc (c.x, c.y, capR - 0.6f, capR - 0.6f, 0.0f, -1.9f, 1.9f, true);
+    g.setColour (juce::Colours::white.withAlpha (0.14f));
+    g.strokePath (rimTop, juce::PathStrokeType (1.0f));
 
     // Painted pointer line running from the cap onto the skirt.
     const float pIn = capR * 0.25f, pOut = skirtR * 0.96f;
@@ -336,25 +377,42 @@ void paintBackdrop (juce::Graphics& g, juce::Rectangle<int> area, const Palette&
 void paintFaceplate (juce::Graphics& g, juce::Rectangle<float> r, const Palette& pal, bool screws)
 {
     constexpr float corner = 5.0f;
+    // The plate stands off the chassis: a soft shadow falls below it.
+    for (int i = 4; i >= 1; --i)
+    {
+        g.setColour (juce::Colours::black.withAlpha (0.1f));
+        g.fillRoundedRectangle (r.expanded ((float) i * 0.8f).translated (0.0f, (float) i * 1.1f), corner + (float) i);
+    }
     g.setColour (pal.panelEdge);
     g.fillRoundedRectangle (r, corner + 1.0f);
 
     const auto plate = r.reduced (1.0f);
-    g.setGradientFill (juce::ColourGradient (pal.panel.brighter (0.1f), 0.0f, plate.getY(),
-                                             pal.panel.darker (0.18f), 0.0f, plate.getBottom(), false));
+    g.setGradientFill (juce::ColourGradient (pal.panel.brighter (0.16f), 0.0f, plate.getY(),
+                                             pal.panel.darker (0.35f), 0.0f, plate.getBottom(), false));
     g.fillRoundedRectangle (plate, corner);
     {
         juce::Graphics::ScopedSaveState state (g);
         juce::Path clip;
         clip.addRoundedRectangle (plate, corner);
         g.reduceClipRegion (clip);
+        // A pool of light from above, falling off towards the corners.
+        juce::ColourGradient pool (juce::Colour (0xffe8a868).withAlpha (0.06f), plate.getCentreX(), plate.getY(),
+                                   juce::Colours::transparentWhite, plate.getCentreX(), plate.getY() + plate.getHeight() * 1.1f, true);
+        g.setGradientFill (pool);
+        g.fillRect (plate);
         paintGrain (g, plate.toNearestInt(), 1.0f);
+        g.setGradientFill (juce::ColourGradient (juce::Colours::white.withAlpha (0.07f), 0.0f, plate.getY(),
+                                                 juce::Colours::transparentWhite, 0.0f, plate.getY() + 5.0f, false));
+        g.fillRect (plate.withHeight (5.0f));
+        g.setGradientFill (juce::ColourGradient (juce::Colours::transparentBlack, 0.0f, plate.getBottom() - 8.0f,
+                                                 juce::Colours::black.withAlpha (0.35f), 0.0f, plate.getBottom(), false));
+        g.fillRect (plate.withTop (plate.getBottom() - 8.0f));
     }
 
     // Bevel: the top edge catches the room light, the bottom edge falls into shadow.
-    g.setColour (juce::Colours::white.withAlpha (0.08f));
+    g.setColour (juce::Colours::white.withAlpha (0.13f));
     g.drawLine (plate.getX() + corner, plate.getY() + 0.5f, plate.getRight() - corner, plate.getY() + 0.5f, 1.0f);
-    g.setColour (juce::Colours::black.withAlpha (0.4f));
+    g.setColour (juce::Colours::black.withAlpha (0.55f));
     g.drawLine (plate.getX() + corner, plate.getBottom() - 0.5f, plate.getRight() - corner, plate.getBottom() - 0.5f, 1.0f);
 
     if (screws)
@@ -376,9 +434,17 @@ void paintInset (juce::Graphics& g, juce::Rectangle<float> r, const Palette& pal
     const auto glass = r.reduced (1.0f).withTrimmedBottom (1.0f);
     g.setColour (pal.track);
     g.fillRoundedRectangle (glass, corner - 1.0f);
-    g.setGradientFill (juce::ColourGradient (juce::Colours::black.withAlpha (0.55f), 0.0f, glass.getY(),
-                                             juce::Colours::transparentBlack, 0.0f, glass.getY() + std::min (7.0f, glass.getHeight() * 0.4f), false));
+    // Inner shadow: deep under the top edge, lighter down the sides.
+    g.setGradientFill (juce::ColourGradient (juce::Colours::black.withAlpha (0.7f), 0.0f, glass.getY(),
+                                             juce::Colours::transparentBlack, 0.0f, glass.getY() + std::min (9.0f, glass.getHeight() * 0.45f), false));
     g.fillRoundedRectangle (glass, corner - 1.0f);
+    const float side = std::min (6.0f, glass.getWidth() * 0.1f);
+    g.setGradientFill (juce::ColourGradient (juce::Colours::black.withAlpha (0.35f), glass.getX(), 0.0f,
+                                             juce::Colours::transparentBlack, glass.getX() + side, 0.0f, false));
+    g.fillRect (glass.withWidth (side));
+    g.setGradientFill (juce::ColourGradient (juce::Colours::black.withAlpha (0.35f), glass.getRight(), 0.0f,
+                                             juce::Colours::transparentBlack, glass.getRight() - side, 0.0f, false));
+    g.fillRect (glass.withLeft (glass.getRight() - side));
 }
 
 void paintScrew (juce::Graphics& g, juce::Point<float> c, float radius, float slotAngle)
@@ -399,10 +465,13 @@ void paintScrew (juce::Graphics& g, juce::Point<float> c, float radius, float sl
 void paintLamp (juce::Graphics& g, juce::Point<float> c, float radius, juce::Colour colour, float lit)
 {
     lit = juce::jlimit (0.0f, 1.0f, lit);
-    for (int i = 3; i >= 1 && lit > 0.0f; --i)
+    if (lit > 0.0f)
     {
-        const float gr = radius + (float) i * 2.2f;
-        g.setColour (colour.withAlpha (0.13f * lit));
+        // Light spilling onto the plate around the lens.
+        const float gr = radius * 4.2f;
+        juce::ColourGradient halo (colour.withAlpha (0.45f * lit), c.x, c.y, colour.withAlpha (0.0f), c.x + gr, c.y, true);
+        halo.addColour (0.3, colour.withAlpha (0.18f * lit));
+        g.setGradientFill (halo);
         g.fillEllipse (c.x - gr, c.y - gr, gr * 2.0f, gr * 2.0f);
     }
     const float bezel = radius + 1.4f;
@@ -417,8 +486,15 @@ void paintLamp (juce::Graphics& g, juce::Point<float> c, float radius, juce::Col
     const auto core = off.brighter (0.3f).interpolatedWith (colour.brighter (0.25f), lit);
     g.setGradientFill (juce::ColourGradient (core, c.x - radius * 0.15f, c.y - radius * 0.2f, rim, c.x + radius, c.y + radius, true));
     g.fillEllipse (c.x - radius, c.y - radius, radius * 2.0f, radius * 2.0f);
+    // Lens: a soft reflection up top, and a lit lamp's filament glowing hot in the middle.
     g.setColour (juce::Colours::white.withAlpha (0.18f + 0.22f * lit));
     g.fillEllipse (c.x - radius * 0.6f, c.y - radius * 0.65f, radius * 0.55f, radius * 0.4f);
+    if (lit > 0.0f)
+    {
+        g.setGradientFill (juce::ColourGradient (juce::Colour (0xfffff3d6).withAlpha (0.75f * lit), c.x, c.y,
+                                                 colour.withAlpha (0.0f), c.x + radius * 0.55f, c.y, true));
+        g.fillEllipse (c.x - radius * 0.55f, c.y - radius * 0.55f, radius * 1.1f, radius * 1.1f);
+    }
 }
 
 void drawPrinted (juce::Graphics& g, const juce::String& text, juce::Rectangle<float> r, juce::Colour colour,

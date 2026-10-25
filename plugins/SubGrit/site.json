@@ -1,15 +1,23 @@
 {
   "publish": true,
   "tagline": "808 + distorted bass engine",
-  "description": "Grungy, distorted 808s and synth basses that stay full: the Dirt section distorts the top while Sub Keep blends the clean sub back underneath. 58 presets in Travis Scott, Mike Dean, untiljapan and Ye styles, plus regular bouncy 808s.",
+  "description": "Grungy, distorted 808s and synth basses that stay full: the Dirt section distorts the top while Sub Keep blends the clean sub back underneath. 68 presets in Travis Scott, Mike Dean, untiljapan, Ye and Yeezus styles, plus regular bouncy 808s.",
   "accent": "#ff5a1f",
   "highlights": [
     "808 body with punch, warmth and knock, plus two unison synth oscillators",
     "Moog-style ladder filter, glide, release dive, tempo-synced LFO",
     "8 distortion types at 4x oversampling with Sub Keep for heavy-but-full low end",
-    "Chorus, delay and space on the top only, so the sub stays mono"
+    "Chorus, delay and space on the top only, so the sub stays mono",
+    "POLY switch: play chords with any preset (it stays put when you change presets)"
   ],
   "installTips": [
     "Notes play at real pitch: the classic 808 range is C2–C3 in FL's piano roll (or use the Octave knob)."
-  ]
+  ],
+  "whatsNew": {
+    "version": "1.2.0",
+    "items": [
+      "YEEZUS: 10 new industrial presets, from TNGHT horn blasts and Daft Punk acid to Arca-style mutant bass and a bare Rick Rubin square",
+      "POLY switch in the header: play chords with any preset. On for new instances; projects saved before this update keep playing mono"
+    ]
+  }
 }

@@ -70,6 +70,7 @@ def main():
                  "tagline": s.get("tagline", ""), "description": s.get("description", ""),
                  "accent": s.get("accent", "#ff5a1f"), "highlights": s.get("highlights", []),
                  "installTips": s.get("installTips", []), "previewNote": s.get("previewNote", ""),
+                 "whatsNew": s.get("whatsNew"),
                  "release": release, "previews": []}
 
         src = os.path.join(args.previews, p["target"])

@@ -59,6 +59,7 @@ private:
     double sr = 44100.0, freeBeat = 0.0, hostBeat = 0.0;
     bool hostPlaying = false;
 
+    dd::Dirt dirt;   // always in the path (mix 0 when off) so the latency never changes
     dd::Tape tape;
     dd::Crusher crusher;
     dd::Ensemble ensemble;

@@ -1,5 +1,7 @@
 #include "Params.h"
 
+#include <dd_dsp/dd_dsp.h>
+
 namespace kitroom
 {
 namespace
@@ -33,6 +35,10 @@ const char* masterId (MP p)
         case MP::Clip:      return "clip";
         case MP::Width:     return "width";
         case MP::Output:    return "outGain";
+        case MP::Drive:     return "drive";
+        case MP::DriveType: return "driveType";
+        case MP::Crush:     return "crush";
+        case MP::Tone:      return "tone";
         case MP::count:     break;
     }
     return "";
@@ -89,6 +95,12 @@ juce::AudioProcessorValueTreeState::ParameterLayout createLayout()
     layout.add (makeFloat (masterId (MP::Clip), "Clip", { 0.0f, 1.0f }, 0.0f, percent));
     layout.add (makeFloat (masterId (MP::Width), "Width", { 0.0f, 1.5f }, 1.0f, percent));
     layout.add (makeFloat (masterId (MP::Output), "Output", { -24.0f, 12.0f }, 0.0f, decibels));
+    layout.add (makeFloat (masterId (MP::Drive), "Drive", { 0.0f, 1.0f }, 0.0f, percent));
+    layout.add (std::make_unique<juce::AudioParameterChoice> (juce::ParameterID { masterId (MP::DriveType), 1 }, "Drive Type",
+                                                              dd::dirtTypeNames(), (int) dd::DirtType::Tube));
+    layout.add (makeFloat (masterId (MP::Crush), "Crush", { 0.0f, 1.0f }, 0.0f, percent));
+    layout.add (makeFloat (masterId (MP::Tone), "Tone", { -1.0f, 1.0f }, 0.0f,
+                           [] (float v, int) { return std::abs (v) < 0.01f ? juce::String ("Flat") : (v > 0.0f ? "Bright " : "Dark ") + juce::String (juce::roundToInt (std::abs (v) * 100.0f)); }));
     return layout;
 }
 

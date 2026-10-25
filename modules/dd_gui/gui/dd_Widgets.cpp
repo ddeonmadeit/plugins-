@@ -117,6 +117,25 @@ void Toggle::paint (juce::Graphics& g)
 }
 
 //==============================================================================
+LampSwitch::LampSwitch (juce::RangedAudioParameter& p, const juce::String& l, juce::Colour c)
+    : attachment (p, [this] (float v) { on = v >= 0.5f; repaint(); }), label (l), colour (c)
+{
+    attachment.sendInitialUpdate();
+    setMouseCursor (juce::MouseCursor::PointingHandCursor);
+}
+
+void LampSwitch::paint (juce::Graphics& g)
+{
+    const auto& pal = paletteOf (*this);
+    auto r = getLocalBounds().toFloat();
+    paintLamp (g, { r.getX() + 12.0f, r.getCentreY() }, 6.0f, colour, on ? 1.0f : 0.0f);
+    drawPrinted (g, label, r.withTrimmedLeft (28.0f), on || isMouseOver() ? pal.text : pal.dim,
+                 LookAndFeel::font (13.0f, true).withExtraKerningFactor (0.12f), juce::Justification::centredLeft);
+}
+
+void LampSwitch::mouseDown (const juce::MouseEvent&) { attachment.setValueAsCompleteGesture (on ? 0.0f : 1.0f); }
+
+//==============================================================================
 Panel::Panel (const juce::String& t, int c, int r, juce::Colour a)
     : title (t), cols (c), rows (r), accent (a)
 {

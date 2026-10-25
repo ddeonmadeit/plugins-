@@ -54,6 +54,9 @@ def main():
         if allowed and data.get("category") not in allowed:
             errors.append("%s: unknown category '%s'" % (rel, data.get("category")))
         for pid, v in data.get("params", {}).items():
+            if pid.startswith("perf"):
+                errors.append("%s: '%s' is a performance parameter; presets must not set it" % (rel, pid))
+                continue
             p = params.get(pid)
             if p is None:
                 errors.append("%s: unknown parameter '%s'" % (rel, pid))

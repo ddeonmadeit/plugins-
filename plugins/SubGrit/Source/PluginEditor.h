@@ -27,6 +27,7 @@ private:
     private:
         SubGritProcessor& proc;
         dd::gui::PresetBar presetBar;
+        dd::gui::LampSwitch polySwitch;
         dd::gui::Panel body808, oscA, oscB, lfo, filter, env, voice, eq, dirt, fx, output, scopePanel;
         dd::gui::Scope& scope;
     };

@@ -14,6 +14,9 @@ site = meta.get("site", {})
 where = "Generators" if meta["kind"] == "SYNTH" else "Effects"
 
 lines = ["**%s**: %s" % (meta["product"], site.get("tagline", "")), "", site.get("description", ""), ""]
+new = site.get("whatsNew") or {}
+if new.get("version") == version and new.get("items"):
+    lines += ["### What's new in %s" % version] + ["- " + h for h in new["items"]] + ["", "### Everything in %s" % meta["product"]]
 for h in site.get("highlights", []):
     lines.append("- " + h)
 lines += [
@@ -24,6 +27,9 @@ lines += [
     "3. FL Studio: Options → Manage plugins → **Find more plugins**. %s appears under %s." % (meta["product"], where),
     "",
     "No admin password? Use the .zip: unzip it and run `bash ~/Downloads/%s-%s-macOS/Install.command` in Terminal." % (plugin, version),
+    "",
+    "**Updating from an older version:** quit FL Studio, run the new .pkg (it replaces the old version), then reopen. "
+    "Projects keep all their settings; no rescan is needed.",
     "",
 ]
 for t in site.get("installTips", []):

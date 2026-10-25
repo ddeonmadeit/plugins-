@@ -44,6 +44,9 @@ article.plugin { margin-top: 40px; border-top: 3px solid var(--c); padding-top: 
 .tagline { font-family: var(--mono); font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--c); margin: 6px 0 12px; }
 .desc { margin: 0; max-width: 60ch; }
 ul.hl { margin: 14px 0 0; padding-left: 18px; color: var(--dim); display: grid; gap: 4px; }
+.new { margin: 16px 0 0; padding: 10px 14px; border-left: 3px solid var(--c); background: var(--panel); border-radius: 0 8px 8px 0; }
+.new h4 { margin: 0 0 6px; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--c); }
+.new ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
 
 .dl { background: var(--panel); border: 1px solid var(--edge); border-radius: 10px; padding: 16px; display: grid; gap: 10px; }
 .ver { font-family: var(--mono); font-size: 12px; color: var(--dim); font-variant-numeric: tabular-nums; }
@@ -151,6 +154,7 @@ function installSteps(p) {
     "In FL Studio: Options → Manage plugins → Find more plugins. " + p.product + " appears under " + (p.kind === "SYNTH" ? "Generators" : "Effects") + ".",
   ];
   steps.push(...(p.installTips || []));
+  steps.push("Updating from an older version: quit FL Studio, run the new .pkg (it replaces the old version), then reopen. Your projects keep all their settings and the new presets appear in the plugin's preset menu.");
   steps.forEach(s => ol.append(el("li", null, s)));
   const alt = el("li");
   alt.innerHTML = "No admin password? Download the .zip, unzip it, and run <code>bash ~/Downloads/" + p.product + "-*-macOS/Install.command</code> in Terminal.";
@@ -203,6 +207,12 @@ function render() {
     const left = el("div");
     left.append(el("h2", "name", p.product.toUpperCase()), el("p", "tagline", p.tagline), el("p", "desc", p.description));
     if (p.highlights && p.highlights.length) { const ul = el("ul", "hl"); p.highlights.forEach(h => ul.append(el("li", null, h))); left.append(ul); }
+    if (p.whatsNew && p.release && p.whatsNew.version === p.release.version) {
+      const box = el("div", "new"), ul = el("ul");
+      box.append(el("h4", null, "New in " + p.whatsNew.version));
+      p.whatsNew.items.forEach(h => ul.append(el("li", null, h)));
+      box.append(ul); left.append(box);
+    }
     const dl = el("div", "dl");
     if (p.release) {
       dl.append(el("div", "ver", "Version " + p.release.version + " · " + p.release.date));

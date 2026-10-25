@@ -21,7 +21,16 @@ description: Design factory presets that sound finished and fit a named style (8
    give them density (more clip / saturation / glue), never more output gain past the peak cap.
 8. Similarity: fix every pair under 0.2 by changing something structural (dirt type, source,
    envelope class, FX, modulation), not by nudging a knob.
-9. Look at `qa-out/<Name>/renders/sheet.png`: every tile should look different.
+9. Variety: `python3 tools/qa/variety.py qa-out/<Name>/renders` compares how presets *play* (attack,
+   sustain, articulation, tail, brightness, noise, width, movement). Fix pairs under ~0.8.
+10. Look at `qa-out/<Name>/renders/sheet.png`: every tile should look different.
+
+**Variety rule (owner feedback on Afterglow 1.0: "most of them sounded like the same sound with
+different effects").** A bank must not be one patch with different FX. Plan each category as a set of
+ROLES before writing values: pad, keys, pluck, lead, bell/mallet, texture/soundscape, bass/drone,
+strings/brass/choir, one EXTREME (pushed hard: distortion, gates, wow, crush) and one SUBTLE (dry, soft,
+close, almost no FX). No two presets may share source + envelope class + register. Prefix extreme and
+subtle descriptions with "EXTREME:" / "SUBTLE:" so the owner can find them.
 
 Names: evocative, no artist names inside preset names (categories carry the style). Descriptions:
 one sentence of what it is plus how to play it ("overlap notes to slide").
@@ -56,6 +65,13 @@ one sentence of what it is plus how to play it ("overlap notes to slide").
 - **Ye (Kanye)**, by era: 808s & Heartbreak = long, nearly clean TR-808 boom; Yeezus = industrial
   (amp/crush, square + saw, noise, stuttering drive, acid fold); TLOP/Donda = stadium distortion with
   huge space, organ-like sustained subs; Vultures = flat-topped, massively clipped 808s.
+- **YEEZUS** (its own category in every plugin): industrial, abrasive and minimal, produced by Daft Punk,
+  Gesaffelstein, Arca, Hudson Mohawke, TNGHT and Mike Dean, reduced by Rick Rubin. Track references:
+  On Sight (squelching acid, fuzz), Black Skinhead (stomping tribal floor toms, heavy breathing),
+  I Am A God (crushed hits, screams), New Slaves (one bare buzzing synth), Hold My Liquor (dark
+  distorted pads), Send It Up (alarm-like synth), Blood On The Leaves (TNGHT horn blasts), Bound 2
+  (dusty soul break). Mix the extremes: some presets brutal (amp, rectify, crush, gates), some bare and
+  dry (the Rubin reduction).
 - **Bouncy 808s**: dry and simple. Punch + knock + short decay for bounce; clean sustained subs;
   drill slides; pluggnb soft and low-passed; Detroit kick-808; phonk fold+clip.
 
@@ -80,6 +96,16 @@ dark feedback, vinyl, slow LFO 2 filter breathing, eerie choir, drones. **Brent 
 tremolo, airy choir, soft attacks, gentle tape and lo-fi, nothing harsh. **Mike Dean** = big saws, resonant
 ladder sweeps from the mod envelope, legato glide solos with delayed vibrato, brass swells, huge halls.
 **Travis Scott** = eerie detuned FM bells, vocal textures, flute leads (sine + pitched air), 16th gates,
-bitcrushed drones, very long dark reverb with shimmer. Every preset sets all FX switches explicitly; macros
+bitcrushed drones, very long dark reverb with shimmer. **Yeezus** = see above: Sync screams, square alarms,
+amp-driven horn stabs, rectified buzz, gated breath. Every preset sets all FX switches explicitly; macros
 stay at 0 in factory presets.
+
+Afterglow sources (shape / char): Analog (saw->pulse / PWM), Strings (brightness / 4'), Choir (vowel
+A-E-I-O-U / breath), Glass (FM index / ratio), Tines (bark / tine), Air (breath / pitchedness), Sine
+(->triangle / octave), Pluck (brightness / ring time 0.35-16 s: harp, harpsichord, nylon), Organ (drawbars
+flute 0, jazz .25, gospel .5, reed .75, full 1 / percussion+click), Mallet (hardness / bar: marimba <.2,
+vibes <.4, kalimba <.6, glock <.8, steel), Sync (slave ratio 1-8x, sweep it with Shape Env / master saw
+blend). Pluck and Mallet ring by themselves: give them amp sustain 1 and let the source decay. QA and
+previews use the `mixed` phrase (held chord, arpeggio, stabs, legato melody) so plucks are heard fairly.
+The generator lives outside the repo; the JSON files are the source of truth.
 
