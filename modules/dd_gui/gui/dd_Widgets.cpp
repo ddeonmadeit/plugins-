@@ -10,9 +10,9 @@ namespace
         return fallback;
     }
 
-    void drawTitle (juce::Graphics& g, const juce::Component& c, const juce::String& title, juce::Rectangle<int> r)
+    void drawTitle (juce::Graphics& g, const juce::Component& c, const juce::String& title, juce::Rectangle<int> r, float scale = 1.0f)
     {
-        const auto f = LookAndFeel::font (10.5f, true).withExtraKerningFactor (0.07f);
+        const auto f = LookAndFeel::font (10.5f * scale, true).withExtraKerningFactor (0.07f);
         const auto text = title.toUpperCase();
         // Squeeze long titles instead of truncating them, like hand-fitted panel lettering.
         const float w = juce::GlyphArrangement::getStringWidth (f, text);
@@ -52,8 +52,8 @@ void Knob::updateValueText()
 void Knob::resized()
 {
     auto r = getLocalBounds();
-    r.removeFromTop (16);
-    r.removeFromBottom (18);
+    r.removeFromTop (juce::roundToInt (16.0f * labelScale));
+    r.removeFromBottom (juce::roundToInt (18.0f * labelScale));
     const int size = std::min (r.getWidth(), r.getHeight());
     slider.setBounds (r.withSizeKeepingCentre (size, size));
 }
@@ -61,11 +61,11 @@ void Knob::resized()
 void Knob::paint (juce::Graphics& g)
 {
     auto r = getLocalBounds();
-    drawTitle (g, *this, title, r.removeFromTop (16));
+    drawTitle (g, *this, title, r.removeFromTop (juce::roundToInt (16.0f * labelScale)), labelScale);
     const auto& pal = paletteOf (*this);
     g.setColour (slider.isMouseOverOrDragging() ? pal.text.interpolatedWith (pal.accent2, 0.5f) : pal.text.withAlpha (0.85f));
-    g.setFont (LookAndFeel::font (12.0f));
-    g.drawFittedText (valueText, r.removeFromBottom (18), juce::Justification::centred, 1, 0.7f);
+    g.setFont (LookAndFeel::font (12.0f * labelScale));
+    g.drawFittedText (valueText, r.removeFromBottom (juce::roundToInt (18.0f * labelScale)), juce::Justification::centred, 1, 0.7f);
 }
 
 //==============================================================================

@@ -119,3 +119,4 @@ Text is cream print (`Palette::text`) or faded tan (`Palette::dim`).
 | --- | --- | --- | --- |
 | SubGrit | synth | Sgrt | 808 + distorted bass. 58 presets: TRAVIS, MIKE DEAN, UNTILJAPAN, YE, BOUNCE 808 |
 | Kitroom | synth | Ktrm | Live acoustic drum kit from multi-mic DrumGizmo recordings (CC BY 4.0): drawn kit UI, GM keys, swappable pieces, close/OH/room mics. 17 presets: STUDIO, LIVE ROOM, VINTAGE, TIGHT, BIG. Local QA needs `KITROOM_LIBRARY` (build it with `plugins/Kitroom/library/build_library.py`) |
+| Afterglow | synth | Aglw | Pads / strings / ear candy / soundscapes. Deep two-layer engine (7 sources) + FX, but the panel is macro-first: a sunset "orb" display (Motion / Tone) and 6 macros. 50 presets: TAME IMPALA, MASSIVE ATTACK, BRENT FAIYAZ, MIKE DEAN, TRAVIS SCOTT |

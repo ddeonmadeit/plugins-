@@ -98,3 +98,14 @@ SubGrit's page: https://claude.ai/artifact/DTxARTUxVBPbuiynMGdjh3
 - After `normalize_presets.py` always rebuild, re-render **and re-analyze** before normalizing again:
   it reads `report.json`, and a stale report applies the same correction twice.
 
+## Pads and textures (Afterglow)
+
+- `--phrase pads`: Dm9 / Bbmaj7 / Fmaj7 / Am7, two bars each at 120 BPM (= the plugins' no-host tempo, so
+  pump / synced delay line up); the top note is added last so mono and legato patches play a melody.
+- Calibrate every sound source to the same loudness before designing presets (render each alone at a low
+  level so nothing hits the clipper; compare RMS) and store the result as per-source gains.
+- Sub-mono check: the analyzer only judges it when the band below 120 Hz carries > -30 dB of the signal and
+  uses an 8th-order low-pass; synths with wide unison need the side high-passed at ~200 Hz, not 140.
+- Plucks, bells and keys read 3-6 LU quieter than pads at the same peak (high crest): give them bus glue
+  0.55-0.75 and a little sustain, and give the plugin a wider loudness tolerance (Afterglow: -14 +-3).
+

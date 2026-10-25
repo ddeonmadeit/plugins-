@@ -14,9 +14,13 @@ public:
 
     juce::Slider& getSlider() noexcept { return slider; }
 
+    /** Scales the title and value text (and the room they take) for big front-panel knobs. */
+    void setLabelScale (float s) { labelScale = s; resized(); repaint(); }
+
 private:
     void updateValueText();
 
+    float labelScale = 1.0f;
     juce::RangedAudioParameter* param = nullptr;
     juce::Slider slider;
     juce::String title, valueText;

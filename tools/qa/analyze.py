@@ -78,10 +78,12 @@ def analyse(path):
         out["band_" + name] = float(np.sum(pxx[(f >= lo) & (f < hi)]) / total)
     out["centroid_hz"] = float(np.sum(f * pxx) / (np.sum(pxx) + 1e-20))
 
-    # Sub must be mono: correlation of L/R below 120 Hz.
-    sos = signal.butter(4, 120, "low", fs=sr, output="sos")
+    # Sub must be mono: correlation of L/R below 120 Hz. Only judged when that band carries real energy
+    # (> -30 dB of the whole signal); the correlation of a near-silent residual says nothing about mono.
+    sos = signal.butter(8, 120, "low", fs=sr, output="sos")   # steep, so stereo mids above 200 Hz do not leak in
     lo = signal.sosfilt(sos, x, axis=0)
-    if np.std(lo[:, 0]) > 1e-6 and np.std(lo[:, 1]) > 1e-6:
+    lo_share = np.sqrt(np.mean(lo ** 2)) / (np.sqrt(np.mean(x ** 2)) + 1e-12)
+    if lo_share > 0.0316 and np.std(lo[:, 0]) > 1e-6 and np.std(lo[:, 1]) > 1e-6:
         out["sub_corr"] = float(np.corrcoef(lo[:, 0], lo[:, 1])[0, 1])
     else:
         out["sub_corr"] = 1.0

@@ -10,6 +10,24 @@ inline const juce::StringArray& waveNames()
     return names;
 }
 
+/** sin (2 pi phase) for a phase in turns, from a 2048-point table (linear interpolation, ~-130 dB error).
+    Cheap enough for FM operators and per-sample LFOs across many voices. */
+inline float sine01 (float phase) noexcept
+{
+    static const auto table = []
+    {
+        std::array<float, 2049> t {};
+        for (size_t i = 0; i < t.size(); ++i)
+            t[i] = (float) std::sin (2.0 * 3.14159265358979323846 * (double) i / 2048.0);
+        return t;
+    }();
+    const float p = phase - std::floor (phase);
+    const float x = p * 2048.0f;
+    const int i = std::min (2047, (int) x);
+    const float f = x - (float) i;
+    return table[(size_t) i] + f * (table[(size_t) i + 1] - table[(size_t) i]);
+}
+
 /** PolyBLEP residual for a discontinuity at phase 0 (t in [0,1), dt = phase increment). */
 inline float polyBlep (float t, float dt) noexcept
 {

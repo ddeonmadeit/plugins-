@@ -135,6 +135,28 @@ slide on presets with glide; leave gaps for clean re-hits.
 User presets are saved to `~/Music/ddeonmadeit/SubGrit/Presets` (SAVE button; "..." menu reveals
 the folder).
 
+## Afterglow: pads, textures and soundscapes
+
+A synth for pads, strings, ear candy, textures and soundscapes, built to be played rather than
+programmed: the window is a sunset, and the sun is the controller. Drag it left-right for **Motion**
+(still to moving: vibrato, phaser, tape wobble, drift) and up-down for **Tone** (bright and high, or
+dark and sinking). Six macros reshape any preset: **Swell**, **Tail**, **Blend**, **Grit**, **Echo**,
+**Space**. Centre is always the preset as designed.
+
+![Afterglow](docs/afterglow.png)
+
+- **Two layers per voice**, each one of seven sources: Analog (Juno / Prophet saws with PWM), Strings
+  (string machine), Choir (formant vowels with breath), Glass (FM bells), Tines (electric piano), Air
+  (pitched breath) and Sine. Up to 7-voice unison, drift, filter (ladder or SVF), two envelopes, two LFOs,
+  poly / mono / legato with glide.
+- **Effects** (lamps on the panel): tape wow, flutter and saturation, lo-fi, Juno / Solina ensemble,
+  phaser, tape-style dub delay, a long reverb with shimmer, and a tempo-synced pump or gate. The low
+  end always stays mono.
+- **50 presets** in five styles, ten each: **TAME IMPALA** (phased Juno synths, Currents pump, glide leads),
+  **MASSIVE ATTACK** (dark trip-hop pads, dub echoes, drones, strings), **BRENT FAIYAZ** (Rhodes, airy
+  choirs, soft lo-fi), **MIKE DEAN** (Moog / Prophet leads and brass, cinematic swells) and **TRAVIS SCOTT**
+  (eerie bells, flutes, gated choirs, crushed drones). Loudness-matched.
+
 ## Kitroom: live acoustic drum kit
 
 A real drum kit, every piece on its own key, recorded with close, overhead and room mics. No

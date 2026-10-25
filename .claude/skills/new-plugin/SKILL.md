@@ -53,7 +53,13 @@ Check: `$H stress` clean, `$H render` sounds right in `analyze.py`.
 Build the editor from `dd::gui::Panel` grids (`add<Knob>`, `add<Choice>`, `add<Toggle>`, `place()` for spans).
 Follow the house style in CLAUDE.md ("Visual style"): dark brown matte vintage hardware, accents only from
 `dd::gui::sunset` (one per section), `paintBackdrop` behind everything, wordmark in `LookAndFeel::display()`
-with `paintSunsetStripes`. The template already does this. For big UIs copy SubGrit's scaled `Content` component pattern
+with `paintSunsetStripes`. The template already does this.
+
+When the owner asks for "not too many knobs" (Omnisphere-like), copy Afterglow's pattern: the engine keeps
+every parameter (presets carry them), the panel shows only bipolar macros (`mTone`, `mSwell` ...: 0 = the
+preset as designed, `bend01()` pushes a 0..1 amount toward 0 or a ceiling) plus a big drawn display that
+doubles as an XY control (`HorizonView`), effect on/off lamps (`LampSwitch`), and `Knob::setLabelScale`
+for big knobs. For big UIs copy SubGrit's scaled `Content` component pattern
 (fixed base size, `setTransform`, aspect-locked resizing, zoom stored in state).
 
 Check: `xvfb-run -a -s "-screen 0 2560x1600x24" $H snapshot --out ui.png` and *look at the image*.

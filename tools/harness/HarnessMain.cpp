@@ -4,7 +4,7 @@
 
       <Plugin>Harness list
       <Plugin>Harness render  --out x.wav [--program N | --preset-file p.json] [--set id=value ...]
-                              [--phrase demo|single|slide|groove|chords|drums|drumvel] [--sr 48000] [--block 256] [--mono]
+                              [--phrase demo|single|slide|groove|chords|pads|drums|drumvel] [--sr 48000] [--block 256] [--mono]
       <Plugin>Harness render-all --outdir dir [--phrase demo] [--sr 48000]
       <Plugin>Harness snapshot --out ui.png [--program N] [--scale 1]
       <Plugin>Harness stress  [--seconds 20] [--sr 48000] [--block 128]
@@ -90,6 +90,19 @@ std::vector<Note> phrase (const juce::String& name, double& totalSeconds)
             t += 0.6;
         }
         totalSeconds = t + 2.0;
+        return out;
+    }
+    if (name == "pads")
+    {
+        // Four chords, two bars each at 120 BPM (Dm9, Bbmaj7, Fmaj7, Am7) in pad voicings.
+        // The top note comes last, so mono / legato patches play it as a melody.
+        const int chords[4][5] = { { 50, 57, 60, 64, 65 }, { 46, 53, 57, 62, -1 }, { 41, 52, 57, 60, -1 }, { 45, 52, 55, 60, 64 } };
+        std::vector<Note> out;
+        for (int c = 0; c < 4; ++c)
+            for (int note : chords[c])
+                if (note >= 0)
+                    out.push_back ({ note, c * 4.0, 3.85, 92 });
+        totalSeconds = 16.0 + 4.0;
         return out;
     }
     if (name == "chords")

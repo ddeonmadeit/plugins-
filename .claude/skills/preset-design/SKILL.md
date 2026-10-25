@@ -72,3 +72,14 @@ sound choice lives in `"extra": {"kit": {"kick": "drs_kick_dead", ...}}` (Preset
 Close vs Overheads vs Room, glue/clip for density, width. Target -18 LUFS +-2 on the `drums` phrase;
 clean presets are peak-limited (crest ~21 dB), so give quiet ones a little glue rather than gain.
 
+## Pad / texture presets (Afterglow)
+
+Signatures used (keep them apart): **Tame Impala** = Juno PWM saws + heavy phaser + tape wow + Currents-style
+pump, glide leads with vibrato. **Massive Attack** = dark (cutoff < 1.5 kHz, high cut 6-9 kHz), dub delay with
+dark feedback, vinyl, slow LFO 2 filter breathing, eerie choir, drones. **Brent Faiyaz** = Tines Rhodes with
+tremolo, airy choir, soft attacks, gentle tape and lo-fi, nothing harsh. **Mike Dean** = big saws, resonant
+ladder sweeps from the mod envelope, legato glide solos with delayed vibrato, brass swells, huge halls.
+**Travis Scott** = eerie detuned FM bells, vocal textures, flute leads (sine + pitched air), 16th gates,
+bitcrushed drones, very long dark reverb with shimmer. Every preset sets all FX switches explicitly; macros
+stay at 0 in factory presets.
+

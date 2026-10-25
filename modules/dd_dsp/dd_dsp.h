@@ -28,3 +28,4 @@
 #include "dsp/dd_Envelopes.h"
 #include "dsp/dd_Saturation.h"
 #include "dsp/dd_Effects.h"
+#include "dsp/dd_Modulation.h"
