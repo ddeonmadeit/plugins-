@@ -9,7 +9,7 @@ description: Design factory presets that sound finished and fit a named style (8
 
 1. **Define each category's signature first** (what every preset in it shares, and what no other
    category does). Write it down in the generator or a comment; it stops presets converging.
-2. Author presets as JSON (`plugins/<Name>/Presets/<CATEGORY>/NN Name.json`). Only the values that
+2. Author presets as JSON (`plugins/<Name>/Presets/<CATEGORY>/NN_Name.json`). Only the values that
    matter need writing at first; a Python dict list run through a small writer is the fastest way
    to author dozens.
 3. Audition any JSON without rebuilding: `$H render --preset-file p.json --out x.wav`, then analyze.

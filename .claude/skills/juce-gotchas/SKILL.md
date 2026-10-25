@@ -22,8 +22,9 @@ description: JUCE 9 / CMake API details and pitfalls already hit in this repo (c
 - `juce::dsp::Oversampling<float> (2 ch, factor 2 = 4x, filterHalfBandPolyphaseIIR, maxQuality, integerLatency=true)`:
   integer latency lets you delay dry paths exactly. `initProcessing (maxBlock)` must cover the largest
   chunk you pass, so process in fixed chunks.
-- `juce_add_binary_data` names resources by bare file name: two `01 Init.json` in different folders
-  collide. Prefix with a category-unique name or keep names unique (preset_lint checks this).
+- `juce_add_binary_data` names resources by bare file name: two `01_Init.json` in different folders
+  collide, so keep file names unique (preset_lint checks this). Use only letters, digits, `_` and `-`:
+  Makefile generators choke on `:` (a `4:20 ...json` preset broke the macOS build).
 - Programs: `getNumPrograms()` must never return 0 (return 1 with "Init"). Expose factory presets only;
   the count must not change at runtime.
 - The VST3 wrapper is built with LTO in Release: the first link takes ~3-4 min in the container. Iterate

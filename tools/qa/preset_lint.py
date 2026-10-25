@@ -4,13 +4,15 @@ Validate a plugin's preset JSON files against its real parameter list.
 
   python3 tools/qa/preset_lint.py <harness-binary> plugins/<Plugin>/Presets [--categories "A,B,C"]
 
-Checks: valid JSON, required fields, unique names, known category, every param id exists,
-values inside range, ints are ints, choice names valid, bools are bools. Exit 1 on any error.
+Checks: safe file names (Make cannot handle ':' etc.), valid JSON, required fields, unique names,
+known category, every param id exists, values inside range, ints are ints, choice names valid,
+bools are bools. Exit 1 on any error.
 """
 import argparse
 import glob
 import json
 import os
+import re
 import subprocess
 import sys
 
@@ -32,6 +34,8 @@ def main():
     for f in files:
         rel = os.path.relpath(f, args.presets_dir)
         b = os.path.basename(f)
+        if not re.fullmatch(r"[0-9]{2}_[A-Za-z0-9_-]+\.json", b):
+            errors.append("%s: file name must look like 01_Some_Name.json (letters, digits, _ and - only)" % rel)
         if b in basenames:
             errors.append("%s: file name also used by %s (binary data names must be unique)" % (rel, basenames[b]))
         basenames[b] = rel

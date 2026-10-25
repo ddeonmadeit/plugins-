@@ -25,7 +25,7 @@ modules/dd_dsp            header-only DSP: PolyBLEP/unison osc, ZDF ladder, SVF,
 modules/dd_core           PresetManager (JSON factory + user presets), param <-> JSON helpers,
                           replaceStateExactly(), ScopeBuffer (lock-free audio -> UI)
 modules/dd_gui            LookAndFeel/Palette, Knob/Choice/Toggle, grid Panel, PresetBar, Scope
-plugins/<Name>/           one plugin: CMakeLists.txt, Source/, Presets/<CATEGORY>/NN Name.json, qa.json
+plugins/<Name>/           one plugin: CMakeLists.txt, Source/, Presets/<CATEGORY>/NN_Name.json, qa.json
 templates/plugin/         scaffold used by tools/new_plugin.py (//@SYNTH //@EFFECT blocks)
 tools/harness/            generic headless CLI compiled per plugin (render, snapshot, stress, param-info)
 tools/qa/                 analyze.py (objective audio QA), preset_lint/fill/normalize, run_qa.sh

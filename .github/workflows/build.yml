@@ -81,14 +81,15 @@ jobs:
 
       - name: Configure (arm64 + x86_64)
         run: |
-          cmake -B build -DCMAKE_BUILD_TYPE=Release -DDD_BUILD_HARNESS=OFF \
+          brew install ninja || true
+          cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DDD_BUILD_HARNESS=OFF \
                 -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0
 
       - name: Build
         run: |
           targets=""
           for p in $(python3 tools/ci/plugin_meta.py --names); do targets="$targets ${p}_VST3 ${p}_AU"; done
-          cmake --build build --config Release --parallel 4 --target $targets
+          cmake --build build --parallel --target $targets
 
       - name: Sign and package
         run: tools/ci/package_macos.sh build dist

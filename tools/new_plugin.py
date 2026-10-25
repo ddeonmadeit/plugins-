@@ -74,7 +74,7 @@ def main():
     os.makedirs(preset_dir, exist_ok=True)
     json.dump({"name": "Init", "category": "INIT", "author": "ddeonmadeit",
                "description": "Starting point.", "params": {}},
-              open(os.path.join(preset_dir, "01 Init.json"), "w"), indent=2)
+              open(os.path.join(preset_dir, "01_Init.json"), "w"), indent=2)
 
     print("created plugins/%s (%s, code %s)" % (name, kind.lower(), code))
     print("next: cmake -B build && cmake --build build --target %s_Harness && tools/qa/run_qa.sh %s" % (name, name))
