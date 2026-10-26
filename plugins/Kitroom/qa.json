@@ -1,5 +1,13 @@
 {
-  "categories": ["STUDIO", "LIVE ROOM", "VINTAGE", "TIGHT", "BIG", "YEEZUS"],
+  "categories": [
+    "STUDIO",
+    "LIVE ROOM",
+    "VINTAGE",
+    "TIGHT",
+    "BIG",
+    "YEEZUS",
+    "MOSHC0RE"
+  ],
   "targetLufs": -18.0,
   "toleranceLu": 2.0,
   "similarBelow": 0.05,

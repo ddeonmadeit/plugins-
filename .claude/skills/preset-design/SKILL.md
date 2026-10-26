@@ -72,6 +72,13 @@ one sentence of what it is plus how to play it ("overlap notes to slide").
   distorted pads), Send It Up (alarm-like synth), Blood On The Leaves (TNGHT horn blasts), Bound 2
   (dusty soul break). Mix the extremes: some presets brutal (amp, rectify, crush, gates), some bare and
   dry (the Rubin reduction).
+- **MOSHC0RE** (category in every plugin): moshc0re is an underground rapper who self-produces in the
+  Playboi Carti / Ken Carson (Opium) rage lane and tags #techno; titles are sci-fi and brutalist
+  (INTERGALACTIC, ALIEN, SYNTHETIC, BRUTALIST, C0RPROGANDA, EGO DEATH, LIGHTS LIGHTS LIGHTS, LONESOME;
+  INTERGALACTIC ~119 BPM, SEMPER FI ~84 / 168). Researched from tags, titles and BPMs, not by ear: ask the
+  owner for reference tracks before reworking it. Signature: blown-out clipped rage 808s with long slides,
+  bright detuned supersaw rage leads, techno (kick-808s, EBM 16th pulses, S&H sequences, dub-techno chords,
+  hoovers, strobes), alien textures (theremin, wobble, 8-bit), gothic vamp choir and organ, one bare SUBTLE preset.
 - **Bouncy 808s**: dry and simple. Punch + knock + short decay for bounce; clean sustained subs;
   drill slides; pluggnb soft and low-passed; Detroit kick-808; phonk fold+clip.
 
