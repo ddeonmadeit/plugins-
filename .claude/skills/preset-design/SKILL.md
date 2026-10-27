@@ -79,6 +79,12 @@ one sentence of what it is plus how to play it ("overlap notes to slide").
   owner for reference tracks before reworking it. Signature: blown-out clipped rage 808s with long slides,
   bright detuned supersaw rage leads, techno (kick-808s, EBM 16th pulses, S&H sequences, dub-techno chords,
   hoovers, strobes), alien textures (theremin, wobble, 8-bit), gothic vamp choir and organ, one bare SUBTLE preset.
+- **KING** (SubGrit + Kitroom): Ye's KING, the opener of BULLY (2026), industrial hip-hop compared to
+  Yeezus, TLOP and a darker MBDTF. Reviews describe a heavy bass line loud in the mix "made to be blasted
+  throughout a stadium", heavy drums, a repeating alarm/ringing-phone sound and a looped gospel-preacher
+  sample (Duke Edwards). Researched from reviews, not by ear: recreations, never the record's audio.
+  Signature: a mid-forward stadium bass line (sub + saw/square, tube), a long taped 808, alarm-rhythm
+  gated grit, industrial stomp, kick-808 boom; kits huge and glued or hammered and dry, one soft church room.
 - **Bouncy 808s**: dry and simple. Punch + knock + short decay for bounce; clean sustained subs;
   drill slides; pluggnb soft and low-passed; Detroit kick-808; phonk fold+clip.
 

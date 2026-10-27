@@ -125,6 +125,6 @@ Text is cream print (`Palette::text`) or faded tan (`Palette::dim`).
 
 | Plugin | Kind | Code | Notes |
 | --- | --- | --- | --- |
-| SubGrit | synth | Sgrt | 808 + distorted bass, POLY switch. 78 presets: TRAVIS, MIKE DEAN, UNTILJAPAN, YE, YEEZUS, MOSHC0RE, BOUNCE 808 |
-| Kitroom | synth | Ktrm | Live acoustic drum kit from multi-mic DrumGizmo recordings (CC BY 4.0): drawn kit UI, GM keys, swappable pieces, close/OH/room mics, bus drive/crush/tone. 31 presets: STUDIO, LIVE ROOM, VINTAGE, TIGHT, BIG, YEEZUS, MOSHC0RE. Local QA needs `KITROOM_LIBRARY` (build it with `plugins/Kitroom/library/build_library.py`) |
+| SubGrit | synth | Sgrt | 808 + distorted bass, POLY switch. 85 presets: TRAVIS, MIKE DEAN, UNTILJAPAN, YE, YEEZUS, MOSHC0RE, KING, BOUNCE 808 |
+| Kitroom | synth | Ktrm | Live acoustic drum kit from multi-mic DrumGizmo recordings (CC BY 4.0): drawn kit UI, GM keys, swappable pieces, close/OH/room mics, bus drive/crush/tone. 37 presets: STUDIO, LIVE ROOM, VINTAGE, TIGHT, BIG, YEEZUS, MOSHC0RE, KING. Local QA needs `KITROOM_LIBRARY` (build it with `plugins/Kitroom/library/build_library.py`) |
 | Afterglow | synth | Aglw | Pads, keys, plucks, leads, bells, soundscapes, electric guitar. Deep two-layer engine (12 sources incl. pluck, organ, mallet, sync, Electric guitar string) + Dirt amp + CAB + strum + FX, but the panel is macro-first: a sunset "orb" display (Motion / Tone), 6 macros, POLY switch. 77 presets (each a different role): TAME IMPALA, MASSIVE ATTACK, BRENT FAIYAZ, MIKE DEAN, TRAVIS SCOTT, YEEZUS, MOSHC0RE, GUITAR |

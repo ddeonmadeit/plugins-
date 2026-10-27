@@ -9,7 +9,7 @@
     "Close, overhead and room mics per piece and for the whole kit, plus tune, decay, glue and width",
     "Kit-bus Drive (8 distortion types), bit Crush and Tone, for anything from warm tape to broken industrial",
     "General MIDI key map shown in FL Studio note names; re-learn any key from your keyboard",
-    "31 kit presets: studio, live room, vintage and jazz, tight funk and soul, big rooms, Yeezus, moshc0re"
+    "37 kit presets: studio, live room, vintage and jazz, tight funk and soul, big rooms, Yeezus, moshc0re, KING"
   ],
   "installTips": [
     "The .pkg also installs the drum sound library (about 230 MB). With the .zip, Install.command copies it for you.",
@@ -17,9 +17,9 @@
   ],
   "previewNote": "on the same five-bar 96 BPM groove: ghost notes, open hat, a ride bar, a tom fill and crashes ringing out.",
   "whatsNew": {
-    "version": "1.3.0",
+    "version": "1.4.0",
     "items": [
-      "MOSHC0RE: 7 new kits for rage and techno on real drums: a clipped rage room, bare brutalist concrete, a spacey intergalactic hall, a warehouse floor-tom kick, a bit-crushed drum machine, a choked dark kit and a natural dry kit"
+      "KING: 6 new kits recreating the heavy drums of Ye's KING (the BULLY opener) on real drums: a stadium kit, an industrial hammer, the darker Dark Fantasy tom room, a dry crushed alarm break, a detuned 808-style low kick and a soft church room for the preacher intro"
     ]
   }
 }
