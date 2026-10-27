@@ -42,3 +42,8 @@ description: JUCE 9 / CMake API details and pitfalls already hit in this repo (c
 - Static lighting / texture masks (film grain, Kitroom's spotlight darkness) are computed once into a
   `juce::Image` with `BitmapData` and drawn each paint; per-pixel work in `paint()` is too slow at 30 fps.
 
+- `juce::SmoothedValue` starts from its constructor value, and `reset (sr, seconds)` keeps the current value.
+  `dd::Dirt` declared `mixSm { 1.0f }`, so after every prepare the first 20 ms ramped from full drive to the
+  preset's mix: the first note of every offline render (QA, previews) was distorted even with Dirt off.
+  Snap smoothers to their targets (`setCurrentAndTargetValue`) on the first process after a reset; look for a
+  loud, bright first 10-20 ms in renders as the symptom.

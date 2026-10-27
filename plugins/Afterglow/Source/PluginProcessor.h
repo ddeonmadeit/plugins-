@@ -60,6 +60,10 @@ private:
     bool hostPlaying = false;
 
     dd::Dirt dirt;   // always in the path (mix 0 when off) so the latency never changes
+    dd::CabSim cab;
+    dd::Biquad ampTight[2], ampVoice[2][3];
+    int ampVoicing = -1;
+    void setAmpVoicing (bool highGain);
     dd::Tape tape;
     dd::Crusher crusher;
     dd::Ensemble ensemble;

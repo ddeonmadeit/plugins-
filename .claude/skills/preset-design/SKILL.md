@@ -112,7 +112,15 @@ A-E-I-O-U / breath), Glass (FM index / ratio), Tines (bark / tine), Air (breath 
 (->triangle / octave), Pluck (brightness / ring time 0.35-16 s: harp, harpsichord, nylon), Organ (drawbars
 flute 0, jazz .25, gospel .5, reed .75, full 1 / percussion+click), Mallet (hardness / bar: marimba <.2,
 vibes <.4, kalimba <.6, glock <.8, steel), Sync (slave ratio 1-8x, sweep it with Shape Env / master saw
-blend). Pluck and Mallet ring by themselves: give them amp sustain 1 and let the source decay. QA and
+blend), Electric (pickup 0 neck .. 1 bridge / sustain 0 palm-muted .. 1 singing). Pluck, Mallet and
+Electric ring by themselves: give them amp sustain 1 and let the source decay.
+
+Electric guitar presets (GUITAR): Electric source, voice filter open (it is the guitar's tone knob), Dirt as
+the amp (Tube = clean/edge, Amp = crunch/high gain, Fuzz = pedal) with CAB on (1x12 Combo or 4x12 Stack),
+`strum` 4-14 ms for chords, amp release 70-260 ms (fingers muting the strings). With CAB on the processor
+tightens the lows before the drive, distorts the full range and adds a tone stack. Judge the tone with
+`tools/qa/spectrum.py` on the renders: crunch ~flat 160 Hz-2.5 kHz, -20 dB by 6 kHz, -50 dB by 10 kHz.
+Double-track rhythm parts with a second Electric layer panned opposite and a few cents apart. QA and
 previews use the `mixed` phrase (held chord, arpeggio, stabs, legato melody) so plucks are heard fairly.
 The generator lives outside the repo; the JSON files are the source of truth.
 

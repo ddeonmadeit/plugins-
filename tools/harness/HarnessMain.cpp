@@ -4,7 +4,7 @@
 
       <Plugin>Harness list
       <Plugin>Harness render  --out x.wav [--program N | --preset-file p.json] [--set id=value ...]
-                              [--phrase demo|single|slide|groove|chords|pads|mixed|drums|drumvel] [--sr 48000] [--block 256] [--mono]
+                              [--phrase demo|single|slide|groove|chords|pads|mixed|guitar|drums|drumvel] [--sr 48000] [--block 256] [--mono]
       <Plugin>Harness render-all --outdir dir [--phrase demo] [--sr 48000]
       <Plugin>Harness snapshot --out ui.png [--program N] [--scale 1]
       <Plugin>Harness stress  [--seconds 20] [--sr 48000] [--block 128]
@@ -103,6 +103,31 @@ std::vector<Note> phrase (const juce::String& name, double& totalSeconds)
                 if (note >= 0)
                     out.push_back ({ note, c * 4.0, 3.85, 92 });
         totalSeconds = 16.0 + 4.0;
+        return out;
+    }
+    if (name == "guitar")
+    {
+        // 80 BPM: three bars strummed on open-chord voicings (down 1, down 2, up 2&, up 3&, down 4,
+        // up 4&), then a bar of single-note riff ending on a held note.
+        const std::vector<std::vector<int>> chords { { 40, 47, 52, 55, 59, 64 }, { 48, 52, 55, 60, 64 },
+                                                     { 43, 47, 50, 55, 59, 67 } };
+        const double beat = 0.75;
+        const double hits[6] = { 0.0, 1.0, 1.5, 2.5, 3.0, 3.5 };
+        const bool downStroke[6] = { true, true, false, false, true, false };
+        std::vector<Note> out;
+        for (int bar = 0; bar < 3; ++bar)
+            for (int h = 0; h < 6; ++h)
+            {
+                const double t = (bar * 4 + hits[h]) * beat;
+                const double next = h < 5 ? (bar * 4 + hits[h + 1]) * beat : (bar + 1) * 4 * beat;
+                for (int note : chords[(size_t) bar])
+                    out.push_back ({ note, t, next - t - 0.03, downStroke[h] ? 104 : 84 });
+            }
+        const int riff[8] = { 64, 67, 69, 71, 74, 71, 69, 67 };
+        for (int i = 0; i < 8; ++i)
+            out.push_back ({ riff[i], (12 + i * 0.5) * beat, 0.5 * beat - 0.02, 96 });
+        out.push_back ({ 64, 16 * beat, 2.0 * beat, 100 });
+        totalSeconds = 16 * beat + 3.0;
         return out;
     }
     if (name == "mixed")

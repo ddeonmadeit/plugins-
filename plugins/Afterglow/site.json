@@ -1,24 +1,30 @@
 {
   "publish": true,
   "tagline": "Pads, keys, plucks and soundscapes, artist-inspired",
-  "description": "A two-layer synth for pads, keys, plucks, leads, bells and soundscapes, played from a sunset horizon instead of a wall of knobs: drag the sun for motion and tone, shape the rest with six macros. 70 presets inspired by Tame Impala, Massive Attack, Brent Faiyaz, Mike Dean, Travis Scott, Yeezus and moshc0re, from bare and soft to extreme.",
+  "description": "A two-layer synth for pads, keys, plucks, leads, bells and soundscapes, played from a sunset horizon instead of a wall of knobs: drag the sun for motion and tone, shape the rest with six macros. 77 presets inspired by Tame Impala, Massive Attack, Brent Faiyaz, Mike Dean, Travis Scott, Yeezus and moshc0re, plus a modelled electric guitar, from bare and soft to extreme.",
   "accent": "#ec7d2e",
   "highlights": [
-    "Eleven sources per layer: Juno-style analog, string machine, formant choir, FM glass, electric piano, pitched air, sine, plucked string, drawbar organ, mallets (marimba, vibes, kalimba, glock, steel) and hard sync",
+    "Twelve sources per layer: Juno-style analog, string machine, formant choir, FM glass, electric piano, pitched air, sine, plucked string, drawbar organ, mallets (marimba, vibes, kalimba, glock, steel), hard sync and a modelled electric guitar",
+    "Electric guitar: a picked string heard through a magnetic pickup (neck to bridge), into the Dirt amp and a CAB speaker (1x12 combo or 4x12 stack); chords strum low to high",
     "Dirt (8 distortion types), tape wow and saturation, lo-fi, Juno / Solina ensemble, phaser, dub delay, shimmer reverb, tempo pump and gate",
     "Drag the sun to set Motion and Tone; Swell, Tail, Blend, Grit, Echo and Space reshape any preset",
     "POLY switch: play chords with any preset, even the mono leads",
-    "70 presets: TAME IMPALA, MASSIVE ATTACK, BRENT FAIYAZ, MIKE DEAN, TRAVIS SCOTT, YEEZUS, MOSHC0RE"
+    "77 presets: TAME IMPALA, MASSIVE ATTACK, BRENT FAIYAZ, MIKE DEAN, TRAVIS SCOTT, YEEZUS, MOSHC0RE, GUITAR"
   ],
   "installTips": [
     "Every macro's centre position is the preset as designed: double-click a knob, or the sun, to go back to it.",
-    "Pump, gate, delay and synced LFOs follow FL Studio's tempo."
+    "Pump, gate, delay and synced LFOs follow FL Studio's tempo.",
+    "Guitar presets: play chords as voicings within one or two octaves (like a real neck), around C2-C5 in FL's piano roll; the POLY switch must be on for chords."
   ],
-  "previewNote": "on the same 120 BPM phrase: a held Dm9, an arpeggio over Bb, Fmaj7 stabs, then a legato melody.",
+  "previewNote": "on the same 120 BPM phrase: a held Dm9, an arpeggio over Bb, Fmaj7 stabs, then a legato melody. GUITAR presets play strummed Em, C and G chords at 80 BPM and a riff.",
   "whatsNew": {
-    "version": "1.2.0",
+    "version": "1.3.0",
     "items": [
-      "MOSHC0RE: 10 new presets: a rage supersaw lead, a sample-and-hold techno sequence, a UFO theremin, a vamp cathedral choir, a dub-techno chord, club-light strobes, an 8-bit lead, a pumping machine drone, a soft music box and a hard-techno hoover"
+      "GUITAR: 7 electric guitar presets: a dark trap clean, a neo-soul clean, Opium-style rage crunch, a palm-muted chug, a Mike Dean solo, Tame Impala fuzz and an ambient volume swell",
+      "New Electric source: a modelled guitar string with pick and pickup position, pick attack and a few cents of twang as each note settles",
+      "New CAB switch: a guitar speaker cabinet after the Dirt amp, with the amp's tone stack in front of it",
+      "Chords on guitar presets strum lowest string first, and quick repeats strum back up",
+      "Fixed: the first notes after loading the plugin could pass through the distortion for a split second"
     ]
   }
 }

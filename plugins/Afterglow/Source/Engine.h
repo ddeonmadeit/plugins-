@@ -9,6 +9,9 @@ namespace ag
     slide in from the last note played. Mono: one voice, every note restarts the envelopes and glides
     from the previous pitch. Legato: overlapping notes slide on the same voice without retriggering.
     The sustain pedal holds notes in every mode.
+
+    Strum (poly only): notes that arrive together start one after another, lowest first, like a pick
+    crossing the strings; a chord that follows quickly is an up-stroke (highest first, a little faster).
 */
 class Engine
 {
@@ -22,10 +25,12 @@ public:
         Mode mode = Mode::Poly;
         float glideMs = 0.0f;
         float bendRange = 2.0f;
+        float strumMs = 0.0f;
     };
 
     void prepare (double sampleRate)
     {
+        sr = sampleRate;
         for (int i = 0; i < kMaxVoices; ++i)
             voices[(size_t) i].prepare (sampleRate, 0x2545F491u + (uint32_t) i * 7919u);
         held.reserve (128);
@@ -42,6 +47,11 @@ public:
         sustainDown = false;
         lastPitch = -1.0f;
         bendSemis = 0.0f;
+        queued = 0;
+        clock = 0;
+        groupStart = -(1 << 30);
+        groupDown = true;
+        groupStarted = 0;
     }
 
     void setSettings (const Settings& s) noexcept { settings = s; }
@@ -69,6 +79,7 @@ public:
         {
             held.clear();
             sustained.clear();
+            queued = 0;
             for (auto& v : voices)
                 if (m.isAllSoundOff()) v.choke(); else if (v.isGateOn()) v.release();
         }
@@ -76,9 +87,26 @@ public:
 
     void render (float* L, float* R, int n, const VoiceParams& vp) noexcept
     {
-        for (auto& v : voices)
-            if (v.isActive())
-                v.render (L, R, n, vp);
+        int done = 0;
+        while (queued > 0)
+        {
+            int first = 0;
+            for (int i = 1; i < queued; ++i)
+                if (queue[(size_t) i].startAt < queue[(size_t) first].startAt)
+                    first = i;
+            const int64_t offset = queue[(size_t) first].startAt - clock;
+            if (offset >= n)
+                break;
+            const int at = (int) std::max<int64_t> (done, offset);
+            renderVoices (L + done, R + done, at - done, vp);
+            done = at;
+            const auto q = queue[(size_t) first];
+            removeQueued (first);
+            ++groupStarted;
+            startVoice (q.note, q.velocity, q.from, vp);
+        }
+        renderVoices (L + done, R + done, n - done, vp);
+        clock += n;
     }
 
     int getNumActiveVoices() const noexcept
@@ -120,8 +148,62 @@ private:
             for (auto& v : voices)
                 if (v.isGateOn() && v.getNote() == note)
                     v.release();
-            startVoice (note, velocity, from, vp);
+            if (settings.strumMs > 0.0f)
+                strum (note, velocity, from, vp);
+            else
+                startVoice (note, velocity, from, vp);
         }
+    }
+
+    void strum (int note, float velocity, float from, const VoiceParams& vp)
+    {
+        if (clock - groupStart > (int64_t) (0.03 * sr))
+        {
+            // A new chord: whatever is still waiting from the last one plays now.
+            while (queued > 0)
+            {
+                const auto q = queue[0];
+                removeQueued (0);
+                startVoice (q.note, q.velocity, q.from, vp);
+            }
+            // Strokes alternate down / up on 8th-note strumming (down to ~65 BPM); a pause resets to down.
+            groupDown = clock - groupStart < (int64_t) (0.47 * sr) ? ! groupDown : true;
+            groupStart = clock;
+            groupStarted = 0;
+        }
+        for (int i = 0; i < queued; ++i)
+            if (queue[(size_t) i].note == note)
+                removeQueued (i--);
+        if (queued == (int) queue.size())
+        {
+            startVoice (note, velocity, from, vp);
+            return;
+        }
+        queue[(size_t) queued++] = { note, velocity, from, 0 };
+
+        // Re-space the chord's waiting strings in stroke order.
+        const bool down = groupDown;
+        std::sort (queue.begin(), queue.begin() + queued,
+                   [down] (const Queued& a, const Queued& b) { return down ? a.note < b.note : a.note > b.note; });
+        const double step = settings.strumMs * 0.001 * sr * (down ? 1.0 : 0.7);
+        for (int i = 0; i < queued; ++i)
+            queue[(size_t) i].startAt = groupStart + (int64_t) ((groupStarted + i) * step);
+    }
+
+    void renderVoices (float* L, float* R, int n, const VoiceParams& vp) noexcept
+    {
+        if (n <= 0)
+            return;
+        for (auto& v : voices)
+            if (v.isActive())
+                v.render (L, R, n, vp);
+    }
+
+    void removeQueued (int i) noexcept
+    {
+        for (int k = i; k < queued - 1; ++k)
+            queue[(size_t) k] = queue[(size_t) k + 1];
+        --queued;
     }
 
     void noteOff (int note, const VoiceParams& vp)
@@ -161,6 +243,16 @@ private:
         }
         else
         {
+            // A string still waiting in a strum sounds before it is let go.
+            for (int i = 0; i < queued; ++i)
+                if (queue[(size_t) i].note == note)
+                {
+                    const auto q = queue[(size_t) i];
+                    removeQueued (i);
+                    ++groupStarted;
+                    startVoice (q.note, q.velocity, q.from, vp);
+                    break;
+                }
             for (auto& v : voices)
                 if (v.isGateOn() && v.getNote() == note)
                     v.release();
@@ -208,7 +300,14 @@ private:
 
     void removeHeld (int note) { held.erase (std::remove (held.begin(), held.end(), note), held.end()); }
 
+    struct Queued { int note; float velocity, from; int64_t startAt; };
+
     std::array<Voice, kMaxVoices> voices {};
+    std::array<Queued, 32> queue {};
+    int queued = 0, groupStarted = 0;
+    int64_t clock = 0, groupStart = -(1 << 30);
+    bool groupDown = true;
+    double sr = 44100.0;
     std::vector<int> held, sustained, pending;
     Settings settings;
     bool sustainDown = false;

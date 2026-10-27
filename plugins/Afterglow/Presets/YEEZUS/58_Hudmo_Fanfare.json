@@ -117,6 +117,9 @@
     "distType": "Fold",
     "distDrive": 0.5,
     "distMix": 0.8,
-    "distTone": 0.2
+    "distTone": 0.2,
+    "cabOn": false,
+    "cabType": "1x12 Combo",
+    "strum": 0.0
   }
 }

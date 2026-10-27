@@ -40,7 +40,7 @@ AfterglowEditor::Content::Content (AfterglowProcessor& p)
     const std::tuple<const char*, const char*, juce::Colour> fxDefs[] = {
         { "distOn", "DIRT", sunset::red }, { "tapeOn", "TAPE", sunset::ember }, { "ensOn", "ENSEMBLE", sunset::orange },
         { "phaserOn", "PHASER", sunset::amber }, { "delayOn", "DELAY", sunset::ember }, { "reverbOn", "REVERB", sunset::yellow },
-        { "pumpOn", "PUMP", sunset::red } };
+        { "pumpOn", "PUMP", sunset::red }, { "cabOn", "CAB", sunset::orange } };
     for (auto& [id, label, colour] : fxDefs)
     {
         auto s = std::make_unique<dd::gui::LampSwitch> (*p.apvts.getParameter (id), label, colour);

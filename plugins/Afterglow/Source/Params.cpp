@@ -6,7 +6,7 @@ namespace ag
 {
 namespace choices
 {
-    const juce::StringArray& sources()     { static const juce::StringArray c { "Analog", "Strings", "Choir", "Glass", "Tines", "Air", "Sine", "Pluck", "Organ", "Mallet", "Sync" }; return c; }
+    const juce::StringArray& sources()     { static const juce::StringArray c { "Analog", "Strings", "Choir", "Glass", "Tines", "Air", "Sine", "Pluck", "Organ", "Mallet", "Sync", "Electric" }; return c; }
     const juce::StringArray& noiseTypes()  { static const juce::StringArray c { "Hiss", "Vinyl", "Wind" }; return c; }
     const juce::StringArray& filterTypes() { static const juce::StringArray c { "Ladder", "LP 12", "BP 12", "HP 12" }; return c; }
     const juce::StringArray& voiceModes()  { static const juce::StringArray c { "Poly", "Mono", "Legato" }; return c; }
@@ -22,7 +22,7 @@ const std::array<ParamSpec, (size_t) kNumParams>& table()
 {
     static const std::array<ParamSpec, (size_t) kNumParams> t {{
         { P::aOn,       "aOn",       "A On",          K::Bool,   0, 1, 1, 0, U::None, nullptr },
-        { P::aSource,   "aSource",   "A Source",      K::Choice, 0, 10, 0, 0, U::None, &choices::sources() },
+        { P::aSource,   "aSource",   "A Source",      K::Choice, 0, 11, 0, 0, U::None, &choices::sources() },
         { P::aLevel,    "aLevel",    "A Level",       K::Float,  0, 1, 0.8f, 0, U::Percent, nullptr },
         { P::aOct,      "aOct",      "A Octave",      K::Int,   -3, 3, 0, 0, U::None, nullptr },
         { P::aSemi,     "aSemi",     "A Semi",        K::Int,  -12, 12, 0, 0, U::Semis, nullptr },
@@ -37,7 +37,7 @@ const std::array<ParamSpec, (size_t) kNumParams>& table()
         { P::aDrift,    "aDrift",    "A Drift",       K::Float,  0, 1, 0.2f, 0, U::Percent, nullptr },
 
         { P::bOn,       "bOn",       "B On",          K::Bool,   0, 1, 0, 0, U::None, nullptr },
-        { P::bSource,   "bSource",   "B Source",      K::Choice, 0, 10, 2, 0, U::None, &choices::sources() },
+        { P::bSource,   "bSource",   "B Source",      K::Choice, 0, 11, 2, 0, U::None, &choices::sources() },
         { P::bLevel,    "bLevel",    "B Level",       K::Float,  0, 1, 0.8f, 0, U::Percent, nullptr },
         { P::bOct,      "bOct",      "B Octave",      K::Int,   -3, 3, 0, 0, U::None, nullptr },
         { P::bSemi,     "bSemi",     "B Semi",        K::Int,  -12, 12, 0, 0, U::Semis, nullptr },
@@ -143,7 +143,10 @@ const std::array<ParamSpec, (size_t) kNumParams>& table()
         { P::distDrive,  "distDrive",  "Dirt Drive",     K::Float,  0, 1, 0.4f, 0, U::Percent, nullptr },
         { P::distMix,    "distMix",    "Dirt Mix",       K::Float,  0, 1, 1, 0, U::Percent, nullptr },
         { P::distTone,   "distTone",   "Dirt Tone",      K::Float, -1, 1, 0, 0, U::Bipolar, nullptr },
-        { P::perfPoly,   "perfPoly",   "Poly Keys",      K::Bool,   0, 1, 1, 0, U::None, nullptr }
+        { P::perfPoly,   "perfPoly",   "Poly Keys",      K::Bool,   0, 1, 1, 0, U::None, nullptr },
+        { P::cabOn,      "cabOn",      "Cabinet",        K::Bool,   0, 1, 0, 0, U::None, nullptr },
+        { P::cabType,    "cabType",    "Cabinet Type",   K::Choice, 0, 1, 0, 0, U::None, &dd::CabSim::typeNames() },
+        { P::strum,      "strum",      "Strum",          K::Float,  0, 80, 0, 0, U::Ms, nullptr }
     }};
     return t;
 }

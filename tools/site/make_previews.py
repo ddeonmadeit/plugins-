@@ -81,8 +81,17 @@ def main():
     tmp = tempfile.mkdtemp()
     try:
         subprocess.run([harness, "render-all", "--phrase", phrase, "--outdir", tmp], check=True, stdout=subprocess.DEVNULL)
+        # Some categories or presets are played differently (Afterglow's GUITAR presets get strummed chords
+        # and a riff). Keys are a category or "CATEGORY - Preset Name"; the preset wins.
+        by_category = qa.get("previewPhraseByCategory", {})
+        index = json.load(open(os.path.join(tmp, "index.json")))
+        for item in index:
+            special = by_category.get(item["program"], by_category.get(item["program"].partition(" - ")[0]))
+            if special:
+                subprocess.run([harness, "render", "--program", str(item["index"]), "--phrase", special,
+                                "--out", os.path.join(tmp, item["file"])], check=True, stdout=subprocess.DEVNULL)
         entries = []
-        for item in json.load(open(os.path.join(tmp, "index.json"))):
+        for item in index:
             x, sr = sf.read(os.path.join(tmp, item["file"]), always_2d=True)
             mix = x
             if backing:

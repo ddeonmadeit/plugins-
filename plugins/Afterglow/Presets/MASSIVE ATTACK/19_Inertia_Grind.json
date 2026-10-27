@@ -117,6 +117,9 @@
     "distType": "Amp",
     "distDrive": 0.7,
     "distMix": 1.0,
-    "distTone": 0.1
+    "distTone": 0.1,
+    "cabOn": false,
+    "cabType": "1x12 Combo",
+    "strum": 0.0
   }
 }

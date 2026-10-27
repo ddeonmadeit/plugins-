@@ -4,8 +4,8 @@
 
 namespace ag
 {
-enum class Source { Analog, Strings, Choir, Glass, Tines, Air, Sine, Pluck, Organ, Mallet, Sync };
-constexpr int kNumSources = 11;
+enum class Source { Analog, Strings, Choir, Glass, Tines, Air, Sine, Pluck, Organ, Mallet, Sync, Electric };
+constexpr int kNumSources = 12;
 
 /** One layer's settings for a block, with the macros and global modulation already applied. */
 struct LayerParams
@@ -39,6 +39,8 @@ struct LayerParams
       Organ    nine drawbars: shape sweeps flute > jazz > gospel > reed > full, char = percussion and key click
       Mallet   struck bar (modal): shape = mallet hardness, char picks the bar (marimba, vibes, kalimba, glock, steel)
       Sync     hard-sync saw: shape = slave ratio (sweep it with Shape Env), char blends the master saw back in
+      Electric electric guitar string: picked near the bridge, heard through a magnetic pickup. shape = pickup
+               (0 neck, warm and round .. 1 bridge, thin and bright), char = sustain (0 palm-muted .. 1 singing)
 */
 class Layer
 {
@@ -85,13 +87,26 @@ public:
             excite[(size_t) i] = -1;   // a pluck excites one period once the pitch is known
             syncPrev[(size_t) i] = 0.0f;
         }
-        if (p.source == Source::Pluck && fresh)
+        if ((p.source == Source::Pluck || p.source == Source::Electric) && fresh)
         {
             for (auto& s : strings)
                 std::fill (s.begin(), s.end(), 0.0f);
             std::fill (stringZ.begin(), stringZ.end(), 0.0f);
             std::fill (dcX.begin(), dcX.end(), 0.0f);
             std::fill (dcY.begin(), dcY.end(), 0.0f);
+            std::fill (apX.begin(), apX.end(), 0.0f);
+            std::fill (apY.begin(), apY.end(), 0.0f);
+        }
+        if (p.source == Source::Electric)
+        {
+            // Every pick lands a little differently; a string starts a few cents sharp and settles.
+            for (auto& b : pickPos)
+                b = 0.1f + 0.07f * rng.uni();
+            twang = (3.0f + 9.0f * vel) / 1200.0f;
+            twangCoef = dd::onePoleCoef (0.045f, sr);
+            for (auto& f : pickupLp)
+                f.reset();
+            pickupDc[0] = pickupDc[1] = 0.0f;
         }
         for (auto& f : formant) for (auto& s : f) s.reset();
         for (auto& f : toneLp) f.reset();
@@ -103,7 +118,7 @@ public:
         // Tines: harder hits keep the bark longer.
         indexCoef = dd::onePoleCoef (0.25f + 0.9f * (1.0f - p.shape) * (0.6f + 0.4f * vel), sr);
         tineCoef = dd::onePoleCoef (p.source == Source::Organ ? 0.22f : 0.045f, sr);
-        clickCoef = dd::onePoleCoef (p.source == Source::Mallet ? 0.0025f : 0.0012f, sr);
+        clickCoef = dd::onePoleCoef (p.source == Source::Mallet ? 0.0025f : (p.source == Source::Electric ? 0.0009f : 0.0012f), sr);
         configure (p);
     }
 
@@ -143,6 +158,8 @@ public:
         }
         if (p.source == Source::Mallet && ! modalReady)
             setupModes (p, hz[0]);
+        if (p.source == Source::Electric)
+            configureElectric (p, hz[0] * ratio[0], nv);
 
         const float inv = 1.0f / (float) sr;
         for (int i = 0; i < n; ++i)
@@ -173,7 +190,15 @@ public:
                 l = toneLp[0].lp (toneHp[0].hp (l));
                 r = toneLp[1].lp (toneHp[1].hp (r));
             }
-            if (p.source == Source::Organ || p.source == Source::Mallet)
+            else if (p.source == Source::Electric)
+            {
+                // Pick scrape on the attack, then the pickup's coil resonance.
+                const float pick = clickEnv * velocity * velocity * 0.35f * rng.bi();
+                l = pickup (0, l + pick);
+                r = pickup (1, r + pick);
+                twang *= twangCoef;
+            }
+            if (p.source == Source::Organ || p.source == Source::Mallet || p.source == Source::Electric)
             {
                 tineEnv *= tineCoef;
                 clickEnv *= clickCoef;
@@ -187,7 +212,7 @@ public:
 private:
     // Per-source gain so every source is equally loud (measured on the pads phrase, one unison voice).
     static constexpr std::array<float, kNumSources> kSourceGain { 0.14f, 0.17f, 0.29f, 0.13f, 0.14f, 0.61f, 0.135f,
-                                                                  0.47f, 0.135f, 0.147f, 0.165f };
+                                                                  0.47f, 0.135f, 0.147f, 0.165f, 0.36f };
 
     static float saw (float t, float dt) noexcept { return 2.0f * t - 1.0f - dd::polyBlep (t, dt); }
 
@@ -283,6 +308,7 @@ private:
             case Source::Organ:   y = organ (v, dt, p.character); break;
             case Source::Mallet:  y = mallet (v, dt, s); break;
             case Source::Sync:    y = sync (v, dt, s, p.character); break;
+            case Source::Electric: y = electric (v, dt); break;
         }
         return y;
     }
@@ -329,6 +355,113 @@ private:
         dcX[(size_t) v] = out;
         dcY[(size_t) v] = y;
         return y;
+    }
+
+    /**
+        Electric guitar string (extended Karplus-Strong): a triangle-shaped pluck written straight into the
+        string, an allpass for exact tuning, a gentle loss filter, and the output read through a comb at the
+        pickup's position along the string, so neck and bridge pickups lose different harmonics like the
+        real thing.
+    */
+    float electric (int v, float dt) noexcept
+    {
+        auto& line = strings[(size_t) v];
+        auto& w = stringWrite[(size_t) v];
+        const float period = juce::jlimit (4.0f, (float) (stringMask - 4), 1.0f / (dt * (1.0f + twang * 0.69315f)));
+        if (excite[(size_t) v] < 0)
+        {
+            pickString (v, period);
+            excite[(size_t) v] = 0;
+        }
+
+        // Loop delay = integer line delay + allpass (0.1..1.1 samples) + loss filter (elecDamp samples).
+        const float len = period - elecDamp;
+        const int di = (int) (len - 0.1f);
+        const float frac = len - (float) di;
+        const float c = (1.0f - frac) / (1.0f + frac);
+        const float x = line[(size_t) ((w - di) & stringMask)];
+        const float ap = c * x + apX[(size_t) v] - c * apY[(size_t) v];
+        apX[(size_t) v] = x;
+        apY[(size_t) v] = ap;
+        auto& z = stringZ[(size_t) v];
+        const float out = ((1.0f - elecDamp) * ap + elecDamp * z) * pluckGain[(size_t) v];
+        z = ap;
+        line[(size_t) (w & stringMask)] = out;
+
+        const int m = std::max (1, (int) (pickupPos * period + 0.5f));
+        const float y = out - 0.92f * line[(size_t) ((w - m) & stringMask)];
+        w = (w + 1) & stringMask;
+        return y;
+    }
+
+    /** The pick: a triangle displacement peaking at the pick point, a little noise for the plectrum's edge. */
+    void pickString (int v, float period) noexcept
+    {
+        auto& line = strings[(size_t) v];
+        const int len = (int) period;
+        const int w = stringWrite[(size_t) v];
+        const float beta = pickPos[(size_t) v];
+        const float amp = 0.35f + 0.65f * velocity;
+        const float grit = 0.08f + 0.22f * velocity;
+        const float soft = 0.25f + 0.75f * velocity;   // soft touches round the corner of the pluck
+        const auto shape = [&] (dd::Rng& r, float& lp, int k)
+        {
+            const float u = (float) k / (float) len;
+            const float tri = u < beta ? u / beta : (1.0f - u) / (1.0f - beta);
+            lp += soft * ((tri + grit * r.bi()) - lp);
+            return lp;
+        };
+
+        // Two passes over the same noise (a copy of the generator): the first finds the mean so the
+        // pluck carries no DC, the second writes it. A ringing string is damped by the pick first.
+        auto replay = rng;
+        float mean = 0.0f, lp = 0.0f;
+        for (int k = 0; k < len; ++k)
+            mean += shape (replay, lp, k);
+        mean /= (float) len;
+        lp = 0.0f;
+        for (int k = 0; k < len; ++k)
+        {
+            auto& slot = line[(size_t) ((w - len + k) & stringMask)];
+            slot = slot * 0.3f + (shape (rng, lp, k) - mean) * amp;
+        }
+    }
+
+    void configureElectric (const LayerParams& p, float noteHz, int nv) noexcept
+    {
+        // Sustain: palm-muted thud (0.12 s, dull) .. normal ring .. singing (13 s); high notes die sooner.
+        const float sustain = p.character;
+        const float t60 = 0.12f * std::exp2 (sustain * 6.5f) * std::pow (196.0f / juce::jlimit (60.0f, 2000.0f, noteHz), 0.4f);
+        const float mute = juce::jlimit (0.0f, 1.0f, (0.3f - sustain) / 0.3f);
+        elecDamp = 0.12f + 0.36f * mute * mute;
+        for (int v = 0; v < nv; ++v)
+            pluckGain[(size_t) v] = std::pow (0.001f, 1.0f / (std::max (20.0f, noteHz * ratio[(size_t) v] / ratio[0]) * t60));
+
+        // Pickup: neck (a quarter of the string from the bridge, humbucker resonance ~2.6 kHz) to bridge
+        // (6 %, single-coil bite ~4.2 kHz).
+        const float sel = p.shape;
+        pickupPos = 0.25f - 0.19f * sel;
+        const float fc = 2600.0f * std::exp2 (sel * 0.7f);
+        const float q = 1.4f + 1.0f * sel;
+        if (std::abs (fc - pickupFc) > 1.0f)
+        {
+            pickupFc = fc;
+            for (auto& f : pickupLp)
+                f.set (std::min (fc, 0.45f * (float) sr), q, sr);
+        }
+        // The comb thins the low end more at the bridge; level it so the pickup switch is not a volume knob.
+        pickupGain = 1.0f / (0.35f + 2.6f * pickupPos);
+    }
+
+    float pickup (int ch, float x) noexcept
+    {
+        float lp, bp, hp;
+        pickupLp[(size_t) ch].process (x, lp, bp, hp);
+        juce::ignoreUnused (bp, hp);
+        // DC-free: the comb removes DC from the string, this guards the pick noise.
+        const float y = lp * pickupGain;
+        pickupDc[ch] += 0.0005f * (y - pickupDc[ch]);
+        return y - pickupDc[ch];
     }
 
     /** Drawbar organ: every footage is an integer multiple of a phase running at half the note (the 16'). */
@@ -535,5 +668,11 @@ private:
 
     // Sync
     std::array<float, kMaxUnison> syncPrev {};
+
+    // Electric
+    std::array<float, kMaxUnison> apX {}, apY {}, pickPos {};
+    std::array<dd::Svf, 2> pickupLp {};
+    float pickupDc[2] {};
+    float elecDamp = 0.12f, pickupPos = 0.2f, pickupFc = -1.0f, pickupGain = 1.0f, twang = 0.0f, twangCoef = 0.0f;
 };
 } // namespace ag

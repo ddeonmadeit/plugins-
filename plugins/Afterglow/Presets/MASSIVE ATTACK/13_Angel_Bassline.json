@@ -117,6 +117,9 @@
     "distType": "Tube",
     "distDrive": 0.35,
     "distMix": 0.6,
-    "distTone": -0.3
+    "distTone": -0.3,
+    "cabOn": false,
+    "cabType": "1x12 Combo",
+    "strum": 0.0
   }
 }

@@ -161,6 +161,7 @@ public:
         }
         delayPos = 0;
         lastCompKey = -1.0f;
+        snapSmoothers = true;
     }
 
     int getLatency() const noexcept { return latency; }
@@ -173,6 +174,16 @@ public:
         const float driveGain = dbToGain (drive01 * dirtMaxDriveDb (p.type));
 
         updateCompensation (p.type, driveGain, p.bias);
+        if (snapSmoothers)
+        {
+            // Start where the settings are: ramping from the defaults would play the first notes after
+            // a reset through full drive even when the mix is 0.
+            driveSm.setCurrentAndTargetValue (driveGain);
+            mixSm.setCurrentAndTargetValue (p.mix);
+            keepSm.setCurrentAndTargetValue (p.subKeep);
+            compSm.setCurrentAndTargetValue (compensation);
+            snapSmoothers = false;
+        }
         driveSm.setTargetValue (driveGain);
         mixSm.setTargetValue (p.mix);
         keepSm.setTargetValue (p.subKeep);
@@ -346,6 +357,7 @@ private:
     float crushHold[2] {};
     int crushCount[2] {};
     float compensation = 1.0f, lastCompKey = -1.0f;
+    bool snapSmoothers = true;
 
     std::array<std::array<float, kMaxBlock>, 2> dry {}, cleanLow {};
     std::array<std::vector<float>, 2> alignRing;

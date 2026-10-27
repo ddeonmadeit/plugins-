@@ -18,7 +18,7 @@ float motionScale (float m) noexcept { return m < 0.0f ? 1.0f + m : 1.0f + 2.0f 
 
 const juce::StringArray& AfterglowProcessor::categoryOrder()
 {
-    static const juce::StringArray order { "TAME IMPALA", "MASSIVE ATTACK", "BRENT FAIYAZ", "MIKE DEAN", "TRAVIS SCOTT", "YEEZUS", "MOSHC0RE", "USER" };
+    static const juce::StringArray order { "TAME IMPALA", "MASSIVE ATTACK", "BRENT FAIYAZ", "MIKE DEAN", "TRAVIS SCOTT", "YEEZUS", "MOSHC0RE", "GUITAR", "USER" };
     return order;
 }
 
@@ -77,6 +77,16 @@ void AfterglowProcessor::prepareToPlay (double sampleRate, int)
     std::fill (std::begin (lastEq), std::end (lastEq), -99.0f);
     glue.prepare (sr);
     clipper.prepare (sr, kChunk);
+    cab.prepare (sr);
+    for (auto& f : ampTight)
+    {
+        f.set (dd::Biquad::Type::HighPass, 70.0f, 0.7071f, 0.0f, sr);
+        f.reset();
+    }
+    ampVoicing = -1;
+    for (auto& chain : ampVoice)
+        for (auto& f : chain)
+            f.reset();
 
     for (auto* s : { &outGainSm, &widthSm, &ensMixSm, &phaserMixSm, &delayMixSm, &reverbMixSm, &pumpDepthSm })
         s->reset (sr, 0.05);
@@ -93,6 +103,22 @@ void AfterglowProcessor::prepareToPlay (double sampleRate, int)
     freeBeat = hostBeat = 0.0;
     levelFollow = 0.0f;
     setLatencySamples (dirt.getLatency() + clipper.getLatency());
+}
+
+void AfterglowProcessor::setAmpVoicing (bool highGain)
+{
+    // The tone stack between the drive and the speaker. Dirt's Amp curve pushes the upper mids hard
+    // before it clips, so a high-gain amp gets a big bass shelf and a cut at its honk; pedals and clean
+    // amps only need a little body and the power stage's soft top.
+    if ((int) highGain == ampVoicing)
+        return;
+    ampVoicing = (int) highGain;
+    for (auto& chain : ampVoice)
+    {
+        chain[0].set (dd::Biquad::Type::LowShelf, 320.0f, 0.6f, highGain ? 10.0f : 3.0f, sr);
+        chain[1].set (dd::Biquad::Type::Peak, 1600.0f, 0.9f, highGain ? -4.0f : 0.0f, sr);
+        chain[2].set (dd::Biquad::Type::HighShelf, 3200.0f, 0.7f, highGain ? -4.0f : -2.0f, sr);
+    }
 }
 
 ag::VoiceParams AfterglowProcessor::buildVoiceParams (float lfo2v, double bpm) const
@@ -223,6 +249,7 @@ void AfterglowProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
     es.mode = params.getBool (P::perfPoly) ? ag::Engine::Mode::Poly : (ag::Engine::Mode) params.getInt (P::voiceMode);
     es.glideMs = params.get (P::glide);
     es.bendRange = (float) params.getInt (P::bendRange);
+    es.strumMs = params.get (P::strum);
     engine.setSettings (es);
     updateFx (bpm);
 
@@ -300,6 +327,15 @@ void AfterglowProcessor::processChunk (float* L, float* R, int n, double bpm)
 
     {
         // Dirt: distortion before the modulation effects, like a pedal in front of chorus and phaser.
+        // With the cabinet on, Dirt is a guitar amp: the lows are tightened before the drive and the
+        // whole range distorts (no clean sub blended back), then the speaker shapes it.
+        const bool cabOn = params.getBool (P::cabOn);
+        if (cabOn)
+            for (int i = 0; i < n; ++i)
+            {
+                L[i] = ampTight[0].process (L[i]);
+                R[i] = ampTight[1].process (R[i]);
+            }
         float* chans[2] = { L, R };
         juce::dsp::AudioBlock<float> block (chans, 2, (size_t) n);
         dd::Dirt::Params dp;
@@ -309,9 +345,25 @@ void AfterglowProcessor::processChunk (float* L, float* R, int n, double bpm)
         dp.tone = params.get (P::distTone);
         dp.bias = 0.35f;
         dp.mix = on ? params.get (P::distMix) : 0.0f;
-        dp.subKeep = 0.35f;
+        dp.subKeep = cabOn ? 0.0f : 0.35f;
         dp.xoverHz = 150.0f;
         dirt.process (block, dp);
+        if (cabOn)
+        {
+            cab.setType ((dd::CabSim::Type) params.getInt (P::cabType));
+            setAmpVoicing (on && dp.type == dd::DirtType::Amp);
+            for (int i = 0; i < n; ++i)
+            {
+                float l = L[i], r = R[i];
+                for (size_t st = 0; st < 3; ++st)
+                {
+                    l = ampVoice[0][st].process (l);
+                    r = ampVoice[1][st].process (r);
+                }
+                L[i] = cab.process (0, l);
+                R[i] = cab.process (1, r);
+            }
+        }
     }
 
     const float lofi = bend01 (params.get (P::lofi), grit, 0.35f);
@@ -447,6 +499,10 @@ void AfterglowProcessor::processChunk (float* L, float* R, int n, double bpm)
             std::fill (R, R + n, 0.0f);
             engine.reset();
             dirt.reset(); tape.reset(); ensemble.reset(); phaser.reset(); delay.reset(); reverb.reset(); shimmerShift.reset();
+            cab.reset(); ampTight[0].reset(); ampTight[1].reset();
+            for (auto& chain : ampVoice)
+                for (auto& f : chain)
+                    f.reset();
             shimmerFb = 0.0f;
             glue.reset();
             clipper.reset();

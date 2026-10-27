@@ -41,6 +41,9 @@ enum class P
     distOn, distType, distDrive, distMix, distTone,
     perfPoly,   // performance switch: belongs to the instance, never to a preset (see dd::isPerformanceParam)
 
+    // Added in 1.3: guitar cabinet after the Dirt stage, and strummed chords (lowest string first)
+    cabOn, cabType, strum,
+
     count
 };
 

@@ -117,6 +117,9 @@
     "distType": "Clip",
     "distDrive": 0.6,
     "distMix": 1.0,
-    "distTone": 0.0
+    "distTone": 0.0,
+    "cabOn": false,
+    "cabType": "1x12 Combo",
+    "strum": 0.0
   }
 }

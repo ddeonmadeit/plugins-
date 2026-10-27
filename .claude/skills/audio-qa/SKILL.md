@@ -28,7 +28,10 @@ programme (kick drops, hats, saw chord) on their input automatically.
 The `demo` phrase: long note, two bouncy repeats, an overlapping pair (tests glide), a fast double,
 a final note with tail. `single` is one 55 Hz note (use for harmonic analysis). `pads` is four held
 chords; `mixed` (Afterglow) is a held chord, an eighth-note arpeggio, stabs and a legato melody, so pads,
-keys and plucks are all measured fairly. `drums` / `drumvel` are Kitroom grooves.
+keys and plucks are all measured fairly. `guitar` is three bars of strummed open chords (down / up
+strokes, 80 BPM) and a riff, for Electric presets. `drums` / `drumvel` are Kitroom grooves.
+Download-page previews use qa.json `previewPhrase`; `previewPhraseByCategory` overrides it per category or
+per `"CATEGORY - Preset Name"` (Afterglow: GUITAR presets get `guitar`, the volume-swell preset `mixed`).
 
 ## Reading analyze.py
 
