@@ -7,7 +7,8 @@
     "TRAVIS SCOTT",
     "YEEZUS",
     "MOSHC0RE",
-    "GUITAR"
+    "GUITAR",
+    "TRIP HOP"
   ],
   "targetLufs": -14.0,
   "toleranceLu": 3.0,
@@ -17,6 +18,7 @@
   "previewBacking": false,
   "previewPhraseByCategory": {
     "GUITAR": "guitar",
-    "GUITAR - Utopia Swell Guitar": "mixed"
+    "GUITAR - Utopia Swell Guitar": "mixed",
+    "TRIP HOP - Wall Tremolo Guitar": "guitar@80"
   }
 }

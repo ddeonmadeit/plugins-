@@ -18,7 +18,7 @@ float motionScale (float m) noexcept { return m < 0.0f ? 1.0f + m : 1.0f + 2.0f 
 
 const juce::StringArray& AfterglowProcessor::categoryOrder()
 {
-    static const juce::StringArray order { "TAME IMPALA", "MASSIVE ATTACK", "BRENT FAIYAZ", "MIKE DEAN", "TRAVIS SCOTT", "YEEZUS", "MOSHC0RE", "GUITAR", "USER" };
+    static const juce::StringArray order { "TAME IMPALA", "MASSIVE ATTACK", "BRENT FAIYAZ", "MIKE DEAN", "TRAVIS SCOTT", "YEEZUS", "MOSHC0RE", "GUITAR", "TRIP HOP", "USER" };
     return order;
 }
 
@@ -440,7 +440,7 @@ void AfterglowProcessor::processChunk (float* L, float* R, int n, double bpm)
     {
         const double divBeats = dd::divisionBeats (params.getInt (P::pumpDiv));
         const double beatsPerSample = bpm / 60.0 / sr;
-        const bool gate = params.getInt (P::pumpMode) == 1;
+        const int mode = params.getInt (P::pumpMode);
         const float smooth = dd::onePoleCoef (0.002f, sr);
         for (int i = 0; i < n; ++i)
         {
@@ -448,8 +448,10 @@ void AfterglowProcessor::processChunk (float* L, float* R, int n, double bpm)
             const float phase = (float) (beat / divBeats - std::floor (beat / divBeats));
             const float depth = pumpDepthSm.getNextValue();
             float target;
-            if (gate)
+            if (mode == 1)
                 target = phase < 0.5f ? 1.0f : 1.0f - depth;
+            else if (mode == 2)
+                target = 1.0f - depth * 0.5f * (1.0f - std::cos (6.2831853f * phase)); // amp tremolo, locked to the grid
             else
             {
                 // Sidechain duck: a fast dip on the beat, then an exponential recovery.

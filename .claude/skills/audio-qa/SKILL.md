@@ -21,7 +21,13 @@ python3 tools/qa/analyze.py <dir> --sheet --target-lufs -9.5 --tolerance 1.5 --s
 python3 tools/qa/variety.py <dir> [<older dir>]         # do the presets play like different instruments?
 tools/qa/run_qa.sh <Name>                              # all of the above, exits non-zero on failure
 $H render --program N --perf --out x.wav               # keep perf* switches (POLY) at their defaults
+$H render --preset-file p.json --phrase "notes:50,0,5.8,100 55,0.02,5.8,96 end=9" --bpm 79 --out x.wav
+python3 tools/qa/tone.py x.wav 0.2 5.8 [--partial 294] # width, tremolo, warble, octave balance of a window
 ```
+
+`notes:` plays any notes (`note,start s,length s,velocity`, optional `end=` seconds): one-shots, a chord
+from a reference, a loop. `--bpm` gives the plugin a playing host transport from beat 0, so synced LFOs,
+delays and pumps (and Afterglow's Trem) run at the reference tempo; without it plugins free-run at 120.
 
 Renders are 32-bit float WAV at 48 kHz with the plugin latency removed. Effects get a built-in test
 programme (kick drops, hats, saw chord) on their input automatically.
@@ -31,7 +37,8 @@ chords; `mixed` (Afterglow) is a held chord, an eighth-note arpeggio, stabs and 
 keys and plucks are all measured fairly. `guitar` is three bars of strummed open chords (down / up
 strokes, 80 BPM) and a riff, for Electric presets. `drums` / `drumvel` are Kitroom grooves.
 Download-page previews use qa.json `previewPhrase`; `previewPhraseByCategory` overrides it per category or
-per `"CATEGORY - Preset Name"` (Afterglow: GUITAR presets get `guitar`, the volume-swell preset `mixed`).
+per `"CATEGORY - Preset Name"` (Afterglow: GUITAR presets get `guitar`, the volume-swell preset `mixed`);
+`"guitar@80"` also renders at that host tempo, for presets with a synced tremolo / pump / delay.
 
 ## Reading analyze.py
 
@@ -116,3 +123,19 @@ SubGrit's page: https://claude.ai/artifact/DTxARTUxVBPbuiynMGdjh3
 - Plucks, bells and keys read 3-6 LU quieter than pads at the same peak (high crest): give them bus glue
   0.55-0.75 and a little sustain, and give the plugin a wider loudness tolerance (Afterglow: -14 +-3).
 
+
+## Matching a reference track (owner sends a beat)
+
+Never ship audio from the reference: measure it, rebuild the sounds in our engines, ship presets (and
+one-shots rendered from them). Workflow that worked for "The Wall" (Afterglow/SubGrit/Kitroom TRIP HOP):
+- Decode with ffmpeg into its own folder; read it with `python3 -I`. Tempo from onset autocorrelation,
+  key from a chroma profile, notes from FFT peaks of held sections.
+- Split stems for analysis only: Demucs `htdemucs_6s` in a scratch venv (CPU torch from
+  download.pytorch.org/whl/cpu, `demucs==4.0.1`; save with soundfile, its torchaudio save needs torchcodec).
+  Drums, bass, guitar, vocals (sung-like leads land here), other (keys, strings, pads).
+- Per stem: zoomed spectrograms, `tone.py` on a held window, harmonic levels of one note (odd vs even,
+  how fast they fall), per-hit pitch / band decays for drums. Then render the same notes through the new
+  preset (`notes:` + `--bpm`) and compare the same numbers until they line up.
+- What mattered: drums mono and dark with the kick pitch matched (drs_kick sits at 48 Hz), a guitar
+  tremolo that is global and synced (a per-voice LFO cancels across strummed notes; use Pump = Trem),
+  chorus + tape for the warble, and the stereo width (L/R correlation) of each part.

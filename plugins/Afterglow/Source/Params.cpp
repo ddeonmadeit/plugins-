@@ -10,7 +10,7 @@ namespace choices
     const juce::StringArray& noiseTypes()  { static const juce::StringArray c { "Hiss", "Vinyl", "Wind" }; return c; }
     const juce::StringArray& filterTypes() { static const juce::StringArray c { "Ladder", "LP 12", "BP 12", "HP 12" }; return c; }
     const juce::StringArray& voiceModes()  { static const juce::StringArray c { "Poly", "Mono", "Legato" }; return c; }
-    const juce::StringArray& pumpModes()   { static const juce::StringArray c { "Duck", "Gate" }; return c; }
+    const juce::StringArray& pumpModes()   { static const juce::StringArray c { "Duck", "Gate", "Trem" }; return c; }
 }
 
 namespace
@@ -120,7 +120,7 @@ const std::array<ParamSpec, (size_t) kNumParams>& table()
         { P::reverbTone, "reverbTone", "Reverb Tone",    K::Float,  0, 1, 0.6f, 0, U::Percent, nullptr },
         { P::shimmer,    "shimmer",    "Shimmer",        K::Float,  0, 1, 0, 0, U::Percent, nullptr },
         { P::pumpOn,     "pumpOn",     "Pump",           K::Bool,   0, 1, 0, 0, U::None, nullptr },
-        { P::pumpMode,   "pumpMode",   "Pump Mode",      K::Choice, 0, 1, 0, 0, U::None, &choices::pumpModes() },
+        { P::pumpMode,   "pumpMode",   "Pump Mode",      K::Choice, 0, 2, 0, 0, U::None, &choices::pumpModes() },
         { P::pumpDiv,    "pumpDiv",    "Pump Rate",      K::Choice, 0, 13, 4, 0, U::None, &dd::divisionNames() },
         { P::pumpDepth,  "pumpDepth",  "Pump Depth",     K::Float,  0, 1, 0.5f, 0, U::Percent, nullptr },
         { P::lowCut,     "lowCut",     "Low Cut",        K::Float, 20, 1000, 40, 120, U::Hz, nullptr },

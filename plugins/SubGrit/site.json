@@ -1,7 +1,7 @@
 {
   "publish": true,
   "tagline": "808 + distorted bass engine",
-  "description": "Grungy, distorted 808s and synth basses that stay full: the Dirt section distorts the top while Sub Keep blends the clean sub back underneath. 85 presets in Travis Scott, Mike Dean, untiljapan, Ye, Yeezus, KING and moshc0re styles, plus regular bouncy 808s.",
+  "description": "Grungy, distorted 808s and synth basses that stay full: the Dirt section distorts the top while Sub Keep blends the clean sub back underneath. 88 presets in Travis Scott, Mike Dean, untiljapan, Ye, Yeezus, KING, moshc0re and trip-hop styles, plus regular bouncy 808s.",
   "accent": "#ff5a1f",
   "highlights": [
     "808 body with punch, warmth and knock, plus two unison synth oscillators",
@@ -14,9 +14,9 @@
     "Notes play at real pitch: the classic 808 range is C2–C3 in FL's piano roll (or use the Octave knob)."
   ],
   "whatsNew": {
-    "version": "1.4.0",
+    "version": "1.5.0",
     "items": [
-      "KING: 7 new presets recreating the low end of Ye's KING (the BULLY opener): the loud stadium bass line, the long taped 808 under it, an alarm-pulsed grit bass, a Yeezus-style industrial stomp, a Dark Fantasy kick-808, a blown-arena square stack and a soft round sub for the preacher intro"
+      "TRIP HOP: 3 sub presets measured from a Massive Attack / Sneaker Pimps style beat: the pure sine sub (soft attack, dead centre), a dub sub with a warm triangle on top so it reads on small speakers, and a sub that glides between overlapping notes"
     ]
   }
 }

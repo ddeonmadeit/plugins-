@@ -85,6 +85,11 @@ one sentence of what it is plus how to play it ("overlap notes to slide").
   sample (Duke Edwards). Researched from reviews, not by ear: recreations, never the record's audio.
   Signature: a mid-forward stadium bass line (sub + saw/square, tube), a long taped 808, alarm-rhythm
   gated grit, industrial stomp, kick-808 boom; kits huge and glued or hammered and dry, one soft church room.
+- **TRIP HOP** (SubGrit + Kitroom + Afterglow): measured from a reference beat the owner sent ("The Wall",
+  Massive Attack / Sneaker Pimps type, 79 BPM, D / G minor). Pure sine sub with a soft attack; mono dusty
+  break (47 Hz kick, fat 195 Hz snare, dark hats, tape + light crush); warm clean guitar with a 1/16 Trem pump,
+  wide chorus warble and a dark room; scooping "aah" choir lead; hollow square keys with dub echo; slow wide
+  high strings. Matching method: audio-qa skill, "Matching a reference track".
 - **Bouncy 808s**: dry and simple. Punch + knock + short decay for bounce; clean sustained subs;
   drill slides; pluggnb soft and low-passed; Detroit kick-808; phonk fold+clip.
 

@@ -9,7 +9,7 @@
     "Close, overhead and room mics per piece and for the whole kit, plus tune, decay, glue and width",
     "Kit-bus Drive (8 distortion types), bit Crush and Tone, for anything from warm tape to broken industrial",
     "General MIDI key map shown in FL Studio note names; re-learn any key from your keyboard",
-    "37 kit presets: studio, live room, vintage and jazz, tight funk and soul, big rooms, Yeezus, moshc0re, KING"
+    "40 kit presets: studio, live room, vintage and jazz, tight funk and soul, big rooms, Yeezus, moshc0re, KING, trip hop"
   ],
   "installTips": [
     "The .pkg also installs the drum sound library (about 230 MB). With the .zip, Install.command copies it for you.",
@@ -17,9 +17,9 @@
   ],
   "previewNote": "on the same five-bar 96 BPM groove: ghost notes, open hat, a ride bar, a tom fill and crashes ringing out.",
   "whatsNew": {
-    "version": "1.4.0",
+    "version": "1.5.0",
     "items": [
-      "KING: 6 new kits recreating the heavy drums of Ye's KING (the BULLY opener) on real drums: a stadium kit, an industrial hammer, the darker Dark Fantasy tom room, a dry crushed alarm break, a detuned 808-style low kick and a soft church room for the preacher intro"
+      "TRIP HOP: 3 mono, dusty breakbeat kits measured from a Massive Attack / Sneaker Pimps style beat: a deep 47 Hz kick with no click, a fat low snare and short dark hats, as a dusty break, a ride break and a crushed sampler break"
     ]
   }
 }

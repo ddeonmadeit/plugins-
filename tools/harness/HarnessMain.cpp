@@ -5,6 +5,8 @@
       <Plugin>Harness list
       <Plugin>Harness render  --out x.wav [--program N | --preset-file p.json] [--set id=value ...]
                               [--phrase demo|single|slide|groove|chords|pads|mixed|guitar|drums|drumvel] [--sr 48000] [--block 256] [--mono]
+                              [--bpm 79]   host tempo, transport playing from beat 0 (default: no host)
+                              --phrase "notes:<note>,<start s>,<length s>,<velocity> ... [end=<s>]"   any notes (one-shots, loops)
       <Plugin>Harness render-all --outdir dir [--phrase demo] [--sr 48000]
       <Plugin>Harness snapshot --out ui.png [--program N] [--scale 1]
       <Plugin>Harness stress  [--seconds 20] [--sr 48000] [--block 128]
@@ -26,6 +28,28 @@ struct Note { int note; double start, length; int velocity; };
 
 std::vector<Note> phrase (const juce::String& name, double& totalSeconds)
 {
+    if (name.startsWith ("notes:"))
+    {
+        // Ad-hoc notes, e.g. "notes:50,0,4,100 55,0.02,4,96 end=7" (default end: last note off + 3 s).
+        std::vector<Note> out;
+        double end = 0.0;
+        for (auto& token : juce::StringArray::fromTokens (name.fromFirstOccurrenceOf (":", false, false), " ", ""))
+        {
+            if (token.startsWith ("end="))
+            {
+                end = token.fromFirstOccurrenceOf ("=", false, false).getDoubleValue();
+                continue;
+            }
+            const auto f = juce::StringArray::fromTokens (token, ",", "");
+            if (f.size() == 4)
+                out.push_back ({ f[0].getIntValue(), f[1].getDoubleValue(), f[2].getDoubleValue(), juce::jlimit (1, 127, f[3].getIntValue()) });
+        }
+        if (end <= 0.0)
+            for (auto& n : out)
+                end = std::max (end, n.start + n.length + 3.0);
+        totalSeconds = std::max (end, 0.1);
+        return out;
+    }
     if (name == "single")
     {
         totalSeconds = 3.0;
@@ -240,10 +264,33 @@ juce::AudioBuffer<float> effectTestSignal (double sr, double seconds)
     return buf;
 }
 
-juce::AudioBuffer<float> renderPhrase (juce::AudioProcessor& proc, const juce::String& phraseName, double sr, int block = 256)
+// A host transport for --bpm: playing from beat 0, so tempo-synced LFOs, delays and pumps lock to the notes.
+struct FixedPlayHead : juce::AudioPlayHead
+{
+    double bpm = 120.0, sr = 48000.0;
+    juce::int64 sample = 0;
+
+    juce::Optional<PositionInfo> getPosition() const override
+    {
+        PositionInfo p;
+        p.setBpm (bpm);
+        p.setIsPlaying (true);
+        p.setTimeInSamples (sample);
+        p.setTimeInSeconds ((double) sample / sr);
+        p.setPpqPosition ((double) sample / sr * bpm / 60.0);
+        return p;
+    }
+};
+
+juce::AudioBuffer<float> renderPhrase (juce::AudioProcessor& proc, const juce::String& phraseName, double sr, int block = 256, double bpm = 0.0)
 {
     double total = 0.0;
     auto notes = phrase (phraseName, total);
+
+    FixedPlayHead playHead;
+    playHead.bpm = bpm;
+    playHead.sr = sr;
+    proc.setPlayHead (bpm > 0.0 ? &playHead : nullptr);
 
     // Effects get the test programme on their input; instruments get silence + MIDI.
     // The current bus layout is kept (see render --mono); output is always written as stereo.
@@ -290,10 +337,12 @@ juce::AudioBuffer<float> renderPhrase (juce::AudioProcessor& proc, const juce::S
         if (isEffect)
             for (int ch = 0; ch < numIn; ++ch)
                 buf.copyFrom (ch, 0, input, std::min (ch, 1), pos, n);
+        playHead.sample = pos;
         proc.processBlock (buf, midi);
         for (int ch = 0; ch < 2; ++ch)
             out.copyFrom (ch, pos, buf, std::min (ch, numOut - 1), 0, n);
     }
+    proc.setPlayHead (nullptr);
 
     // Remove the reported latency so renders line up with the MIDI.
     const int lat = proc.getLatencySamples();
@@ -397,7 +446,7 @@ int cmdRender (juce::AudioProcessor& proc, const Args& a)
             return 1;
         }
     }
-    auto buf = renderPhrase (proc, a.get ("--phrase", "demo"), sr, a.get ("--block", "256").getIntValue());
+    auto buf = renderPhrase (proc, a.get ("--phrase", "demo"), sr, a.get ("--block", "256").getIntValue(), a.get ("--bpm", "0").getDoubleValue());
     const juce::File out (a.get ("--out", "render.wav"));
     if (! writeWav (out, buf, sr))
     {
