@@ -90,6 +90,12 @@ one sentence of what it is plus how to play it ("overlap notes to slide").
   break (47 Hz kick, fat 195 Hz snare, dark hats, tape + light crush); warm clean guitar with a 1/16 Trem pump,
   wide chorus warble and a dark room; scooping "aah" choir lead; hollow square keys with dub echo; slow wide
   high strings. Matching method: audio-qa skill, "Matching a reference track".
+- **SAFE** (SubGrit + Afterglow; owner said no drums): SAFE (Saif Musaad), Toronto R&B / trap, sing-rap;
+  reviews: moody R&B with a street edge, "evocative sub-bass and vaporous atmospherics"; STAY (2019) adds
+  dancehall and afrobeat (DJ Dahi, T-Minus, Doc McKinney, Pluss on Paid In Full ft. Carti). Researched from
+  reviews and credits, not by ear. Signature: underwater low-passed 808s and keys, dark 80s synth bass and
+  lead (Doc McKinney), afro / dancehall plucks (marimba, muted guitar, log bass), reverse-swell haze,
+  vocal chops. Keep it apart from BRENT FAIYAZ (bright Rhodes, airy choir) and MASSIVE ATTACK (kalimba).
 - **Bouncy 808s**: dry and simple. Punch + knock + short decay for bounce; clean sustained subs;
   drill slides; pluggnb soft and low-passed; Detroit kick-808; phonk fold+clip.
 

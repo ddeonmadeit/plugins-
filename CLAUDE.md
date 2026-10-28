@@ -126,6 +126,6 @@ Text is cream print (`Palette::text`) or faded tan (`Palette::dim`).
 
 | Plugin | Kind | Code | Notes |
 | --- | --- | --- | --- |
-| SubGrit | synth | Sgrt | 808 + distorted bass, POLY switch. 88 presets: TRAVIS, MIKE DEAN, UNTILJAPAN, YE, YEEZUS, MOSHC0RE, KING, TRIP HOP, BOUNCE 808 |
+| SubGrit | synth | Sgrt | 808 + distorted bass, POLY switch. 94 presets: TRAVIS, MIKE DEAN, UNTILJAPAN, YE, YEEZUS, MOSHC0RE, KING, TRIP HOP, SAFE, BOUNCE 808 |
 | Kitroom | synth | Ktrm | Live acoustic drum kit from multi-mic DrumGizmo recordings (CC BY 4.0): drawn kit UI, GM keys, swappable pieces, close/OH/room mics, bus drive/crush/tone. 40 presets: STUDIO, LIVE ROOM, VINTAGE, TIGHT, BIG, YEEZUS, MOSHC0RE, KING, TRIP HOP. Local QA needs `KITROOM_LIBRARY` (build it with `plugins/Kitroom/library/build_library.py`) |
-| Afterglow | synth | Aglw | Pads, keys, plucks, leads, bells, soundscapes, electric guitar. Deep two-layer engine (12 sources incl. pluck, organ, mallet, sync, Electric guitar string) + Dirt amp + CAB + strum + FX, but the panel is macro-first: a sunset "orb" display (Motion / Tone), 6 macros, POLY switch. 81 presets (each a different role): TAME IMPALA, MASSIVE ATTACK, BRENT FAIYAZ, MIKE DEAN, TRAVIS SCOTT, YEEZUS, MOSHC0RE, GUITAR, TRIP HOP |
+| Afterglow | synth | Aglw | Pads, keys, plucks, leads, bells, soundscapes, electric guitar. Deep two-layer engine (12 sources incl. pluck, organ, mallet, sync, Electric guitar string) + Dirt amp + CAB + strum + FX, but the panel is macro-first: a sunset "orb" display (Motion / Tone), 6 macros, POLY switch. 88 presets (each a different role): TAME IMPALA, MASSIVE ATTACK, BRENT FAIYAZ, MIKE DEAN, TRAVIS SCOTT, YEEZUS, MOSHC0RE, GUITAR, TRIP HOP, SAFE |

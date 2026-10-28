@@ -18,7 +18,7 @@ float motionScale (float m) noexcept { return m < 0.0f ? 1.0f + m : 1.0f + 2.0f 
 
 const juce::StringArray& AfterglowProcessor::categoryOrder()
 {
-    static const juce::StringArray order { "TAME IMPALA", "MASSIVE ATTACK", "BRENT FAIYAZ", "MIKE DEAN", "TRAVIS SCOTT", "YEEZUS", "MOSHC0RE", "GUITAR", "TRIP HOP", "USER" };
+    static const juce::StringArray order { "TAME IMPALA", "MASSIVE ATTACK", "BRENT FAIYAZ", "MIKE DEAN", "TRAVIS SCOTT", "YEEZUS", "MOSHC0RE", "GUITAR", "TRIP HOP", "SAFE", "USER" };
     return order;
 }
 

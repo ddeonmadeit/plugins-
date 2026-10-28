@@ -1,7 +1,7 @@
 {
   "publish": true,
   "tagline": "Pads, keys, plucks and soundscapes, artist-inspired",
-  "description": "A two-layer synth for pads, keys, plucks, leads, bells and soundscapes, played from a sunset horizon instead of a wall of knobs: drag the sun for motion and tone, shape the rest with six macros. 81 presets inspired by Tame Impala, Massive Attack, Brent Faiyaz, Mike Dean, Travis Scott, Yeezus, moshc0re and trip hop, plus a modelled electric guitar, from bare and soft to extreme.",
+  "description": "A two-layer synth for pads, keys, plucks, leads, bells and soundscapes, played from a sunset horizon instead of a wall of knobs: drag the sun for motion and tone, shape the rest with six macros. 88 presets inspired by Tame Impala, Massive Attack, Brent Faiyaz, Mike Dean, Travis Scott, Yeezus, moshc0re, SAFE and trip hop, plus a modelled electric guitar, from bare and soft to extreme.",
   "accent": "#ec7d2e",
   "highlights": [
     "Twelve sources per layer: Juno-style analog, string machine, formant choir, FM glass, electric piano, pitched air, sine, plucked string, drawbar organ, mallets (marimba, vibes, kalimba, glock, steel), hard sync and a modelled electric guitar",
@@ -9,7 +9,7 @@
     "Dirt (8 distortion types), tape wow and saturation, lo-fi, Juno / Solina ensemble, phaser, dub delay, shimmer reverb, tempo pump and gate",
     "Drag the sun to set Motion and Tone; Swell, Tail, Blend, Grit, Echo and Space reshape any preset",
     "POLY switch: play chords with any preset, even the mono leads",
-    "81 presets: TAME IMPALA, MASSIVE ATTACK, BRENT FAIYAZ, MIKE DEAN, TRAVIS SCOTT, YEEZUS, MOSHC0RE, GUITAR, TRIP HOP"
+    "88 presets: TAME IMPALA, MASSIVE ATTACK, BRENT FAIYAZ, MIKE DEAN, TRAVIS SCOTT, YEEZUS, MOSHC0RE, GUITAR, TRIP HOP, SAFE"
   ],
   "installTips": [
     "Every macro's centre position is the preset as designed: double-click a knob, or the sun, to go back to it.",
@@ -18,10 +18,9 @@
   ],
   "previewNote": "on the same 120 BPM phrase: a held Dm9, an arpeggio over Bb, Fmaj7 stabs, then a legato melody. GUITAR presets play strummed Em, C and G chords at 80 BPM and a riff.",
   "whatsNew": {
-    "version": "1.4.0",
+    "version": "1.5.0",
     "items": [
-      "TRIP HOP: 4 presets measured from a Massive Attack / Sneaker Pimps style beat: a warm clean tremolo guitar (tremolo locked to 16ths, wide chorus warble, dark room), an airy ghost voice that scoops into each note, hollow square keys with a dub echo, and slow high strings",
-      "Pump has a new Trem mode: a smooth tremolo locked to your project's tempo (set the division, e.g. 1/16)"
+      "SAFE: 7 new presets in SAFE's moody Toronto R&B lane, each a different instrument: underwater electric piano, a reverse-swell vapor pad, a dry afrobeat marimba, a dreamy piano, a dark 80s lead, palm-muted afro guitar and a chopped vocal stab"
     ]
   }
 }
