@@ -11,6 +11,11 @@ live once it has a release. **Releasing = version bump**: when a push to `main` 
 validates and releases it as `<Name>-v<version>`. New plugins start with `"publish": false`; flip it when the
 owner is happy. To ship an update, bump `VERSION` and push. Details: `.claude/skills/mac-release/SKILL.md`.
 
+Installers aren't notarized yet (that needs the owner's Apple Developer ID; CI is ready for it, see the
+mac-release skill), so a double-clicked .pkg gets macOS's "Apple could not verify" warning. The no-warning
+install is the Terminal command the page offers: `curl -fsSL https://ddeonmadeit.github.io/plugins-/install.sh | bash`.
+When an author name is needed anywhere (signing, credits, metadata), the owner's is **DEON**.
+
 ## Skills (read the matching one before starting)
 
 | Task | Skill |
@@ -43,8 +48,10 @@ tools/harness/            generic headless CLI compiled per plugin (render any n
 tools/qa/                 analyze.py (objective audio QA), variety.py (presets = different instruments?), spectrum.py (tonal balance),
                           tone.py (match a reference sound: width, tremolo, warble, octave balance),
                           preset_lint/fill/normalize, run_qa.sh, drum_velocity.py
-tools/ci/                 plugin_meta.py (reads dd_add_plugin args + site.json), package_macos.sh (+ sample libraries)
-tools/site/               make_previews.py, build_site.py + template.html (download page), release_notes.py
+tools/ci/                 plugin_meta.py (reads dd_add_plugin args + site.json), package_macos.sh (+ sample libraries),
+                          macos_signing.sh + notarize_macos.sh (Developer ID, active once the owner adds the secrets)
+tools/site/               make_previews.py, build_site.py + template.html (download page), install.sh (Terminal
+                          installer template), release_notes.py
 packaging/macos/          Install.command + README.txt shipped in the zip
 .github/workflows/        build.yml: sample libraries (built once, cached) -> Linux QA + previews and macOS
                           universal build/sign/package/validate -> GitHub Release -> download site (gh-pages)

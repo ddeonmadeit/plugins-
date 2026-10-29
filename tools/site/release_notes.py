@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Markdown body for a plugin's GitHub Release.  Usage: release_notes.py <Plugin> <version>"""
+"""Markdown body for a plugin's GitHub Release.  Usage: release_notes.py <Plugin> <version>
+
+DD_NOTARIZED=1 (set by the macOS job after notarize_macos.sh) drops the Gatekeeper workaround and adds
+a marker that tools/site/build_site.py reads, so the download page stops offering it too.
+"""
 import json
 import os
 import subprocess
@@ -7,6 +11,8 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 SITE_URL = "https://ddeonmadeit.github.io/plugins-/"
+NOTARIZED_MARK = "<!-- dd:notarized -->"   # keep in sync with build_site.py
+notarized = os.environ.get("DD_NOTARIZED") == "1"
 
 plugin, version = sys.argv[1], sys.argv[2]
 meta = json.loads(subprocess.check_output(["python3", os.path.join(ROOT, "tools/ci/plugin_meta.py"), "--only", plugin]))[0]
@@ -19,12 +25,26 @@ if new.get("version") == version and new.get("items"):
     lines += ["### What's new in %s" % version] + ["- " + h for h in new["items"]] + ["", "### Everything in %s" % meta["product"]]
 for h in site.get("highlights", []):
     lines.append("- " + h)
+lines += ["", "### Install (macOS 11+, Apple Silicon + Intel, VST3 + AU)"]
+if notarized:
+    lines += [
+        "1. Download **%s-%s-macOS.pkg** below and double-click it." % (plugin, version),
+        "2. FL Studio: Options → Manage plugins → **Find more plugins**. %s appears under %s." % (meta["product"], where),
+    ]
+else:
+    lines += [
+        "**No macOS warning:** open Terminal, paste this and press Return (it asks for your Mac password):",
+        "",
+        "```",
+        "curl -fsSL %sinstall.sh | bash -s %s" % (SITE_URL, meta["product"]),
+        "```",
+        "",
+        "Or download **%s-%s-macOS.pkg** below and double-click it. The first time, macOS says \"Apple could not verify\" it: "
+        "click Done, then System Settings → Privacy & Security → **Open Anyway**, and run the .pkg again." % (plugin, version),
+        "",
+        "Then in FL Studio: Options → Manage plugins → **Find more plugins**. %s appears under %s." % (meta["product"], where),
+    ]
 lines += [
-    "",
-    "### Install (macOS 11+, Apple Silicon + Intel, VST3 + AU)",
-    "1. Download **%s-%s-macOS.pkg** below and double-click it." % (plugin, version),
-    "2. The first time, macOS says it can't verify the developer: System Settings → Privacy & Security → **Open Anyway**, then run the .pkg again.",
-    "3. FL Studio: Options → Manage plugins → **Find more plugins**. %s appears under %s." % (meta["product"], where),
     "",
     "No admin password? Use the .zip: unzip it and run `bash ~/Downloads/%s-%s-macOS/Install.command` in Terminal." % (plugin, version),
     "",
@@ -38,4 +58,6 @@ lines += [
     "",
     "Previews of every preset and all other plugins: %s" % SITE_URL,
 ]
+if notarized:
+    lines += ["", NOTARIZED_MARK]
 print("\n".join(lines))

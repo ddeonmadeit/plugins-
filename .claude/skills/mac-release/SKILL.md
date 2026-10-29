@@ -10,14 +10,17 @@ plugin listed by `tools/ci/plugin_meta.py` (parsed from each `dd_add_plugin()` c
 
 1. Configure with `-DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DDD_BUILD_HARNESS=OFF`.
 2. Build `<Name>_VST3` and `<Name>_AU`.
-3. `tools/ci/package_macos.sh build dist`: ad-hoc `codesign --deep -s -` (required on Apple Silicon),
+3. `tools/ci/package_macos.sh build dist`: `codesign` with the owner's Developer ID when
+   `tools/ci/macos_signing.sh` found the certificates (see "Notarization" below), else ad-hoc `-s -` (required on Apple Silicon),
    `lipo -info` (must list both archs), `<Name>-<ver>-macOS.zip` (bundles + Install.command + README.txt,
    made with `ditto` so permissions survive) and `<Name>-<ver>-macOS.pkg` (pkgbuild per format with
    `BundleIsRelocatable=false`, then productbuild).
 4. `auval -v aumu|aufx <code> Ddeo` after copying the component to `~/Library/Audio/Plug-Ins/Components`
    and killing `AudioComponentRegistrar`.
 5. pluginval strictness 8 on the VST3.
-6. Upload artifact `macOS-installers`; in a release run, `gh release create <Name>-v<version>` (the tag is
+6. Released plugins only, when Developer ID is set up: `tools/ci/notarize_macos.sh` (notarytool submit --wait,
+   staple the pkg, staple the bundles inside the zip) and `DD_NOTARIZED=1` for the release notes.
+7. Upload artifact `macOS-installers`; in a release run, `gh release create <Name>-v<version>` (the tag is
    created at the built commit) named "<Name> <version>" with those two files and notes from
    `tools/site/release_notes.py`.
 
@@ -25,7 +28,7 @@ The Linux job runs the full audio QA (`tools/qa/run_qa.sh`) plus pluginval, uplo
 renders preset previews (`tools/site/make_previews.py`) as the `site-previews` artifact.
 
 The `site` job (push to main or a release tag, after both jobs) queries the releases API, runs
-`tools/site/build_site.py` and force-pushes a single-commit `gh-pages` branch. GitHub Pages serves it at
+`tools/site/build_site.py` (writes `index.html` and `install.sh`, the Terminal installer) and force-pushes a single-commit `gh-pages` branch. GitHub Pages serves it at
 **https://ddeonmadeit.github.io/plugins-/** (Pages was enabled automatically by the first gh-pages push;
 nothing to configure). Each plugin's card uses `plugins/<Name>/site.json` and its newest release.
 
@@ -55,10 +58,45 @@ The repo is public, so release assets download without a GitHub login. Never del
 users may have linked to; ship a new version instead. Releases made by CI do not trigger other workflows
 (GITHUB_TOKEN events never do), which is why the site job lives in the same workflow.
 
+## Notarization (no "Apple could not verify" warning on a double-clicked .pkg)
+
+Gatekeeper shows that warning for any downloaded installer Apple hasn't notarized. Only the owner can
+fix that for double-clicks: it needs their **Apple Developer Program** membership (paid, yearly). The
+certificate carries the name on their Apple account (for an individual, their legal name); where we
+pick an author name ourselves, the owner's is **DEON**. The CI half is built and waits for these
+repository secrets (Settings > Secrets and variables > Actions):
+
+| Secret | What |
+| --- | --- |
+| `MACOS_CERTS_P12` | base64 of one .p12 exported from Keychain Access holding both "Developer ID Application" and "Developer ID Installer" (with private keys): `base64 -i certs.p12 \| pbcopy` |
+| `MACOS_CERTS_PASSWORD` | the password chosen when exporting the .p12 |
+| `APPLE_ID` | the Apple Account email of the developer account |
+| `APPLE_APP_PASSWORD` | an app-specific password from account.apple.com > Sign-In and Security |
+| `APPLE_TEAM_ID` | optional; read from the certificate name otherwise |
+
+Certificates: developer.apple.com > Certificates > + > Developer ID Application, then again for Developer
+ID Installer (each needs a CSR from Keychain Access > Certificate Assistant > Request a Certificate From a
+Certificate Authority, saved to disk); double-click the downloaded .cer files, then select both in
+Keychain Access > My Certificates and Export as one .p12.
+
+With the secrets in place every build is Developer ID signed (hardened runtime, timestamp, signed pkg)
+and every release is notarized and stapled; a failed notarization fails the job, so nothing un-notarized
+is released by accident. Releases made before that stay un-notarized: bump each plugin's VERSION to ship
+notarized ones. `release_notes.py` adds `<!-- dd:notarized -->` to notarized releases and the page drops
+the warning text and Terminal box for them.
+
+Until then, the no-warning route is the Terminal installer on the site: files curl downloads get no
+quarantine flag, so Gatekeeper never assesses them, and `installer` doesn't either.
+
 ## What to tell the user about installing
 
-- Easiest: double-click the `.pkg`. It is not notarized, so macOS blocks it the first time:
-  System Settings > Privacy & Security > "Open Anyway", then run it again. Installs to
+- No warning, everything at once: paste `curl -fsSL https://ddeonmadeit.github.io/plugins-/install.sh | bash`
+  into Terminal (`| bash -s Sunburst` for one plugin, `-s -- --reinstall` to force). It skips plugins whose
+  installed VST3 already has the newest version, checks each download's SHA-256 from the release, runs
+  `sudo installer` on the same .pkg, and moves older user-folder copies (from Install.command) to the Trash.
+  `tools/site/install.sh` is the template; it must stay macOS bash 3.2 compatible.
+- Double-click the `.pkg`. While it is not notarized, macOS says "Apple could not verify ..." the first time:
+  Done, then System Settings > Privacy & Security > "Open Anyway", then run it again. Installs to
   `/Library/Audio/Plug-Ins/VST3` and `/Library/Audio/Plug-Ins/Components`.
 - No-admin route: unzip, then in Terminal `bash ~/Downloads/<folder>/Install.command`. It copies to
   `~/Library/Audio/Plug-Ins/...` and strips the quarantine flag (unsigned plug-ins with that flag are blocked).
@@ -70,5 +108,3 @@ users may have linked to; ship a new version instead. Releases made by CI do not
 - FL Studio: Options > Manage plugins > Find more plugins / Start scan; instruments show under Generators.
   If missing, add the folders above to "Plugin search paths". FL's piano roll names MIDI 60 "C5", so a
   real-pitch 808 lives around FL "C2-C3".
-- Real notarization needs a paid Apple Developer ID; add it later as repository secrets plus
-  `codesign --options runtime` and `xcrun notarytool` steps if the user wants frictionless installs.

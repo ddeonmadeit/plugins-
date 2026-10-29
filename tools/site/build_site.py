@@ -9,6 +9,8 @@ Each plugin's download block points at its newest published release tagged "<Plu
 with assets "<Plugin>-<version>-macOS.pkg/.zip". A plugin with "publish": true but no release yet is
 listed as "not released yet"; unpublished plugins without a release are left off the page.
 Text comes from plugins/<Plugin>/site.json; previews from tools/site/make_previews.py.
+Also writes install.sh (from tools/site/install.sh): the Terminal installer the page offers, with the
+newest .pkg of every released plugin baked in.
 """
 import argparse
 import datetime
@@ -19,6 +21,8 @@ import shutil
 import subprocess
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+HERE = os.path.dirname(os.path.abspath(__file__))
+NOTARIZED_MARK = "<!-- dd:notarized -->"
 
 
 def version_key(v):
@@ -38,11 +42,15 @@ def latest_release(releases, target):
             def asset(suffix):
                 for name, a in assets.items():
                     if name.endswith(suffix):
-                        return {"url": a["browser_download_url"], "size": a["size"]}
+                        digest = a.get("digest") or ""
+                        return {"url": a["browser_download_url"], "size": a["size"],
+                                "sha256": digest[7:] if digest.startswith("sha256:") else ""}
                 return None
 
             best = {"version": version, "tag": tag, "url": r["html_url"],
                     "date": (r.get("published_at") or "")[:10],
+                    # release_notes.py marks releases whose installers Apple notarized
+                    "notarized": NOTARIZED_MARK in (r.get("body") or ""),
                     "pkg": asset("-macOS.pkg"), "zip": asset("-macOS.zip")}
     return best
 
@@ -59,7 +67,10 @@ def main():
     plugins = json.loads(subprocess.check_output(["python3", os.path.join(ROOT, "tools/ci/plugin_meta.py")]))
 
     os.makedirs(args.out, exist_ok=True)
-    site = {"repo": args.repo, "generated": datetime.date.today().isoformat(), "plugins": []}
+    owner, name = args.repo.split("/", 1)
+    site_url = "https://%s.github.io/%s/" % (owner.lower(), name)
+    site = {"repo": args.repo, "generated": datetime.date.today().isoformat(), "plugins": [],
+            "installCmd": "curl -fsSL %sinstall.sh | bash" % site_url}
     for p in plugins:
         s = p.get("site", {})
         release = latest_release(releases, p["target"])
@@ -89,7 +100,14 @@ def main():
     # Released plugins first, newest release first; unreleased ones at the end.
     site["plugins"].sort(key=lambda e: e["release"]["date"] if e["release"] else "", reverse=True)
 
-    html = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "template.html")).read()
+    lines = ['        "%s|%s|%s|%s"' % (e["product"], e["release"]["version"], e["release"]["pkg"]["url"], e["release"]["pkg"]["sha256"])
+             for e in site["plugins"] if e["release"] and e["release"]["pkg"]]
+    script = open(os.path.join(HERE, "install.sh")).read()
+    script = script.replace("__SITE_URL__", site_url).replace("__RELEASES__", "\n".join(lines))
+    open(os.path.join(args.out, "install.sh"), "w").write(script)
+    print("wrote %s/install.sh (%d plugins)" % (args.out, len(lines)))
+
+    html = open(os.path.join(HERE, "template.html")).read()
     data = json.dumps(site, separators=(",", ":")).replace("</", "<\\/")
     open(os.path.join(args.out, "index.html"), "w").write(html.replace("__SITE__", data))
     open(os.path.join(args.out, ".nojekyll"), "w").close()

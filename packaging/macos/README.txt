@@ -1,10 +1,16 @@
 INSTALLING ON macOS (FL Studio, Logic, Ableton, ...)
 ====================================================
 
-Option A: installer package (easiest)
+Quickest, with no macOS warning: one Terminal command
+  Open Terminal (Cmd+Space, type Terminal, Return), paste this line and press Return:
+      curl -fsSL https://ddeonmadeit.github.io/plugins-/install.sh | bash
+  It installs every plug-in, or updates the ones you have (add " -s Sunburst" to pick one).
+  Type your Mac password when asked; nothing shows while you type.
+
+Option A: installer package
   1. Double-click the .pkg file.
-  2. If macOS says it "can't be opened" (the package is not notarized by Apple):
-     open System Settings > Privacy & Security, scroll down, click "Open Anyway",
+  2. If macOS says "Apple could not verify ..." (the package is not notarized by Apple):
+     click Done, open System Settings > Privacy & Security, scroll down, click "Open Anyway",
      then run the .pkg again.
   3. It installs into /Library/Audio/Plug-Ins/VST3 and /Library/Audio/Plug-Ins/Components
      (plus the sound library in /Library/Application Support/ddeonmadeit for sample-based plug-ins).

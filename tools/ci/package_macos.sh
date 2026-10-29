@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
-# Sign (ad-hoc) and package every built plugin for macOS.
+# Sign and package every built plugin for macOS.
 #   tools/ci/package_macos.sh [build-dir] [dist-dir] [libraries-dir]
 # Produces, per plugin:
 #   dist/<Plugin>-<version>-macOS.pkg   installer -> /Library/Audio/Plug-Ins/{VST3,Components}
 #                                       (+ /Library/Application Support/ddeonmadeit/<Plugin>/Library for sample libraries)
 #   dist/<Plugin>-<version>-macOS.zip   bundles (+ "<Plugin> Library") + Install.command + README.txt
 # README.txt is packaging/macos/README.txt followed by plugins/<Plugin>/README-mac.txt when it exists.
+# Signing: Developer ID (hardened runtime, timestamped, pkg signed too) when macos_signing.sh found the
+# owner's certificates (DD_SIGN_APP / DD_SIGN_INSTALLER), ad-hoc otherwise (Apple Silicon needs at least that).
+# notarize_macos.sh then notarizes the released installers.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
@@ -29,7 +32,11 @@ for i in $(seq 0 $((count - 1))); do
     echo "== $target $version"
     for b in "$vst3" "$au"; do
         [[ -d "$b" ]] || { echo "missing $b"; exit 1; }
-        codesign --force --deep --timestamp=none --sign - "$b"
+        if [[ -n "${DD_SIGN_APP:-}" ]]; then
+            codesign --force --deep --options runtime --timestamp --sign "$DD_SIGN_APP" "$b"
+        else
+            codesign --force --deep --timestamp=none --sign - "$b"
+        fi
         codesign --verify --deep --strict "$b"
         lipo -info "$b/Contents/MacOS/$product"
     done
@@ -72,7 +79,9 @@ for i in $(seq 0 $((count - 1))); do
                  --install-location "/Library/Application Support/ddeonmadeit/$product/Library" "$pk/$target-library.pkg"
         parts+=(--package "$pk/$target-library.pkg")
     fi
-    productbuild "${parts[@]}" "$DIST/$target-$version-macOS.pkg"
+    sign=()
+    [[ -z "${DD_SIGN_INSTALLER:-}" ]] || sign=(--sign "$DD_SIGN_INSTALLER" --timestamp)
+    productbuild ${sign[@]+"${sign[@]}"} "${parts[@]}" "$DIST/$target-$version-macOS.pkg"
 done
 
 rm -rf "$DIST/stage"

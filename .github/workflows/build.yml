@@ -228,6 +228,14 @@ jobs:
           for p in $PLUGINS; do targets="$targets ${p}_VST3 ${p}_AU"; done
           cmake --build build --parallel --target $targets
 
+      # Developer ID signing + notarization switch on by themselves once the owner adds the secrets
+      # (see .claude/skills/mac-release/SKILL.md); without them everything is ad-hoc signed as before.
+      - name: Developer ID certificates
+        env:
+          MACOS_CERTS_P12: ${{ secrets.MACOS_CERTS_P12 }}
+          MACOS_CERTS_PASSWORD: ${{ secrets.MACOS_CERTS_PASSWORD }}
+        run: tools/ci/macos_signing.sh
+
       - name: Sign and package
         run: tools/ci/package_macos.sh build dist libraries
 
@@ -257,6 +265,20 @@ jobs:
             pluginval/pluginval.app/Contents/MacOS/pluginval --strictness-level 8 --validate-in-process \
               --timeout-ms 600000 --validate "build/plugins/$p/${p}_artefacts/Release/VST3/$product.vst3"
           done
+
+      - name: Notarize releases
+        if: env.RELEASES != '' && env.DD_SIGN_INSTALLER != ''
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          set -eo pipefail
+          for p in $RELEASES; do
+            version=$(python3 tools/ci/plugin_meta.py --only "$p" | python3 -c "import json,sys; print(json.load(sys.stdin)[0]['version'])")
+            tools/ci/notarize_macos.sh "dist/$p-$version-macOS.pkg" "dist/$p-$version-macOS.zip"
+          done
+          echo "DD_NOTARIZED=1" >> "$GITHUB_ENV"
 
       - name: Upload installers
         uses: actions/upload-artifact@v4

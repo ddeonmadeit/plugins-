@@ -24,6 +24,7 @@
   --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
 }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }   /* .row / .quick set display, which would beat the hidden attribute */
 html { background: var(--bg); }
 body {
   margin: 0; background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 15px; line-height: 1.5;
@@ -62,6 +63,19 @@ details.install summary { cursor: pointer; font-weight: 600; }
 details.install ol { margin: 10px 0 4px; padding-left: 20px; display: grid; gap: 6px; max-width: 70ch; }
 code { font-family: var(--mono); font-size: 13px; background: var(--track); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
 
+/* Terminal install command: the no-warning route while installers aren't notarized. */
+.quick { margin-top: 28px; background: var(--panel); border: 1px solid var(--edge); border-left: 3px solid var(--flame); border-radius: 0 10px 10px 0; padding: 16px 18px; display: grid; gap: 10px; }
+.quick h2 { margin: 0; font-family: var(--display); font-weight: 700; font-size: 28px; letter-spacing: 0.03em; line-height: 1; }
+.quick p { margin: 0; color: var(--dim); max-width: 70ch; }
+.quick p b { color: var(--fg); font-weight: 600; }
+.cmd { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: stretch; }
+.cmd code { display: block; background: var(--bg); border: 1px solid var(--edge); border-radius: 8px; padding: 10px 12px; font-size: 13px; line-height: 1.45; }
+.cmd.small code { font-size: 11.5px; padding: 8px 10px; }
+.copy { font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; background: var(--flame); color: #0b0b0d; border: 0; border-radius: 8px; padding: 0 14px; cursor: pointer; font-weight: 500; min-width: 76px; }
+.dl .cmd { grid-template-columns: minmax(0, 1fr); }
+.dl .copy { background: var(--c); padding: 8px 14px; }
+.copy:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+
 .presets h3 { font-family: var(--display); font-weight: 700; font-size: 30px; margin: 0 0 4px; letter-spacing: 0.03em; }
 .presets p.note { margin: 0 0 10px; color: var(--dim); font-size: 14px; }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; padding-block: 8px; }
@@ -92,10 +106,15 @@ footer { margin-top: 48px; color: var(--dim); font-size: 13px; display: grid; ga
     <h1>PLUGINS</h1>
     <p class="lede">Free <b>VST3 + AU</b> instruments and effects for <b>macOS</b> (Apple Silicon and Intel), built for FL Studio. Every download link on this page always points at the newest release.</p>
   </header>
+  <section class="quick" id="quick" aria-labelledby="quick-h" hidden>
+    <h2 id="quick-h">Install without the macOS warning</h2>
+    <p>Open <b>Terminal</b> (press <b>⌘ Space</b>, type <b>Terminal</b>, press Return), paste this line and press Return. It installs every plugin, or updates the ones you already have, and macOS won't say <b>“Apple could not verify…”</b>. When it asks for your Mac password, type it and press Return (nothing shows while you type).</p>
+    <div class="cmd" id="cmd-all"></div>
+  </section>
   <main id="plugins"></main>
   <footer>
     <p id="updated"></p>
-    <p>Installers aren't notarized by Apple yet, so macOS asks once: System Settings → Privacy &amp; Security → Open Anyway.</p>
+    <p id="notary"></p>
   </footer>
 </div>
 <audio id="player" preload="none"></audio>
@@ -144,14 +163,35 @@ player.addEventListener("pause", () => current && setPlaying(current, false));
 player.addEventListener("ended", () => { if (current) { setPlaying(current, false); drawWave(current, 0); } });
 player.addEventListener("timeupdate", () => { if (current && isFinite(player.duration)) drawWave(current, player.currentTime / player.duration); });
 
+function cmdBox(text, small) {
+  const box = el("div", small ? "cmd small" : "cmd");
+  const code = el("code", null, text);
+  const btn = el("button", "copy", "Copy");
+  btn.type = "button";
+  btn.setAttribute("aria-label", "Copy the Terminal command");
+  btn.addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(text); }
+    catch (e) { const r = document.createRange(); r.selectNodeContents(code); const s = getSelection(); s.removeAllRanges(); s.addRange(r); document.execCommand("copy"); }
+    btn.textContent = "Copied";
+    setTimeout(() => { btn.textContent = "Copy"; }, 1600);
+  });
+  box.append(code, btn);
+  return box;
+}
+function pluginCmd(p) { return SITE.installCmd + " -s " + p.product; }
+
 function installSteps(p) {
   const d = el("details", "install");
   d.append(el("summary", null, "How to install in FL Studio"));
   const ol = el("ol");
-  const steps = [
+  const where = "In FL Studio: Options → Manage plugins → Find more plugins. " + p.product + " appears under " + (p.kind === "SYNTH" ? "Generators" : "Effects") + ".";
+  const steps = p.release && !p.release.notarized ? [
+    "Easiest, with no macOS warning: open Terminal, paste the command under the download button, press Return and type your Mac password when asked.",
+    "Or download the .pkg and double-click it. macOS says “Apple could not verify…” the first time: click Done, open System Settings → Privacy & Security, click Open Anyway, then run the .pkg again.",
+    where,
+  ] : [
     "Download the .pkg and double-click it.",
-    "The first time, macOS says it can't verify the developer. Open System Settings → Privacy & Security, click Open Anyway, then run the .pkg again.",
-    "In FL Studio: Options → Manage plugins → Find more plugins. " + p.product + " appears under " + (p.kind === "SYNTH" ? "Generators" : "Effects") + ".",
+    where,
   ];
   steps.push(...(p.installTips || []));
   steps.push("Updating from an older version: quit FL Studio, run the new .pkg (it replaces the old version), then reopen. Your projects keep all their settings and the new presets appear in the plugin's preset menu.");
@@ -218,6 +258,7 @@ function render() {
       dl.append(el("div", "ver", "Version " + p.release.version + " · " + p.release.date));
       if (p.release.pkg) { const b = el("a", "btn primary", "Download for Mac (.pkg, " + mb(p.release.pkg.size) + ")"); b.href = p.release.pkg.url; dl.append(b); }
       if (p.release.zip) { const b = el("a", "btn secondary", "Zip + install script (" + mb(p.release.zip.size) + ")"); b.href = p.release.zip.url; dl.append(b); }
+      if (p.release.pkg && !p.release.notarized) { dl.append(el("p", "req", "No-warning install, paste in Terminal:"), cmdBox(pluginCmd(p), true)); }
       dl.append(el("p", "req", "macOS 11 or newer · Apple Silicon + Intel · VST3 + AU"));
       const notes = el("a", "req", "Release notes and older versions"); notes.href = p.release.url; dl.append(notes);
     } else {
@@ -229,6 +270,12 @@ function render() {
     main.append(a);
   });
   document.getElementById("updated").textContent = "Page rebuilt automatically on " + SITE.generated + " from github.com/" + SITE.repo + ".";
+  const released = SITE.plugins.filter(p => p.release && p.release.pkg);
+  if (released.some(p => !p.release.notarized)) {
+    document.getElementById("cmd-all").replaceWith(cmdBox(SITE.installCmd, false));
+    document.getElementById("quick").hidden = false;
+    document.getElementById("notary").textContent = "The installers aren't notarized by Apple yet, so a double-clicked .pkg gets the “Apple could not verify” warning once (System Settings → Privacy & Security → Open Anyway). The Terminal command installs the same .pkg without it.";
+  }
 }
 function redraw() { rows.forEach(r => { if (!r.row.hidden) drawWave(r, current === r && isFinite(player.duration) ? player.currentTime / player.duration : 0); }); }
 render(); redraw();
