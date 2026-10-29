@@ -1,0 +1,66 @@
+{
+  "comment": "Sunburst sample sources. Every library here is CC0 1.0 (public domain): free to redistribute in the plugin. Credits are kept in ATTRIBUTION.txt and shown in the UI anyway.",
+  "sources": {
+    "shiny": {
+      "url": "https://github.com/sfzinstruments/karoryfer.shinyguitar/releases/download/v1.002/Karoryfer.Shinyguitar.v1.002.zip",
+      "md5": "4d1f759b7587899d1807dc48738599f0",
+      "kind": "zip",
+      "check": "Shinyguitar/Samples/acoustic/e2_vl1_rr1_1.wav",
+      "root": "Shinyguitar",
+      "credit": "Shinyguitar by Karoryfer Samples (D. Smolken), CC0 1.0",
+      "url_info": "https://shop.karoryfer.com/pages/free-shinyguitar"
+    },
+    "emily": {
+      "url": "https://github.com/sfzinstruments/karoryfer.emilyguitar/releases/download/v1.001/Karoryfer.Emilyguitar.v1.001.zip",
+      "md5": "2d010a7c695fcf69421c3cb9479cdf95",
+      "kind": "zip",
+      "check": "Emilyguitar/notes/e2_f_rr1.wav",
+      "root": "Emilyguitar",
+      "credit": "Emilyguitar by Karoryfer Samples (D. Smolken), CC0 1.0",
+      "url_info": "https://shop.karoryfer.com/pages/free-emilyguitar"
+    },
+    "bg": {
+      "url": "https://github.com/sfzinstruments/karoryfer.black-and-green-guitars/releases/download/v1.000/Karoryfer_Black_And_Green_Guitars_1000.zip",
+      "md5": "8031ab1ab65f9b7dbebf8ea9e79ee65c",
+      "kind": "zip",
+      "subdir": "BlackAndGreen",
+      "check": "BlackAndGreen/Samples/green/ord/twang_e3_f_rr1.wav",
+      "root": "BlackAndGreen",
+      "credit": "Black And Green Guitars by Karoryfer Samples (recorded by Brian Wood), CC0 1.0",
+      "url_info": "https://shop.karoryfer.com/pages/free-black-and-green-guitars"
+    },
+    "nylon": {
+      "url": "https://freepats.zenvoid.org/Guitar/SpanishClassicalGuitar/SpanishClassicalGuitar-SFZ-20190618.7z",
+      "md5": "8d6c89686f7ea8306f051c9cee60a59d",
+      "kind": "7z",
+      "check": "SpanishClassicalGuitar/samples/A3.wav",
+      "root": "SpanishClassicalGuitar",
+      "credit": "Spanish Classical Guitar by Roberto for the FreePats project, CC0 1.0",
+      "url_info": "https://freepats.zenvoid.org/Guitar/acoustic-guitar.html"
+    }
+  },
+  "processing": {
+    "maxRoundRobins": 3,
+    "maxSeconds": 6.0,
+    "fadeSeconds": 1.2,
+    "tailFloorDb": -66.0,
+    "preRollMs": 4.0,
+    "loudnessMs": 150.0,
+    "targetLoudnessDb": -18.0,
+    "peakCeilingDb": -0.5
+  },
+  "instruments": [
+    { "id": "acoustic", "name": "Archtop Acoustic", "family": "acoustic", "source": "shiny", "parser": "shiny", "channel": 1,
+      "finish": "#c8742c", "noiseFamily": "acoustic" },
+    { "id": "nylon", "name": "Nylon Classical", "family": "acoustic", "source": "nylon", "parser": "nylon",
+      "finish": "#d79a4a", "noiseFamily": "acoustic", "releaseFrom": "acoustic" },
+    { "id": "jazz", "name": "Archtop Jazz", "family": "electric", "source": "shiny", "parser": "shiny", "channel": 2,
+      "finish": "#2a1a12", "noiseFamily": "electric" },
+    { "id": "sg", "name": "Solidbody", "family": "electric", "source": "emily", "parser": "emily",
+      "finish": "#8a1c14", "noiseFamily": "electric" },
+    { "id": "gretsch", "name": "Orange Hollow", "family": "electric", "source": "bg", "parser": "bg", "color": "green",
+      "finish": "#b8541c", "noiseFamily": "electric" },
+    { "id": "hofner", "name": "Club Hollow", "family": "electric", "source": "bg", "parser": "bg", "color": "black",
+      "finish": "#120e0c", "noiseFamily": "electric" }
+  ]
+}

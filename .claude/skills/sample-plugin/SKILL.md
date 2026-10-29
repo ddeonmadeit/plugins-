@@ -93,3 +93,27 @@ has the sound swap combo, articulation rows with key learn, and per-piece knobs.
   `Install.command` copies to `~/Library/Application Support/...`.
 - Plugin-specific install text: `plugins/<Name>/README-mac.txt` (appended to the zip README) and
   `site.json` `installTips` / `previewNote` (download page + release notes).
+
+## 7. Guitars (worked example: plugins/Sunburst)
+
+- Sources (all CC0 1.0, listed with md5 in `library/sources.json`): Karoryfer Shinyguitar (archtop recorded
+  through its pickup *and* a mic at once: `_1` = mic, `_2` = pickup, so one library gives an acoustic and a jazz
+  box), Emilyguitar (an SG recorded direct: ideal into an amp model), Black And Green Guitars (Gretsch + Hofner
+  hollowbodies, chromatic, hammer-on and release samples), FreePats Spanish Classical Guitar (nylon, chromatic,
+  one layer). Download the GitHub *release* zips: the Black And Green git repo has `* text eol=crlf`, so a clone
+  corrupts every WAV.
+- Naming traps: Black And Green names notes an octave up (`e3` = MIDI 40); FreePats file names are wrong
+  (`G1.wav` plays G2). The builder checks every name against a YIN pitch estimate, stores the tuning error in
+  cents (the voice plays it back in tune) and ignores estimates more than 0.6 st off (high or quiet notes).
+- Size: trimmed tails, notes capped at 6 s with a fade, 3 round robins per layer: six guitars = 131 MB of FLAC.
+- Engine (`GuitarEngine`): six strings; each note goes to the cheapest string (lowest fret, never one already
+  held), so a new note on a ringing string stops it and chords spread naturally. Velocity -> layer by loudness
+  (as Kitroom), one-layer instruments also darken with velocity. Legato on the held string: Hammer (hammer
+  sample or the sustain sample started past the pick) or Slide (the ringing voice glides). Strum queue copied
+  from Afterglow. Track 1 = a double take (another round robin, 12-28 ms late, a few cents off).
+- String noise is its own knob and the only thing that plays noise: release damping samples on note-off,
+  synthesized squeaks on position shifts along wound strings, slide scrapes, pick ticks. At 0 it is silent.
+  Seed the engine's RNG in reset(): random round robins otherwise make every render different and loudness
+  normalization never converges.
+- Doubles and rooms must stay mono below the low strings: Sunburst high-passes the side at 240 Hz (4th order);
+  at 150 Hz double-tracked presets failed the analyzer's sub-mono check.

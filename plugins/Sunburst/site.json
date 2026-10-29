@@ -1,0 +1,19 @@
+{
+  "publish": true,
+  "tagline": "Real recorded acoustic and electric guitars, with a pedalboard and an amp",
+  "description": "Six sampled guitars (archtop acoustic, nylon, jazz box, solidbody and two hollowbodies), played on six virtual strings with velocity layers and round robin: chords spread across the neck, strums, hammer-ons, slides and palm mutes. Then a pedalboard, three amp channels and a speaker cabinet. A String Noise knob turns fret squeaks and string damping up, or all the way off.",
+  "accent": "#ec7d2e",
+  "highlights": [
+    "Six real guitars, recorded note by note at up to 4 velocities with round robins: archtop acoustic (miked), nylon classical, jazz box, solidbody and two hollowbodies",
+    "Plays like a guitar: every note goes to a string, so a new note on the same string stops the old one, chords spread across the neck and strums run low to high (and back up on quick repeats)",
+    "String Noise knob: fret squeaks on position shifts, string damping on release, slide scrapes and pick ticks, from loud to completely off",
+    "Palm mute (also on the mod wheel), hammer-ons and slides on legato notes, vibrato, humanize, double-tracking for wide stereo guitars",
+    "Pedalboard: compressor, overdrive, fuzz, chorus, tempo-synced tremolo and delay; amp with Clean, Crunch and Lead channels, a 1x12 or 4x12 cabinet and mic placement, plus a room",
+    "35 presets, each a different guitar part: acoustic, clean, crunch and heavy, plus Travis Scott, Mike Dean, Yeezus, moshc0re, trip hop and SAFE"
+  ],
+  "installTips": [
+    "The .pkg also installs the guitar sample library (about 130 MB). With the .zip, Install.command copies it for you.",
+    "Play between E3 and D7 (FL note names). Mod wheel = palm mute, sustain pedal = let ring, pitch bend = string bend. C2 to E2 play noises: muted strum, body knock, string mute, fret squeak, pick."
+  ],
+  "previewNote": "on the same 80 BPM part: strummed Em, C and G chords (down and up strokes), then a single-note riff."
+}

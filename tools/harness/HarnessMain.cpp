@@ -488,6 +488,7 @@ int cmdSnapshot (juce::AudioProcessor& proc, const Args& a)
 {
     if (a.has ("--program"))
         proc.setCurrentProgram (a.get ("--program").getIntValue());
+    applySets (proc, a.getAll ("--set"));
     proc.setPlayConfigDetails (0, 2, 48000.0, 256);
     proc.setNonRealtime (true);   // plugins that stream samples finish loading before the picture
     proc.prepareToPlay (48000.0, 256);

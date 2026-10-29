@@ -99,6 +99,15 @@ one sentence of what it is plus how to play it ("overlap notes to slide").
 - **Bouncy 808s**: dry and simple. Punch + knock + short decay for bounce; clean sustained subs;
   drill slides; pluggnb soft and low-passed; Detroit kick-808; phonk fold+clip.
 
+## Guitar presets (Sunburst)
+
+Each preset is a guitar part: pick the instrument first (acoustic, nylon, jazz box, solidbody, orange / club
+hollow), then the playing (pick, palm mute, strum, ring, legato, double), then the rig. Two presets that share
+instrument + amp channel + legato style read as duplicates on the `guitar` phrase (analyzer < 0.15); change
+the guitar or the register (transpose +12 for a high lead). Amp channels are level-matched across Gain, so
+`outGain` stays within a few dB. Target -14 LUFS +-3 on `guitar`; clean plucked presets are peak-limited:
+give them glue rather than gain.
+
 ## Loudness reference (SubGrit)
 
 Demo phrase target -9.5 LUFS, window -11.0 to -8.0, true peak <= -0.8 dBTP. Slammed presets end up

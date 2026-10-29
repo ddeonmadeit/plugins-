@@ -1,0 +1,7 @@
+{
+  "categories": ["INIT"],
+  "targetLufs": -12.0,
+  "toleranceLu": 6.0,
+  "similarBelow": 0.0,
+  "phrase": "demo"
+}
