@@ -75,12 +75,13 @@ def main():
 
     qa_path = os.path.join(ROOT, "plugins", args.plugin, "qa.json")
     qa = json.load(open(qa_path)) if os.path.exists(qa_path) else {}
-    phrase = qa.get("previewPhrase", "groove" if kind == "SYNTH" else "demo")
+    phrase, _, phraseBpm = qa.get("previewPhrase", "groove" if kind == "SYNTH" else "demo").partition("@")
     backing = qa.get("previewBacking", kind == "SYNTH")
 
     tmp = tempfile.mkdtemp()
     try:
-        subprocess.run([harness, "render-all", "--phrase", phrase, "--outdir", tmp], check=True, stdout=subprocess.DEVNULL)
+        subprocess.run([harness, "render-all", "--phrase", phrase, "--outdir", tmp] + (["--bpm", phraseBpm] if phraseBpm else []),
+                       check=True, stdout=subprocess.DEVNULL)
         # Some categories or presets are played differently (Afterglow's GUITAR presets get strummed chords
         # and a riff). Keys are a category or "CATEGORY - Preset Name"; the preset wins. "phrase@bpm" also
         # gives the plugin that host tempo, so synced LFOs, delays and pumps match the phrase.

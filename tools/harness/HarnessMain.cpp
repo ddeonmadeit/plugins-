@@ -7,7 +7,7 @@
                               [--phrase demo|single|slide|groove|chords|pads|mixed|guitar|drums|drumvel] [--sr 48000] [--block 256] [--mono]
                               [--bpm 79]   host tempo, transport playing from beat 0 (default: no host)
                               --phrase "notes:<note>,<start s>,<length s>,<velocity> ... [end=<s>]"   any notes (one-shots, loops)
-      <Plugin>Harness render-all --outdir dir [--phrase demo] [--sr 48000]
+      <Plugin>Harness render-all --outdir dir [--phrase demo] [--sr 48000] [--bpm 80]
       <Plugin>Harness snapshot --out ui.png [--program N] [--scale 1]
       <Plugin>Harness stress  [--seconds 20] [--sr 48000] [--block 128]
       <Plugin>Harness dump-params    current values as preset-style JSON
@@ -468,7 +468,7 @@ int cmdRenderAll (juce::AudioProcessor& proc, const Args& a)
     for (int i = 0; i < proc.getNumPrograms(); ++i)
     {
         proc.setCurrentProgram (i);
-        auto buf = renderPhrase (proc, phraseName, sr);
+        auto buf = renderPhrase (proc, phraseName, sr, 256, a.get ("--bpm", "0").getDoubleValue());
         const auto name = proc.getProgramName (i);
         const auto file = dir.getChildFile (juce::String (i).paddedLeft ('0', 3) + "_" + safeName (name) + ".wav");
         if (! writeWav (file, buf, sr))

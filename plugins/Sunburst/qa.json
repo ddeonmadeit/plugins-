@@ -1,7 +1,20 @@
 {
-  "categories": ["INIT"],
-  "targetLufs": -12.0,
-  "toleranceLu": 6.0,
-  "similarBelow": 0.0,
-  "phrase": "demo"
+  "categories": [
+    "ACOUSTIC",
+    "CLEAN",
+    "CRUNCH",
+    "HEAVY",
+    "TRAVIS SCOTT",
+    "MIKE DEAN",
+    "YEEZUS",
+    "MOSHC0RE",
+    "TRIP HOP",
+    "SAFE"
+  ],
+  "targetLufs": -14.0,
+  "toleranceLu": 3.0,
+  "similarBelow": 0.15,
+  "phrase": "guitar",
+  "previewPhrase": "guitar@80",
+  "previewBacking": false
 }

@@ -38,7 +38,7 @@ keys and plucks are all measured fairly. `guitar` is three bars of strummed open
 strokes, 80 BPM) and a riff, for Electric presets. `drums` / `drumvel` are Kitroom grooves.
 Download-page previews use qa.json `previewPhrase`; `previewPhraseByCategory` overrides it per category or
 per `"CATEGORY - Preset Name"` (Afterglow: GUITAR presets get `guitar`, the volume-swell preset `mixed`);
-`"guitar@80"` also renders at that host tempo, for presets with a synced tremolo / pump / delay.
+`"guitar@80"` (here or in `previewPhrase`) also renders at that host tempo, for presets with a synced tremolo / pump / delay.
 
 ## Reading analyze.py
 
