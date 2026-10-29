@@ -50,6 +50,7 @@ public:
             fuzzMid[ch].set (dd::Biquad::Type::LowPass, 3800.0f, 0.7071f, 0.0f, osr);
             interstage[ch].set (dd::Biquad::Type::LowPass, 7000.0f, 0.6f, 0.0f, osr);
             dcPre[ch].setCutoff (12.0f, osr);
+            dcPost[ch].setCutoff (10.0f, sr);
             sideLowCut[ch].set (dd::Biquad::Type::HighPass, 160.0f, 0.7071f, 0.0f, sr);
         }
         cache = {};
@@ -130,8 +131,11 @@ public:
                     y = presenceShelf[ch].process (y) * cache.ampLevel;
                     if (s.cabOn)
                         y = micLow[ch].process (micShelf[ch].process (cab.process (ch, y)));
-                    x[ch] = dcPost[ch].hp (y);
+                    x[ch] = y;
                 }
+            // Asymmetric clipping (drive, fuzz, preamp) leaves an offset; block it whichever stages ran.
+            for (int ch = 0; ch < 2; ++ch)
+                x[ch] = dcPost[ch].hp (x[ch]);
 
             // Double tracking: the take leans left and its double right, the wider the more Double.
             const float d = s.doubleTrack > 0.001f ? juce::jlimit (0.0f, 1.0f, s.doubleTrack) : 0.0f;
@@ -285,7 +289,6 @@ private:
                 stackMid[ch].set (dd::Biquad::Type::Peak, 650.0f, 0.8f, s.mid * 10.0f + m.midOffset, sr);
                 stackHigh[ch].set (dd::Biquad::Type::HighShelf, 2800.0f, 0.7071f, s.treble * 12.0f, sr);
                 presenceShelf[ch].set (dd::Biquad::Type::HighShelf, 4500.0f, 0.7071f, s.presence * 8.0f, sr);
-                dcPost[ch].setCutoff (10.0f, sr);
             }
         }
         if (! cache.valid || cache.cabType != s.cabType || changed (cache.mic, s.mic))

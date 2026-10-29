@@ -33,8 +33,8 @@
       "url": "https://freepats.zenvoid.org/Guitar/SpanishClassicalGuitar/SpanishClassicalGuitar-SFZ-20190618.7z",
       "md5": "8d6c89686f7ea8306f051c9cee60a59d",
       "kind": "7z",
-      "check": "SpanishClassicalGuitar/samples/A3.wav",
-      "root": "SpanishClassicalGuitar",
+      "check": "SpanishClassicalGuitar-SFZ-20190618/samples/A3.wav",
+      "root": "SpanishClassicalGuitar-SFZ-20190618",
       "credit": "Spanish Classical Guitar by Roberto for the FreePats project, CC0 1.0",
       "url_info": "https://freepats.zenvoid.org/Guitar/acoustic-guitar.html"
     }
