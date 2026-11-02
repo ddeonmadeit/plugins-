@@ -80,6 +80,7 @@ private:
     dd::Svf sideLowCut[2];
     dd::GlueCompressor glue;
     dd::Clipper clipper;
+    dd::TapeStop tapeStop;
     juce::SmoothedValue<float> outGainSm { 1.0f }, widthSm { 1.0f }, ensMixSm, phaserMixSm, delayMixSm, reverbMixSm, pumpDepthSm;
     float levelFollow = 0.0f;
 

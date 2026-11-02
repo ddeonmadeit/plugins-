@@ -73,6 +73,8 @@ const std::array<ParamSpec, (size_t) kNumParams>& table()
         { P::width,         "width",         "Width",           K::Float,  0, 1.5f, 1, 0, U::Percent, nullptr },
         { P::glue,          "glue",          "Glue",            K::Float,  0, 1, 0.2f, 0, U::Percent, nullptr },
         { P::outGain,       "outGain",       "Output",          K::Float, -24, 12, 0, 0, U::Db, nullptr },
+        { P::perfTapeStop,  "perfTapeStop",  "Tape Stop",       K::Bool,   0, 1, 0, 0, U::None, nullptr },
+        { P::perfTapeTime,  "perfTapeTime",  "Tape Stop Time",  K::Choice, 0, 8, 3, 0, U::None, &dd::TapeStop::timeNames() },
     }};
     return t;
 }

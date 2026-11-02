@@ -34,11 +34,11 @@ CMakeLists.txt            fetches JUCE (pinned tag), adds modules, adds every pl
 cmake/DDPlugin.cmake      dd_add_plugin(): plugin formats + embedded presets + <Name>_Harness
 modules/dd_dsp            header-only DSP: PolyBLEP/unison osc, ZDF ladder, SVF, LR4 crossover, ADSR,
                           LFO, 8 distortion curves + multiband Dirt (4x OS), guitar CabSim, chorus, delay,
-                          FDN reverb, glue comp, oversampled clipper
+                          FDN reverb, glue comp, oversampled clipper, tape stop
 modules/dd_core           PresetManager (JSON factory + user presets), param <-> JSON helpers,
                           replaceStateExactly(), ScopeBuffer (lock-free audio -> UI)
 modules/dd_gui            house look (see "Visual style"): LookAndFeel/Palette + sunset colours, Knob/Choice/Toggle,
-                          grid Panel, PresetBar, CRT Scope, surfaces (backdrop, faceplate, inset, lamp, screw,
+                          grid Panel, PresetBar, CRT Scope, TapeStopControl, surfaces (backdrop, faceplate, inset, lamp, screw,
                           grain, sunset stripes), embedded Barlow Condensed font (fonts/, SIL OFL)
 plugins/<Name>/           one plugin: CMakeLists.txt, Source/, Presets/<CATEGORY>/NN_Name.json, qa.json,
                           site.json (tagline, description, accent, highlights, installTips for the download page),
@@ -135,5 +135,5 @@ Text is cream print (`Palette::text`) or faded tan (`Palette::dim`).
 | --- | --- | --- | --- |
 | SubGrit | synth | Sgrt | 808 + distorted bass, POLY switch. 94 presets: TRAVIS, MIKE DEAN, UNTILJAPAN, YE, YEEZUS, MOSHC0RE, KING, TRIP HOP, SAFE, BOUNCE 808 |
 | Kitroom | synth | Ktrm | Live acoustic drum kit from multi-mic DrumGizmo recordings (CC BY 4.0): drawn kit UI, GM keys, swappable pieces, close/OH/room mics, bus drive/crush/tone. 40 presets: STUDIO, LIVE ROOM, VINTAGE, TIGHT, BIG, YEEZUS, MOSHC0RE, KING, TRIP HOP. Local QA needs `KITROOM_LIBRARY` (build it with `plugins/Kitroom/library/build_library.py`) |
-| Sunburst | synth | Sbst | Sampled acoustic + electric guitars (CC0: Karoryfer Shinyguitar / Emilyguitar / Black And Green, FreePats nylon), six-string engine (string assignment, strum, hammer-on / slide legato, palm mute, double-track), String Noise knob, pedalboard (comp, drive, fuzz, chorus, synced trem, delay), Clean / Crunch / Lead amp + cab + room. Drawn guitar UI with lit strings. 35 presets: ACOUSTIC, CLEAN, CRUNCH, HEAVY, TRAVIS SCOTT, MIKE DEAN, YEEZUS, MOSHC0RE, TRIP HOP, SAFE. Local QA needs `SUNBURST_LIBRARY` (`plugins/Sunburst/library/build_library.py`) |
-| Afterglow | synth | Aglw | Pads, keys, plucks, leads, bells, soundscapes, electric guitar. Deep two-layer engine (12 sources incl. pluck, organ, mallet, sync, Electric guitar string) + Dirt amp + CAB + strum + FX, but the panel is macro-first: a sunset "orb" display (Motion / Tone), 6 macros, POLY switch. 88 presets (each a different role): TAME IMPALA, MASSIVE ATTACK, BRENT FAIYAZ, MIKE DEAN, TRAVIS SCOTT, YEEZUS, MOSHC0RE, GUITAR, TRIP HOP, SAFE |
+| Sunburst | synth | Sbst | Sampled acoustic + electric guitars (CC0: Karoryfer Shinyguitar / Emilyguitar / Black And Green, FreePats nylon), six-string engine (string assignment, strum, hammer-on / slide legato, palm mute, double-track), String Noise knob, pedalboard (comp, drive, fuzz, chorus, synced trem, delay), Clean / Crunch / Lead amp + cab + room. Drawn guitar UI with lit strings. TAPE STOP. 35 presets: ACOUSTIC, CLEAN, CRUNCH, HEAVY, TRAVIS SCOTT, MIKE DEAN, YEEZUS, MOSHC0RE, TRIP HOP, SAFE. Local QA needs `SUNBURST_LIBRARY` (`plugins/Sunburst/library/build_library.py`) |
+| Afterglow | synth | Aglw | Pads, keys, plucks, leads, bells, soundscapes, electric guitar. Deep two-layer engine (12 sources incl. pluck, organ, mallet, sync, Electric guitar string) + Dirt amp + CAB + strum + FX, but the panel is macro-first: a sunset "orb" display (Motion / Tone), 6 macros, POLY switch, TAPE STOP. 89 presets (each a different role): TAME IMPALA, MASSIVE ATTACK, BRENT FAIYAZ, MIKE DEAN, TRAVIS SCOTT, YEEZUS, MOSHC0RE, GUITAR, TRIP HOP, SAFE |

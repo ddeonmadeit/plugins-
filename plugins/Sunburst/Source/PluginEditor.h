@@ -28,6 +28,7 @@ private:
     private:
         SunburstProcessor& proc;
         dd::gui::PresetBar presetBar;
+        dd::gui::TapeStopControl tapeStop;
         GuitarView guitar;
         dd::gui::Panel playing, amp, room;
         std::vector<std::unique_ptr<PedalView>> pedals;

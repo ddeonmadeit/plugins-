@@ -22,12 +22,15 @@ python3 tools/qa/variety.py <dir> [<older dir>]         # do the presets play li
 tools/qa/run_qa.sh <Name>                              # all of the above, exits non-zero on failure
 $H render --program N --perf --out x.wav               # keep perf* switches (POLY) at their defaults
 $H render --preset-file p.json --phrase "notes:50,0,5.8,100 55,0.02,5.8,96 end=9" --bpm 79 --out x.wav
+$H render --program N --at 3:perfTapeStop=1 --at 6:perfTapeStop=0 --out x.wav   # change params mid-render (automation)
 python3 tools/qa/tone.py x.wav 0.2 5.8 [--partial 294] # width, tremolo, warble, octave balance of a window
 ```
 
 `notes:` plays any notes (`note,start s,length s,velocity`, optional `end=` seconds): one-shots, a chord
 from a reference, a loop. `--bpm` gives the plugin a playing host transport from beat 0, so synced LFOs,
 delays and pumps (and Afterglow's Trem) run at the reference tempo; without it plugins free-run at 120.
+`--at <seconds>:<id>=<value>` changes a parameter at that time (block-accurate), like host automation;
+it also reaches `perf*` parameters, which `--set` and presets never touch.
 
 Renders are 32-bit float WAV at 48 kHz with the plugin latency removed. Effects get a built-in test
 programme (kick drops, hats, saw chord) on their input automatically.

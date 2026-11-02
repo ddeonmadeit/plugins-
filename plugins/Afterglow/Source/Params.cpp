@@ -146,7 +146,9 @@ const std::array<ParamSpec, (size_t) kNumParams>& table()
         { P::perfPoly,   "perfPoly",   "Poly Keys",      K::Bool,   0, 1, 1, 0, U::None, nullptr },
         { P::cabOn,      "cabOn",      "Cabinet",        K::Bool,   0, 1, 0, 0, U::None, nullptr },
         { P::cabType,    "cabType",    "Cabinet Type",   K::Choice, 0, 1, 0, 0, U::None, &dd::CabSim::typeNames() },
-        { P::strum,      "strum",      "Strum",          K::Float,  0, 80, 0, 0, U::Ms, nullptr }
+        { P::strum,      "strum",      "Strum",          K::Float,  0, 80, 0, 0, U::Ms, nullptr },
+        { P::perfTapeStop, "perfTapeStop", "Tape Stop",      K::Bool,   0, 1, 0, 0, U::None, nullptr },
+        { P::perfTapeTime, "perfTapeTime", "Tape Stop Time", K::Choice, 0, 8, 3, 0, U::None, &dd::TapeStop::timeNames() }
     }};
     return t;
 }

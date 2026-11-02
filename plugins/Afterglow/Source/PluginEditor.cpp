@@ -19,7 +19,8 @@ constexpr int kDeckH = 224;
 
 //==============================================================================
 AfterglowEditor::Content::Content (AfterglowProcessor& p)
-    : proc (p), presetBar (p.presets), polySwitch (*p.apvts.getParameter ("perfPoly"), "POLY", sunset::amber), horizon (p)
+    : proc (p), presetBar (p.presets), polySwitch (*p.apvts.getParameter ("perfPoly"), "POLY", sunset::amber), tapeStop (p.apvts),
+      horizon (p)
 {
     const std::tuple<const char*, const char*, juce::Colour, const char*> macroDefs[] = {
         { "mSwell", "Swell", sunset::yellow, "Slower or faster attack" },
@@ -51,6 +52,7 @@ AfterglowEditor::Content::Content (AfterglowProcessor& p)
 
     polySwitch.setTooltip ("Poly: play chords with any preset. Off: each preset's own mode (mono / legato leads). Stays as you set it when you change presets.");
     addAndMakeVisible (polySwitch);
+    addAndMakeVisible (tapeStop);
     addAndMakeVisible (presetBar);
     addAndMakeVisible (horizon);
 }
@@ -111,8 +113,9 @@ void AfterglowEditor::Content::resized()
     auto r = getLocalBounds().reduced (12);
     auto head = r.removeFromTop (64);
     head.removeFromLeft (300);
-    polySwitch.setBounds (head.getRight() - 84, head.getY() + 6, 84, 26);
-    head.removeFromRight (170);
+    auto side = head.removeFromRight (200);
+    tapeStop.setBounds (side.getX(), side.getY() + 6, side.getWidth(), 26);
+    polySwitch.setBounds (side.getX(), side.getBottom() - 26, 84, 26);
     presetBar.setBounds (head.withSizeKeepingCentre (std::min (head.getWidth(), 600), 54));
     r.removeFromTop (8);
 

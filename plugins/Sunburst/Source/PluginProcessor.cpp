@@ -73,6 +73,7 @@ void SunburstProcessor::prepareToPlay (double sampleRate, int)
     rig.prepare (sr);
     glue.prepare (sr);
     clipper.prepare (sr, kChunk);
+    tapeStop.prepare (sr);
     for (auto& f : sideLowCut)
     {
         f.set (dd::Biquad::Type::HighPass, 240.0f, 0.7071f, 0.0f, sr);   // doubles and rooms spread above the low strings only
@@ -184,6 +185,7 @@ void SunburstProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
     rig.setDelayTime ((float) (dd::divisionBeats (params.getInt (P::delayDiv)) * 60.0 / bpm * sr), false);
     outGainSm.setTargetValue (dd::dbToGain (params.get (P::outGain)));
     widthSm.setTargetValue (params.get (P::width));
+    tapeStop.set (params.getBool (P::perfTapeStop), dd::TapeStop::timeSeconds (params.getInt (P::perfTapeTime), bpm));
 
     const int numSamples = buffer.getNumSamples();
     buffer.clear();
@@ -255,6 +257,7 @@ void SunburstProcessor::processChunk (float* L, float* R, int n)
         const float g = outGainSm.getNextValue();
         L[i] *= g;
         R[i] *= g;
+        tapeStop.process (L[i], R[i]);
     }
     clipper.process (block, 0.0f);
 
@@ -267,6 +270,7 @@ void SunburstProcessor::processChunk (float* L, float* R, int n)
             rig.reset();
             glue.reset();
             clipper.reset();
+            tapeStop.reset();
             for (auto& f : sideLowCut)
                 f.reset();
             return;

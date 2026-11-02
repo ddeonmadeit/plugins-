@@ -74,6 +74,7 @@ private:
     dd::Biquad sideLowCut[2];
     dd::GlueCompressor glue;
     dd::Clipper clipper;
+    dd::TapeStop tapeStop;
     juce::SmoothedValue<float> outGainSm { 1.0f }, widthSm { 1.0f };
     std::array<std::atomic<float>, sunburst::GuitarEngine::kStrings> stringLevels {};
     std::array<std::atomic<int>, sunburst::GuitarEngine::kStrings> stringFrets {};

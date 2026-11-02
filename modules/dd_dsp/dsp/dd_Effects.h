@@ -356,4 +356,125 @@ private:
     OS os { 2, 2, OS::filterHalfBandPolyphaseIIR, true, true };
     juce::SmoothedValue<float> driveSm { 0.0f };
 };
+
+/**
+    Tape stop: the output slows to a halt like a tape machine losing power (speed and pitch fall
+    together), stays silent while held, and fades back to the live signal on release.
+    The speed curve is e^(-t / 0.56 T), measured from a real trip-hop tape stop (half speed after
+    37 % of the stop, a fifth after 87 %), with a fade over the last fifth. Zero latency: the live
+    signal passes straight through until the stop is engaged.
+*/
+class TapeStop
+{
+public:
+    static constexpr float kMaxSeconds = 4.0f;
+
+    /** Stop lengths offered by every plugin's TAPE STOP control; index 3 (2 s) is the default. */
+    static const juce::StringArray& timeNames()
+    {
+        static const juce::StringArray n { "0.5 s", "1 s", "1.5 s", "2 s", "3 s", "4 s", "1 beat", "2 beats", "1 bar" };
+        return n;
+    }
+
+    static float timeSeconds (int index, double bpm) noexcept
+    {
+        constexpr float secs[] = { 0.5f, 1.0f, 1.5f, 2.0f, 3.0f, 4.0f };
+        if (index >= 0 && index < 6)
+            return secs[index];
+        const double beats = index == 6 ? 1.0 : index == 7 ? 2.0 : 4.0;
+        return (float) (beats * 60.0 / std::max (30.0, bpm));
+    }
+
+    void prepare (double newSr)
+    {
+        sr = newSr;
+        for (auto& b : lines)
+            b.prepare ((int) (kMaxSeconds * sr) + 64);
+        reset();
+    }
+
+    void reset()
+    {
+        for (auto& b : lines)
+            b.reset();
+        engaged = false;
+        xf = 0.0f;
+        lag = 0.0;
+        t = 0.0;
+    }
+
+    /** Call once per block: engage (true) or release (false), and the stop length in seconds. */
+    void set (bool stop, float seconds) noexcept
+    {
+        const float len = juce::jlimit (0.05f, kMaxSeconds, seconds);
+        if (stop && ! engaged)
+        {
+            lag = kBaseLag;
+            t = 0.0;
+        }
+        engaged = stop;
+        stopLen = len;
+        invTau = 1.0 / (0.56 * (double) len);
+    }
+
+    /** True while the stop or its release fade is running (the effect touches the signal). */
+    bool isActive() const noexcept { return engaged || xf > 0.0f; }
+
+    void process (float& l, float& r) noexcept
+    {
+        lines[0].push (l);
+        lines[1].push (r);
+        if (! isActive())
+            return;
+
+        // Engage and release both crossfade over ~6 ms; at the start the tape is only kBaseLag
+        // samples behind the live signal, so the switch is inaudible until it slows down.
+        const float step = (float) (1.0 / (0.006 * sr));
+        xf = engaged ? std::min (1.0f, xf + step) : std::max (0.0f, xf - step);
+
+        float gain = 0.0f;
+        if (t < (double) stopLen)
+        {
+            const double speed = std::exp (-t * invTau);
+            lag += 1.0 - speed;
+            t += 1.0 / sr;
+            const double fadeStart = 0.8 * (double) stopLen;
+            gain = t < fadeStart ? 1.0f
+                                 : (float) (0.5 + 0.5 * std::cos (juce::MathConstants<double>::pi * (t - fadeStart) / ((double) stopLen - fadeStart)));
+        }
+        const float tl = gain > 0.0f ? read (lines[0], lag) * gain : 0.0f;
+        const float tr = gain > 0.0f ? read (lines[1], lag) * gain : 0.0f;
+        l += (tl - l) * xf;
+        r += (tr - r) * xf;
+    }
+
+private:
+    static constexpr double kBaseLag = 4.0;
+
+    /** Hermite read `delay` samples behind the newest sample, in double precision: the lag reaches
+        hundreds of thousands of samples, where a float delay would quantise the fraction. */
+    static float read (const DelayBuffer& b, double delay) noexcept
+    {
+        const double d = juce::jlimit (1.0, (double) (b.mask - 3), delay);
+        const int di = (int) d;
+        const float f = (float) (d - (double) di);
+        const int m = b.mask;
+        const int i0 = (b.pos - 1 - di + 2 * (m + 1)) & m;
+        const float xm1 = b.buf[(size_t) ((i0 + 1) & m)];
+        const float x0  = b.buf[(size_t) i0];
+        const float x1  = b.buf[(size_t) ((i0 - 1 + m + 1) & m)];
+        const float x2  = b.buf[(size_t) ((i0 - 2 + m + 1) & m)];
+        const float c = (x1 - xm1) * 0.5f;
+        const float v = x0 - x1;
+        const float w = c + v;
+        const float a = w + v + (x2 - x0) * 0.5f;
+        const float bb = w + a;
+        return ((a * f - bb) * f + c) * f + x0;
+    }
+
+    double sr = 44100.0, lag = 0.0, t = 0.0, invTau = 1.0;
+    float stopLen = 2.0f, xf = 0.0f;
+    bool engaged = false;
+    DelayBuffer lines[2];
+};
 } // namespace dd

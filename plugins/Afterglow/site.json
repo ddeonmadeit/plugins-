@@ -9,18 +9,21 @@
     "Dirt (8 distortion types), tape wow and saturation, lo-fi, Juno / Solina ensemble, phaser, dub delay, shimmer reverb, tempo pump and gate",
     "Drag the sun to set Motion and Tone; Swell, Tail, Blend, Grit, Echo and Space reshape any preset",
     "POLY switch: play chords with any preset, even the mono leads",
-    "88 presets: TAME IMPALA, MASSIVE ATTACK, BRENT FAIYAZ, MIKE DEAN, TRAVIS SCOTT, YEEZUS, MOSHC0RE, GUITAR, TRIP HOP, SAFE"
+    "89 presets: TAME IMPALA, MASSIVE ATTACK, BRENT FAIYAZ, MIKE DEAN, TRAVIS SCOTT, YEEZUS, MOSHC0RE, GUITAR, TRIP HOP, SAFE",
+    "TAPE STOP: slow everything to a halt like a tape machine powering down, then automate it at the end of a beat"
   ],
   "installTips": [
     "Every macro's centre position is the preset as designed: double-click a knob, or the sun, to go back to it.",
     "Pump, gate, delay and synced LFOs follow FL Studio's tempo.",
-    "Guitar presets: play chords as voicings within one or two octaves (like a real neck), around C2-C5 in FL's piano roll; the POLY switch must be on for chords."
+    "Guitar presets: play chords as voicings within one or two octaves (like a real neck), around C2-C5 in FL's piano roll; the POLY switch must be on for chords.",
+    "TAPE STOP: in FL Studio, right-click the switch > Create automation clip, then draw it on where the beat should stop. It stays silent until switched off again."
   ],
   "previewNote": "on the same 120 BPM phrase: a held Dm9, an arpeggio over Bb, Fmaj7 stabs, then a legato melody. GUITAR presets play strummed Em, C and G chords at 80 BPM and a riff.",
   "whatsNew": {
-    "version": "1.5.0",
+    "version": "1.6.0",
     "items": [
-      "SAFE: 7 new presets in SAFE's moody Toronto R&B lane, each a different instrument: underwater electric piano, a reverse-swell vapor pad, a dry afrobeat marimba, a dreamy piano, a dark 80s lead, palm-muted afro guitar and a chopped vocal stab"
+      "Wall Dusty Stabs (TRIP HOP): the dusty chord stabs from The Wall, a muted electric piano and vibraphone hit that dies away in half a second, with record dust and tape warble",
+      "TAPE STOP switch (top right): the sound slows to a halt like a tape machine powering down, the same 2-second stop that ends The Wall. Pick the length (0.5 to 4 s, or 1 beat, 2 beats, 1 bar) and automate the switch in FL Studio"
     ]
   }
 }

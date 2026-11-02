@@ -77,6 +77,7 @@ void AfterglowProcessor::prepareToPlay (double sampleRate, int)
     std::fill (std::begin (lastEq), std::end (lastEq), -99.0f);
     glue.prepare (sr);
     clipper.prepare (sr, kChunk);
+    tapeStop.prepare (sr);
     cab.prepare (sr);
     for (auto& f : ampTight)
     {
@@ -252,6 +253,7 @@ void AfterglowProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
     es.strumMs = params.get (P::strum);
     engine.setSettings (es);
     updateFx (bpm);
+    tapeStop.set (params.getBool (P::perfTapeStop), dd::TapeStop::timeSeconds (params.getInt (P::perfTapeTime), bpm));
 
     const int numSamples = buffer.getNumSamples();
     const int numCh = buffer.getNumChannels();
@@ -487,6 +489,7 @@ void AfterglowProcessor::processChunk (float* L, float* R, int n, double bpm)
         const float g = outGainSm.getNextValue();
         L[i] *= g;
         R[i] *= g;
+        tapeStop.process (L[i], R[i]);
     }
     float* chans[2] = { L, R };
     juce::dsp::AudioBlock<float> block (chans, 2, (size_t) n);
@@ -508,6 +511,7 @@ void AfterglowProcessor::processChunk (float* L, float* R, int n, double bpm)
             shimmerFb = 0.0f;
             glue.reset();
             clipper.reset();
+            tapeStop.reset();
             for (auto& f : sideLowCut) f.reset();
             return;
         }

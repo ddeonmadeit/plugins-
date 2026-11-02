@@ -9,11 +9,19 @@
     "String Noise knob: fret squeaks on position shifts, string damping on release, slide scrapes and pick ticks, from loud to completely off",
     "Palm mute (also on the mod wheel), hammer-ons and slides on legato notes, vibrato, humanize, double-tracking for wide stereo guitars",
     "Pedalboard: compressor, overdrive, fuzz, chorus, tempo-synced tremolo and delay; amp with Clean, Crunch and Lead channels, a 1x12 or 4x12 cabinet and mic placement, plus a room",
+    "TAPE STOP: slow the guitar to a halt like a tape machine powering down, then automate it at the end of a beat",
     "35 presets, each a different guitar part: acoustic, clean, crunch and heavy, plus Travis Scott, Mike Dean, Yeezus, moshc0re, trip hop and SAFE"
   ],
   "installTips": [
     "The .pkg also installs the guitar sample library (about 130 MB). With the .zip, Install.command copies it for you.",
-    "Play between E3 and D7 (FL note names). Mod wheel = palm mute, sustain pedal = let ring, pitch bend = string bend. C2 to E2 play noises: muted strum, body knock, string mute, fret squeak, pick."
+    "Play between E3 and D7 (FL note names). Mod wheel = palm mute, sustain pedal = let ring, pitch bend = string bend. C2 to E2 play noises: muted strum, body knock, string mute, fret squeak, pick.",
+    "TAPE STOP: in FL Studio, right-click the switch > Create automation clip, then draw it on where the beat should stop. It stays silent until switched off again."
   ],
-  "previewNote": "on the same 80 BPM part: strummed Em, C and G chords (down and up strokes), then a single-note riff."
+  "previewNote": "on the same 80 BPM part: strummed Em, C and G chords (down and up strokes), then a single-note riff.",
+  "whatsNew": {
+    "version": "1.1.0",
+    "items": [
+      "TAPE STOP switch (top right): the sound slows to a halt like a tape machine powering down, the same 2-second stop that ends The Wall. Pick the length (0.5 to 4 s, or 1 beat, 2 beats, 1 bar) and automate the switch in FL Studio"
+    ]
+  }
 }

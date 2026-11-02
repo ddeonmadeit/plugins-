@@ -18,6 +18,9 @@ SUNBURST: PLAYING THE GUITARS
     - STRING NOISE: fret squeaks, string damping, slide scrapes and pick ticks. All the way down for
       clean notes.
     - DOUBLE: a second take panned opposite, for wide double-tracked guitars.
+    - TAPE STOP (top right): the guitar slows to a halt like a tape machine powering down and stays
+      silent until switched off; the menu sets how long. Right-click it > Create automation clip in
+      FL Studio to drop it at the end of a beat.
 
   Samples (all CC0 1.0, credited with thanks): Shinyguitar, Emilyguitar and Black And Green Guitars
   by Karoryfer Samples; Spanish Classical Guitar by the FreePats project. See ATTRIBUTION.txt in the

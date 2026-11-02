@@ -6,6 +6,7 @@
       <Plugin>Harness render  --out x.wav [--program N | --preset-file p.json] [--set id=value ...]
                               [--phrase demo|single|slide|groove|chords|pads|mixed|guitar|drums|drumvel] [--sr 48000] [--block 256] [--mono]
                               [--bpm 79]   host tempo, transport playing from beat 0 (default: no host)
+                              [--at 6.5:perfTapeStop=1 ...]   change a parameter at a time in seconds (like automation)
                               --phrase "notes:<note>,<start s>,<length s>,<velocity> ... [end=<s>]"   any notes (one-shots, loops)
       <Plugin>Harness render-all --outdir dir [--phrase demo] [--sr 48000] [--bpm 80]
       <Plugin>Harness snapshot --out ui.png [--program N] [--scale 1]
@@ -219,6 +220,21 @@ void applySets (juce::AudioProcessor& proc, const juce::StringArray& sets)
     {
         const auto key = s.upToFirstOccurrenceOf ("=", false, false).trim();
         const auto val = s.fromFirstOccurrenceOf ("=", false, false).trim();
+        if (dd::isPerformanceParam (key))
+        {
+            // Presets never carry perf* switches, so set those on the parameter itself (real units / choice index).
+            bool found = false;
+            for (auto* p : proc.getParameters())
+                if (auto* rp = dynamic_cast<juce::RangedAudioParameter*> (p); rp != nullptr && rp->getParameterID() == key)
+                {
+                    const float v = val == "true" ? 1.0f : val == "false" ? 0.0f : val.getFloatValue();
+                    rp->setValueNotifyingHost (rp->convertTo0to1 (v));
+                    found = true;
+                }
+            if (! found)
+                std::cerr << "warning: unknown parameter '" << key << "'\n";
+            continue;
+        }
         if (val == "true" || val == "false")         obj->setProperty (key, val == "true");
         else if (val.containsOnly ("-+.0123456789e")) obj->setProperty (key, val.getDoubleValue());
         else                                          obj->setProperty (key, val);
@@ -282,8 +298,16 @@ struct FixedPlayHead : juce::AudioPlayHead
     }
 };
 
-juce::AudioBuffer<float> renderPhrase (juce::AudioProcessor& proc, const juce::String& phraseName, double sr, int block = 256, double bpm = 0.0)
+juce::AudioBuffer<float> renderPhrase (juce::AudioProcessor& proc, const juce::String& phraseName, double sr, int block = 256, double bpm = 0.0,
+                                       const juce::StringArray& timedSets = {})
 {
+    // "--at <seconds>:<id>=<value>", applied at the start of the block containing that time.
+    std::vector<std::pair<int, juce::String>> timed;
+    for (auto& t : timedSets)
+        timed.push_back ({ (int) (t.upToFirstOccurrenceOf (":", false, false).getDoubleValue() * sr), t.fromFirstOccurrenceOf (":", false, false) });
+    std::stable_sort (timed.begin(), timed.end(), [] (const auto& x, const auto& y) { return x.first < y.first; });
+    size_t nextTimed = 0;
+
     double total = 0.0;
     auto notes = phrase (phraseName, total);
 
@@ -338,6 +362,8 @@ juce::AudioBuffer<float> renderPhrase (juce::AudioProcessor& proc, const juce::S
             for (int ch = 0; ch < numIn; ++ch)
                 buf.copyFrom (ch, 0, input, std::min (ch, 1), pos, n);
         playHead.sample = pos;
+        while (nextTimed < timed.size() && timed[nextTimed].first < pos + n)
+            applySets (proc, juce::StringArray (timed[nextTimed++].second));
         proc.processBlock (buf, midi);
         for (int ch = 0; ch < 2; ++ch)
             out.copyFrom (ch, pos, buf, std::min (ch, numOut - 1), 0, n);
@@ -446,7 +472,8 @@ int cmdRender (juce::AudioProcessor& proc, const Args& a)
             return 1;
         }
     }
-    auto buf = renderPhrase (proc, a.get ("--phrase", "demo"), sr, a.get ("--block", "256").getIntValue(), a.get ("--bpm", "0").getDoubleValue());
+    auto buf = renderPhrase (proc, a.get ("--phrase", "demo"), sr, a.get ("--block", "256").getIntValue(), a.get ("--bpm", "0").getDoubleValue(),
+                             a.getAll ("--at"));
     const juce::File out (a.get ("--out", "render.wav"));
     if (! writeWav (out, buf, sr))
     {
@@ -604,10 +631,11 @@ int main (int argc, char* argv[])
     const auto cmd = a.raw.isEmpty() ? juce::String ("list") : a.raw[0];
     std::unique_ptr<juce::AudioProcessor> proc (createPluginFilter());
 
-    // Render presets as designed: performance switches ("perf*", e.g. Poly) off unless --perf is given.
+    // Render presets as designed: performance switches ("perf*" on/off, e.g. Poly) off unless --perf is given.
+    // Other perf settings (e.g. the tape stop length) keep their defaults.
     if (! a.has ("--perf"))
         for (auto* p : proc->getParameters())
-            if (auto* rp = dynamic_cast<juce::RangedAudioParameter*> (p); rp != nullptr && dd::isPerformanceParam (rp->getParameterID()))
+            if (auto* rp = dynamic_cast<juce::AudioParameterBool*> (p); rp != nullptr && dd::isPerformanceParam (rp->getParameterID()))
                 rp->setValueNotifyingHost (0.0f);
 
     int rc = 0;

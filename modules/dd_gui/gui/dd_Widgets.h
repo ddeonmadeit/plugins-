@@ -77,6 +77,25 @@ private:
 };
 
 /**
+    TAPE STOP performance control (dd::TapeStop): a lamp switch and the stop length beside it, or
+    below it when the component is taller than one row. Bound to the perf ids, so it stays with the
+    instance and FL Studio can automate the switch.
+*/
+class TapeStopControl : public juce::Component
+{
+public:
+    explicit TapeStopControl (juce::AudioProcessorValueTreeState& state,
+                              const juce::String& switchId = "perfTapeStop", const juce::String& timeId = "perfTapeTime");
+
+    void resized() override;
+
+private:
+    LampSwitch lamp;
+    juce::ComboBox time;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> attachment;
+};
+
+/**
     Titled section that lays its children out on a fixed grid of cells.
     Children are added in reading order; use place() for anything spanning several cells.
 */

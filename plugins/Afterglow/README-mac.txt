@@ -11,6 +11,10 @@ AFTERGLOW: PLAYING IT
   POLY (top right) lets you play chords with any preset, even the mono leads; switch it off to hear
   a lead preset glide and play legato as designed. It stays as you set it when you change presets.
   Pads like held chords and the sustain pedal; leads (mono / legato presets) like overlapping notes.
+  TAPE STOP (top right) slows the sound to a halt like a tape machine powering down, then stays
+  silent until you switch it off. The menu beside it sets how long the stop takes (2 s is the stop
+  at the end of The Wall). To drop it at the end of a beat in FL Studio: right-click the switch >
+  Create automation clip, and draw it on where the stop should start.
 
 UPDATING
   Quit FL Studio, run the new .pkg (it replaces the old version), then reopen your project. Sounds

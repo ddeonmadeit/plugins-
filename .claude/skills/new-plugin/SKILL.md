@@ -35,11 +35,14 @@ may grow at the end (state stores the index, not the normalised value).
 **Performance switches** (things the player sets for themselves, like the POLY keys switch) get an id
 starting with `perf`. `dd::isPerformanceParam()` makes PresetManager skip them on load and save, so
 changing presets never flips them; `preset_fill.py` leaves them out and `preset_lint.py` rejects them in
-presets; the harness forces them to 0 (presets render as designed) unless `--perf` is passed. When a new
+presets; the harness switches the on/off ones to 0 (presets render as designed) unless `--perf` is passed. When a new
 parameter must behave differently for sessions saved before it existed (POLY: on for new instances, off
 for old projects), call `dd::keepOldDefault (apvts, tree, "perfPoly", 0.0f)` in `setStateInformation`
 after `replaceStateExactly`. Every synth must be able to play chords: add a POLY `perf` switch if any
 preset is mono (`dd::gui::LampSwitch` in the header, see SubGrit / Afterglow).
+Melodic plugins also get a tape stop: `dd::TapeStop` last in the chain before the clipper, params
+`perfTapeStop` (Bool) + `perfTapeTime` (Choice over `dd::TapeStop::timeNames()`, default 3 = 2 s), and
+`dd::gui::TapeStopControl` in the header (see Afterglow / Sunburst).
 
 ## 3. DSP
 

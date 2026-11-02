@@ -136,6 +136,37 @@ void LampSwitch::paint (juce::Graphics& g)
 void LampSwitch::mouseDown (const juce::MouseEvent&) { attachment.setValueAsCompleteGesture (on ? 0.0f : 1.0f); }
 
 //==============================================================================
+TapeStopControl::TapeStopControl (juce::AudioProcessorValueTreeState& state, const juce::String& switchId, const juce::String& timeId)
+    : lamp (*state.getParameter (switchId), "TAPE STOP", sunset::red)
+{
+    lamp.setTooltip ("Tape stop: the sound slows down to a halt like a tape machine powering off, and stays silent "
+                     "until you switch it off again. In FL Studio, right-click it > Create automation clip to drop it at the end of a beat.");
+    addAndMakeVisible (lamp);
+
+    if (auto* p = dynamic_cast<juce::AudioParameterChoice*> (state.getParameter (timeId)))
+        time.addItemList (p->choices, 1);
+    time.setTooltip ("How long the tape takes to stop");
+    addAndMakeVisible (time);
+    attachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment> (state, timeId, time);
+}
+
+void TapeStopControl::resized()
+{
+    auto r = getLocalBounds();
+    if (r.getHeight() >= 44)
+    {
+        lamp.setBounds (r.removeFromTop (r.getHeight() / 2));
+        time.setBounds (r.withSizeKeepingCentre (r.getWidth(), 22));
+    }
+    else
+    {
+        const int w = r.getWidth() * 2 / 5;
+        time.setBounds (r.removeFromRight (w).withSizeKeepingCentre (w, 22));
+        lamp.setBounds (r);
+    }
+}
+
+//==============================================================================
 Panel::Panel (const juce::String& t, int c, int r, juce::Colour a)
     : title (t), cols (c), rows (r), accent (a)
 {

@@ -18,6 +18,8 @@ enum class P
     reverbOn, reverbMix, reverbSize,
     // Output
     width, glue, outGain,
+    // Added in 1.1: tape stop. Performance controls: the instance's, never a preset's (dd::isPerformanceParam).
+    perfTapeStop, perfTapeTime,
     count
 };
 

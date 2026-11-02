@@ -29,6 +29,7 @@ private:
         AfterglowProcessor& proc;
         dd::gui::PresetBar presetBar;
         dd::gui::LampSwitch polySwitch;
+        dd::gui::TapeStopControl tapeStop;
         HorizonView horizon;
         std::vector<std::unique_ptr<dd::gui::Knob>> macros;
         std::vector<std::unique_ptr<dd::gui::LampSwitch>> switches;

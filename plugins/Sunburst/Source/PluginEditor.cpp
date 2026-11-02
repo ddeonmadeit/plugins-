@@ -17,7 +17,7 @@ dd::gui::Palette sunburstPalette()
 
 //==============================================================================
 SunburstEditor::Content::Content (SunburstProcessor& p)
-    : proc (p), presetBar (p.presets), guitar (p),
+    : proc (p), presetBar (p.presets), tapeStop (p.apvts), guitar (p),
       playing ("Playing", 7, 3, sunset::amber),
       amp ("Amp", 13, 1, sunset::orange),
       room ("Room & Output", 6, 1, sunset::yellow)
@@ -101,6 +101,7 @@ SunburstEditor::Content::Content (SunburstProcessor& p)
     pedal ("Delay",  "delayOn",  C { { "delayDiv", "Time" }, { "delayFeedback", "Repeats" }, { "delayMix", "Mix" } }, juce::Colour (0xff2c1a10));
 
     addAndMakeVisible (presetBar);
+    addAndMakeVisible (tapeStop);
     addAndMakeVisible (guitar);
     addAndMakeVisible (playing);
     addAndMakeVisible (amp);
@@ -147,7 +148,8 @@ void SunburstEditor::Content::resized()
     auto r = getLocalBounds().reduced (12);
     auto head = r.removeFromTop (64);
     head.removeFromLeft (320);
-    head.removeFromRight (170);
+    auto side = head.removeFromRight (200);
+    tapeStop.setBounds (side.getX(), side.getY() + 6, side.getWidth(), 26);
     presetBar.setBounds (head.withSizeKeepingCentre (std::min (head.getWidth(), 600), 54));
     r.removeFromTop (8);
 
