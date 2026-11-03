@@ -63,9 +63,8 @@ void Knob::paint (juce::Graphics& g)
     auto r = getLocalBounds();
     drawTitle (g, *this, title, r.removeFromTop (juce::roundToInt (16.0f * labelScale)), labelScale);
     const auto& pal = paletteOf (*this);
-    g.setColour (slider.isMouseOverOrDragging() ? pal.text.interpolatedWith (pal.accent2, 0.5f) : pal.text.withAlpha (0.85f));
-    g.setFont (LookAndFeel::font (12.0f * labelScale));
-    g.drawFittedText (valueText, r.removeFromBottom (juce::roundToInt (18.0f * labelScale)), juce::Justification::centred, 1, 0.7f);
+    drawPrintedFitted (g, valueText, r.removeFromBottom (juce::roundToInt (18.0f * labelScale)),
+                       slider.isMouseOverOrDragging() ? pal.text.brighter (0.3f) : pal.text, LookAndFeel::font (12.0f * labelScale));
 }
 
 //==============================================================================
@@ -128,8 +127,8 @@ void LampSwitch::paint (juce::Graphics& g)
 {
     const auto& pal = paletteOf (*this);
     auto r = getLocalBounds().toFloat();
-    paintLamp (g, { r.getX() + 12.0f, r.getCentreY() }, 6.0f, colour, on ? 1.0f : 0.0f);
-    drawPrinted (g, label, r.withTrimmedLeft (28.0f), on || isMouseOver() ? pal.text : pal.dim,
+    paintLamp (g, { r.getX() + 16.0f, r.getCentreY() }, 6.0f, colour, on ? 1.0f : 0.0f);
+    drawPrinted (g, label, r.withTrimmedLeft (31.0f), on || isMouseOver() ? pal.text : pal.dim,
                  LookAndFeel::font (13.0f, true).withExtraKerningFactor (0.12f), juce::Justification::centredLeft);
 }
 

@@ -527,9 +527,10 @@ void GuitarView::paint (juce::Graphics& g)
 
 //==============================================================================
 PedalView::PedalView (juce::AudioProcessorValueTreeState& s, const juce::String& n, const juce::String& onId,
-                      std::vector<std::pair<juce::String, juce::String>> controls, juce::Colour c)
-    : name (n), body (c), onAttach (*s.getParameter (onId), [this] (float v) { on = v >= 0.5f; repaint(); })
+                      std::vector<std::pair<juce::String, juce::String>> controls)
+    : name (n), onAttach (*s.getParameter (onId), [this] (float v) { on = v >= 0.5f; repaint(); })
 {
+    setLookAndFeel (&silverLook);
     onAttach.sendInitialUpdate();
     for (auto& [id, title] : controls)
     {
@@ -565,51 +566,69 @@ void PedalView::mouseDown (const juce::MouseEvent& e)
         onAttach.setValueAsCompleteGesture (on ? 0.0f : 1.0f);
 }
 
+PedalView::~PedalView()
+{
+    setLookAndFeel (nullptr);
+}
+
 void PedalView::paint (juce::Graphics& g)
 {
     auto r = getLocalBounds().toFloat().reduced (4.0f);
-    // Cast shadow, then the die-cast enclosure: lit top-left, shadowed bottom-right, a bevelled rim.
+    // Cast shadow, then a brushed aluminium enclosure: lit from above, its rounded edges catching the light.
     for (int i = 5; i >= 1; --i)
     {
-        g.setColour (juce::Colours::black.withAlpha (0.1f));
-        g.fillRoundedRectangle (r.translated (2.0f, (float) i * 1.5f).expanded ((float) i * 0.6f), 9.0f);
+        g.setColour (juce::Colours::black.withAlpha (0.12f));
+        g.fillRoundedRectangle (r.translated (1.5f, (float) i * 1.5f).expanded ((float) i * 0.6f), 9.0f);
     }
-    g.setGradientFill (juce::ColourGradient (body.brighter (0.25f), r.getX(), r.getY(), body.darker (0.7f), r.getRight(), r.getBottom(), false));
-    g.fillRoundedRectangle (r, 8.0f);
-    g.setColour (juce::Colours::white.withAlpha (0.16f));
-    g.drawRoundedRectangle (r.reduced (1.0f), 8.0f, 1.2f);
-    g.setColour (juce::Colours::black.withAlpha (0.6f));
-    g.drawRoundedRectangle (r, 8.0f, 1.5f);
-    dd::gui::paintGrain (g, r.getSmallestIntegerContainer(), 0.6f);
+    g.setColour (juce::Colours::black.withAlpha (0.7f));
+    g.fillRoundedRectangle (r, 8.5f);
+    const auto shell = r.reduced (0.8f);
+    dd::gui::paintBrushedMetal (g, shell, juce::Colour (0xffaeb1b5), 8.0f, 0.9f);
+    juce::Path rim;
+    rim.addRoundedRectangle (shell.reduced (0.6f), 7.6f);
+    g.setGradientFill (juce::ColourGradient (juce::Colours::white.withAlpha (0.9f), 0.0f, shell.getY(),
+                                             juce::Colours::black.withAlpha (0.35f), 0.0f, shell.getBottom(), false));
+    g.strokePath (rim, juce::PathStrokeType (1.2f));
 
-    // Knob panel recess at the top.
+    // Control panel milled into the top: a shallow recess, shaded under its top edge.
     auto panel = r.reduced (8.0f).removeFromTop (100.0f);
-    g.setColour (juce::Colours::black.withAlpha (0.35f));
+    g.setColour (juce::Colours::white.withAlpha (0.55f));
+    g.fillRoundedRectangle (panel.translated (0.0f, 1.0f), 6.0f);
+    g.setColour (juce::Colours::black.withAlpha (0.4f));
+    g.fillRoundedRectangle (panel.translated (0.0f, -0.6f), 6.0f);
+    dd::gui::paintBrushedMetal (g, panel, juce::Colour (0xff8f9297), 6.0f, 0.7f);
+    g.setGradientFill (juce::ColourGradient (juce::Colours::black.withAlpha (0.35f), 0.0f, panel.getY(),
+                                             juce::Colours::transparentBlack, 0.0f, panel.getY() + 10.0f, false));
     g.fillRoundedRectangle (panel, 6.0f);
-    g.setColour (juce::Colours::white.withAlpha (0.06f));
-    g.drawRoundedRectangle (panel.translated (0.0f, 1.0f), 6.0f, 1.0f);
 
-    // Bottom-plate screws and a little sunset band between the knobs and the name.
     for (auto c : { r.getTopLeft() + juce::Point<float> (9.0f, 9.0f), r.getTopRight() + juce::Point<float> (-9.0f, 9.0f),
                     r.getBottomLeft() + juce::Point<float> (9.0f, -9.0f), r.getBottomRight() + juce::Point<float> (-9.0f, -9.0f) })
         dd::gui::paintScrew (g, c, 3.2f, 0.6f);
     const float midY = (panel.getBottom() + r.getBottom() - 78.0f) * 0.5f;
     dd::gui::paintSunsetStripes (g, juce::Rectangle<float> (std::min (90.0f, r.getWidth() * 0.55f), 10.0f).withCentre ({ r.getCentreX(), midY }));
 
-    // Name plate.
-    auto label = juce::Rectangle<float> (r.getWidth() - 24.0f, 22.0f).withCentre ({ r.getCentreX(), r.getBottom() - 66.0f });
-    g.setColour (juce::Colour (0xff0d0805));
-    g.fillRoundedRectangle (label, 4.0f);
-    dd::gui::drawPrinted (g, name.toUpperCase(), label, juce::Colour (0xffeadcc3),
-                          dd::gui::LookAndFeel::display (15.0f).withExtraKerningFactor (0.12f));
+    // The name, engraved deep into the aluminium.
+    auto label = juce::Rectangle<float> (r.getWidth() - 24.0f, 24.0f).withCentre ({ r.getCentreX(), r.getBottom() - 66.0f });
+    dd::gui::drawPrinted (g, name.toUpperCase(), label, juce::Colour (0xff1d1f23),
+                          dd::gui::LookAndFeel::display (17.0f).withExtraKerningFactor (0.14f));
 
-    // Status jewel and the chrome footswitch.
+    // Status LED and the chrome footswitch: a hex nut around a domed, polished plunger.
     dd::gui::paintLamp (g, { r.getRight() - 20.0f, r.getBottom() - 30.0f }, 5.0f, dd::gui::sunset::red.brighter (0.1f), on ? 1.0f : 0.0f);
-    g.setColour (juce::Colours::black.withAlpha (0.55f));
-    g.fillEllipse (footswitch.translated (1.5f, 3.5f).expanded (2.0f));
-    g.setGradientFill (juce::ColourGradient (juce::Colour (0xfff0e6d8), footswitch.getX(), footswitch.getY(), juce::Colour (0xff5d4e40), footswitch.getRight(), footswitch.getBottom(), false));
-    g.fillEllipse (footswitch);
-    const auto cap = footswitch.reduced (8.0f);
-    g.setGradientFill (juce::ColourGradient (juce::Colour (0xff6d5c4c), cap.getX(), cap.getY(), juce::Colour (0xffd8ccbc), cap.getRight(), cap.getBottom(), false));
+    g.setColour (juce::Colours::black.withAlpha (0.5f));
+    g.fillEllipse (footswitch.translated (1.0f, 3.0f).expanded (2.0f));
+    juce::Path nut;
+    nut.addPolygon (footswitch.getCentre(), 6, footswitch.getWidth() * 0.56f, juce::MathConstants<float>::pi / 6.0f);
+    g.setGradientFill (juce::ColourGradient (juce::Colour (0xfff5f6f7), footswitch.getX(), footswitch.getY(),
+                                             juce::Colour (0xff50545a), footswitch.getRight(), footswitch.getBottom(), false));
+    g.fillPath (nut);
+    g.setColour (juce::Colours::black.withAlpha (0.45f));
+    g.strokePath (nut, juce::PathStrokeType (0.8f));
+    const auto cap = footswitch.reduced (7.0f);
+    juce::ColourGradient dome (juce::Colour (0xffffffff), cap.getX() + cap.getWidth() * 0.3f, cap.getY() + cap.getHeight() * 0.25f,
+                               juce::Colour (0xff6a6e74), cap.getRight(), cap.getBottom(), true);
+    dome.addColour (0.4, juce::Colour (0xffc4c7cb));
+    g.setGradientFill (dome);
     g.fillEllipse (cap);
+    g.setColour (juce::Colours::black.withAlpha (0.5f));
+    g.drawEllipse (cap, 0.8f);
 }

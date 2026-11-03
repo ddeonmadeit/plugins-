@@ -6,9 +6,7 @@ namespace sunset = dd::gui::sunset;
 
 dd::gui::Palette afterglowPalette()
 {
-    dd::gui::Palette p;   // dark brown matte hardware; highlights only from the sunset set
-    p.background = juce::Colour (0xff0c0704);   // deeper than the house chassis: the sunset glows against near-black
-    p.panel = juce::Colour (0xff1d110a);
+    dd::gui::Palette p;   // brushed brown metal, silver hardware; warm colour only for things that glow
     p.accent = sunset::orange;
     p.accent2 = sunset::amber;
     return p;
@@ -62,32 +60,22 @@ void AfterglowEditor::Content::paint (juce::Graphics& g)
     const auto pal = afterglowPalette();
     dd::gui::paintBackdrop (g, getLocalBounds(), pal);
 
-    // Wordmark with a 70s sunset stripe band running off it.
+    // Raised silver wordmark with machined grooves running off it.
     auto head = getLocalBounds().removeFromTop (12 + 64).reduced (16, 0).withTrimmedTop (12).toFloat();
     auto logo = head.removeFromLeft (300.0f);
     const auto wordFont = dd::gui::LookAndFeel::display (40.0f).withExtraKerningFactor (0.04f);
     const float wordW = juce::GlyphArrangement::getStringWidth (wordFont, "AFTERGLOW");
     auto wordRow = logo.removeFromTop (42.0f);
-    dd::gui::drawPrinted (g, "AFTERGLOW", wordRow, pal.text, wordFont, juce::Justification::bottomLeft);
+    dd::gui::drawEmbossed (g, "AFTERGLOW", wordRow, wordFont, juce::Justification::bottomLeft);
     dd::gui::paintSunsetStripes (g, { wordRow.getX() + wordW + 12.0f, wordRow.getBottom() - 21.0f, 300.0f - wordW - 24.0f, 12.0f });
-    dd::gui::drawPrinted (g, "PADS  /  TEXTURES  /  SOUNDSCAPES", logo.removeFromTop (18.0f), pal.accent2,
+    dd::gui::drawPrinted (g, "PADS  /  TEXTURES  /  SOUNDSCAPES", logo.removeFromTop (18.0f), pal.dim,
                           dd::gui::LookAndFeel::font (12.0f, true).withExtraKerningFactor (0.22f), juce::Justification::topLeft);
     auto right = head.removeFromRight (160.0f);
     dd::gui::drawPrinted (g, juce::String ("ddeonmadeit  v") + DD_PLUGIN_VERSION, right.removeFromBottom (24.0f), pal.dim,
                           dd::gui::LookAndFeel::font (12.0f), juce::Justification::centredRight);
 
-    // The horizon sits in a bezel: a soft shadow around it and a lit lower lip, so it reads as a screen set into the case.
-    const auto screen = horizon.getBounds().toFloat();
-    for (int i = 5; i >= 1; --i)
-    {
-        g.setColour (juce::Colours::black.withAlpha (0.11f));
-        g.fillRoundedRectangle (screen.expanded (2.0f + (float) i).translated (0.0f, (float) i * 0.8f), 10.0f + (float) i);
-    }
-    const auto bezel = screen.expanded (4.0f);
-    g.setGradientFill (juce::ColourGradient (juce::Colour (0xff070403), 0.0f, bezel.getY(), juce::Colour (0xff2a1a10), 0.0f, bezel.getBottom(), false));
-    g.fillRoundedRectangle (bezel, 11.0f);
-    g.setColour (juce::Colours::white.withAlpha (0.08f));
-    g.drawRoundedRectangle (bezel.reduced (0.5f), 11.0f, 1.0f);
+    // The horizon is a screen set into the case behind a machined silver bezel.
+    dd::gui::paintBezel (g, horizon.getBounds().toFloat(), 8.0f, 7.0f);
 
     // The macro deck: one faceplate, macros on the left, effect switches on the right.
     const auto plate = deck.toFloat();

@@ -38,8 +38,8 @@ modules/dd_dsp            header-only DSP: PolyBLEP/unison osc, ZDF ladder, SVF,
 modules/dd_core           PresetManager (JSON factory + user presets), param <-> JSON helpers,
                           replaceStateExactly(), ScopeBuffer (lock-free audio -> UI)
 modules/dd_gui            house look (see "Visual style"): LookAndFeel/Palette + sunset colours, Knob/Choice/Toggle,
-                          grid Panel, PresetBar, CRT Scope, TapeStopControl, surfaces (backdrop, faceplate, inset, lamp, screw,
-                          grain, sunset stripes), embedded Barlow Condensed font (fonts/, SIL OFL)
+                          grid Panel, PresetBar, CRT Scope, TapeStopControl, materials (brushed metal backdrop/faceplate, inset,
+                          bezel, lamp, screw, engraved/embossed/glowing text), embedded Barlow Condensed font (fonts/, SIL OFL)
 plugins/<Name>/           one plugin: CMakeLists.txt, Source/, Presets/<CATEGORY>/NN_Name.json, qa.json,
                           site.json (tagline, description, accent, highlights, installTips for the download page),
                           optional library/ (sample library builder) and README-mac.txt (zip README notes)
@@ -104,20 +104,32 @@ libfreetype-dev, libfontconfig1-dev, xvfb; Python: numpy, scipy, soundfile, matp
 
 ## Visual style (owner's brief: every plugin)
 
-Dark brown **matte**, grainy, realistic **vintage analog hardware**. The **only** highlight colours are warm
-sunset tones: `dd::gui::sunset::red / ember / orange / amber / yellow`. No blue, green, teal, purple or neon.
-Text is cream print (`Palette::text`) or faded tan (`Palette::dim`).
+**Extremely realistic hardware** (owner's brief, Nov 2026): panels are **brushed brown metal** (the owner likes
+the brown; keep `Palette::panel` / `background`, measured hue ~26°, saturation ~0.33), lit and shiny, with
+**machined silver** parts on them: knobs, screws, keys, bezels, pedal enclosures. Everything is embossed or
+debossed. Warm colour (`dd::gui::sunset::red / ember / orange / amber / yellow`) appears **only where a real
+light would glow**: lamps, backlit knob slots, display glass, lit key legends, scope trace, spotlights. No
+printed colour, no blue, green, teal, purple or neon.
 
-- Editors paint `dd::gui::paintBackdrop` (grain + vignette), sections are `dd::gui::Panel` faceplates (screws,
-  jewel lamp in the section colour), displays/menus are recessed insets with amber text, knobs are
-  bakelite with a knurled skirt and a lit scale arc. Wordmark: `LookAndFeel::display()` + `paintSunsetStripes`.
-- Use `LookAndFeel::font()` / `display()` for all text (embedded font, identical on macOS and Linux) and
-  `drawPrinted()` for text on faceplates.
+- Light comes from above: top edges catch it, parts cast soft shadows down onto the plate, anything cut into
+  the metal is shaded under its top wall and lit on its lower lip.
+- Materials are in `dd_gui` (dd_Theme): `paintBackdrop` (darker brushed chassis), `dd::gui::Panel` /
+  `paintFaceplate` (raised brushed plate, machined edge, silver Phillips screws), `paintBrushedMetal` (any
+  metal surface, cached brushed texture + sheen), `paintInset` (window milled into the plate: chamfer, smoked
+  glass), `paintBezel` (silver frame around a scene window), `paintLamp` (chrome bezel, glowing glass).
+  Knobs (LookAndFeel) are machined silver: knurled skirt, polished chamfer, spun top (cached image), black
+  pointer groove, sitting in a backlit slot that glows in the knob's accent. Keys are silver with engraved
+  or backlit legends; combo boxes and menus are dark glass with amber text (`Palette::glass`).
+- Text: `drawPrinted()` engraves (light colours: cut through the brown to bare metal; dark colours: engraved
+  into silver), `drawEmbossed()` for raised chrome wordmarks (next to `paintSunsetStripes`, which now cuts three
+  machined grooves), `drawGlowing()` for light behind glass. Parts that are bare silver (pedals) use a
+  `LookAndFeel` built from `dd::gui::onSilver (palette)` so their labels engrave dark.
+- Use `LookAndFeel::font()` / `display()` for all text (embedded font, identical on macOS and Linux).
 - **No flat, dull or muddy objects** (owner, Afterglow 1.0 feedback): everything has depth (shadows, bevels,
-  sockets, inner shadows, glows), and tones are either deep dark or vibrant sunset, never mid-brown mush.
-  Still matte: soft light, no plastic gloss.
-- Drawn scenes (Kitroom's kit) follow the same light: dark room, warm tungsten spotlights from above,
-  film grain and vignette, crisp labels on top.
+  sockets, inner shadows, glows); metal needs its sheen and brushing, never a flat fill.
+- Drawn scenes (Kitroom's kit, Sunburst's stage, Afterglow's horizon) are seen through a silver-bezelled
+  window: dark room, warm tungsten spotlights from above, film grain and vignette, crisp labels on top.
+- Check a change at `snapshot --scale 2` too: brushing, chamfers and glows only read right up close.
 
 ## Quality bar (what "done" means for a plugin)
 

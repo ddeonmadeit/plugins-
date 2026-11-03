@@ -6,9 +6,7 @@ namespace sunset = dd::gui::sunset;
 
 dd::gui::Palette sunburstPalette()
 {
-    dd::gui::Palette p;   // dark brown matte hardware; highlights only from the sunset set
-    p.background = juce::Colour (0xff100906);
-    p.panel = juce::Colour (0xff24170e);
+    dd::gui::Palette p;   // brushed brown metal, silver hardware; warm colour only for things that glow
     p.accent = sunset::orange;
     p.accent2 = sunset::amber;
     return p;
@@ -87,18 +85,18 @@ SunburstEditor::Content::Content (SunburstProcessor& p)
     room.add<dd::gui::Knob> (s, "outGain", "Output", sunset::yellow);
 
     using C = std::vector<std::pair<juce::String, juce::String>>;
-    auto pedal = [&] (const char* name, const char* onId, C controls, juce::Colour body)
+    auto pedal = [&] (const char* name, const char* onId, C controls)
     {
-        auto pv = std::make_unique<PedalView> (s, name, onId, std::move (controls), body);
+        auto pv = std::make_unique<PedalView> (s, name, onId, std::move (controls));
         addAndMakeVisible (*pv);
         pedals.push_back (std::move (pv));
     };
-    pedal ("Comp",   "compOn",   C { { "compAmount", "Squeeze" } },                                           juce::Colour (0xff6a3c12));
-    pedal ("Drive",  "driveOn",  C { { "driveGain", "Gain" }, { "driveTone", "Tone" } },                      juce::Colour (0xff7a2a0c));
-    pedal ("Fuzz",   "fuzzOn",   C { { "fuzzGain", "Fuzz" } },                                                juce::Colour (0xff6a140c));
-    pedal ("Chorus", "chorusOn", C { { "chorusRate", "Rate" }, { "chorusDepth", "Depth" } },                  juce::Colour (0xff7a4a14));
-    pedal ("Trem",   "tremOn",   C { { "tremDiv", "Rate" }, { "tremDepth", "Depth" } },                       juce::Colour (0xff8a5016));
-    pedal ("Delay",  "delayOn",  C { { "delayDiv", "Time" }, { "delayFeedback", "Repeats" }, { "delayMix", "Mix" } }, juce::Colour (0xff2c1a10));
+    pedal ("Comp",   "compOn",   C { { "compAmount", "Squeeze" } });
+    pedal ("Drive",  "driveOn",  C { { "driveGain", "Gain" }, { "driveTone", "Tone" } });
+    pedal ("Fuzz",   "fuzzOn",   C { { "fuzzGain", "Fuzz" } });
+    pedal ("Chorus", "chorusOn", C { { "chorusRate", "Rate" }, { "chorusDepth", "Depth" } });
+    pedal ("Trem",   "tremOn",   C { { "tremDiv", "Rate" }, { "tremDepth", "Depth" } });
+    pedal ("Delay",  "delayOn",  C { { "delayDiv", "Time" }, { "delayFeedback", "Repeats" }, { "delayMix", "Mix" } });
 
     addAndMakeVisible (presetBar);
     addAndMakeVisible (tapeStop);
@@ -112,15 +110,16 @@ void SunburstEditor::Content::paint (juce::Graphics& g)
 {
     const auto pal = sunburstPalette();
     dd::gui::paintBackdrop (g, getLocalBounds(), pal);
+    dd::gui::paintBezel (g, guitar.getBounds().toFloat(), 10.0f, 7.0f);   // the stage window, framed in machined silver
 
     auto head = getLocalBounds().removeFromTop (12 + 64).reduced (16, 0).withTrimmedTop (12).toFloat();
     auto logo = head.removeFromLeft (320.0f);
     const auto wordFont = dd::gui::LookAndFeel::display (40.0f).withExtraKerningFactor (0.04f);
     const float wordW = juce::GlyphArrangement::getStringWidth (wordFont, "SUNBURST");
     auto wordRow = logo.removeFromTop (42.0f);
-    dd::gui::drawPrinted (g, "SUNBURST", wordRow, pal.text, wordFont, juce::Justification::bottomLeft);
+    dd::gui::drawEmbossed (g, "SUNBURST", wordRow, wordFont, juce::Justification::bottomLeft);
     dd::gui::paintSunsetStripes (g, { wordRow.getX() + wordW + 12.0f, wordRow.getBottom() - 21.0f, 320.0f - wordW - 24.0f, 12.0f });
-    dd::gui::drawPrinted (g, "ACOUSTIC  /  ELECTRIC  GUITAR", logo.removeFromTop (18.0f), pal.accent2,
+    dd::gui::drawPrinted (g, "ACOUSTIC  /  ELECTRIC  GUITAR", logo.removeFromTop (18.0f), pal.dim,
                           dd::gui::LookAndFeel::font (12.0f, true).withExtraKerningFactor (0.22f), juce::Justification::topLeft);
     auto right = head.removeFromRight (160.0f);
     dd::gui::drawPrinted (g, juce::String ("ddeonmadeit  v") + DD_PLUGIN_VERSION, right.removeFromBottom (24.0f), pal.dim,

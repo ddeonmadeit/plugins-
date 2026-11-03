@@ -4,7 +4,7 @@ namespace
 {
 dd::gui::Palette kitroomPalette()
 {
-    dd::gui::Palette p;   // dark brown matte hardware; highlights only from the sunset set
+    dd::gui::Palette p;   // brushed brown metal, silver hardware; warm colour only for things that glow
     p.accent = dd::gui::sunset::orange;
     p.accent2 = dd::gui::sunset::amber;
     return p;
@@ -57,16 +57,17 @@ void KitroomEditor::Content::paint (juce::Graphics& g)
 {
     const auto pal = kitroomPalette();
     dd::gui::paintBackdrop (g, getLocalBounds(), pal);
+    dd::gui::paintBezel (g, kit.getBounds().toFloat(), 8.0f, 7.0f);   // the kit is seen through a silver-framed window
 
-    // Wordmark with a 70s sunset stripe band running off it.
+    // Raised silver wordmark with machined grooves running off it.
     auto head = getLocalBounds().removeFromTop (12 + 64).reduced (16, 0).withTrimmedTop (12).toFloat();
     auto logo = head.removeFromLeft (300.0f);
     const auto wordFont = dd::gui::LookAndFeel::display (40.0f).withExtraKerningFactor (0.04f);
     const float wordW = juce::GlyphArrangement::getStringWidth (wordFont, "KITROOM");
     auto wordRow = logo.removeFromTop (42.0f);
-    dd::gui::drawPrinted (g, "KITROOM", wordRow, pal.text, wordFont, juce::Justification::bottomLeft);
+    dd::gui::drawEmbossed (g, "KITROOM", wordRow, wordFont, juce::Justification::bottomLeft);
     dd::gui::paintSunsetStripes (g, { wordRow.getX() + wordW + 12.0f, wordRow.getBottom() - 21.0f, 300.0f - wordW - 24.0f, 12.0f });
-    dd::gui::drawPrinted (g, "LIVE DRUM KIT  /  MULTI-MIC", logo.removeFromTop (18.0f), pal.accent2,
+    dd::gui::drawPrinted (g, "LIVE DRUM KIT  /  MULTI-MIC", logo.removeFromTop (18.0f), pal.dim,
                           dd::gui::LookAndFeel::font (12.0f, true).withExtraKerningFactor (0.3f), juce::Justification::topLeft);
 
     auto right = head.removeFromRight (170.0f);

@@ -64,9 +64,9 @@ Check: `$H stress` clean, `$H render` sounds right in `analyze.py`.
 ## 4. UI
 
 Build the editor from `dd::gui::Panel` grids (`add<Knob>`, `add<Choice>`, `add<Toggle>`, `place()` for spans).
-Follow the house style in CLAUDE.md ("Visual style"): dark brown matte vintage hardware, accents only from
-`dd::gui::sunset` (one per section), `paintBackdrop` behind everything, wordmark in `LookAndFeel::display()`
-with `paintSunsetStripes`. The template already does this. Owner's rule: **nothing flat, nothing muddy**.
+Follow the house style in CLAUDE.md ("Visual style"): realistic brushed brown metal panels with machined silver
+parts, warm `dd::gui::sunset` light only where something glows (one lamp colour per section), `paintBackdrop`
+behind everything, wordmark raised with `drawEmbossed` (`LookAndFeel::display()`) beside `paintSunsetStripes`. The template already does this. Owner's rule: **nothing flat, nothing muddy**.
 Every object needs depth (cast shadow, bevel, socket, inner shadow, glow) and every tone is either deep
 dark or vibrant; mid-brown low-contrast fills read as mud. The shared painters already do this (knobs sit
 in sockets with a backlit scale, faceplates cast shadows, lamps bloom); drawn scenes need layers

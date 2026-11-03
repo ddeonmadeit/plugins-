@@ -48,7 +48,8 @@ class PedalView : public juce::Component
 {
 public:
     PedalView (juce::AudioProcessorValueTreeState& s, const juce::String& name, const juce::String& onId,
-               std::vector<std::pair<juce::String, juce::String>> controls, juce::Colour body);
+               std::vector<std::pair<juce::String, juce::String>> controls);
+    ~PedalView() override;
 
     void paint (juce::Graphics&) override;
     void resized() override;
@@ -58,9 +59,9 @@ public:
 
 private:
     juce::String name;
-    juce::Colour body;
     juce::ParameterAttachment onAttach;
     bool on = false;
+    dd::gui::LookAndFeel silverLook { dd::gui::onSilver ({}) };   // dark engraving on the aluminium; outlives the widgets
     std::vector<std::unique_ptr<juce::Component>> widgets;
     juce::Rectangle<float> footswitch;
 };

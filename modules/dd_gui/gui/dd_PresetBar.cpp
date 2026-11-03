@@ -129,9 +129,9 @@ void PresetBar::paint (juce::Graphics& g)
 {
     auto r = getLocalBounds();
     r.removeFromTop (34);
+    Palette pal;
     if (auto* lf = dynamic_cast<LookAndFeel*> (&getLookAndFeel()))
-        g.setColour (lf->palette().dim);
-    g.setFont (LookAndFeel::font (12.0f));
-    g.drawFittedText (description, r, juce::Justification::centredLeft, 1, 0.9f);
+        pal = lf->palette();
+    drawPrintedFitted (g, description, r, pal.dim, LookAndFeel::font (12.0f), juce::Justification::centredLeft);
 }
 } // namespace dd::gui

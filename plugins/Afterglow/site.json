@@ -20,10 +20,10 @@
   ],
   "previewNote": "on the same 120 BPM phrase: a held Dm9, an arpeggio over Bb, Fmaj7 stabs, then a legato melody. GUITAR presets play strummed Em, C and G chords at 80 BPM and a riff.",
   "whatsNew": {
-    "version": "1.6.0",
+    "version": "1.7.0",
     "items": [
-      "Wall Dusty Stabs (TRIP HOP): the dusty chord stabs from The Wall, a muted electric piano and vibraphone hit that dies away in half a second, with record dust and tape warble",
-      "TAPE STOP switch (top right): the sound slows to a halt like a tape machine powering down, the same 2-second stop that ends The Wall. Pick the length (0.5 to 4 s, or 1 beat, 2 beats, 1 bar) and automate the switch in FL Studio"
+      "New look: the brown metal panels are now real brushed metal, a little lighter and shinier, with machined silver knobs (spun tops, knurled skirts), silver screws and keys, engraved labels and a raised chrome wordmark. Warm colour only where something really glows: lamps, the backlit slot around each knob, display glass",
+      "The sunset screen sits in a machined silver bezel"
     ]
   }
 }

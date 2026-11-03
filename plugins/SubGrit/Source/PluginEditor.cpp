@@ -4,7 +4,7 @@ namespace
 {
 dd::gui::Palette subGritPalette()
 {
-    dd::gui::Palette p;   // dark brown matte hardware; highlights only from the sunset set
+    dd::gui::Palette p;   // brushed brown metal, silver hardware; warm colour only for things that glow
     p.accent = dd::gui::sunset::orange;
     p.accent2 = dd::gui::sunset::amber;
     return p;
@@ -145,15 +145,15 @@ void SubGritEditor::Content::paint (juce::Graphics& g)
     const auto pal = subGritPalette();
     dd::gui::paintBackdrop (g, getLocalBounds(), pal);
 
-    // Wordmark with a 70s sunset stripe band running off it.
+    // Raised silver wordmark with machined grooves running off it.
     auto head = getLocalBounds().removeFromTop (12 + 64).reduced (16, 0).withTrimmedTop (12).toFloat();
     auto logo = head.removeFromLeft (300.0f);
     const auto wordFont = dd::gui::LookAndFeel::display (40.0f).withExtraKerningFactor (0.04f);
     const float wordW = juce::GlyphArrangement::getStringWidth (wordFont, "SUBGRIT");
     auto wordRow = logo.removeFromTop (42.0f);
-    dd::gui::drawPrinted (g, "SUBGRIT", wordRow, pal.text, wordFont, juce::Justification::bottomLeft);
+    dd::gui::drawEmbossed (g, "SUBGRIT", wordRow, wordFont, juce::Justification::bottomLeft);
     dd::gui::paintSunsetStripes (g, { wordRow.getX() + wordW + 12.0f, wordRow.getBottom() - 21.0f, 300.0f - wordW - 24.0f, 12.0f });
-    dd::gui::drawPrinted (g, "808 + DIRT BASS ENGINE", logo.removeFromTop (18.0f), pal.accent2,
+    dd::gui::drawPrinted (g, "808 + DIRT BASS ENGINE", logo.removeFromTop (18.0f), pal.dim,
                           dd::gui::LookAndFeel::font (12.0f, true).withExtraKerningFactor (0.3f), juce::Justification::topLeft);
 
     auto right = head.removeFromRight (160.0f);
