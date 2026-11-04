@@ -1,0 +1,21 @@
+{
+  "publish": true,
+  "tagline": "A whole analog vocal chain with pitch correction and a visual EQ, voiced after famous records",
+  "description": "Put it on a vocal and pick a record: Phil Collins' In The Air Tonight, Travis Scott hard tune, 808s-era Kanye, Tame Impala, R&B, trip hop and more. Underneath is a full chain you can change: pitch correction (key, scale, retune speed, humanize, flex, formant), mic voicing, tube preamp, a six-band EQ you drag on a live analyzer, FET / opto / vintage-limiter compression, de-esser, doubler, a vocoder that follows your voice, tape, tape delay and reverb.",
+  "accent": "#e0793f",
+  "highlights": [
+    "In The Air Tonight (Phil Collins, 1981): a dynamic mic into a cheap old limiter at 6:1 with a slow attack, almost dry with a dark tape echo, plus the vocoder version for the second verse",
+    "Pitch correction that keeps the voice natural: notes are moved whole periods at a time (PSOLA), so vowels and timbre stay put; retune speed from instant (the robotic effect) to gentle, humanize for held notes, flex for slides, natural vibrato kept or flattened, transpose and formant shift",
+    "Visual EQ: drag the points of a six-band EQ (low cut, low shelf, three bands, high shelf, high cut) over a live analyzer of the voice before and after; scroll for width",
+    "Analog chain: dynamic / condenser / ribbon / radio / lo-fi mic voicing, tube, tape, console or crunch preamp, and FET, opto, vintage-limiter or VCA compression with a gain-reduction meter",
+    "De-esser, doubler (automatic double tracking), tape saturation, a tape delay that ducks under the voice, and plate, room, hall, chamber and 80s gated reverbs",
+    "Vocoder that plays the note you sing (and the chord of your key) with string, robot, choir or brass voices: no MIDI needed",
+    "23 presets, each a different record or job: 80s, Travis Scott, Ye, Tame Impala, R&B, trip hop, moshc0re and studio essentials"
+  ],
+  "installTips": [
+    "Put Aircheck first on the vocal track (FL Studio: Mixer > vocal insert > slot 1), then pick a preset.",
+    "For pitch correction set Key and Scale to the song; Chromatic works anywhere but snaps to every semitone. Retune 0 ms is the hard robotic effect, 20 to 50 ms sounds natural.",
+    "It delays the sound by about 50 ms so the pitch correction can look ahead; FL Studio compensates automatically. To sing through it live, use a separate low-latency monitor."
+  ],
+  "previewNote": "on a synthetic sung test phrase (slightly off pitch on purpose), so you hear the chain and the correction, not a real singer."
+}

@@ -1,0 +1,18 @@
+{
+  "categories": [
+    "80S",
+    "TRAVIS SCOTT",
+    "YE",
+    "TAME IMPALA",
+    "R&B",
+    "TRIP HOP",
+    "MOSHC0RE",
+    "STUDIO"
+  ],
+  "targetLufs": -15.0,
+  "toleranceLu": 1.5,
+  "similarBelow": 0.08,
+  "phrase": "vocal",
+  "previewPhrase": "vocal",
+  "previewBacking": false
+}
