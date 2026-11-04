@@ -14,7 +14,7 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
 
-    static constexpr int kBaseW = 1280, kBaseH = 820;
+    static constexpr int kBaseW = 1280, kBaseH = 780;
 
 private:
     /** Everything is laid out at base size inside this, then scaled as one piece. */
@@ -27,12 +27,14 @@ private:
 
     private:
         SunburstProcessor& proc;
-        dd::gui::PresetBar presetBar;
+        dd::gui::TopBar topBar;
+        dd::gui::DescriptionLine description;
         dd::gui::TapeStopControl tapeStop;
         GuitarView guitar;
         dd::gui::Panel playing, amp, room;
         std::vector<std::unique_ptr<PedalView>> pedals;
         juce::Rectangle<int> pedalboard;
+        dd::gui::Atmosphere atmosphere;
     };
 
     SunburstProcessor& proc;

@@ -14,7 +14,7 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
 
-    static constexpr int kBaseW = 1100, kBaseH = 700;
+    static constexpr int kBaseW = 1200, kBaseH = 704;
 
 private:
     /** Everything is laid out at base size inside this, then scaled as one piece. */
@@ -27,13 +27,14 @@ private:
 
     private:
         AfterglowProcessor& proc;
-        dd::gui::PresetBar presetBar;
+        dd::gui::TopBar topBar;   // no description line: the horizon shows the preset's name and description
         dd::gui::LampSwitch polySwitch;
         dd::gui::TapeStopControl tapeStop;
         HorizonView horizon;
         std::vector<std::unique_ptr<dd::gui::Knob>> macros;
         std::vector<std::unique_ptr<dd::gui::LampSwitch>> switches;
         juce::Rectangle<int> deck;
+        dd::gui::Atmosphere atmosphere;
     };
 
     AfterglowProcessor& proc;

@@ -23,8 +23,9 @@ using dd::gui::Toggle;
 
 SubGritEditor::Content::Content (SubGritProcessor& p)
     : proc (p),
-      presetBar (p.presets),
-      polySwitch (*p.apvts.getParameter ("perfPoly"), "POLY", dd::gui::sunset::amber),
+      topBar (p.presets, "SUB", "GRIT", "808 + Dirt Bass Engine"),
+      description (topBar.presets()),
+      polySwitch (*p.apvts.getParameter ("perfPoly"), "Poly", dd::gui::sunset::amber),
       body808 ("808 Body", 4, 2, kSourceAccent),
       oscA ("Osc A", 4, 2, kSourceAccent),
       oscB ("Osc B", 4, 2, kSourceAccent),
@@ -134,42 +135,28 @@ SubGritEditor::Content::Content (SubGritProcessor& p)
     output.add<Knob> (s, "width", "Width", kDirtAccent);
 
     polySwitch.setTooltip ("Poly: play chords with any preset. Off: each preset's own mode (mono 808 slides). Stays as you set it when you change presets.");
-    addAndMakeVisible (polySwitch);
-    addAndMakeVisible (presetBar);
+    topBar.addRight (polySwitch, 96);
+    addAndMakeVisible (topBar);
+    description.setHint (juce::String ("ddeonmadeit  v") + DD_PLUGIN_VERSION);
+    addAndMakeVisible (description);
     for (auto* c : { &body808, &oscA, &oscB, &lfo, &filter, &env, &voice, &eq, &dirt, &fx, &output, &scopePanel })
         addAndMakeVisible (c);
+    addAndMakeVisible (atmosphere);
 }
 
 void SubGritEditor::Content::paint (juce::Graphics& g)
 {
-    const auto pal = subGritPalette();
-    dd::gui::paintBackdrop (g, getLocalBounds(), pal);
-
-    // Raised silver wordmark with machined grooves running off it.
-    auto head = getLocalBounds().removeFromTop (12 + 64).reduced (16, 0).withTrimmedTop (12).toFloat();
-    auto logo = head.removeFromLeft (300.0f);
-    const auto wordFont = dd::gui::LookAndFeel::display (40.0f).withExtraKerningFactor (0.04f);
-    const float wordW = juce::GlyphArrangement::getStringWidth (wordFont, "SUBGRIT");
-    auto wordRow = logo.removeFromTop (42.0f);
-    dd::gui::drawEmbossed (g, "SUBGRIT", wordRow, wordFont, juce::Justification::bottomLeft);
-    dd::gui::paintSunsetStripes (g, { wordRow.getX() + wordW + 12.0f, wordRow.getBottom() - 21.0f, 300.0f - wordW - 24.0f, 12.0f });
-    dd::gui::drawPrinted (g, "808 + DIRT BASS ENGINE", logo.removeFromTop (18.0f), pal.dim,
-                          dd::gui::LookAndFeel::font (12.0f, true).withExtraKerningFactor (0.3f), juce::Justification::topLeft);
-
-    auto right = head.removeFromRight (160.0f);
-    dd::gui::drawPrinted (g, juce::String ("ddeonmadeit  v") + DD_PLUGIN_VERSION, right.removeFromBottom (24.0f), pal.dim,
-                          dd::gui::LookAndFeel::font (12.0f), juce::Justification::centredRight);
+    dd::gui::paintBackdrop (g, getLocalBounds(), subGritPalette());
+    dd::gui::paintPanelShadows (g, *this);
 }
 
 void SubGritEditor::Content::resized()
 {
-    auto r = getLocalBounds().reduced (12);
-    auto head = r.removeFromTop (64);
-    head.removeFromLeft (300);
-    polySwitch.setBounds (head.getRight() - 84, head.getY() + 6, 84, 26);
-    head.removeFromRight (170);
-    presetBar.setBounds (head.withSizeKeepingCentre (std::min (head.getWidth(), 640), 54));
-    r.removeFromTop (8);
+    topBar.setBounds (0, 8, getWidth(), dd::gui::TopBar::kHeight);
+    description.setBounds (26, topBar.getBottom() + 6, getWidth() - 52, 22);
+    atmosphere.setBounds (getLocalBounds());
+
+    auto r = getLocalBounds().reduced (14, 0).withTrimmedTop (description.getBottom() + 6).withTrimmedBottom (14);
 
     const int gap = 8;
     auto layoutRow = [&] (std::initializer_list<dd::gui::Panel*> panels)

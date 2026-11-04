@@ -37,9 +37,9 @@ modules/dd_dsp            header-only DSP: PolyBLEP/unison osc, ZDF ladder, SVF,
                           FDN reverb, glue comp, oversampled clipper, tape stop
 modules/dd_core           PresetManager (JSON factory + user presets), param <-> JSON helpers,
                           replaceStateExactly(), ScopeBuffer (lock-free audio -> UI)
-modules/dd_gui            house look (see "Visual style"): LookAndFeel/Palette + sunset colours, Knob/Choice/Toggle,
-                          grid Panel, PresetBar, CRT Scope, TapeStopControl, materials (brushed metal backdrop/faceplate, inset,
-                          bezel, lamp, screw, engraved/embossed/glowing text), embedded Barlow Condensed font (fonts/, SIL OFL)
+modules/dd_gui            house look (see "Visual style"): DARK/LITE theme tokens, LookAndFeel, Knob/Choice/Toggle/LampSwitch,
+                          grid Panel, TopBar + PresetBar keys + DescriptionLine, Atmosphere, console Scope, TapeStopControl,
+                          materials (keycaps, lit keys, trays, switches, console, wells), embedded Instrument Sans (fonts/, SIL OFL)
 plugins/<Name>/           one plugin: CMakeLists.txt, Source/, Presets/<CATEGORY>/NN_Name.json, qa.json,
                           site.json (tagline, description, accent, highlights, installTips for the download page),
                           optional library/ (sample library builder) and README-mac.txt (zip README notes)
@@ -104,35 +104,37 @@ libfreetype-dev, libfontconfig1-dev, xvfb; Python: numpy, scipy, soundfile, matp
 
 ## Visual style (owner's brief: every plugin)
 
-**Extremely realistic hardware** (owner's brief, Nov 2026): panels are **brushed brown metal** (the owner likes
-the brown; keep `Palette::panel` / `background`, measured hue ~26°, saturation ~0.33), lit and shiny, with
-**machined silver** parts on them: knobs, screws, keys, bezels, pedal enclosures. Everything is embossed or
-debossed. Warm colour (`dd::gui::sunset::red / ember / orange / amber / yellow`) appears **only where a real
-light would glow**: lamps, backlit knob slots, display glass, lit key legends, scope trace, spotlights. No
-printed colour, no blue, green, teal, purple or neon.
+**The rawleads design** (owner, Nov 2026: "match the latest version of this software i made",
+https://github.com/kodiakskode/rawleads, `src/outreach.css`): a "Precision Industrial Instrument", Braun-like.
+Every plugin follows it exactly; it replaced the earlier brushed-brown-metal look.
 
-- Light comes from above: top edges catch it, parts cast soft shadows down onto the plate, anything cut into
-  the metal is shaded under its top wall and lit on its lower lip.
-- Materials are in `dd_gui` (dd_Theme): `paintBackdrop` (darker brushed chassis), `dd::gui::Panel` /
-  `paintFaceplate` (raised plate, polished machined edges, silver Phillips screws), `paintBrushedMetal` (any
-  metal surface: polished = the studio reflected with a crisp horizon above the middle, satin for the chassis;
-  fine hairline brushing, light stretched across the grain), `paintInset` (window milled into the plate: chamfer, smoked
-  glass), `paintBezel` (silver frame around a scene window), `paintLamp` (chrome bezel, glowing glass).
-  Knobs (LookAndFeel) are machined silver: knurled skirt, polished chamfer, spun top (cached image), black
-  pointer groove, sitting in a backlit slot that glows in the knob's accent. Keys are silver with engraved
-  or backlit legends; combo boxes and menus are dark glass with amber text (`Palette::glass`).
-- Text: `drawPrinted()` engraves (light colours: cut through the brown to bare metal; dark colours: engraved
-  into silver), `drawEmbossed()` for raised chrome wordmarks (next to `paintSunsetStripes`, which now cuts three
-  machined grooves), `drawGlowing()` for light behind glass. Parts that are bare silver (pedals) use a
-  `LookAndFeel` built from `dd::gui::onSilver (palette)` so their labels engrave dark.
-- Use `LookAndFeel::font()` / `display()` for all text (embedded font, identical on macOS and Linux).
-- **No flat, dull or muddy objects** (owner, Afterglow 1.0 feedback): everything has depth (shadows, bevels,
-  sockets, inner shadows, glows); metal needs its sheen and brushing, never a flat fill. Owner on the first
-  metal pass: coarse streaky brushing looked fake and flat; the brushing must be fine hairlines and the
-  metal clearly shiny (strong reflections), while engraved labels stay readable on the brightest band.
-- Drawn scenes (Kitroom's kit, Sunburst's stage, Afterglow's horizon) are seen through a silver-bezelled
-  window: dark room, warm tungsten spotlights from above, film grain and vignette, crisp labels on top.
-- Check a change at `snapshot --scale 2` too: brushing, chamfers and glows only read right up close.
+- **Two themes, DARK and LITE**, switched by the `ThemeSwitch` in every top bar. The choice is global (all open
+  editors of all plugins follow it, with a 280 ms crossfade) and saved in `ddeonmadeit/ui.settings`. Colours
+  come from `dd::gui::tokens()` (room, chassis, rail, metal, keycap, tray, edge light/dark, cream text shades,
+  signal); never hard-code a theme colour. `DD_THEME=light|dark` forces one for headless snapshots.
+- **One signal colour**: the orange of an incandescent lamp behind smoked plastic (#c5602c / glow #e0793f;
+  `dd::gui::sunset::*` are its shades). It appears only where a light glows: lit keys, LEDs, knob arcs and
+  pointers, the console trace, the accent half of the wordmark. No other hues.
+- **Layout**: the room, a chassis with rounded top corners, then `dd::gui::TopBar` (two-tone brand + subtitle,
+  the preset keytray with the lit preset key in the middle, the plugin's own switches via `addRight`, DARK/LITE),
+  `dd::gui::DescriptionLine` under it (preset description rising in, version hint on the right), then raised
+  `Panel`s (".glass"). Editors paint `paintBackdrop` + `paintPanelShadows` and add a `dd::gui::Atmosphere` last
+  (vignette, matte grain, the cursor's shadow, theme crossfade, open fade, filament flicker of lit keys).
+  Mark custom raised components with `markRaised()` so their shadow is cast.
+- **Parts**: keycaps with a wall that collapses when pressed (`paintKeycap`); lit keys are smoked plastic with
+  an amber LED glowing through and a flickering filament (`paintLitKey`, components set `ddLit` /
+  `ddFlickerPeriod` properties); recessed trays (`paintTray`, `paintInset`); switches with an LED
+  (`paintSwitch`, `Toggle`, `LampSwitch`); console displays of warm black glass with scanlines and breathing
+  lamp bloom (`paintConsole`, the Scope); wells for drawn scenes (`paintBezel`). Knobs: a round tray, the value
+  arc lit in signal orange, a keycap cap with a lit pointer.
+- **Text**: Instrument Sans (embedded, SIL OFL) through `LookAndFeel::font (size, weight)` / `display()`.
+  rawleads uses Braun Linear, which is proprietary (Braun GmbH, all rights reserved): never ship it.
+  Captions are small, bold, wide-tracked and muted (`drawCaption`); lit legends use `drawGlowing`.
+- Drawn scenes (Kitroom's kit, Sunburst's stage, Afterglow's horizon) stay dark in both themes, like rawleads'
+  preview pane: dark room, warm light, light grain (`paintGrain` amount ~0.15), crisp labels.
+- **No flat, dull or muddy objects** (owner, Afterglow 1.0 feedback): everything has depth (cast shadows,
+  inset shading, edge light, glows).
+- Check both themes, and at `snapshot --scale 2`: glows, walls and grain only read right up close.
 
 ## Quality bar (what "done" means for a plugin)
 

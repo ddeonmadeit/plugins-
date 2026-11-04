@@ -370,7 +370,7 @@ void HorizonView::paint (juce::Graphics& g)
     paintRidges (g, sun);
     paintWater (g, sun, rad);
 
-    dd::gui::paintGrain (g, getLocalBounds(), 0.75f);
+    dd::gui::paintGrain (g, getLocalBounds(), 0.14f);
     juce::ColourGradient vignette (juce::Colours::transparentBlack, bounds.getCentreX(), bounds.getCentreY(),
                                    juce::Colours::black.withAlpha (0.55f), 0.0f, 0.0f, true);
     vignette.addColour (0.55, juce::Colours::transparentBlack);

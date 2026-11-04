@@ -15,7 +15,7 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
 
-    static constexpr int kBaseW = 1200, kBaseH = 812;
+    static constexpr int kBaseW = 1200, kBaseH = 836;
 
 private:
     /** Everything is laid out at base size inside this, then scaled as one piece. */
@@ -28,10 +28,12 @@ private:
 
     private:
         KitroomProcessor& proc;
-        dd::gui::PresetBar presetBar;
+        dd::gui::TopBar topBar;
+        dd::gui::DescriptionLine description;
         KitView kit;
         ElementPanel element;
         dd::gui::Panel mix;
+        dd::gui::Atmosphere atmosphere;
     };
 
     KitroomProcessor& proc;

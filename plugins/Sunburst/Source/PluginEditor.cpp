@@ -15,7 +15,11 @@ dd::gui::Palette sunburstPalette()
 
 //==============================================================================
 SunburstEditor::Content::Content (SunburstProcessor& p)
-    : proc (p), presetBar (p.presets), tapeStop (p.apvts), guitar (p),
+    : proc (p),
+      topBar (p.presets, "SUN", "BURST", "Acoustic / Electric Guitar"),
+      description (topBar.presets()),
+      tapeStop (p.apvts),
+      guitar (p),
       playing ("Playing", 7, 3, sunset::amber),
       amp ("Amp", 13, 1, sunset::orange),
       room ("Room & Output", 6, 1, sunset::yellow)
@@ -98,71 +102,46 @@ SunburstEditor::Content::Content (SunburstProcessor& p)
     pedal ("Trem",   "tremOn",   C { { "tremDiv", "Rate" }, { "tremDepth", "Depth" } });
     pedal ("Delay",  "delayOn",  C { { "delayDiv", "Time" }, { "delayFeedback", "Repeats" }, { "delayMix", "Mix" } });
 
-    addAndMakeVisible (presetBar);
-    addAndMakeVisible (tapeStop);
+    topBar.addRight (tapeStop, 196);
+    addAndMakeVisible (topBar);
+    description.setHint (juce::String ("ddeonmadeit  v") + DD_PLUGIN_VERSION);
+    addAndMakeVisible (description);
     addAndMakeVisible (guitar);
     addAndMakeVisible (playing);
     addAndMakeVisible (amp);
     addAndMakeVisible (room);
+    addAndMakeVisible (atmosphere);
 }
 
 void SunburstEditor::Content::paint (juce::Graphics& g)
 {
-    const auto pal = sunburstPalette();
-    dd::gui::paintBackdrop (g, getLocalBounds(), pal);
-    dd::gui::paintBezel (g, guitar.getBounds().toFloat(), 10.0f, 7.0f);   // the stage window, framed in machined silver
+    dd::gui::paintBackdrop (g, getLocalBounds(), sunburstPalette());
+    dd::gui::paintPanelShadows (g, *this);
+    dd::gui::paintBezel (g, guitar.getBounds().toFloat(), 10.0f, 7.0f);   // the stage, seen through a window in the chassis
 
-    auto head = getLocalBounds().removeFromTop (12 + 64).reduced (16, 0).withTrimmedTop (12).toFloat();
-    auto logo = head.removeFromLeft (320.0f);
-    const auto wordFont = dd::gui::LookAndFeel::display (40.0f).withExtraKerningFactor (0.04f);
-    const float wordW = juce::GlyphArrangement::getStringWidth (wordFont, "SUNBURST");
-    auto wordRow = logo.removeFromTop (42.0f);
-    dd::gui::drawEmbossed (g, "SUNBURST", wordRow, wordFont, juce::Justification::bottomLeft);
-    dd::gui::paintSunsetStripes (g, { wordRow.getX() + wordW + 12.0f, wordRow.getBottom() - 21.0f, 320.0f - wordW - 24.0f, 12.0f });
-    dd::gui::drawPrinted (g, "ACOUSTIC  /  ELECTRIC  GUITAR", logo.removeFromTop (18.0f), pal.dim,
-                          dd::gui::LookAndFeel::font (12.0f, true).withExtraKerningFactor (0.22f), juce::Justification::topLeft);
-    auto right = head.removeFromRight (160.0f);
-    dd::gui::drawPrinted (g, juce::String ("ddeonmadeit  v") + DD_PLUGIN_VERSION, right.removeFromBottom (24.0f), pal.dim,
-                          dd::gui::LookAndFeel::font (12.0f), juce::Justification::centredRight);
-
-    // The pedalboard: a dark rubber-topped board with a lip, pedals sit on it.
-    const auto board = pedalboard.toFloat();
-    for (int i = 5; i >= 1; --i)
-    {
-        g.setColour (juce::Colours::black.withAlpha (0.1f));
-        g.fillRoundedRectangle (board.translated (0.0f, (float) i * 1.4f).expanded ((float) i), 10.0f);
-    }
-    g.setGradientFill (juce::ColourGradient (juce::Colour (0xff1c120c), board.getX(), board.getY(), juce::Colour (0xff0a0604), board.getX(), board.getBottom(), false));
-    g.fillRoundedRectangle (board, 10.0f);
-    g.setColour (juce::Colours::white.withAlpha (0.06f));
-    g.drawRoundedRectangle (board.reduced (1.0f), 10.0f, 1.0f);
-    dd::gui::paintGrain (g, pedalboard, 1.2f);
-    dd::gui::paintLamp (g, { board.getX() + 20.0f, board.getY() + 17.0f }, 3.2f, sunset::ember, 1.0f);
-    dd::gui::drawPrinted (g, "PEDALBOARD", { board.getX() + 30.0f, board.getY() + 6.0f, 200.0f, 22.0f }, pal.text,
-                          dd::gui::LookAndFeel::font (13.0f, true).withExtraKerningFactor (0.1f), juce::Justification::centredLeft);
+    // The pedalboard: a long recessed tray the pedals stand in.
+    dd::gui::paintTray (g, pedalboard.toFloat(), 14.0f, 1.0f);
+    dd::gui::drawCaption (g, "Pedalboard", pedalboard.toFloat().reduced (18.0f, 0.0f).withHeight (30.0f));
 }
 
 void SunburstEditor::Content::resized()
 {
-    auto r = getLocalBounds().reduced (12);
-    auto head = r.removeFromTop (64);
-    head.removeFromLeft (320);
-    auto side = head.removeFromRight (200);
-    tapeStop.setBounds (side.getX(), side.getY() + 6, side.getWidth(), 26);
-    presetBar.setBounds (head.withSizeKeepingCentre (std::min (head.getWidth(), 600), 54));
-    r.removeFromTop (8);
+    topBar.setBounds (0, 8, getWidth(), dd::gui::TopBar::kHeight);
+    description.setBounds (26, topBar.getBottom() + 6, getWidth() - 52, 22);
+    atmosphere.setBounds (getLocalBounds());
 
+    auto r = getLocalBounds().reduced (12, 0).withTrimmedTop (description.getBottom() + 6).withTrimmedBottom (14);
     auto top = r.removeFromTop (playing.preferredSize().y);
     playing.setBounds (top.removeFromRight (playing.preferredSize().x));
-    top.removeFromRight (10);
-    guitar.setBounds (top);
-    r.removeFromTop (10);
+    top.removeFromRight (14);
+    guitar.setBounds (top.reduced (2, 0));
+    r.removeFromTop (12);
 
     auto bottom = r.removeFromBottom (amp.preferredSize().y);
     room.setBounds (bottom.removeFromRight (room.preferredSize().x));
     bottom.removeFromRight (10);
     amp.setBounds (bottom.removeFromLeft (amp.preferredSize().x));
-    r.removeFromBottom (10);
+    r.removeFromBottom (12);
 
     pedalboard = r;
     auto row = r.reduced (14, 0).withTrimmedTop (30).withTrimmedBottom (10);

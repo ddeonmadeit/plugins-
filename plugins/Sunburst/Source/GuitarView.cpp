@@ -149,7 +149,7 @@ void GuitarView::paintStage (juce::Graphics& g, juce::Rectangle<float> r)
     cone.lineTo (r.getX() + r.getWidth() * 0.22f, r.getBottom());
     cone.closeSubPath();
     g.fillPath (cone);
-    dd::gui::paintGrain (g, r.getSmallestIntegerContainer(), 0.9f);
+    dd::gui::paintGrain (g, r.getSmallestIntegerContainer(), 0.16f);
     // Vignette and a recessed rim.
     juce::ColourGradient vig (juce::Colours::transparentBlack, r.getCentreX(), r.getCentreY(),
                               juce::Colours::black.withAlpha (0.7f), r.getX(), r.getY(), true);
@@ -484,13 +484,12 @@ void GuitarView::paintGuitar (juce::Graphics& g, juce::Rectangle<float> r, const
 
 void GuitarView::paint (juce::Graphics& g)
 {
-    const auto pal = dd::gui::Palette();
     paintStage (g, stage);
     const auto lk = look();
     paintGuitar (g, stage.reduced (stage.getWidth() * 0.03f, stage.getHeight() * 0.16f).translated (0.0f, stage.getHeight() * 0.06f), lk);
 
-    // Name plate with arrows.
-    dd::gui::paintInset (g, namePlate, pal, 5.0f);
+    // Name plate with arrows: a small console display, dark glass in either theme.
+    dd::gui::paintConsole (g, namePlate, 6.0f, 0.8f);
     const auto& lib = proc.getLibrary();
     const auto& ids = sunburst::choices::guitarIds();
     const auto* info = lib.find (ids[guitarIndex()]);
@@ -515,11 +514,11 @@ void GuitarView::paint (juce::Graphics& g)
     }
     if (info != nullptr)
     {
-        g.setColour (pal.dim.withAlpha (0.8f));
+        g.setColour (juce::Colour (0xffa39a8c).withAlpha (0.85f));   // the stage is dark in both themes
         g.setFont (dd::gui::LookAndFeel::font (11.5f));
         g.drawText ("Samples: " + info->credit, stage.reduced (16.0f, 10.0f).removeFromBottom (16.0f), juce::Justification::bottomLeft);
     }
-    g.setColour (pal.dim.withAlpha (0.8f));
+    g.setColour (juce::Colour (0xffa39a8c).withAlpha (0.85f));   // the stage is dark in both themes
     g.setFont (dd::gui::LookAndFeel::font (11.5f));
     g.drawText ("Noise keys C2-E2:  muted strum  /  knock  /  mute  /  squeak  /  pick", stage.reduced (16.0f, 10.0f).removeFromTop (20.0f),
                 juce::Justification::topRight);
@@ -528,9 +527,16 @@ void GuitarView::paint (juce::Graphics& g)
 //==============================================================================
 PedalView::PedalView (juce::AudioProcessorValueTreeState& s, const juce::String& n, const juce::String& onId,
                       std::vector<std::pair<juce::String, juce::String>> controls)
-    : name (n), onAttach (*s.getParameter (onId), [this] (float v) { on = v >= 0.5f; repaint(); })
+    : name (n), onAttach (*s.getParameter (onId), [this] (float v)
+      {
+          on = v >= 0.5f;
+          getProperties().set ("ddLit", on);   // the Atmosphere flickers lit keys
+          repaint();
+      })
 {
-    setLookAndFeel (&silverLook);
+    period = 4.2 + 0.37 * (double) (n.hashCode() & 7);   // each pedal's lamp flickers in its own rhythm
+    getProperties().set ("ddFlickerPeriod", period);
+    setMouseCursor (juce::MouseCursor::PointingHandCursor);
     onAttach.sendInitialUpdate();
     for (auto& [id, title] : controls)
     {
@@ -557,78 +563,44 @@ void PedalView::resized()
         else
             c->setBounds (cell);
     }
-    footswitch = juce::Rectangle<float> (34.0f, 34.0f).withCentre ({ (float) getWidth() * 0.5f, (float) getHeight() - 30.0f });
+    footswitch = getLocalBounds().reduced (13, 0).toFloat().removeFromBottom (66.0f).withTrimmedBottom (13.0f);
 }
 
 void PedalView::mouseDown (const juce::MouseEvent& e)
 {
-    if (footswitch.expanded (10.0f).contains (e.position) || e.position.y > (float) getHeight() - 60.0f)
+    if (footswitch.contains (e.position))
         onAttach.setValueAsCompleteGesture (on ? 0.0f : 1.0f);
 }
 
-PedalView::~PedalView()
-{
-    setLookAndFeel (nullptr);
-}
+PedalView::~PedalView() = default;
 
 void PedalView::paint (juce::Graphics& g)
 {
+    const auto& t = dd::gui::tokens();
     auto r = getLocalBounds().toFloat().reduced (4.0f);
-    // Cast shadow, then a brushed aluminium enclosure: lit from above, its rounded edges catching the light.
+    // A raised block on the board: soft cast shadow, the panel face, a recessed tray for its controls.
     for (int i = 5; i >= 1; --i)
     {
-        g.setColour (juce::Colours::black.withAlpha (0.12f));
-        g.fillRoundedRectangle (r.translated (1.5f, (float) i * 1.5f).expanded ((float) i * 0.6f), 9.0f);
+        g.setColour (juce::Colours::black.withAlpha (t.light ? 0.035f : 0.1f));
+        g.fillRoundedRectangle (r.translated (0.0f, (float) i * 1.6f).expanded ((float) i * 0.5f), 13.0f);
     }
-    g.setColour (juce::Colours::black.withAlpha (0.7f));
-    g.fillRoundedRectangle (r, 8.5f);
-    const auto shell = r.reduced (0.8f);
-    dd::gui::paintBrushedMetal (g, shell, juce::Colour (0xffaeb1b5), 8.0f, 0.9f);
-    juce::Path rim;
-    rim.addRoundedRectangle (shell.reduced (0.6f), 7.6f);
-    g.setGradientFill (juce::ColourGradient (juce::Colours::white.withAlpha (0.9f), 0.0f, shell.getY(),
-                                             juce::Colours::black.withAlpha (0.35f), 0.0f, shell.getBottom(), false));
-    g.strokePath (rim, juce::PathStrokeType (1.2f));
+    dd::gui::paintBrushedMetal (g, r, {}, 12.0f);
+    dd::gui::paintTray (g, getLocalBounds().reduced (12, 9).removeFromTop (96).toFloat(), 9.0f, 0.8f);
 
-    // Control panel milled into the top: a shallow recess, shaded under its top edge.
-    auto panel = r.reduced (8.0f).removeFromTop (100.0f);
-    g.setColour (juce::Colours::white.withAlpha (0.55f));
-    g.fillRoundedRectangle (panel.translated (0.0f, 1.0f), 6.0f);
-    g.setColour (juce::Colours::black.withAlpha (0.4f));
-    g.fillRoundedRectangle (panel.translated (0.0f, -0.6f), 6.0f);
-    dd::gui::paintBrushedMetal (g, panel, juce::Colour (0xff8f9297), 6.0f, 0.7f);
-    g.setGradientFill (juce::ColourGradient (juce::Colours::black.withAlpha (0.35f), 0.0f, panel.getY(),
-                                             juce::Colours::transparentBlack, 0.0f, panel.getY() + 10.0f, false));
-    g.fillRoundedRectangle (panel, 6.0f);
-
-    for (auto c : { r.getTopLeft() + juce::Point<float> (9.0f, 9.0f), r.getTopRight() + juce::Point<float> (-9.0f, 9.0f),
-                    r.getBottomLeft() + juce::Point<float> (9.0f, -9.0f), r.getBottomRight() + juce::Point<float> (-9.0f, -9.0f) })
-        dd::gui::paintScrew (g, c, 3.2f, 0.6f);
-    const float midY = (panel.getBottom() + r.getBottom() - 78.0f) * 0.5f;
-    dd::gui::paintSunsetStripes (g, juce::Rectangle<float> (std::min (90.0f, r.getWidth() * 0.55f), 10.0f).withCentre ({ r.getCentreX(), midY }));
-
-    // The name, engraved deep into the aluminium.
-    auto label = juce::Rectangle<float> (r.getWidth() - 24.0f, 24.0f).withCentre ({ r.getCentreX(), r.getBottom() - 66.0f });
-    dd::gui::drawPrinted (g, name.toUpperCase(), label, juce::Colour (0xff1d1f23),
-                          dd::gui::LookAndFeel::display (17.0f).withExtraKerningFactor (0.14f));
-
-    // Status LED and the chrome footswitch: a hex nut around a domed, polished plunger.
-    dd::gui::paintLamp (g, { r.getRight() - 20.0f, r.getBottom() - 30.0f }, 5.0f, dd::gui::sunset::red.brighter (0.1f), on ? 1.0f : 0.0f);
-    g.setColour (juce::Colours::black.withAlpha (0.5f));
-    g.fillEllipse (footswitch.translated (1.0f, 3.0f).expanded (2.0f));
-    juce::Path nut;
-    nut.addPolygon (footswitch.getCentre(), 6, footswitch.getWidth() * 0.56f, juce::MathConstants<float>::pi / 6.0f);
-    g.setGradientFill (juce::ColourGradient (juce::Colour (0xfff5f6f7), footswitch.getX(), footswitch.getY(),
-                                             juce::Colour (0xff50545a), footswitch.getRight(), footswitch.getBottom(), false));
-    g.fillPath (nut);
-    g.setColour (juce::Colours::black.withAlpha (0.45f));
-    g.strokePath (nut, juce::PathStrokeType (0.8f));
-    const auto cap = footswitch.reduced (7.0f);
-    juce::ColourGradient dome (juce::Colour (0xffffffff), cap.getX() + cap.getWidth() * 0.3f, cap.getY() + cap.getHeight() * 0.25f,
-                               juce::Colour (0xff6a6e74), cap.getRight(), cap.getBottom(), true);
-    dome.addColour (0.4, juce::Colour (0xffc4c7cb));
-    g.setGradientFill (dome);
-    g.fillEllipse (cap);
-    g.setColour (juce::Colours::black.withAlpha (0.5f));
-    g.drawEllipse (cap, 0.8f);
+    // The footswitch is a keycap with the pedal's name; when the pedal is on, an amber lamp glows through it.
+    const float wall = 4.0f;
+    const auto key = footswitch.withTrimmedBottom (wall);
+    if (on)
+        dd::gui::paintLitKey (g, key, 10.0f, false, dd::gui::filamentFlicker (dd::gui::animationTime(), period, 0.3), wall, 3.0f);
+    else
+        dd::gui::paintKeycap (g, key, 10.0f, false, wall);
+    const auto f = dd::gui::LookAndFeel::font (12.0f, 700).withExtraKerningFactor (0.16f);
+    if (on)
+        dd::gui::drawGlowing (g, name.toUpperCase(), key, juce::Colour (0xffffd9a0), f);
+    else
+    {
+        g.setFont (f);
+        g.setColour (t.cream300);
+        g.drawText (name.toUpperCase(), key, juce::Justification::centred, false);
+    }
 }

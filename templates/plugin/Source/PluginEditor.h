@@ -15,7 +15,10 @@ public:
 
 private:
     dd::gui::LookAndFeel lnf;
-    dd::gui::PresetBar presetBar;
+    juce::TooltipWindow tooltips { this, 600 };
+    dd::gui::TopBar topBar;                 // brand, preset keys, DARK / LITE
+    dd::gui::DescriptionLine description;   // the preset's description, rising in on change
     dd::gui::Panel main;
     dd::gui::Scope* scope = nullptr;
+    dd::gui::Atmosphere atmosphere;         // vignette, grain, cursor shadow, theme crossfade, lamp flicker: keep last
 };

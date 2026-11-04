@@ -43,7 +43,7 @@ private:
     juce::Image stageLight;
 };
 
-/** A stompbox: enclosure in its own colour, its controls up top, a footswitch with a jewel lamp. */
+/** A stompbox: a raised block with its controls in a tray up top and a keycap footswitch that lights when it is on. */
 class PedalView : public juce::Component
 {
 public:
@@ -61,7 +61,7 @@ private:
     juce::String name;
     juce::ParameterAttachment onAttach;
     bool on = false;
-    dd::gui::LookAndFeel silverLook { dd::gui::onSilver ({}) };   // dark engraving on the aluminium; outlives the widgets
+    double period = 5.0;
     std::vector<std::unique_ptr<juce::Component>> widgets;
     juce::Rectangle<float> footswitch;
 };

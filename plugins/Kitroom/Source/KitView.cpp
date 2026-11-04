@@ -589,7 +589,7 @@ void KitView::paint (juce::Graphics& g)
 
     // Film grain and a lens vignette over the scene, then the labels on top, crisp.
     const auto area = getLocalBounds();
-    dd::gui::paintGrain (g, area, 0.8f);
+    dd::gui::paintGrain (g, area, 0.16f);
     juce::ColourGradient vignette (juce::Colours::transparentBlack, area.toFloat().getCentreX(), area.toFloat().getCentreY() - 40.0f,
                                    juce::Colours::black.withAlpha (0.6f), 0.0f, 0.0f, true);
     vignette.addColour (0.5, juce::Colours::transparentBlack);

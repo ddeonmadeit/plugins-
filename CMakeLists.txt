@@ -27,13 +27,14 @@ juce_add_module(modules/dd_dsp)
 juce_add_module(modules/dd_core)
 juce_add_module(modules/dd_gui)
 
-# dd_gui's typeface (Barlow Condensed, SIL Open Font License: modules/dd_gui/fonts/OFL.txt).
+# dd_gui's typeface (Instrument Sans, SIL Open Font License: modules/dd_gui/fonts/OFL.txt).
 juce_add_binary_data(dd_fonts
     HEADER_NAME DDFonts.h
     NAMESPACE   DDFonts
-    SOURCES     modules/dd_gui/fonts/BarlowCondensed-Medium.ttf
-                modules/dd_gui/fonts/BarlowCondensed-SemiBold.ttf
-                modules/dd_gui/fonts/BarlowCondensed-Bold.ttf)
+    SOURCES     modules/dd_gui/fonts/InstrumentSans-Regular.ttf
+                modules/dd_gui/fonts/InstrumentSans-Medium.ttf
+                modules/dd_gui/fonts/InstrumentSans-SemiBold.ttf
+                modules/dd_gui/fonts/InstrumentSans-Bold.ttf)
 set_target_properties(dd_fonts PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 # Every folder in plugins/ with a CMakeLists.txt is a plugin.

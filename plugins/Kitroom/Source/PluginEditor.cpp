@@ -19,7 +19,8 @@ using dd::gui::Knob;
 
 KitroomEditor::Content::Content (KitroomProcessor& p)
     : proc (p),
-      presetBar (p.presets),
+      topBar (p.presets, "KIT", "ROOM", "Live Drum Kit / Multi-Mic"),
+      description (topBar.presets()),
       kit (p),
       element (p),
       mix ("Mix", 6, 3, kMicAccent)
@@ -47,49 +48,34 @@ KitroomEditor::Content::Content (KitroomProcessor& p)
 
     kit.onSelect = [this] (int slot) { element.setSlot (slot); };
 
-    addAndMakeVisible (presetBar);
+    description.setHint (juce::String ("Click a piece to edit it  /  ddeonmadeit v") + DD_PLUGIN_VERSION);
+    dd::gui::markRaised (element, 14.0f);
+    addAndMakeVisible (topBar);
+    addAndMakeVisible (description);
     addAndMakeVisible (kit);
     addAndMakeVisible (element);
     addAndMakeVisible (mix);
+    addAndMakeVisible (atmosphere);
 }
 
 void KitroomEditor::Content::paint (juce::Graphics& g)
 {
-    const auto pal = kitroomPalette();
-    dd::gui::paintBackdrop (g, getLocalBounds(), pal);
-    dd::gui::paintBezel (g, kit.getBounds().toFloat(), 8.0f, 7.0f);   // the kit is seen through a silver-framed window
-
-    // Raised silver wordmark with machined grooves running off it.
-    auto head = getLocalBounds().removeFromTop (12 + 64).reduced (16, 0).withTrimmedTop (12).toFloat();
-    auto logo = head.removeFromLeft (300.0f);
-    const auto wordFont = dd::gui::LookAndFeel::display (40.0f).withExtraKerningFactor (0.04f);
-    const float wordW = juce::GlyphArrangement::getStringWidth (wordFont, "KITROOM");
-    auto wordRow = logo.removeFromTop (42.0f);
-    dd::gui::drawEmbossed (g, "KITROOM", wordRow, wordFont, juce::Justification::bottomLeft);
-    dd::gui::paintSunsetStripes (g, { wordRow.getX() + wordW + 12.0f, wordRow.getBottom() - 21.0f, 300.0f - wordW - 24.0f, 12.0f });
-    dd::gui::drawPrinted (g, "LIVE DRUM KIT  /  MULTI-MIC", logo.removeFromTop (18.0f), pal.dim,
-                          dd::gui::LookAndFeel::font (12.0f, true).withExtraKerningFactor (0.3f), juce::Justification::topLeft);
-
-    auto right = head.removeFromRight (170.0f);
-    const auto small = dd::gui::LookAndFeel::font (12.0f);
-    dd::gui::drawPrinted (g, juce::String ("ddeonmadeit  v") + DD_PLUGIN_VERSION, right.removeFromTop (32.0f), pal.dim, small,
-                          juce::Justification::bottomRight);
-    dd::gui::drawPrinted (g, "click a piece to edit it", right, pal.dim, small, juce::Justification::topRight);
+    dd::gui::paintBackdrop (g, getLocalBounds(), kitroomPalette());
+    dd::gui::paintPanelShadows (g, *this);
+    dd::gui::paintBezel (g, kit.getBounds().toFloat(), 10.0f, 7.0f);   // the kit is seen through a window set into the chassis
 }
 
 void KitroomEditor::Content::resized()
 {
-    auto r = getLocalBounds().reduced (12);
-    auto head = r.removeFromTop (64);
-    head.removeFromLeft (300);
-    head.removeFromRight (170);
-    presetBar.setBounds (head.withSizeKeepingCentre (std::min (head.getWidth(), 640), 54));
-    r.removeFromTop (8);
+    topBar.setBounds (0, 8, getWidth(), dd::gui::TopBar::kHeight);
+    description.setBounds (26, topBar.getBottom() + 6, getWidth() - 52, 22);
+    atmosphere.setBounds (getLocalBounds());
 
+    auto r = getLocalBounds().reduced (12, 0).withTrimmedTop (description.getBottom() + 6).withTrimmedBottom (12);
     kit.setBounds (r.removeFromTop (KitView::kH).withSizeKeepingCentre (KitView::kW, KitView::kH));
-    r.removeFromTop (10);
+    r.removeFromTop (12);
     mix.setBounds (r.removeFromRight (mix.preferredSize().x + 8));
-    r.removeFromRight (8);
+    r.removeFromRight (10);
     element.setBounds (r);
 }
 

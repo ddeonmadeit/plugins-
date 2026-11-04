@@ -13,11 +13,15 @@ dd::gui::Palette afterglowPalette()
 }
 
 constexpr int kDeckH = 224;
+constexpr int kFxW = 272;   // the effects side of the deck
 } // namespace
 
 //==============================================================================
 AfterglowEditor::Content::Content (AfterglowProcessor& p)
-    : proc (p), presetBar (p.presets), polySwitch (*p.apvts.getParameter ("perfPoly"), "POLY", sunset::amber), tapeStop (p.apvts),
+    : proc (p),
+      topBar (p.presets, "AFTER", "GLOW", "Pads / Textures / Soundscapes"),
+      polySwitch (*p.apvts.getParameter ("perfPoly"), "Poly", sunset::amber),
+      tapeStop (p.apvts),
       horizon (p)
 {
     const std::tuple<const char*, const char*, juce::Colour, const char*> macroDefs[] = {
@@ -49,70 +53,55 @@ AfterglowEditor::Content::Content (AfterglowProcessor& p)
     }
 
     polySwitch.setTooltip ("Poly: play chords with any preset. Off: each preset's own mode (mono / legato leads). Stays as you set it when you change presets.");
-    addAndMakeVisible (polySwitch);
-    addAndMakeVisible (tapeStop);
-    addAndMakeVisible (presetBar);
+    topBar.addRight (polySwitch, 96);
+    topBar.addRight (tapeStop, 196);
+    addAndMakeVisible (topBar);
     addAndMakeVisible (horizon);
+    addAndMakeVisible (atmosphere);
 }
 
 void AfterglowEditor::Content::paint (juce::Graphics& g)
 {
-    const auto pal = afterglowPalette();
-    dd::gui::paintBackdrop (g, getLocalBounds(), pal);
+    const auto& t = dd::gui::tokens();
+    dd::gui::paintBackdrop (g, getLocalBounds(), afterglowPalette());
+    dd::gui::paintPanelShadows (g, *this);
 
-    // Raised silver wordmark with machined grooves running off it.
-    auto head = getLocalBounds().removeFromTop (12 + 64).reduced (16, 0).withTrimmedTop (12).toFloat();
-    auto logo = head.removeFromLeft (300.0f);
-    const auto wordFont = dd::gui::LookAndFeel::display (40.0f).withExtraKerningFactor (0.04f);
-    const float wordW = juce::GlyphArrangement::getStringWidth (wordFont, "AFTERGLOW");
-    auto wordRow = logo.removeFromTop (42.0f);
-    dd::gui::drawEmbossed (g, "AFTERGLOW", wordRow, wordFont, juce::Justification::bottomLeft);
-    dd::gui::paintSunsetStripes (g, { wordRow.getX() + wordW + 12.0f, wordRow.getBottom() - 21.0f, 300.0f - wordW - 24.0f, 12.0f });
-    dd::gui::drawPrinted (g, "PADS  /  TEXTURES  /  SOUNDSCAPES", logo.removeFromTop (18.0f), pal.dim,
-                          dd::gui::LookAndFeel::font (12.0f, true).withExtraKerningFactor (0.22f), juce::Justification::topLeft);
-    auto right = head.removeFromRight (160.0f);
-    dd::gui::drawPrinted (g, juce::String ("ddeonmadeit  v") + DD_PLUGIN_VERSION, right.removeFromBottom (24.0f), pal.dim,
-                          dd::gui::LookAndFeel::font (12.0f), juce::Justification::centredRight);
+    // The horizon is a screen set into the chassis.
+    dd::gui::paintBezel (g, horizon.getBounds().toFloat(), 10.0f, 7.0f);
 
-    // The horizon is a screen set into the case behind a machined silver bezel.
-    dd::gui::paintBezel (g, horizon.getBounds().toFloat(), 8.0f, 7.0f);
-
-    // The macro deck: one faceplate, macros on the left, effect switches on the right.
+    // The macro deck: one raised panel, macros on the left, effect switches on the right.
     const auto plate = deck.toFloat();
-    dd::gui::paintFaceplate (g, plate, pal);
-    // Sunset light from the screen above spills onto the top of the deck.
-    g.setGradientFill (juce::ColourGradient (sunset::orange.withAlpha (0.09f), 0.0f, plate.getY(),
-                                             sunset::orange.withAlpha (0.0f), 0.0f, plate.getY() + 70.0f, false));
-    g.fillRoundedRectangle (plate.reduced (1.0f).withHeight (70.0f), 5.0f);
-    const auto title = dd::gui::LookAndFeel::font (13.0f, true).withExtraKerningFactor (0.1f);
-    dd::gui::paintLamp (g, { plate.getX() + 22.0f, plate.getY() + 19.0f }, 3.2f, pal.accent, 1.0f);
-    dd::gui::drawPrinted (g, "MACROS", { plate.getX() + 32.0f, plate.getY() + 8.0f, 200.0f, 22.0f }, pal.text, title, juce::Justification::centredLeft);
-    const float split = plate.getRight() - 236.0f;
-    g.setColour (juce::Colours::black.withAlpha (0.45f));
+    dd::gui::paintRaisedShadow (g, plate, 14.0f);
+    dd::gui::paintFaceplate (g, plate, afterglowPalette());
+    // The screen's warm light spills onto the top of the deck.
+    g.setGradientFill (juce::ColourGradient (t.signal.withAlpha (t.light ? 0.05f : 0.08f), 0.0f, plate.getY(),
+                                             t.signal.withAlpha (0.0f), 0.0f, plate.getY() + 70.0f, false));
+    g.fillRoundedRectangle (plate.reduced (1.0f).withHeight (70.0f), 13.0f);
+    dd::gui::drawCaption (g, "Macros", { plate.getX() + 18.0f, plate.getY() + 10.0f, 200.0f, 18.0f });
+    const float split = plate.getRight() - kFxW;
+    g.setColour (t.edgeDark);
     g.fillRect (split, plate.getY() + 14.0f, 1.0f, plate.getHeight() - 28.0f);
-    g.setColour (juce::Colours::white.withAlpha (0.05f));
+    g.setColour (t.edgeLight);
     g.fillRect (split + 1.0f, plate.getY() + 14.0f, 1.0f, plate.getHeight() - 28.0f);
-    dd::gui::paintLamp (g, { split + 24.0f, plate.getY() + 19.0f }, 3.2f, pal.accent2, 1.0f);
-    dd::gui::drawPrinted (g, "EFFECTS", { split + 34.0f, plate.getY() + 8.0f, 200.0f, 22.0f }, pal.text, title, juce::Justification::centredLeft);
+    dd::gui::drawCaption (g, "Effects", { split + 22.0f, plate.getY() + 10.0f, 200.0f, 18.0f });
+    g.setFont (dd::gui::LookAndFeel::font (9.0f, 700).withExtraKerningFactor (0.12f));
+    g.setColour (t.faint);
+    g.drawText ((juce::String ("ddeonmadeit  v") + DD_PLUGIN_VERSION).toUpperCase(),
+                juce::Rectangle<float> (plate.getRight() - 218.0f, plate.getY() + 10.0f, 200.0f, 18.0f), juce::Justification::centredRight, false);
 }
 
 void AfterglowEditor::Content::resized()
 {
-    auto r = getLocalBounds().reduced (12);
-    auto head = r.removeFromTop (64);
-    head.removeFromLeft (300);
-    auto side = head.removeFromRight (200);
-    tapeStop.setBounds (side.getX(), side.getY() + 6, side.getWidth(), 26);
-    polySwitch.setBounds (side.getX(), side.getBottom() - 26, 84, 26);
-    presetBar.setBounds (head.withSizeKeepingCentre (std::min (head.getWidth(), 600), 54));
-    r.removeFromTop (8);
+    topBar.setBounds (0, 8, getWidth(), dd::gui::TopBar::kHeight);
+    atmosphere.setBounds (getLocalBounds());
 
+    auto r = getLocalBounds().reduced (14, 0).withTrimmedTop (topBar.getBottom() + 14).withTrimmedBottom (14);
     deck = r.removeFromBottom (kDeckH);
-    r.removeFromBottom (10);
-    horizon.setBounds (r);
+    r.removeFromBottom (14);
+    horizon.setBounds (r.reduced (2, 0));
 
     auto inner = deck.reduced (18, 0).withTrimmedTop (36).withTrimmedBottom (16);
-    auto fx = inner.removeFromRight (236 - 18);
+    auto fx = inner.removeFromRight (kFxW - 18);
     fx.removeFromLeft (22);
     const int knobW = inner.getWidth() / (int) macros.size();
     for (auto& k : macros)

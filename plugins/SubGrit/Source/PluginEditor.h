@@ -13,7 +13,7 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
 
-    static constexpr int kBaseW = 1200, kBaseH = 712;
+    static constexpr int kBaseW = 1200, kBaseH = 738;
 
 private:
     /** Everything is laid out at base size inside this, then scaled as one piece. */
@@ -26,10 +26,12 @@ private:
 
     private:
         SubGritProcessor& proc;
-        dd::gui::PresetBar presetBar;
+        dd::gui::TopBar topBar;
+        dd::gui::DescriptionLine description;
         dd::gui::LampSwitch polySwitch;
         dd::gui::Panel body808, oscA, oscB, lfo, filter, env, voice, eq, dirt, fx, output, scopePanel;
         dd::gui::Scope& scope;
+        dd::gui::Atmosphere atmosphere;
     };
 
     SubGritProcessor& proc;

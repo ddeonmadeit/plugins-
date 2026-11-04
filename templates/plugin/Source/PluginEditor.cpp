@@ -4,14 +4,16 @@ namespace
 {
 dd::gui::Palette palette()
 {
-    dd::gui::Palette p;   // house style: brushed brown metal, silver hardware; dd::gui::sunset only for things that glow
-    p.accent = dd::gui::sunset::orange;   // pick this plugin's identity colour from the sunset set
+    dd::gui::Palette p;   // house style (rawleads): colours come from the DARK / LITE theme tokens
+    p.accent = dd::gui::sunset::orange;   // signal orange: only for things that glow
     return p;
 }
 } // namespace
 
 __NAME__Editor::__NAME__Editor (__NAME__Processor& p)
-    : AudioProcessorEditor (p), lnf (palette()), presetBar (p.presets),
+    : AudioProcessorEditor (p), lnf (palette()),
+      topBar (p.presets, "__NAME__", "", "__NAME__"),   // brand + accent half (e.g. "SUB", "GRIT") and a short subtitle
+      description (topBar.presets()),
 //@SYNTH
       main ("__NAME__", 5, 2, palette().accent)
 //@END
@@ -44,9 +46,12 @@ __NAME__Editor::__NAME__Editor (__NAME__Processor& p)
 //@EFFECT
     main.place (1, 1, 3, 1);
 //@END
-    addAndMakeVisible (presetBar);
+    description.setHint (juce::String ("ddeonmadeit  v") + DD_PLUGIN_VERSION);
+    addAndMakeVisible (topBar);
+    addAndMakeVisible (description);
     addAndMakeVisible (main);
-    setSize (std::max (700, main.preferredSize().x + 24), main.preferredSize().y + 100);
+    addAndMakeVisible (atmosphere);
+    setSize (std::max (900, main.preferredSize().x + 28), main.preferredSize().y + 108 + 14);
 }
 
 __NAME__Editor::~__NAME__Editor() { setLookAndFeel (nullptr); }
@@ -54,16 +59,13 @@ __NAME__Editor::~__NAME__Editor() { setLookAndFeel (nullptr); }
 void __NAME__Editor::paint (juce::Graphics& g)
 {
     dd::gui::paintBackdrop (g, getLocalBounds(), lnf.palette());
-    dd::gui::drawEmbossed (g, juce::String ("__NAME__").toUpperCase(), getLocalBounds().removeFromTop (56).reduced (14, 0).toFloat(),
-                           dd::gui::LookAndFeel::display (28.0f), juce::Justification::centredLeft);
+    dd::gui::paintPanelShadows (g, *this);
 }
 
 void __NAME__Editor::resized()
 {
-    auto r = getLocalBounds().reduced (12);
-    auto head = r.removeFromTop (56);
-    head.removeFromLeft (180);
-    presetBar.setBounds (head);
-    r.removeFromTop (8);
-    main.setBounds (r);
+    topBar.setBounds (0, 8, getWidth(), dd::gui::TopBar::kHeight);
+    description.setBounds (26, topBar.getBottom() + 6, getWidth() - 52, 22);
+    main.setBounds (getLocalBounds().reduced (14, 0).withTrimmedTop (description.getBottom() + 6).withTrimmedBottom (14));
+    atmosphere.setBounds (getLocalBounds());
 }

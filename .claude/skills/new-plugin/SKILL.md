@@ -64,13 +64,14 @@ Check: `$H stress` clean, `$H render` sounds right in `analyze.py`.
 ## 4. UI
 
 Build the editor from `dd::gui::Panel` grids (`add<Knob>`, `add<Choice>`, `add<Toggle>`, `place()` for spans).
-Follow the house style in CLAUDE.md ("Visual style"): realistic brushed brown metal panels with machined silver
-parts, warm `dd::gui::sunset` light only where something glows (one lamp colour per section), `paintBackdrop`
-behind everything, wordmark raised with `drawEmbossed` (`LookAndFeel::display()`) beside `paintSunsetStripes`. The template already does this. Owner's rule: **nothing flat, nothing muddy**.
-Every object needs depth (cast shadow, bevel, socket, inner shadow, glow) and every tone is either deep
-dark or vibrant; mid-brown low-contrast fills read as mud. The shared painters already do this (knobs sit
-in sockets with a backlit scale, faceplates cast shadows, lamps bloom); drawn scenes need layers
-(Afterglow: three mountain ranges in aerial perspective, sun bloom, reflection column, glass sheen).
+Follow the house style in CLAUDE.md ("Visual style"): the rawleads design, DARK and LITE themes from
+`dd::gui::tokens()`, one signal orange only where a light glows. The template already has the frame:
+`TopBar` (brand, preset keys, the plugin's switches via `addRight`, DARK/LITE), `DescriptionLine`, raised
+`Panel`s, `paintBackdrop` + `paintPanelShadows` in `paint()`, and an `Atmosphere` added last. Owner's rule:
+**nothing flat, nothing muddy**: every object needs depth (cast shadow, keycap wall, tray inset, edge light,
+glow). The shared painters already do this; drawn scenes need layers (Afterglow: three mountain ranges in
+aerial perspective, sun bloom, reflection column, glass sheen) and stay dark in both themes. Snapshot both
+themes (`DD_THEME=light` / `dark`).
 
 When the owner asks for "not too many knobs" (Omnisphere-like), copy Afterglow's pattern: the engine keeps
 every parameter (presets carry them), the panel shows only bipolar macros (`mTone`, `mSwell` ...: 0 = the
