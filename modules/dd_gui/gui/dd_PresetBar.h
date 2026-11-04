@@ -41,13 +41,14 @@ private:
     void changeListenerCallback (juce::ChangeBroadcaster*) override { refresh(); }
     void refresh();
     void promptSave();
+    void promptSaveAs();
     void showMenu();
     void showCategories();
     void showPresets();
 
     dd::PresetManager& pm;
     Key prevKey { "<" }, catKey { "" }, nameKey { "", true }, nextKey { ">" }, saveKey { "Save" }, menuKey { "..." };
-    juce::String description;
+    juce::String description, shownName;
 };
 
 /**

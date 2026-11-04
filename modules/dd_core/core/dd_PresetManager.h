@@ -27,15 +27,22 @@ void keepOldDefault (juce::AudioProcessorValueTreeState& apvts, const juce::Valu
 
 /**
     Factory presets are JSON files embedded with juce_add_binary_data; user presets are the same JSON
-    format in ~/Music/<company>/<plugin>/Presets. JSON values are in real units (Hz, ms, dB, choice
-    names) so presets are readable and diffable. Parameters a preset leaves out get their default.
+    format in ~/Music/<company>/<plugin>/Presets, a folder installers and updates never touch. JSON values
+    are in real units (Hz, ms, dB, choice names) so presets are readable and diffable. Parameters a
+    preset leaves out get their default.
+
+    Saving over a factory preset writes a user file marked "overrides": it takes the factory preset's
+    place (and host program slot) until it is deleted ("Restore factory version"), so updates never
+    replace the user's version. User presets keep the category they were saved in.
 
     {
       "name": "Astro Slide", "category": "TRAVIS", "author": "...", "description": "...",
       "params": { "cutoff": 420, "dirtType": "Tape", "legato": true }
     }
 */
-class PresetManager : public juce::ChangeBroadcaster
+class PresetManager : public juce::ChangeBroadcaster,
+                      private juce::AudioProcessorParameter::Listener,
+                      private juce::AsyncUpdater
 {
 public:
     struct Preset
@@ -44,13 +51,17 @@ public:
         juce::var params;
         juce::var extra;          // plugin-specific state that isn't a parameter (see onApplyExtra)
         bool isFactory = true;
+        bool isOverride = false;  // a factory preset the user saved over (file holds their version)
         juce::File file;
+        juce::var factoryParams, factoryExtra;
+        juce::String factoryDescription;
     };
 
     static constexpr const char* kUserCategory = "USER";
 
     PresetManager (juce::AudioProcessorValueTreeState& state, juce::StringArray categoryOrder,
                    const juce::String& company, const juce::String& pluginName);
+    ~PresetManager() override;
 
     /** Parses and registers one embedded preset. Returns false (and logs) on malformed JSON. */
     bool addFactoryPreset (const juce::String& json, const juce::String& sortKey);
@@ -76,8 +87,18 @@ public:
     juce::String getCurrentCategory() const;
     juce::String getCurrentDescription() const;
 
-    bool saveUserPreset (const juce::String& name);
+    /** Saves the current sound as a new user preset (category defaults to USER). */
+    bool saveUserPreset (const juce::String& name, const juce::String& category = kUserCategory);
+    /** Saves over the current preset: rewrites a user preset, or stores an override of a factory one. */
+    bool saveOverCurrent();
+    /** Deletes the user's version of an overridden factory preset and reloads the original. */
+    bool restoreFactory (int index);
+    /** Deletes a user preset's file. */
+    bool deleteUserPreset (int index);
     juce::File getUserPresetDirectory() const { return userDir; }
+
+    /** True once a parameter has changed since the preset was loaded or saved. */
+    bool isModified() const noexcept { return modified.load(); }
 
     /** Current parameter values as a JSON object in real units. */
     juce::var captureParams() const;
@@ -103,7 +124,16 @@ private:
     int numFactory = 0;
     int currentIndex = -1;
     juce::String orphanName; // name restored from a session whose preset no longer exists
+    std::vector<bool> perfParam;
+    std::atomic<bool> modified { false };
+    bool applying = false;
 
     void sortFactory();
+    void apply (const Preset&);
+    bool writeFile (const juce::File&, const juce::String& name, const juce::String& category,
+                    const juce::String& description, bool overrides);
+    void parameterValueChanged (int index, float) override;
+    void parameterGestureChanged (int, bool) override {}
+    void handleAsyncUpdate() override { sendChangeMessage(); }
 };
 } // namespace dd

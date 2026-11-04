@@ -100,7 +100,10 @@ void PresetBar::refresh()
 {
     const auto cat = pm.getCurrentCategory();
     catKey.setLabel (cat.isEmpty() ? juce::String ("-") : cat, false);
-    nameKey.setLabel (pm.getCurrentName());
+    // A star marks a sound edited since it was loaded or saved (only a new name rises in).
+    const auto name = pm.getCurrentName();
+    nameKey.setLabel (name + (pm.isModified() ? " *" : ""), name != shownName);
+    shownName = name;
     description = pm.getCurrentDescription();
     if (onPresetChanged)
         onPresetChanged();
@@ -152,17 +155,61 @@ void PresetBar::showPresets()
 
 void PresetBar::promptSave()
 {
-    auto* w = new juce::AlertWindow ("Save Preset", "Saved to " + pm.getUserPresetDirectory().getFullPathName(),
+    // Save over the current preset (a factory preset keeps the user's version in its place, safe from
+    // updates), save as a new one, or undo / delete the user's file.
+    const int index = pm.getCurrentIndex();
+    const bool hasCurrent = index >= 0;
+    const auto& cur = hasCurrent ? pm.get (index) : dd::PresetManager::Preset();
+    juce::PopupMenu m;
+    m.addItem (1, "Save over \"" + pm.getCurrentName() + "\"", hasCurrent);
+    m.addItem (2, "Save as new preset...");
+    if (hasCurrent && cur.isOverride)
+    {
+        m.addSeparator();
+        m.addItem (3, "Restore factory version of \"" + cur.name + "\"");
+    }
+    if (hasCurrent && ! cur.isFactory)
+    {
+        m.addSeparator();
+        m.addItem (4, "Delete \"" + cur.name + "\"");
+    }
+    juce::Component::SafePointer<PresetBar> safe (this);
+    m.showMenuAsync (juce::PopupMenu::Options().withTargetComponent (&saveKey), [safe, index] (int r)
+    {
+        if (safe == nullptr || r <= 0)
+            return;
+        auto& manager = safe->pm;
+        if (r == 1)      manager.saveOverCurrent();
+        else if (r == 2) safe->promptSaveAs();
+        else if (r == 3) manager.restoreFactory (index);
+        else if (r == 4) manager.deleteUserPreset (index);
+    });
+}
+
+void PresetBar::promptSaveAs()
+{
+    auto* w = new juce::AlertWindow ("Save As New Preset", "Kept in " + pm.getUserPresetDirectory().getFullPathName()
+                                         + "\n(updates never touch it)",
                                      juce::MessageBoxIconType::NoIcon, this);
     w->setLookAndFeel (&getLookAndFeel());
-    w->addTextEditor ("name", pm.getCurrentName() + (pm.getCurrentCategory() == dd::PresetManager::kUserCategory ? "" : " (mine)"));
+    w->addTextEditor ("name", pm.getCurrentName() + (pm.getCurrentCategory() == dd::PresetManager::kUserCategory ? "" : " (mine)"), "Name");
+    auto cats = pm.getCategories();
+    cats.removeString (dd::PresetManager::kUserCategory);
+    cats.insert (0, dd::PresetManager::kUserCategory);
+    w->addComboBox ("category", cats, "Category");
+    if (auto* box = w->getComboBoxComponent ("category"))
+        box->setSelectedItemIndex (0, juce::dontSendNotification);
     w->addButton ("Save", 1, juce::KeyPress (juce::KeyPress::returnKey));
     w->addButton ("Cancel", 0, juce::KeyPress (juce::KeyPress::escapeKey));
     juce::Component::SafePointer<PresetBar> safe (this);
     w->enterModalState (true, juce::ModalCallbackFunction::create ([safe, w] (int result)
     {
-        if (result == 1 && safe != nullptr)
-            safe->pm.saveUserPreset (w->getTextEditorContents ("name"));
+        if (result != 1 || safe == nullptr)
+            return;
+        juce::String category = dd::PresetManager::kUserCategory;
+        if (auto* box = w->getComboBoxComponent ("category"))
+            category = box->getText();
+        safe->pm.saveUserPreset (w->getTextEditorContents ("name"), category);
     }), true);
 }
 

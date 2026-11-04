@@ -37,6 +37,11 @@ juce_add_binary_data(dd_fonts
                 modules/dd_gui/fonts/InstrumentSans-Bold.ttf)
 set_target_properties(dd_fonts PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
+option(DD_BUILD_TESTS "Build the shared-module unit tests" ON)
+if(DD_BUILD_TESTS)
+    add_subdirectory(tools/tests)
+endif()
+
 # Every folder in plugins/ with a CMakeLists.txt is a plugin.
 file(GLOB DD_PLUGIN_DIRS LIST_DIRECTORIES true "${CMAKE_CURRENT_SOURCE_DIR}/plugins/*")
 foreach(dir ${DD_PLUGIN_DIRS})

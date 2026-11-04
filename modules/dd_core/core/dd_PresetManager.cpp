@@ -6,6 +6,39 @@ PresetManager::PresetManager (juce::AudioProcessorValueTreeState& state, juce::S
 {
     userDir = juce::File::getSpecialLocation (juce::File::userMusicDirectory)
                   .getChildFile (company).getChildFile (pluginName).getChildFile ("Presets");
+    // Watch every sound parameter so the preset bar can show that the sound was edited.
+    for (auto* p : apvts.processor.getParameters())
+    {
+        auto* rp = dynamic_cast<juce::RangedAudioParameter*> (p);
+        perfParam.push_back (rp == nullptr || isPerformanceParam (rp->getParameterID()));
+        p->addListener (this);
+    }
+}
+
+PresetManager::~PresetManager()
+{
+    for (auto* p : apvts.processor.getParameters())
+        p->removeListener (this);
+    cancelPendingUpdate();
+}
+
+void PresetManager::parameterValueChanged (int index, float)
+{
+    // Can arrive on any thread (host automation): only flip the flag and repaint later.
+    if (applying || ! juce::isPositiveAndBelow (index, (int) perfParam.size()) || perfParam[(size_t) index])
+        return;
+    if (! modified.exchange (true))
+        triggerAsyncUpdate();
+}
+
+void PresetManager::apply (const Preset& p)
+{
+    applying = true;
+    applyParams (p.params);
+    if (onApplyExtra)
+        onApplyExtra (p.extra);
+    applying = false;
+    modified = false;
 }
 
 bool PresetManager::addFactoryPreset (const juce::String& json, const juce::String& sortKey)
@@ -28,6 +61,9 @@ bool PresetManager::addFactoryPreset (const juce::String& json, const juce::Stri
     p.extra       = parsed.getProperty ("extra", juce::var());
     p.sortKey     = sortKey;
     p.isFactory   = true;
+    p.factoryParams = p.params;
+    p.factoryExtra = p.extra;
+    p.factoryDescription = p.description;
     presets.insert (numFactory++, p);
     return true;
 }
@@ -60,7 +96,17 @@ void PresetManager::rescanUserPresets()
     const auto currentName = getCurrentName();
     const auto currentCat = getCurrentCategory();
 
+    // Back to the factory originals, then lay the user's files over them.
     presets.removeRange (numFactory, presets.size() - numFactory);
+    for (int i = 0; i < numFactory; ++i)
+    {
+        auto& f = presets.getReference (i);
+        f.params = f.factoryParams;
+        f.extra = f.factoryExtra;
+        f.description = f.factoryDescription;
+        f.isOverride = false;
+        f.file = juce::File();
+    }
 
     if (userDir.isDirectory())
     {
@@ -71,9 +117,29 @@ void PresetManager::rescanUserPresets()
             juce::var parsed;
             if (juce::JSON::parse (f.loadFileAsString(), parsed).failed() || ! parsed.isObject())
                 continue;
+            const auto name = parsed.getProperty ("name", f.getFileNameWithoutExtension()).toString();
+            const auto category = parsed.getProperty ("category", kUserCategory).toString();
+            if ((bool) parsed.getProperty ("overrides", false))
+            {
+                int target = -1;
+                for (int i = 0; i < numFactory && target < 0; ++i)
+                    if (presets.getReference (i).name == name && presets.getReference (i).category == category)
+                        target = i;
+                if (target >= 0)
+                {
+                    auto& t = presets.getReference (target);
+                    t.params = parsed.getProperty ("params", juce::var());
+                    t.extra = parsed.getProperty ("extra", juce::var());
+                    if (parsed.hasProperty ("description"))
+                        t.description = parsed.getProperty ("description", "").toString();
+                    t.isOverride = true;
+                    t.file = f;
+                    continue;
+                }
+            }
             Preset p;
-            p.name = parsed.getProperty ("name", f.getFileNameWithoutExtension()).toString();
-            p.category = kUserCategory;
+            p.name = name;
+            p.category = category.isNotEmpty() ? category : juce::String (kUserCategory);
             p.author = parsed.getProperty ("author", "").toString();
             p.description = parsed.getProperty ("description", "").toString();
             p.params = parsed.getProperty ("params", juce::var());
@@ -119,9 +185,7 @@ bool PresetManager::loadPreset (int index)
 {
     if (! juce::isPositiveAndBelow (index, presets.size()))
         return false;
-    applyParams (presets.getReference (index).params);
-    if (onApplyExtra)
-        onApplyExtra (presets.getReference (index).extra);
+    apply (presets.getReference (index));
     currentIndex = index;
     orphanName.clear();
     sendChangeMessage();
@@ -139,9 +203,9 @@ void PresetManager::loadRelative (int delta)
 
 void PresetManager::loadInit()
 {
-    applyParams (juce::var (new juce::DynamicObject()));
-    if (onApplyExtra)
-        onApplyExtra (juce::var());
+    Preset init;
+    init.params = juce::var (new juce::DynamicObject());
+    apply (init);
     currentIndex = -1;
     orphanName = "Init";
     sendChangeMessage();
@@ -169,30 +233,87 @@ juce::String PresetManager::sanitiseFileName (const juce::String& name)
     return juce::File::createLegalFileName (name.trim()).replaceCharacter ('.', '_');
 }
 
-bool PresetManager::saveUserPreset (const juce::String& rawName)
+bool PresetManager::writeFile (const juce::File& file, const juce::String& name, const juce::String& category,
+                               const juce::String& description, bool overrides)
 {
-    const auto name = rawName.trim();
-    if (name.isEmpty())
-        return false;
-
     if (! userDir.isDirectory() && ! userDir.createDirectory())
         return false;
-
     auto* obj = new juce::DynamicObject();
     obj->setProperty ("name", name);
-    obj->setProperty ("category", kUserCategory);
+    obj->setProperty ("category", category);
     obj->setProperty ("author", "user");
+    if (description.isNotEmpty())
+        obj->setProperty ("description", description);
+    if (overrides)
+        obj->setProperty ("overrides", true);
     obj->setProperty ("params", captureParams());
     if (onCaptureExtra)
         obj->setProperty ("extra", onCaptureExtra());
+    return file.replaceWithText (juce::JSON::toString (juce::var (obj), false));
+}
 
-    const auto file = userDir.getChildFile (sanitiseFileName (name) + ".json");
-    if (! file.replaceWithText (juce::JSON::toString (juce::var (obj), false)))
+bool PresetManager::saveUserPreset (const juce::String& rawName, const juce::String& rawCategory)
+{
+    const auto name = rawName.trim();
+    const auto category = rawCategory.trim().isNotEmpty() ? rawCategory.trim().toUpperCase() : juce::String (kUserCategory);
+    if (name.isEmpty())
+        return false;
+    // USER presets keep the plain file name older versions used; other categories are prefixed so
+    // the same name can live in two categories.
+    const auto base = category == kUserCategory ? sanitiseFileName (name) : sanitiseFileName (category) + "__" + sanitiseFileName (name);
+    if (! writeFile (userDir.getChildFile (base + ".json"), name, category, {}, false))
         return false;
 
     rescanUserPresets();
-    currentIndex = indexOf (name, kUserCategory);
+    currentIndex = indexOf (name, category);
+    for (int i = numFactory; i < presets.size(); ++i)   // prefer the user copy if a factory one shares the name
+        if (presets.getReference (i).name == name && presets.getReference (i).category == category)
+            currentIndex = i;
+    modified = false;
     sendChangeMessage();
+    return true;
+}
+
+bool PresetManager::saveOverCurrent()
+{
+    if (! juce::isPositiveAndBelow (currentIndex, presets.size()))
+        return false;
+    const auto p = presets.getReference (currentIndex);
+    const auto file = p.file != juce::File() ? p.file
+                    : userDir.getChildFile (sanitiseFileName (p.category) + "__" + sanitiseFileName (p.name) + ".override.json");
+    if (! writeFile (file, p.name, p.category, p.isFactory ? juce::String() : p.description, p.isFactory))
+        return false;
+    const int keep = currentIndex;
+    rescanUserPresets();
+    currentIndex = keep;
+    modified = false;
+    sendChangeMessage();
+    return true;
+}
+
+bool PresetManager::restoreFactory (int index)
+{
+    if (! juce::isPositiveAndBelow (index, numFactory) || ! presets.getReference (index).isOverride)
+        return false;
+    presets.getReference (index).file.deleteFile();
+    rescanUserPresets();
+    return loadPreset (index);
+}
+
+bool PresetManager::deleteUserPreset (int index)
+{
+    if (! juce::isPositiveAndBelow (index, presets.size()) || presets.getReference (index).isFactory)
+        return false;
+    presets.getReference (index).file.deleteFile();
+    const bool wasCurrent = index == currentIndex;
+    rescanUserPresets();
+    if (wasCurrent)
+    {
+        currentIndex = -1;
+        orphanName = "Init";
+        modified = true;
+        sendChangeMessage();
+    }
     return true;
 }
 
@@ -295,6 +416,7 @@ void PresetManager::writeState (juce::ValueTree& state) const
 {
     state.setProperty ("presetName", getCurrentName(), nullptr);
     state.setProperty ("presetCategory", getCurrentCategory(), nullptr);
+    state.setProperty ("presetModified", isModified(), nullptr);
 }
 
 void PresetManager::readState (const juce::ValueTree& state)
@@ -303,6 +425,7 @@ void PresetManager::readState (const juce::ValueTree& state)
     const auto cat = state.getProperty ("presetCategory").toString();
     currentIndex = indexOf (name, cat);
     orphanName = currentIndex < 0 ? name : juce::String();
+    modified = (bool) state.getProperty ("presetModified", false);
     sendChangeMessage();
 }
 void keepOldDefault (juce::AudioProcessorValueTreeState& apvts, const juce::ValueTree& savedState,
