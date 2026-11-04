@@ -10,7 +10,7 @@
     "Palm mute (also on the mod wheel), hammer-ons and slides on legato notes, vibrato, humanize, double-tracking for wide stereo guitars",
     "Pedalboard: compressor, overdrive, fuzz, chorus, tempo-synced tremolo and delay; amp with Clean, Crunch and Lead channels, a 1x12 or 4x12 cabinet and mic placement, plus a room",
     "TAPE STOP: slow the guitar to a halt like a tape machine powering down, then automate it at the end of a beat",
-    "35 presets, each a different guitar part: acoustic, clean, crunch and heavy, plus Travis Scott, Mike Dean, Yeezus, moshc0re, trip hop and SAFE"
+    "40 presets, each a different guitar part: acoustic, clean, crunch and heavy, plus Travis Scott, Mike Dean, Yeezus, moshc0re, trip hop, 80s and SAFE"
   ],
   "installTips": [
     "The .pkg also installs the guitar sample library (about 130 MB). With the .zip, Install.command copies it for you.",
@@ -19,10 +19,10 @@
   ],
   "previewNote": "on the same 80 BPM part: strummed Em, C and G chords (down and up strokes), then a single-note riff.",
   "whatsNew": {
-    "version": "1.2.0",
+    "version": "1.3.0",
     "items": [
-      "New look: the brown metal panels are now real brushed metal, a little lighter and shinier, with machined silver knobs (spun tops, knurled skirts), silver screws and keys, engraved labels and a raised chrome wordmark. Warm colour only where something really glows: lamps, the backlit slot around each knob, display glass",
-      "The pedals are brushed aluminium enclosures with engraved names, chrome footswitches and status LEDs; the guitar stage sits in a silver bezel"
+      "80s category, 5 new guitar parts: an I'm Still Standing pop-rock rhythm, the decade's chorus clean, arena power chords, an arena lead solo and synth-pop muted plucks (subtle)",
+      "New look, matching the rawleads instrument design: a DARK / LITE switch in the top bar (every open plugin follows it, with a soft crossfade), keycap buttons that press in, the preset name on a lit smoked-amber key with a flickering lamp behind it, LED switches, glowing knob arcs, console displays and the Instrument Sans typeface; the pedals' footswitches are keycaps that light up amber when the pedal is on"
     ]
   }
 }

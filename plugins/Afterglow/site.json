@@ -1,7 +1,7 @@
 {
   "publish": true,
   "tagline": "Pads, keys, plucks and soundscapes, artist-inspired",
-  "description": "A two-layer synth for pads, keys, plucks, leads, bells and soundscapes, played from a sunset horizon instead of a wall of knobs: drag the sun for motion and tone, shape the rest with six macros. 88 presets inspired by Tame Impala, Massive Attack, Brent Faiyaz, Mike Dean, Travis Scott, Yeezus, moshc0re, SAFE and trip hop, plus a modelled electric guitar, from bare and soft to extreme.",
+  "description": "A two-layer synth for pads, keys, plucks, leads, bells and soundscapes, played from a sunset horizon instead of a wall of knobs: drag the sun for motion and tone, shape the rest with six macros. 99 presets inspired by Tame Impala, Massive Attack, Brent Faiyaz, Mike Dean, Travis Scott, Yeezus, moshc0re, SAFE and trip hop, plus a modelled electric guitar, from bare and soft to extreme.",
   "accent": "#ec7d2e",
   "highlights": [
     "Twelve sources per layer: Juno-style analog, string machine, formant choir, FM glass, electric piano, pitched air, sine, plucked string, drawbar organ, mallets (marimba, vibes, kalimba, glock, steel), hard sync and a modelled electric guitar",
@@ -9,7 +9,7 @@
     "Dirt (8 distortion types), tape wow and saturation, lo-fi, Juno / Solina ensemble, phaser, dub delay, shimmer reverb, tempo pump and gate",
     "Drag the sun to set Motion and Tone; Swell, Tail, Blend, Grit, Echo and Space reshape any preset",
     "POLY switch: play chords with any preset, even the mono leads",
-    "89 presets: TAME IMPALA, MASSIVE ATTACK, BRENT FAIYAZ, MIKE DEAN, TRAVIS SCOTT, YEEZUS, MOSHC0RE, GUITAR, TRIP HOP, SAFE",
+    "99 presets: TAME IMPALA, MASSIVE ATTACK, BRENT FAIYAZ, MIKE DEAN, TRAVIS SCOTT, YEEZUS, MOSHC0RE, GUITAR, TRIP HOP, 80S, SAFE",
     "TAPE STOP: slow everything to a halt like a tape machine powering down, then automate it at the end of a beat"
   ],
   "installTips": [
@@ -20,10 +20,10 @@
   ],
   "previewNote": "on the same 120 BPM phrase: a held Dm9, an arpeggio over Bb, Fmaj7 stabs, then a legato melody. GUITAR presets play strummed Em, C and G chords at 80 BPM and a riff.",
   "whatsNew": {
-    "version": "1.7.0",
+    "version": "1.8.0",
     "items": [
-      "New look: the brown metal panels are now real brushed metal, a little lighter and shinier, with machined silver knobs (spun tops, knurled skirts), silver screws and keys, engraved labels and a raised chrome wordmark. Warm colour only where something really glows: lamps, the backlit slot around each knob, display glass",
-      "The sunset screen sits in a machined silver bezel"
+      "80s category, 10 new instruments: the Push It To The Limit Jupiter lead and sitar-like arpeggio, a DX tine electric piano, an I'm Still Standing piano, funk DI guitar chops, an orchestra hit, poly brass, a Juno pad, a Moroder machine (extreme) and ballad bells (subtle)",
+      "New look, matching the rawleads instrument design: a DARK / LITE switch in the top bar (every open plugin follows it, with a soft crossfade), keycap buttons that press in, the preset name on a lit smoked-amber key with a flickering lamp behind it, LED switches, glowing knob arcs, console displays and the Instrument Sans typeface"
     ]
   }
 }
