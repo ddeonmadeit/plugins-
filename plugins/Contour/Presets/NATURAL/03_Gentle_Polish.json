@@ -1,0 +1,15 @@
+{
+  "name": "Gentle Polish",
+  "category": "NATURAL",
+  "author": "ddeonmadeit",
+  "description": "Most of the way to pitch with a light hand on the wander of long notes; vibrato as sung, slow natural transitions.",
+  "params": {
+    "center": 0.7,
+    "drift": 0.3,
+    "vibrato": 1.0,
+    "transition": 70.0,
+    "formant": 0.0,
+    "transpose": 0,
+    "outGain": 0.1
+  }
+}

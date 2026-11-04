@@ -1,0 +1,15 @@
+{
+  "name": "Wide Vibrato",
+  "category": "CREATIVE",
+  "author": "ddeonmadeit",
+  "description": "Centres the notes and doubles the singer's own vibrato: old-school soul and gospel width on any take.",
+  "params": {
+    "center": 0.8,
+    "drift": 0.3,
+    "vibrato": 1.9,
+    "transition": 60.0,
+    "formant": 0.0,
+    "transpose": 0,
+    "outGain": 0.1
+  }
+}

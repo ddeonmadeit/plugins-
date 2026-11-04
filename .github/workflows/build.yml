@@ -116,10 +116,12 @@ jobs:
         run: |
           targets=""
           for p in $(python3 tools/ci/plugin_meta.py --names); do targets="$targets ${p}_Harness ${p}_VST3"; done
-          cmake --build build --parallel --target $targets dd_tests
+          cmake --build build --parallel --target $targets dd_tests contour_tests
 
       - name: Unit tests (shared modules)
-        run: build/tools/tests/dd_tests_artefacts/Release/dd_tests
+        run: |
+          build/tools/tests/dd_tests_artefacts/Release/dd_tests
+          build/tools/tests/contour_tests_artefacts/Release/contour_tests
 
       - name: Get pluginval
         run: |

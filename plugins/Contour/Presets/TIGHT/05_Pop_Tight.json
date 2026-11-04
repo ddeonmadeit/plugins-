@@ -1,0 +1,15 @@
+{
+  "name": "Pop Tight",
+  "category": "TIGHT",
+  "author": "ddeonmadeit",
+  "description": "Modern pop lead: every note on pitch, held notes steady, vibrato a touch smaller, quick but human moves between notes.",
+  "params": {
+    "center": 1.0,
+    "drift": 0.65,
+    "vibrato": 0.85,
+    "transition": 35.0,
+    "formant": 0.0,
+    "transpose": 0,
+    "outGain": 0.1
+  }
+}

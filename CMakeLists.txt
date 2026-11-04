@@ -26,6 +26,7 @@ include(cmake/DDPlugin.cmake)
 juce_add_module(modules/dd_dsp)
 juce_add_module(modules/dd_core)
 juce_add_module(modules/dd_gui)
+juce_add_module(modules/dd_take)
 
 # dd_gui's typeface (Instrument Sans, SIL Open Font License: modules/dd_gui/fonts/OFL.txt).
 juce_add_binary_data(dd_fonts

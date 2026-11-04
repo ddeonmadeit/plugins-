@@ -1,0 +1,15 @@
+{
+  "name": "Deep Voice",
+  "category": "CREATIVE",
+  "author": "ddeonmadeit",
+  "description": "Same notes, bigger singer: formants 3 semitones down for a darker, deeper character, lightly tuned.",
+  "params": {
+    "center": 0.7,
+    "drift": 0.25,
+    "vibrato": 1.0,
+    "transition": 55.0,
+    "formant": -3.0,
+    "transpose": 0,
+    "outGain": 0.6
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "Studio Natural",
+  "category": "NATURAL",
+  "author": "ddeonmadeit",
+  "description": "What a careful engineer does by hand: centres on pitch, steadies drift on held notes, vibrato and transitions untouched.",
+  "params": {
+    "center": 0.88,
+    "drift": 0.45,
+    "vibrato": 0.95,
+    "transition": 55.0,
+    "formant": 0.0,
+    "transpose": 0,
+    "outGain": 0.1
+  }
+}

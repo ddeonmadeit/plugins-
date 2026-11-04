@@ -1,0 +1,15 @@
+{
+  "name": "Straight Tone",
+  "category": "TIGHT",
+  "author": "ddeonmadeit",
+  "description": "Vibrato taken out and notes centred: the straight, still sound of a lot of indie and R&B leads.",
+  "params": {
+    "center": 0.92,
+    "drift": 0.55,
+    "vibrato": 0.0,
+    "transition": 45.0,
+    "formant": 0.0,
+    "transpose": 0,
+    "outGain": 0.1
+  }
+}

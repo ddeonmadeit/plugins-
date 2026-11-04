@@ -1,0 +1,10 @@
+{
+  "categories": ["NATURAL", "TIGHT", "CREATIVE"],
+  "targetLufs": -15.0,
+  "toleranceLu": 1.5,
+  "similarBelow": 0.0,
+  "phrase": "vocal",
+  "passes": 2,
+  "previewPhrase": "vocal",
+  "previewBacking": false
+}

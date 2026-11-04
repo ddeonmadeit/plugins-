@@ -1,0 +1,15 @@
+{
+  "name": "Octave Up",
+  "category": "CREATIVE",
+  "author": "ddeonmadeit",
+  "description": "An octave higher with its vowels kept, so it reads as a voice, not a chipmunk: for airy doubles and ad-libs.",
+  "params": {
+    "center": 0.85,
+    "drift": 0.4,
+    "vibrato": 0.9,
+    "transition": 45.0,
+    "formant": 0.6,
+    "transpose": 12,
+    "outGain": 3.0
+  }
+}

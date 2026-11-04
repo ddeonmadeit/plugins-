@@ -27,7 +27,7 @@ if [[ -d "$ROOT/plugins/$PLUGIN/Presets" ]]; then
 fi
 
 echo "== render all presets"
-"$HARNESS" render-all --outdir "$OUT/renders" --phrase "$(cfg phrase demo)" > "$OUT/render.log"
+"$HARNESS" render-all --outdir "$OUT/renders" --phrase "$(cfg phrase demo)" --passes "$(cfg passes 1)" > "$OUT/render.log"
 
 echo "== analyze"
 python3 "$ROOT/tools/qa/analyze.py" "$OUT/renders" --sheet \
@@ -39,15 +39,16 @@ if grep -qE "loudness|TOO SIMILAR" "$OUT/analysis.txt"; then
 fi
 
 echo "== stress"
-"$HARNESS" stress --seconds 20 | tee "$OUT/stress.txt"
-"$HARNESS" stress --seconds 5 --block 1 | tee -a "$OUT/stress.txt"
-"$HARNESS" stress --seconds 5 --sr 96000 --block 1024 | tee -a "$OUT/stress.txt"
+P="--passes $(cfg passes 1)"
+"$HARNESS" stress --seconds 20 $P | tee "$OUT/stress.txt"
+"$HARNESS" stress --seconds 5 --block 1 $P | tee -a "$OUT/stress.txt"
+"$HARNESS" stress --seconds 5 --sr 96000 --block 1024 $P | tee -a "$OUT/stress.txt"
 
 echo "== UI snapshot"
 if command -v xvfb-run > /dev/null; then
-    xvfb-run -a -s "-screen 0 2560x1600x24" "$HARNESS" snapshot --out "$OUT/ui.png" --phrase "$(cfg phrase demo)"
+    xvfb-run -a -s "-screen 0 2560x1600x24" "$HARNESS" snapshot --out "$OUT/ui.png" --phrase "$(cfg phrase demo)" --passes "$(cfg passes 1)"
 else
-    "$HARNESS" snapshot --out "$OUT/ui.png" --phrase "$(cfg phrase demo)" || echo "(snapshot skipped: no display)"
+    "$HARNESS" snapshot --out "$OUT/ui.png" --phrase "$(cfg phrase demo)" --passes "$(cfg passes 1)" || echo "(snapshot skipped: no display)"
 fi
 
 if [[ -n "${PLUGINVAL:-}" && -d "$VST3" ]]; then

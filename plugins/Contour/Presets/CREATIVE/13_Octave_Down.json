@@ -1,0 +1,15 @@
+{
+  "name": "Octave Down",
+  "category": "CREATIVE",
+  "author": "ddeonmadeit",
+  "description": "The whole take an octave lower with its vowels kept (no slowed-down sound): a doubled low layer or a pitched-down hook.",
+  "params": {
+    "center": 0.85,
+    "drift": 0.4,
+    "vibrato": 0.9,
+    "transition": 45.0,
+    "formant": 0.0,
+    "transpose": -12,
+    "outGain": 3.1
+  }
+}

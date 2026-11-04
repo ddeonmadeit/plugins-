@@ -1,0 +1,15 @@
+{
+  "name": "Fifth Harmony",
+  "category": "CREATIVE",
+  "author": "ddeonmadeit",
+  "description": "A perfect fifth above, tuned tight: put Contour on a copy of the lead and blend it under for an instant harmony.",
+  "params": {
+    "center": 1.0,
+    "drift": 0.6,
+    "vibrato": 0.8,
+    "transition": 30.0,
+    "formant": 0.0,
+    "transpose": 7,
+    "outGain": 1.9
+  }
+}

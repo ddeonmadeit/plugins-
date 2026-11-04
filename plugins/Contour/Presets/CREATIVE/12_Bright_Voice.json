@@ -1,0 +1,15 @@
+{
+  "name": "Bright Voice",
+  "category": "CREATIVE",
+  "author": "ddeonmadeit",
+  "description": "Same notes, smaller and brighter singer: formants up 2.5 semitones, lightly tuned.",
+  "params": {
+    "center": 0.7,
+    "drift": 0.25,
+    "vibrato": 1.0,
+    "transition": 55.0,
+    "formant": 2.5,
+    "transpose": 0,
+    "outGain": 0.8
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "Hard Snap",
+  "category": "CREATIVE",
+  "author": "ddeonmadeit",
+  "description": "The hard-tune effect: instant jumps between perfectly flat notes, no drift, no vibrato.",
+  "params": {
+    "center": 1.0,
+    "drift": 1.0,
+    "vibrato": 0.0,
+    "transition": 2.0,
+    "formant": 0.0,
+    "transpose": 0,
+    "outGain": 0.1
+  }
+}

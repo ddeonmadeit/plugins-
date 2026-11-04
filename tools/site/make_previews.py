@@ -80,7 +80,8 @@ def main():
 
     tmp = tempfile.mkdtemp()
     try:
-        subprocess.run([harness, "render-all", "--phrase", phrase, "--outdir", tmp] + (["--bpm", phraseBpm] if phraseBpm else []),
+        passes = ["--passes", str(qa["passes"])] if qa.get("passes", 1) > 1 else []
+        subprocess.run([harness, "render-all", "--phrase", phrase, "--outdir", tmp] + passes + (["--bpm", phraseBpm] if phraseBpm else []),
                        check=True, stdout=subprocess.DEVNULL)
         # Some categories or presets are played differently (Afterglow's GUITAR presets get strummed chords
         # and a riff). Keys are a category or "CATEGORY - Preset Name"; the preset wins. "phrase@bpm" also

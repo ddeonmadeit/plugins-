@@ -6,6 +6,8 @@
       <Plugin>Harness render  --out x.wav [--program N | --preset-file p.json] [--set id=value ...]
                               [--phrase demo|single|slide|groove|chords|pads|mixed|guitar|drums|drumvel|vocal] [--sr 48000] [--block 256] [--mono]
                               [--input voice.wav]   effects: process this file instead of the test programme
+                              [--passes 2]          play the phrase twice on a host timeline, keep the last pass
+                                                    (plugins that capture first and play back an edit: Contour)
                               [--bpm 79]   host tempo, transport playing from beat 0 (default: no host)
                               [--at 6.5:perfTapeStop=1 ...]   change a parameter at a time in seconds (like automation)
                               --phrase "notes:<note>,<start s>,<length s>,<velocity> ... [end=<s>]"   any notes (one-shots, loops)
@@ -392,6 +394,7 @@ juce::AudioBuffer<float> vocalTestSignal (double sr, double seconds)
 }
 
 juce::File gInputFile;   // --input: an audio file to run through an effect instead of the test programme
+int gPasses = 1;         // --passes 2: play the phrase twice on a host timeline (capture-then-edit plugins: Contour)
 
 /** Loads --input at the render rate (resampled if needed). */
 juce::AudioBuffer<float> loadInputFile (double sr, double& seconds)
@@ -426,12 +429,13 @@ struct FixedPlayHead : juce::AudioPlayHead
 {
     double bpm = 120.0, sr = 48000.0;
     juce::int64 sample = 0;
+    bool playing = true;
 
     juce::Optional<PositionInfo> getPosition() const override
     {
         PositionInfo p;
         p.setBpm (bpm);
-        p.setIsPlaying (true);
+        p.setIsPlaying (playing);
         p.setTimeInSamples (sample);
         p.setTimeInSeconds ((double) sample / sr);
         p.setPpqPosition ((double) sample / sr * bpm / 60.0);
@@ -459,9 +463,9 @@ juce::AudioBuffer<float> renderPhrase (juce::AudioProcessor& proc, const juce::S
     }
 
     FixedPlayHead playHead;
-    playHead.bpm = bpm;
+    playHead.bpm = bpm > 0.0 ? bpm : 120.0;
     playHead.sr = sr;
-    proc.setPlayHead (bpm > 0.0 ? &playHead : nullptr);
+    proc.setPlayHead (bpm > 0.0 || gPasses > 1 ? &playHead : nullptr);
 
     // Effects get the test programme on their input; instruments get silence + MIDI.
     // The current bus layout is kept (see render --mono); output is always written as stereo.
@@ -495,6 +499,31 @@ juce::AudioBuffer<float> renderPhrase (juce::AudioProcessor& proc, const juce::S
         if (a.sample != b.sample) return a.sample < b.sample;
         return a.msg.isNoteOff() && b.msg.isNoteOn(); // offs first at the same time
     });
+
+    // Earlier passes: the plugin hears the phrase on the timeline (and analyses it once the transport stops).
+    for (int pass = 1; pass < gPasses; ++pass)
+    {
+        for (int pos = 0; pos < totalSamples; pos += block)
+        {
+            const int n = std::min (block, totalSamples - pos);
+            buf.setSize (numBuf, n, false, false, true);
+            buf.clear();
+            if (isEffect)
+                for (int ch = 0; ch < numIn; ++ch)
+                    buf.copyFrom (ch, 0, input, std::min (ch, 1), pos, n);
+            playHead.sample = pos;
+            midi.clear();
+            proc.processBlock (buf, midi);
+        }
+        playHead.playing = false;
+        for (int i = 0; i < 8; ++i)
+        {
+            buf.setSize (numBuf, block, false, false, true);
+            buf.clear();
+            proc.processBlock (buf, midi);
+        }
+        playHead.playing = true;
+    }
 
     size_t ev = 0;
     for (int pos = 0; pos < totalSamples; pos += block)
@@ -677,16 +706,37 @@ int cmdSnapshot (juce::AudioProcessor& proc, const Args& a)
     {
         proc.setPlayConfigDetails (2, 2, 48000.0, 256);
         proc.prepareToPlay (48000.0, 256);
-        const double seconds = 3.6;
+        const double seconds = gPasses > 1 ? 8.5 : 3.6;
         const auto input = a.get ("--phrase", "demo") == "vocal" ? vocalTestSignal (48000.0, seconds) : effectTestSignal (48000.0, seconds);
         juce::AudioBuffer<float> buf (2, 256);
         juce::MidiBuffer midi;
-        for (int pos = 0; pos + 256 <= input.getNumSamples(); pos += 256)
+        FixedPlayHead playHead;
+        playHead.sr = 48000.0;
+        if (gPasses > 1)
+            proc.setPlayHead (&playHead);
+        for (int pass = 0; pass < gPasses; ++pass)
         {
-            for (int ch = 0; ch < 2; ++ch)
-                buf.copyFrom (ch, 0, input, ch, pos, 256);
-            proc.processBlock (buf, midi);
+            playHead.playing = true;
+            for (int pos = 0; pos + 256 <= input.getNumSamples(); pos += 256)
+            {
+                for (int ch = 0; ch < 2; ++ch)
+                    buf.copyFrom (ch, 0, input, ch, pos, 256);
+                playHead.sample = pos;
+                proc.processBlock (buf, midi);
+                if (gPasses > 1 && pass == gPasses - 1 && pos > input.getNumSamples() * 2 / 5)
+                    break;   // stop mid-phrase so the playhead shows
+            }
+            if (pass + 1 < gPasses)
+            {
+                playHead.playing = false;
+                for (int i = 0; i < 8; ++i)
+                {
+                    buf.clear();
+                    proc.processBlock (buf, midi);
+                }
+            }
         }
+        proc.setPlayHead (nullptr);
     }
     else
     {
@@ -747,9 +797,38 @@ int cmdStress (juce::AudioProcessor& proc, const Args& a)
     proc.processBlock (buf, midi);
     proc.setNonRealtime (false);
 
+    // --passes 2: a host timeline too. Play 4 s (a capture-then-edit plugin records it), stop, then keep
+    // playing back that span with seeks and loops while everything else is randomised.
+    FixedPlayHead playHead;
+    playHead.sr = sr;
+    const int captureBlocks = (int) (4.0 * sr / block), stopBlocks = std::max (1, (int) (0.5 * sr / block));
+    if (gPasses > 1)
+        proc.setPlayHead (&playHead);
+
     const auto t0 = std::chrono::steady_clock::now();
     for (int b = 0; b < blocks; ++b)
     {
+        if (gPasses > 1)
+        {
+            if (b < captureBlocks)
+            {
+                playHead.playing = true;
+                playHead.sample = (juce::int64) b * block;
+            }
+            else if (b < captureBlocks + stopBlocks)
+            {
+                playHead.playing = false;
+                if (b == captureBlocks + 1)
+                    juce::Thread::sleep (400);   // let the plugin's worker finish its analysis
+            }
+            else
+            {
+                playHead.playing = rnd.nextFloat() > 0.02f;
+                playHead.sample += block;
+                if (rnd.nextFloat() < 0.01f || playHead.sample > (juce::int64) (5.0 * sr))
+                    playHead.sample = (juce::int64) (rnd.nextFloat() * 4.5f * (float) sr);
+            }
+        }
         midi.clear();
         if (rnd.nextFloat() < 0.08f)
             midi.addEvent (juce::MidiMessage::noteOn (1, 20 + rnd.nextInt (60), (juce::uint8) (1 + rnd.nextInt (126))), rnd.nextInt (block));
@@ -783,6 +862,7 @@ int cmdStress (juce::AudioProcessor& proc, const Args& a)
     const double elapsed = std::chrono::duration<double> (std::chrono::steady_clock::now() - t0).count();
     std::cout << "stress: " << seconds << " s audio in " << elapsed << " s (" << (seconds / elapsed) << "x realtime), "
               << "peak " << juce::Decibels::gainToDecibels (maxPeak) << " dBFS, non-finite samples: " << bad << "\n";
+    proc.setPlayHead (nullptr);
     proc.releaseResources();
     return bad == 0 ? 0 : 2;
 }
@@ -799,6 +879,8 @@ int main (int argc, char* argv[])
     const auto cmd = a.raw.isEmpty() ? juce::String ("list") : a.raw[0];
     if (a.has ("--input"))
         gInputFile = juce::File::getCurrentWorkingDirectory().getChildFile (a.get ("--input"));
+    if (a.has ("--passes"))
+        gPasses = std::max (1, a.get ("--passes").getIntValue());
     std::unique_ptr<juce::AudioProcessor> proc (createPluginFilter());
 
     // Render presets as designed: performance switches ("perf*" on/off, e.g. Poly) off unless --perf is given.

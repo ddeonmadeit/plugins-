@@ -1,0 +1,21 @@
+{
+  "publish": true,
+  "tagline": "Edit a sung vocal note by note: move pitches, flatten or deepen vibrato, fix timing, change the voice",
+  "description": "The Melodyne way of tuning, in your DAW: put Contour on the vocal track and press play, and it captures the take. Stop, and every sung note appears as a blob on a piano roll with the pitch line running through it. Drag notes to new pitches (they snap to your key), steady or exaggerate the vibrato and drift of each one, move and stretch them in time, split and join them, change their level and the voice's character. Global Center / Drift / Vibrato controls tune the whole take at once, and playback follows the song.",
+  "accent": "#e0793f",
+  "highlights": [
+    "Transfer, like Melodyne: Contour records the track while your DAW plays (TRANSFER is lit), finds every note when you stop, and from then on plays your edited take in time with the song. Or drop a vocal file on it.",
+    "Notes you can grab: drag up or down to change the pitch (snaps to the key and scale, Alt for fine), sideways to move it in time, the edges to stretch it; double-click snaps a note to the scale. Arrow keys move the selection, Delete mutes it, Ctrl/Cmd+Z undoes.",
+    "Tools for each note: Vibrato (flatten, keep or deepen), Drift (steady the slow wander of held notes), Formant (bigger and darker or smaller and brighter without changing the note), Level, and Split / join.",
+    "Pitch-synchronous (PSOLA) processing: each sung pulse is moved whole, so vowels and timbre stay natural; an untouched note comes out sample-for-sample identical to what was sung, with no latency.",
+    "Whole-take correction on top: Center pulls every note you haven't moved toward the scale, Drift steadies, Vibrato scales, Transition sets how fast pitch moves between notes (down to the hard-tune effect), plus Formant, Transpose and key detection.",
+    "Bounce the edit to a WAV and drag it straight into your playlist. Takes are stored in Music/ddeonmadeit/Contour/Takes and your edits are saved with the project.",
+    "15 correction styles: natural touch-ups, tight pop, straight tone, R&B runs, hard snap, wide vibrato, deeper or brighter voice, octave up or down, a fifth-above harmony."
+  ],
+  "installTips": [
+    "Put Contour FIRST on the vocal's mixer track (before Aircheck or any effects), press play over the part you want to edit, then stop: the notes appear.",
+    "After the first capture TRANSFER goes dark and playback plays your edit. If you change or move the vocal clip, press TRANSFER and play that part again.",
+    "To print the edit: BOUNCE, then drag DRAG OUT into the playlist and drop it at bar 1 (the file starts at the song's beginning, so it lines up)."
+  ],
+  "previewNote": "on a synthetic sung test phrase (slightly off pitch on purpose), captured and played back through each correction style."
+}

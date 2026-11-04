@@ -1,0 +1,15 @@
+{
+  "name": "Hand Edit Only",
+  "category": "NATURAL",
+  "author": "ddeonmadeit",
+  "description": "The take exactly as sung (it nulls with the original). Nothing is corrected until you move a note yourself: the starting point for Melodyne-style editing.",
+  "params": {
+    "center": 0.0,
+    "drift": 0.0,
+    "vibrato": 1.0,
+    "transition": 60.0,
+    "formant": 0.0,
+    "transpose": 0,
+    "outGain": 0.0
+  }
+}
