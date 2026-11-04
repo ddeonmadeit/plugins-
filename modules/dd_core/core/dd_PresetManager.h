@@ -103,6 +103,11 @@ public:
     /** Current parameter values as a JSON object in real units. */
     juce::var captureParams() const;
     void applyParams (const juce::var& params);
+    /** Applies a whole preset given as parsed JSON (params and extra), like loading a factory preset. */
+    void applyPresetJson (const juce::var& preset);
+
+    /** The manager attached to a processor, if it has one (lets the QA harness load preset files fully). */
+    static PresetManager* forProcessor (const juce::AudioProcessor& processor);
 
     void writeState (juce::ValueTree& state) const;
     void readState (const juce::ValueTree& state);

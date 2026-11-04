@@ -17,10 +17,9 @@
   ],
   "previewNote": "on the same five-bar 96 BPM groove: ghost notes, open hat, a ride bar, a tom fill and crashes ringing out.",
   "whatsNew": {
-    "version": "1.9.0",
+    "version": "1.10.0",
     "items": [
-      "Presets you can make your own: Save opens a menu to save over the current preset (your version takes the factory preset's place and stays through updates), save as a new preset in any category, restore the factory version or delete one of yours; a star next to the name shows the sound has been edited. Your presets live in Music/ddeonmadeit/<plugin>/Presets and are never touched by an update",
-      "Fixed a rare crash when a host unloads the plugin"
+      "Gimme Dat Knock (2000S): the dry Neptunes kit from the song DEON sent, matched hit by hit: a short, punchy kick tuned up, a tight high snare, a woody cross-stick (side stick) for the 3-3-2 knock pattern, dark closed hats, no room"
     ]
   }
 }

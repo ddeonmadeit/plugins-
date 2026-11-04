@@ -14,10 +14,9 @@
     "Notes play at real pitch: the classic 808 range is C2–C3 in FL's piano roll (or use the Octave knob)."
   ],
   "whatsNew": {
-    "version": "1.10.0",
+    "version": "1.11.0",
     "items": [
-      "Presets you can make your own: Save opens a menu to save over the current preset (your version takes the factory preset's place and stays through updates), save as a new preset in any category, restore the factory version or delete one of yours; a star next to the name shows the sound has been edited. Your presets live in Music/ddeonmadeit/<plugin>/Presets and are never touched by an update",
-      "Fixed a rare crash when a host unloads the plugin"
+      "Gimme Dat Bass (2000S): the rubbery Neptunes synth bass, matched to the song DEON sent: a resonant 12 dB filter that pops on every note, a little tube drive, legato slides. Short funky phrases with rests and chromatic walk-downs"
     ]
   }
 }

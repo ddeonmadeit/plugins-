@@ -1,5 +1,19 @@
 namespace dd
 {
+namespace
+{
+struct Registry
+{
+    std::mutex lock;
+    std::map<const juce::AudioProcessor*, PresetManager*> managers;
+};
+Registry& registry()
+{
+    static Registry r;   // plain C++ objects only: safe to outlive JUCE at exit
+    return r;
+}
+} // namespace
+
 PresetManager::PresetManager (juce::AudioProcessorValueTreeState& state, juce::StringArray order,
                               const juce::String& company, const juce::String& pluginName)
     : apvts (state), categoryOrder (std::move (order))
@@ -13,10 +27,16 @@ PresetManager::PresetManager (juce::AudioProcessorValueTreeState& state, juce::S
         perfParam.push_back (rp == nullptr || isPerformanceParam (rp->getParameterID()));
         p->addListener (this);
     }
+    const std::lock_guard<std::mutex> g (registry().lock);
+    registry().managers[&apvts.processor] = this;
 }
 
 PresetManager::~PresetManager()
 {
+    {
+        const std::lock_guard<std::mutex> g (registry().lock);
+        registry().managers.erase (&apvts.processor);
+    }
     for (auto* p : apvts.processor.getParameters())
         p->removeListener (this);
     cancelPendingUpdate();
@@ -39,6 +59,21 @@ void PresetManager::apply (const Preset& p)
         onApplyExtra (p.extra);
     applying = false;
     modified = false;
+}
+
+void PresetManager::applyPresetJson (const juce::var& preset)
+{
+    Preset p;
+    p.params = preset.getProperty ("params", juce::var());
+    p.extra = preset.getProperty ("extra", juce::var());
+    apply (p);
+}
+
+PresetManager* PresetManager::forProcessor (const juce::AudioProcessor& processor)
+{
+    const std::lock_guard<std::mutex> g (registry().lock);
+    const auto it = registry().managers.find (&processor);
+    return it != registry().managers.end() ? it->second : nullptr;
 }
 
 bool PresetManager::addFactoryPreset (const juce::String& json, const juce::String& sortKey)

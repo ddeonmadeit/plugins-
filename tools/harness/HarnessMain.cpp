@@ -261,6 +261,9 @@ bool loadPresetFile (juce::AudioProcessor& proc, const juce::File& f)
     }
     for (auto& u : dd::applyParameterValues (proc, parsed.getProperty ("params", juce::var())))
         std::cerr << "warning: unknown parameter '" << u << "' in " << f.getFileName() << "\n";
+    // Non-parameter state ("extra", e.g. Kitroom's drum pieces) the way a factory preset would load it.
+    if (auto* pm = dd::PresetManager::forProcessor (proc))
+        pm->applyPresetJson (parsed);
     return true;
 }
 

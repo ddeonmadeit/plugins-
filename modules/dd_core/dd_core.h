@@ -18,6 +18,8 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 
 #include <atomic>
+#include <map>
+#include <mutex>
 
 #include "core/dd_PresetManager.h"
 #include "core/dd_ScopeBuffer.h"

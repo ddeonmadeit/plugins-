@@ -19,10 +19,9 @@
   ],
   "previewNote": "on the same 80 BPM part: strummed Em, C and G chords (down and up strokes), then a single-note riff.",
   "whatsNew": {
-    "version": "1.5.0",
+    "version": "1.6.0",
     "items": [
-      "Presets you can make your own: Save opens a menu to save over the current preset (your version takes the factory preset's place and stays through updates), save as a new preset in any category, restore the factory version or delete one of yours; a star next to the name shows the sound has been edited. Your presets live in Music/ddeonmadeit/<plugin>/Presets and are never touched by an update",
-      "Fixed a rare crash when a host unloads the plugin"
+      "Gimme Dat Stabs (2000S): the typical 2000s Pharrell guitar, matched to the song DEON sent: a warm jazz box played clean and dry, hard-picked triad stabs that ring a little, lightly double-tracked, with slides into chord tones"
     ]
   }
 }
