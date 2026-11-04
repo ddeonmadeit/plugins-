@@ -1,0 +1,14 @@
+{
+  "name": "Natural",
+  "category": "VOCAL",
+  "author": "ddeonmadeit",
+  "description": "Every sharp sound a little softer, the harsh ones more: the starting point for most vocals.",
+  "params": {
+    "amount": 0.5,
+    "sensitivity": 0.5,
+    "freq": 5000.0,
+    "fade": 5.0,
+    "mode": "Split",
+    "outGain": -0.1
+  }
+}

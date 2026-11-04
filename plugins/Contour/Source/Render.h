@@ -23,11 +23,10 @@ struct Grain
     float gain = 1.0f;
 };
 
-/** Everything the audio thread needs, immutable once published. */
-struct Playback
+/** Everything the audio thread needs, immutable once published (spans: where the take replaces the input). */
+struct Playback : dd::TakePlayback
 {
     std::vector<Grain> grains;          // ascending by `out`
-    std::vector<dd::Span> spans;        // where the take replaces the live input
     float maxHalf = 0.0f;
     float outGain = 1.0f;
 };

@@ -1,0 +1,14 @@
+{
+  "name": "Bright Ad-Libs",
+  "category": "RAP",
+  "author": "ddeonmadeit",
+  "description": "For pushed, bright ad-lib and double tracks: high split, keeps the bite in the words.",
+  "params": {
+    "amount": 0.55,
+    "sensitivity": 0.65,
+    "freq": 6500.0,
+    "fade": 4.0,
+    "mode": "Split",
+    "outGain": -0.1
+  }
+}

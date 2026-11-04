@@ -1,0 +1,14 @@
+{
+  "name": "Rap Lead",
+  "category": "RAP",
+  "author": "ddeonmadeit",
+  "description": "Fast, tight cuts that also catch hard T's and K's in quick flows.",
+  "params": {
+    "amount": 0.65,
+    "sensitivity": 0.62,
+    "freq": 4500.0,
+    "fade": 3.0,
+    "mode": "Split",
+    "outGain": 0.0
+  }
+}

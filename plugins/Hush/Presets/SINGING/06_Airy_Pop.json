@@ -1,0 +1,14 @@
+{
+  "name": "Airy Pop",
+  "category": "SINGING",
+  "author": "ddeonmadeit",
+  "description": "Keeps the air on top of a pop vocal and only lowers the S's that whistle.",
+  "params": {
+    "amount": 0.45,
+    "sensitivity": 0.45,
+    "freq": 7000.0,
+    "fade": 6.0,
+    "mode": "Split",
+    "outGain": -0.2
+  }
+}

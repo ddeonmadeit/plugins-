@@ -1,0 +1,14 @@
+{
+  "name": "Firm",
+  "category": "VOCAL",
+  "author": "ddeonmadeit",
+  "description": "A clearly smoother vocal: every S, SH and T turned down, the loud ones a lot.",
+  "params": {
+    "amount": 0.75,
+    "sensitivity": 0.55,
+    "freq": 5000.0,
+    "fade": 4.0,
+    "mode": "Split",
+    "outGain": 0.0
+  }
+}

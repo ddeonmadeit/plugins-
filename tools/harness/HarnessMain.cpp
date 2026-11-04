@@ -182,10 +182,10 @@ std::vector<Note> phrase (const juce::String& name, double& totalSeconds)
         totalSeconds = 16.0 + 4.0;
         return out;
     }
-    if (name == "vocal")
+    if (name == "vocal" || name == "lyric")
     {
         totalSeconds = 8.5;   // effects only: a synthetic sung phrase on the input (vocalTestSignal), no MIDI
-        return {};
+        return {};            // "lyric" adds sung consonants (S, SH, T, F) of different loudness: for de-essers
     }
     if (name == "chords")
     {
@@ -393,6 +393,55 @@ juce::AudioBuffer<float> vocalTestSignal (double sr, double seconds)
     return buf;
 }
 
+/** The sung phrase with words: S, SH, T and F consonants around the notes, some soft, some harsh, so a
+    de-esser has something to find and each sound needs a different amount. */
+juce::AudioBuffer<float> lyricTestSignal (double sr, double seconds)
+{
+    auto buf = vocalTestSignal (sr, seconds);
+    struct Consonant { char kind; float start, length, level; };
+    static const Consonant cs[] = {
+        { 's', 0.12f, 0.17f, 0.42f }, { 't', 0.84f, 0.02f, 0.5f },  { 'h', 1.24f, 0.13f, 0.3f },  { 's', 2.20f, 0.14f, 0.16f },
+        { 't', 2.79f, 0.02f, 0.35f }, { 'c', 4.08f, 0.15f, 0.34f }, { 's', 4.29f, 0.15f, 0.75f }, { 's', 5.20f, 0.13f, 0.3f },
+        { 'f', 5.70f, 0.12f, 0.08f }, { 's', 6.27f, 0.11f, 0.5f },  { 's', 7.56f, 0.22f, 0.36f } };
+    juce::Random rnd (11);
+    struct Bq
+    {
+        double b0 = 1, b1 = 0, b2 = 0, a1 = 0, a2 = 0, z1 = 0, z2 = 0;
+        void set (bool hp, double hz, double rate)
+        {
+            const double w = juce::MathConstants<double>::twoPi * hz / rate, cw = std::cos (w), al = std::sin (w) / 1.4142, a0 = 1 + al;
+            b0 = (hp ? (1 + cw) / 2 : (1 - cw) / 2) / a0; b1 = (hp ? -(1 + cw) : (1 - cw)) / a0; b2 = b0; a1 = -2 * cw / a0; a2 = (1 - al) / a0;
+            z1 = z2 = 0;
+        }
+        float run (float x) { const double y = b0 * x + z1; z1 = b1 * x - a1 * y + z2; z2 = b2 * x - a2 * y; return (float) y; }
+    };
+    for (const auto& c : cs)
+    {
+        Bq hp1, hp2, lp1, lp2;
+        const double lo = c.kind == 's' ? 5200.0 : c.kind == 'h' || c.kind == 'c' ? 2200.0 : c.kind == 'f' ? 1500.0 : 1800.0;
+        const double hi = c.kind == 's' ? 11500.0 : c.kind == 'h' || c.kind == 'c' ? 6500.0 : 12000.0;
+        hp1.set (true, lo, sr); hp2.set (true, lo, sr); lp1.set (false, std::min (hi, sr * 0.45), sr); lp2.set (false, std::min (hi, sr * 0.45), sr);
+        const int a = (int) (c.start * sr), len = (int) (c.length * sr);
+        for (int i = 0; i < len + (int) (0.01 * sr) && a + i < buf.getNumSamples(); ++i)
+        {
+            const float u = std::min (1.0f, (float) i / (float) std::max (1, len));
+            const float arch = std::max (0.0f, std::sin (juce::MathConstants<float>::pi * u));
+            float env;
+            if (c.kind == 't')
+                env = std::exp (-u * 4.0f);                                   // a burst
+            else if (c.kind == 'c')
+                env = (u < 0.12f ? 1.0f : 0.6f) * arch;
+            else
+                env = std::pow (arch, 0.7f);
+            const float w = rnd.nextFloat() * 2.0f - 1.0f;
+            const float x = lp2.run (lp1.run (hp2.run (hp1.run (w)))) * env * c.level * 1.2f;
+            for (int ch = 0; ch < buf.getNumChannels(); ++ch)
+                buf.addSample (ch, a + i, x);
+        }
+    }
+    return buf;
+}
+
 juce::File gInputFile;   // --input: an audio file to run through an effect instead of the test programme
 int gPasses = 1;         // --passes 2: play the phrase twice on a host timeline (capture-then-edit plugins: Contour)
 
@@ -479,6 +528,7 @@ juce::AudioBuffer<float> renderPhrase (juce::AudioProcessor& proc, const juce::S
     const auto input = ! isEffect ? juce::AudioBuffer<float>()
                      : fileInput.getNumSamples() > 0 ? fileInput
                      : phraseName == "vocal" ? vocalTestSignal (sr, total)
+                     : phraseName == "lyric" ? lyricTestSignal (sr, total)
                      : effectTestSignal (sr, total);
 
     const int totalSamples = (int) (total * sr);
@@ -707,7 +757,10 @@ int cmdSnapshot (juce::AudioProcessor& proc, const Args& a)
         proc.setPlayConfigDetails (2, 2, 48000.0, 256);
         proc.prepareToPlay (48000.0, 256);
         const double seconds = gPasses > 1 ? 8.5 : 3.6;
-        const auto input = a.get ("--phrase", "demo") == "vocal" ? vocalTestSignal (48000.0, seconds) : effectTestSignal (48000.0, seconds);
+        const auto phraseName = a.get ("--phrase", "demo");
+        const auto input = phraseName == "vocal" ? vocalTestSignal (48000.0, seconds)
+                         : phraseName == "lyric" ? lyricTestSignal (48000.0, seconds)
+                                                 : effectTestSignal (48000.0, seconds);
         juce::AudioBuffer<float> buf (2, 256);
         juce::MidiBuffer midi;
         FixedPlayHead playHead;

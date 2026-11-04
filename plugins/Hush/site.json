@@ -1,0 +1,21 @@
+{
+  "publish": true,
+  "tagline": "A de-esser that finds every S, SH and T in your vocal and lets you set each one's level",
+  "description": "Put Hush on the vocal and press play: it captures the take and lights up every sharp sound (each S, SH, CH and T) on the waveform, labelled and in its place. Each one gets its own level in the lane below: drag a single harsh S down by 9 dB, leave a soft one alone, or let Amount handle them all, louder ones more. Only what's above Freq is turned down, through a zero-phase split, so the voice underneath never moves. Before you capture, it de-esses live.",
+  "accent": "#e0793f",
+  "highlights": [
+    "One fader per sound: every S, SH and T the vocal makes is found and drawn where it happens; drag its handle down to lower just that sound, by any amount from 0 to -30 dB",
+    "Amount sets them all at once (harsh ones more than soft ones), then you fix the few that need it by hand; ALL S / ALL SH / ALL T select a whole kind, AUTO and BYPASS reset a selection",
+    "Click a sound to hear it inside its word; arrow keys step through them; Shift-click or drag a box to move several together; Ctrl/Cmd+Z undoes",
+    "Clean: Split mode crossfades only the part above Freq to a zero-phase low band, so with no cut the vocal comes out sample-for-sample identical, and with a cut nothing below Freq changes. Wide mode turns the whole sound down",
+    "Works like Contour: TRANSFER captures the track while your DAW plays, playback follows the song with no latency, and audio not yet captured is de-essed live",
+    "Listen switch to hear only what is being taken out; bounce the result to a WAV and drag it into your playlist",
+    "12 presets for natural, firm, rap, airy pop, breathy R&B, high and low voices, a heavy lisp fix and hand-only editing"
+  ],
+  "installTips": [
+    "Put Hush on the vocal's mixer track (after Contour if you use it, before compression and reverb), press play over the part you want to de-ess, then stop: the sounds appear.",
+    "After the first capture TRANSFER goes dark and playback plays your levels. If you change the vocal, press TRANSFER and play that part again.",
+    "To print it: BOUNCE, then drag DRAG OUT into the playlist and drop it at bar 1."
+  ],
+  "previewNote": "on a synthetic sung phrase with S, SH and T consonants of different loudness, captured and played back through each preset."
+}

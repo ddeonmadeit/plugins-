@@ -1,0 +1,14 @@
+{
+  "name": "Breathy R&B",
+  "category": "SINGING",
+  "author": "ddeonmadeit",
+  "description": "Long, soft fades for breathy R&B: sibilance tucked in without dulling the breaths.",
+  "params": {
+    "amount": 0.6,
+    "sensitivity": 0.55,
+    "freq": 5500.0,
+    "fade": 8.0,
+    "mode": "Split",
+    "outGain": -0.1
+  }
+}

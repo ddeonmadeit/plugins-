@@ -1,0 +1,14 @@
+{
+  "name": "Gentle",
+  "category": "VOCAL",
+  "author": "ddeonmadeit",
+  "description": "Only the edge comes off: soft cuts on the brightest S's, airy top end kept.",
+  "params": {
+    "amount": 0.3,
+    "sensitivity": 0.4,
+    "freq": 6000.0,
+    "fade": 7.0,
+    "mode": "Split",
+    "outGain": -0.2
+  }
+}

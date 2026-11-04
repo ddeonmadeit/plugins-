@@ -1,0 +1,14 @@
+{
+  "name": "Lisp Fix",
+  "category": "SPECIAL",
+  "author": "ddeonmadeit",
+  "description": "Heavy: every sharp sound well down, the whole sound not just the top. For a very sibilant singer or mic.",
+  "params": {
+    "amount": 0.95,
+    "sensitivity": 0.7,
+    "freq": 4000.0,
+    "fade": 4.0,
+    "mode": "Wide",
+    "outGain": 0.4
+  }
+}

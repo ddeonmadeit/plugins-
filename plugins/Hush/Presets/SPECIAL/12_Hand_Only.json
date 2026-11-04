@@ -1,0 +1,14 @@
+{
+  "name": "Hand Only",
+  "category": "SPECIAL",
+  "author": "ddeonmadeit",
+  "description": "Nothing automatic: the take plays exactly as sung until you drag a sound down yourself.",
+  "params": {
+    "amount": 0.0,
+    "sensitivity": 0.5,
+    "freq": 5000.0,
+    "fade": 5.0,
+    "mode": "Split",
+    "outGain": -0.5
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "Low Voice",
+  "category": "SINGING",
+  "author": "ddeonmadeit",
+  "description": "Tuned for deeper voices, whose S's and SH's sit lower, from about 4 kHz.",
+  "params": {
+    "amount": 0.6,
+    "sensitivity": 0.5,
+    "freq": 4200.0,
+    "fade": 5.0,
+    "mode": "Split",
+    "outGain": 0.0
+  }
+}

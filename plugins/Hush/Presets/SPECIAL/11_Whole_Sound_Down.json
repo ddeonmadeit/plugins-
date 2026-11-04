@@ -1,0 +1,14 @@
+{
+  "name": "Whole Sound Down",
+  "category": "SPECIAL",
+  "author": "ddeonmadeit",
+  "description": "Turns each sharp sound down as a whole (Wide), like riding the fader on every S.",
+  "params": {
+    "amount": 0.7,
+    "sensitivity": 0.5,
+    "freq": 5000.0,
+    "fade": 6.0,
+    "mode": "Wide",
+    "outGain": 0.3
+  }
+}

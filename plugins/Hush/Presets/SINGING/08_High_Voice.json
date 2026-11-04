@@ -1,0 +1,14 @@
+{
+  "name": "High Voice",
+  "category": "SINGING",
+  "author": "ddeonmadeit",
+  "description": "Tuned for higher voices, whose S's sit up around 7 to 9 kHz.",
+  "params": {
+    "amount": 0.6,
+    "sensitivity": 0.5,
+    "freq": 6500.0,
+    "fade": 5.0,
+    "mode": "Split",
+    "outGain": -0.1
+  }
+}

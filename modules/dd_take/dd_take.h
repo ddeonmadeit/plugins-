@@ -30,3 +30,4 @@
 #include "take/dd_Ranges.h"
 #include "take/dd_PitchTrack.h"
 #include "take/dd_TakeFiles.h"
+#include "take/dd_TakeEngine.h"

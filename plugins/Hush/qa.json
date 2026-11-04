@@ -1,0 +1,10 @@
+{
+  "categories": ["VOCAL", "RAP", "SINGING", "SPECIAL"],
+  "targetLufs": -15.0,
+  "toleranceLu": 1.5,
+  "similarBelow": 0.0,
+  "phrase": "lyric",
+  "passes": 2,
+  "previewPhrase": "lyric",
+  "previewBacking": false
+}
