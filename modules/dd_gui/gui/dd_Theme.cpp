@@ -7,28 +7,29 @@
 
 namespace dd::gui
 {
+/** The embedded typefaces. Deleted with JUCE's other shutdown objects (before the font engine goes away),
+    not by static destruction at unload, which can run after it in a plugin host. */
+struct EmbeddedFonts : private juce::DeletedAtShutdown
+{
+    juce::Typeface::Ptr regular, medium, semiBold, bold;
+
+    ~EmbeddedFonts() override { clearSingletonInstance(); }
+    JUCE_DECLARE_SINGLETON_INLINE (EmbeddedFonts, false)
+
+    EmbeddedFonts()
+    {
+       #if DD_HAS_EMBEDDED_FONTS
+        regular = juce::Typeface::createSystemTypefaceFor (DDFonts::InstrumentSansRegular_ttf, (size_t) DDFonts::InstrumentSansRegular_ttfSize);
+        medium = juce::Typeface::createSystemTypefaceFor (DDFonts::InstrumentSansMedium_ttf, (size_t) DDFonts::InstrumentSansMedium_ttfSize);
+        semiBold = juce::Typeface::createSystemTypefaceFor (DDFonts::InstrumentSansSemiBold_ttf, (size_t) DDFonts::InstrumentSansSemiBold_ttfSize);
+        bold = juce::Typeface::createSystemTypefaceFor (DDFonts::InstrumentSansBold_ttf, (size_t) DDFonts::InstrumentSansBold_ttfSize);
+       #endif
+    }
+};
+
 namespace
 {
-    struct EmbeddedFonts
-    {
-        juce::Typeface::Ptr regular, medium, semiBold, bold;
-
-        EmbeddedFonts()
-        {
-           #if DD_HAS_EMBEDDED_FONTS
-            regular = juce::Typeface::createSystemTypefaceFor (DDFonts::InstrumentSansRegular_ttf, (size_t) DDFonts::InstrumentSansRegular_ttfSize);
-            medium = juce::Typeface::createSystemTypefaceFor (DDFonts::InstrumentSansMedium_ttf, (size_t) DDFonts::InstrumentSansMedium_ttfSize);
-            semiBold = juce::Typeface::createSystemTypefaceFor (DDFonts::InstrumentSansSemiBold_ttf, (size_t) DDFonts::InstrumentSansSemiBold_ttfSize);
-            bold = juce::Typeface::createSystemTypefaceFor (DDFonts::InstrumentSansBold_ttf, (size_t) DDFonts::InstrumentSansBold_ttfSize);
-           #endif
-        }
-    };
-
-    const EmbeddedFonts& fonts()
-    {
-        static const EmbeddedFonts f;
-        return f;
-    }
+    const EmbeddedFonts& fonts() { return *EmbeddedFonts::getInstance(); }
 
     juce::Colour rgba (int r, int g, int b, float a) { return juce::Colour ((juce::uint8) r, (juce::uint8) g, (juce::uint8) b, a); }
 
@@ -83,17 +84,21 @@ namespace
         Tokens dark = makeDark(), light = makeLight();
         bool isLight = false;
         std::vector<ThemeListener*> listeners;
-        std::unique_ptr<juce::PropertiesFile> settings;
 
-        ThemeState()
+        // Opened only to read or write, so no file object outlives the plugin's JUCE at unload.
+        static std::unique_ptr<juce::PropertiesFile> openSettings()
         {
             juce::PropertiesFile::Options o;
             o.applicationName = "ui";
             o.filenameSuffix = "settings";
             o.folderName = "ddeonmadeit";
             o.osxLibrarySubFolder = "Application Support";
-            settings = std::make_unique<juce::PropertiesFile> (o);
-            isLight = settings->getValue ("theme", "dark") == "light";
+            return std::make_unique<juce::PropertiesFile> (o);
+        }
+
+        ThemeState()
+        {
+            isLight = openSettings()->getValue ("theme", "dark") == "light";
             // For headless snapshots of either theme without touching the saved setting.
             const auto forced = juce::SystemStats::getEnvironmentVariable ("DD_THEME", {});
             if (forced.isNotEmpty())
@@ -202,8 +207,11 @@ void setLightTheme (bool light)
     const auto listeners = s.listeners;
     for (auto* l : listeners) l->themeAboutToChange();
     s.isLight = light;
-    s.settings->setValue ("theme", light ? "light" : "dark");
-    s.settings->saveIfNeeded();
+    {
+        auto settings = ThemeState::openSettings();
+        settings->setValue ("theme", light ? "light" : "dark");
+        settings->saveIfNeeded();
+    }
     for (auto* l : listeners) l->themeChanged();
 }
 
@@ -461,9 +469,12 @@ juce::Font LookAndFeel::getComboBoxFont (juce::ComboBox& box)
 
 void LookAndFeel::positionComboBoxText (juce::ComboBox& box, juce::Label& label)
 {
-    label.setBounds (8, 1, box.getWidth() - 24, box.getHeight() - 2);
+    // Narrow boxes (one panel cell) squeeze long names rather than cutting them off.
+    const bool narrow = box.getWidth() < 80;
+    label.setBounds (narrow ? 5 : 8, 1, box.getWidth() - (narrow ? 21 : 24), box.getHeight() - 2);
+    label.setBorderSize (juce::BorderSize<int> (1, narrow ? 1 : 3, 1, 1));
     label.setFont (getComboBoxFont (box));
-    label.setMinimumHorizontalScale (0.6f);
+    label.setMinimumHorizontalScale (narrow ? 0.5f : 0.6f);
     label.setJustificationType (juce::Justification::centredLeft);
     label.setColour (juce::Label::textColourId, tokens().cream100);
 }

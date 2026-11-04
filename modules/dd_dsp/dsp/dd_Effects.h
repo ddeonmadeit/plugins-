@@ -157,10 +157,25 @@ public:
         }
         for (size_t i = 0; i < 4; ++i)
             diff[i].prepare ((int) (kDiffMs[i] * 0.001f * (float) sr) + 8);
-        preDelay.prepare ((int) (0.03 * sr));
+        preDelay.prepare ((int) (0.26 * sr));
+        preDelaySamples = (int) (0.012 * sr);
         inHp.setCutoff (220.0f, sr);
         lastSize = -1.0f;
+        lastDampHz = 6500.0f;
     }
+
+    /** High-frequency damping in the tail (default 6.5 kHz: darker = lower). */
+    void setDamping (float hz)
+    {
+        if (std::abs (hz - lastDampHz) < 1.0f)
+            return;
+        lastDampHz = hz;
+        for (auto& d : damp)
+            d.setCutoff (hz, sr);
+    }
+
+    /** Gap before the reverb starts, 0..250 ms (default 12 ms). */
+    void setPreDelay (float ms) { preDelaySamples = juce::jlimit (1, (int) (0.25 * sr), (int) (ms * 0.001f * (float) sr)); }
 
     void reset()
     {
@@ -191,7 +206,7 @@ public:
     {
         float x = inHp.hp ((inL + inR) * 0.5f);
         preDelay.push (x);
-        x = preDelay.readInt ((int) (0.012 * sr));
+        x = preDelay.readInt (preDelaySamples);
 
         for (size_t i = 0; i < 4; ++i)
         {
@@ -245,7 +260,8 @@ private:
     DelayBuffer lines[8], diff[4], preDelay;
     OnePole damp[8], inHp;
     std::array<float, 8> lengths {}, gains {};
-    float lastSize = -1.0f;
+    float lastSize = -1.0f, lastDampHz = 6500.0f;
+    int preDelaySamples = 1;
 };
 
 /** Stereo-linked bus compressor for keeping 808s even. amount 0 = bypass. */
