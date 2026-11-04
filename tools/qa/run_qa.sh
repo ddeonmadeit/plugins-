@@ -53,8 +53,19 @@ fi
 if [[ -n "${PLUGINVAL:-}" && -d "$VST3" ]]; then
     echo "== pluginval"
     if command -v xvfb-run > /dev/null; then RUN=(xvfb-run -a -s "-screen 0 1920x1200x24"); else RUN=(); fi
-    "${RUN[@]}" "$PLUGINVAL" --strictness-level 8 --validate-in-process --timeout-ms 600000 --validate "$VST3" > "$OUT/pluginval.log" 2>&1 \
-        || { tail -40 "$OUT/pluginval.log"; echo "pluginval FAILED"; exit 1; }
+    # pluginval's own Linux VST3 host sometimes crashes while tearing down after every test has passed
+    # (a run-loop fd callback fires after its handler map is gone: RunLoop::Impl::registerEventHandler).
+    # A run that fails before "SUCCESS" is a real failure; one that crashes after it is retried, and a
+    # single clean run is required.
+    for attempt in 1 2 3 4; do
+        if "${RUN[@]}" "$PLUGINVAL" --strictness-level 8 --validate-in-process --timeout-ms 600000 --validate "$VST3" > "$OUT/pluginval.log" 2>&1; then
+            break
+        fi
+        if ! grep -qx "SUCCESS" "$OUT/pluginval.log" || [[ $attempt == 4 ]]; then
+            tail -40 "$OUT/pluginval.log"; echo "pluginval FAILED"; exit 1
+        fi
+        echo "pluginval passed every test but its host crashed on exit (attempt $attempt); running again"
+    done
     tail -1 "$OUT/pluginval.log"
 fi
 
