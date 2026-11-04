@@ -58,38 +58,37 @@ namespace
     }
 
 
-    /** Horizontal brushing: long streaks of light and dark, periodic across x so the tile wraps cleanly. */
+    /** Hairline brushing: every row is its own fine line (its own brightness plus a very long, slow drift
+        along x), rows independent of each other as on real brushed metal. Periodic across x so the tile wraps. */
     const juce::Image& brushedImage()
     {
         static const juce::Image image = []
         {
-            constexpr int w = 512, h = 256, k = 18;
+            constexpr int w = 1024, h = 256, k = 90;
             juce::Random rnd (0xb105);
-            std::vector<float> row ((size_t) w), smooth ((size_t) w), prev ((size_t) w, 0.0f);
+            auto gauss = [&rnd] { return (rnd.nextFloat() + rnd.nextFloat() + rnd.nextFloat() - 1.5f) * 2.0f; };
+            std::vector<float> row ((size_t) w), smooth ((size_t) w);
             juce::Image im (juce::Image::ARGB, w, h, true, juce::SoftwareImageType());
             juce::Image::BitmapData bd (im, juce::Image::BitmapData::writeOnly);
+            const float norm = std::sqrt ((float) (2 * k + 1)) * 0.35f / (float) (2 * k + 1);
             for (int y = 0; y < h; ++y)
             {
+                const float offset = gauss() * 0.55f;
                 for (auto& v : row)
-                    v = rnd.nextFloat() * 2.0f - 1.0f;
+                    v = gauss();
                 float acc = 0.0f;
                 for (int i = -k; i <= k; ++i)
                     acc += row[(size_t) ((i + w) % w)];
                 for (int x = 0; x < w; ++x)
                 {
-                    smooth[(size_t) x] = acc / (float) (2 * k + 1);
+                    smooth[(size_t) x] = acc * norm;
                     acc += row[(size_t) ((x + k + 1) % w)] - row[(size_t) ((x - k + w) % w)];
                 }
-                const float depth = 0.5f + rnd.nextFloat() * (rnd.nextFloat() < 0.04f ? 2.2f : 0.9f);   // the odd deeper scratch
                 for (int x = 0; x < w; ++x)
                 {
-                    float v = smooth[(size_t) x] * 3.4f * depth + row[(size_t) x] * 0.14f;
-                    v = 0.7f * v + 0.3f * prev[(size_t) x];
-                    prev[(size_t) x] = v;
-                    const float a = std::min (1.0f, std::abs (v));
-                    // Warm-tinted streaks keep the metal's colour instead of greying it.
-                    bd.setPixelColour (x, y, v > 0.0f ? juce::Colour (0xfffff0dc).withAlpha (a * 0.34f)
-                                                      : juce::Colour (0xff140a04).withAlpha (a * 0.5f));
+                    const float v = offset + smooth[(size_t) x] + gauss() * 0.12f;
+                    bd.setPixelColour (x, y, v > 0.0f ? juce::Colour (0xfffff3e4).withAlpha (std::min (1.0f, v * 0.05f))
+                                                      : juce::Colour (0xff0d0805).withAlpha (std::min (1.0f, -v * 0.08f)));
                 }
             }
             return im;
@@ -140,14 +139,42 @@ namespace
     const juce::Colour kInk { 0xff1a0f08 };         // dark text on lit buttons
     const juce::Colour kSilverInk { 0xff26282c };   // engraving on bare silver parts
 
-    /** Machined silver: light top, darker lower half, as polished aluminium under a top light. */
+    /** Polished silver: the bright room above reflected in the top half, a crisp darker horizon below it and
+        a lighter bounce at the bottom, as polished metal under studio light. */
     juce::ColourGradient silverGradient (juce::Rectangle<float> r, bool bright = false)
     {
-        juce::ColourGradient gr (juce::Colour (bright ? 0xfff4f5f6 : 0xffe9ebed), 0.0f, r.getY(),
-                                 juce::Colour (0xff86898e), 0.0f, r.getBottom(), false);
-        gr.addColour (0.45, juce::Colour (0xffc3c6ca));
-        gr.addColour (0.55, juce::Colour (0xffa6a9ae));
+        juce::ColourGradient gr (juce::Colour (bright ? 0xfffdfdfd : 0xfff4f5f6), 0.0f, r.getY(),
+                                 juce::Colour (0xffbfc2c6), 0.0f, r.getBottom(), false);
+        gr.addColour (0.38, juce::Colour (bright ? 0xffe2e4e7 : 0xffd6d9dc));
+        gr.addColour (0.44, juce::Colour (0xff9a9ea3));
+        gr.addColour (0.72, juce::Colour (0xff85898e));
         return gr;
+    }
+
+    /** `base` lit by a factor: brighter or darker without changing hue; strong highlights lose a little
+        saturation, as reflections on coloured metal do. */
+    juce::Colour litMetal (juce::Colour base, float f)
+    {
+        float h, s, v;
+        base.getHSB (h, s, v);
+        const float desat = 1.0f - 0.35f * juce::jlimit (0.0f, 1.0f, f - 1.3f);
+        return juce::Colour::fromHSV (h, s * desat, juce::jlimit (0.0f, 1.0f, v * f), 1.0f);
+    }
+
+    /** A soft vertical band of light across the brushing (anisotropic highlight), as gradient stops. */
+    void addStreak (juce::Graphics& g, juce::Rectangle<float> r, float centreX, float halfWidth, float alpha)
+    {
+        if (alpha <= 0.002f)
+            return;
+        const juce::Colour light (0xfffff1e0);
+        juce::ColourGradient band (light.withAlpha (0.0f), centreX - halfWidth, 0.0f, light.withAlpha (0.0f), centreX + halfWidth, 0.0f, false);
+        band.addColour (0.25, light.withAlpha (alpha * 0.2f));
+        band.addColour (0.4, light.withAlpha (alpha * 0.65f));
+        band.addColour (0.5, light.withAlpha (alpha));
+        band.addColour (0.6, light.withAlpha (alpha * 0.65f));
+        band.addColour (0.75, light.withAlpha (alpha * 0.2f));
+        g.setGradientFill (band);
+        g.fillRect (r.withLeft (std::max (r.getX(), centreX - halfWidth)).withRight (std::min (r.getRight(), centreX + halfWidth)));
     }
 }
 
@@ -386,7 +413,7 @@ void LookAndFeel::drawButtonBackground (juce::Graphics& g, juce::Button& b, cons
         juce::Path clip;
         clip.addRoundedRectangle (cap, corner);
         g.reduceClipRegion (clip);
-        g.setTiledImageFill (brushedImage(), (int) cap.getX(), (int) cap.getY(), 0.35f);
+        g.setTiledImageFill (brushedImage(), (int) cap.getX(), (int) cap.getY(), 0.8f);
         g.fillRect (cap);
         if (on)
         {
@@ -455,7 +482,7 @@ void paintGrain (juce::Graphics& g, juce::Rectangle<int> area, float amount)
     g.fillRect (area);
 }
 
-void paintBrushedMetal (juce::Graphics& g, juce::Rectangle<float> r, juce::Colour base, float corner, float brushing)
+void paintBrushedMetal (juce::Graphics& g, juce::Rectangle<float> r, juce::Colour base, float corner, float brushing, bool polished)
 {
     juce::Graphics::ScopedSaveState state (g);
     if (corner > 0.0f)
@@ -469,40 +496,53 @@ void paintBrushedMetal (juce::Graphics& g, juce::Rectangle<float> r, juce::Colou
         g.reduceClipRegion (r.getSmallestIntegerContainer());
     }
 
-    // Lit from above: brighter at the top, a soft fall-off below (hue and saturation kept: lit metal of
-    // a colour is that colour, brighter, not paler).
-    juce::ColourGradient body (base.withMultipliedBrightness (1.32f), 0.0f, r.getY(), base.withMultipliedBrightness (0.72f), 0.0f, r.getBottom(), false);
-    body.addColour (0.35, base.withMultipliedBrightness (1.08f));
-    g.setGradientFill (body);
+    // What the metal reflects: polished plates mirror the studio (a bright ceiling at the top, a crisp
+    // darker horizon just above the middle, a lighter bounce off the desk at the bottom); satin metal only
+    // a soft top-to-bottom fall-off.
+    juce::ColourGradient env (litMetal (base, polished ? 1.85f : 1.5f), 0.0f, r.getY(), litMetal (base, polished ? 1.22f : 1.0f), 0.0f, r.getBottom(), false);
+    if (polished)
+    {
+        env.addColour (0.06, litMetal (base, 1.55f));
+        env.addColour (0.3, litMetal (base, 1.22f));
+        env.addColour (0.4, litMetal (base, 1.12f));
+        env.addColour (0.43, litMetal (base, 0.8f));
+        env.addColour (0.6, litMetal (base, 0.7f));
+        env.addColour (0.85, litMetal (base, 0.88f));
+    }
+    else
+    {
+        env.addColour (0.3, litMetal (base, 1.15f));
+        env.addColour (0.6, litMetal (base, 0.85f));
+    }
+    g.setGradientFill (env);
     g.fillRect (r);
 
-    // Brushing: long horizontal tool marks.
-    g.setTiledImageFill (brushedImage(), juce::roundToInt (r.getX()), juce::roundToInt (r.getY()), juce::jlimit (0.0f, 1.0f, 0.55f * brushing));
+    // Hairline brushing.
+    g.setTiledImageFill (brushedImage(), juce::roundToInt (r.getX()), juce::roundToInt (r.getY()), juce::jlimit (0.0f, 1.0f, brushing));
     g.fillRect (r);
 
-    // Brushed metal smears a light into a band across the brushing: a soft vertical sheen left of
-    // centre, with a tighter, brighter core (this is what makes it read as metal, not paint).
-    const float bx = r.getX() + r.getWidth() * 0.32f, bw = std::max (60.0f, r.getWidth() * 0.34f);
-    juce::ColourGradient sheen (juce::Colours::white.withAlpha (0.0f), bx - bw, 0.0f, juce::Colours::white.withAlpha (0.0f), bx + bw, 0.0f, false);
-    sheen.addColour (0.3, juce::Colour (0xffffe2c2).withAlpha (0.05f));
-    sheen.addColour (0.46, juce::Colour (0xffffe9d2).withAlpha (0.13f));
-    sheen.addColour (0.5, juce::Colour (0xfffff3e4).withAlpha (0.2f));
-    sheen.addColour (0.54, juce::Colour (0xffffe9d2).withAlpha (0.13f));
-    sheen.addColour (0.7, juce::Colour (0xffffe2c2).withAlpha (0.05f));
-    g.setGradientFill (sheen);
-    g.fillRect (r);
-    // A second, fainter reflection of the room further right.
-    const float bx2 = r.getX() + r.getWidth() * 0.78f, bw2 = bw * 0.6f;
-    juce::ColourGradient sheen2 (juce::Colours::white.withAlpha (0.0f), bx2 - bw2, 0.0f, juce::Colours::white.withAlpha (0.0f), bx2 + bw2, 0.0f, false);
-    sheen2.addColour (0.5, juce::Colour (0xffffe9d2).withAlpha (0.08f));
-    g.setGradientFill (sheen2);
+    // Brushed metal stretches a light into a band across the grain: a soft core with a wider skirt left of
+    // centre, a fainter one further right. Strength scales with how much room the metal has to brighten.
+    float h, sat, v;
+    base.getHSB (h, sat, v);
+    const float room = std::min (1.6f, v / std::max (0.15f, 1.0f - v));
+    const float k = polished ? 1.0f : 0.6f;
+    addStreak (g, r, r.getX() + r.getWidth() * 0.3f, r.getWidth() * 0.07f, 0.22f * room * k);
+    addStreak (g, r, r.getX() + r.getWidth() * 0.3f, r.getWidth() * 0.28f, 0.13f * room * k);
+    addStreak (g, r, r.getX() + r.getWidth() * 0.75f, r.getWidth() * 0.16f, 0.08f * room * k);
+
+    // A broad reflection falling in from the upper left.
+    const float span = std::max (r.getWidth(), r.getHeight());
+    juce::ColourGradient diag (juce::Colour (0xfffff1e0).withAlpha (0.12f * room * k), r.getX() + r.getWidth() * 0.1f, r.getY() - r.getHeight() * 0.05f,
+                               juce::Colour (0xfffff1e0).withAlpha (0.0f), r.getX() + r.getWidth() * 0.1f + span * 0.45f, r.getY() - r.getHeight() * 0.05f, true);
+    g.setGradientFill (diag);
     g.fillRect (r);
 }
 
 void paintBackdrop (juce::Graphics& g, juce::Rectangle<int> area, const Palette& pal)
 {
     const auto r = area.toFloat();
-    paintBrushedMetal (g, r, pal.background, 0.0f, 0.8f);
+    paintBrushedMetal (g, r, pal.background, 0.0f, 0.9f, false);
 
     juce::ColourGradient vignette (juce::Colours::transparentBlack, r.getCentreX(), r.getCentreY(),
                                    juce::Colours::black.withAlpha (0.5f), r.getX(), r.getY(), true);
@@ -526,17 +566,23 @@ void paintFaceplate (juce::Graphics& g, juce::Rectangle<float> r, const Palette&
     const auto plate = r.reduced (1.0f);
     paintBrushedMetal (g, plate, pal.panel, corner);
 
-    // Machined edges: the cut through the anodising shows bright metal along the top and left,
-    // the lower edge turns away from the light.
+    // Polished, machined edges: the chamfer along the top and left faces the light and shows bright bare
+    // metal through the anodising; the lower and right edges turn away into shadow.
     juce::Path edge;
     edge.addRoundedRectangle (plate.reduced (0.5f), corner);
-    g.setGradientFill (juce::ColourGradient (juce::Colour (0xfff3ece2).withAlpha (0.75f), 0.0f, plate.getY(),
-                                             juce::Colour (0xffd8cbbb).withAlpha (0.1f), 0.0f, plate.getY() + std::min (40.0f, plate.getHeight() * 0.5f), false));
+    juce::ColourGradient rim (juce::Colour (0xfffff6ea).withAlpha (0.9f), 0.0f, plate.getY(),
+                              juce::Colour (0xffd8cbbb).withAlpha (0.12f), 0.0f, plate.getY() + std::min (60.0f, plate.getHeight() * 0.6f), false);
+    g.setGradientFill (rim);
     g.strokePath (edge, juce::PathStrokeType (1.0f));
-    g.setColour (juce::Colours::black.withAlpha (0.55f));
+    g.setColour (juce::Colour (0xfffff3e4).withAlpha (0.4f));
+    g.drawLine (plate.getX() + corner, plate.getY() + 1.6f, plate.getRight() - corner, plate.getY() + 1.6f, 1.0f);
+    g.setColour (juce::Colour (0xfffff3e4).withAlpha (0.18f));
+    g.drawLine (plate.getX() + 1.4f, plate.getY() + corner, plate.getX() + 1.4f, plate.getBottom() - corner, 1.0f);
+    g.setColour (juce::Colours::black.withAlpha (0.65f));
     g.drawLine (plate.getX() + corner, plate.getBottom() - 0.5f, plate.getRight() - corner, plate.getBottom() - 0.5f, 1.2f);
-    g.setColour (juce::Colours::white.withAlpha (0.12f));
-    g.drawLine (plate.getX() + corner, plate.getY() + 1.8f, plate.getRight() - corner, plate.getY() + 1.8f, 1.0f);
+    g.setColour (juce::Colours::black.withAlpha (0.28f));
+    g.drawLine (plate.getX() + corner, plate.getBottom() - 1.8f, plate.getRight() - corner, plate.getBottom() - 1.8f, 1.0f);
+    g.drawLine (plate.getRight() - 1.2f, plate.getY() + corner, plate.getRight() - 1.2f, plate.getBottom() - corner, 1.0f);
 
     if (screws)
     {
@@ -591,7 +637,7 @@ void paintBezel (juce::Graphics& g, juce::Rectangle<float> window, float corner,
         g.reduceClipRegion (ring);
         g.setGradientFill (silverGradient (outer));
         g.fillRect (outer);
-        g.setTiledImageFill (brushedImage(), (int) outer.getX(), (int) outer.getY(), 0.45f);
+        g.setTiledImageFill (brushedImage(), (int) outer.getX(), (int) outer.getY(), 0.9f);
         g.fillRect (outer);
         // A machined step halfway across the frame: a fine dark cut with light on its lower side.
         juce::Path step;

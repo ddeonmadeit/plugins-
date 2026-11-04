@@ -18,7 +18,7 @@ namespace sunset
 struct Palette
 {
     juce::Colour background { 0xff29231f };   // chassis: darker brown metal
-    juce::Colour panel      { 0xff423227 };   // brushed brown anodised faceplates
+    juce::Colour panel      { 0xff47372b };   // brushed brown anodised faceplates
     juce::Colour panelEdge  { 0xff0b0705 };   // the shadow gap around a plate
     juce::Colour track      { 0xff0e0b09 };   // smoked glass: displays and backlit slots
     juce::Colour text       { 0xffe6ded2 };   // engraving: bare silver metal showing through the anodising
@@ -82,8 +82,10 @@ private:
 /** Chassis: darker brushed brown metal, finely brushed, falling off towards the corners. */
 void paintBackdrop (juce::Graphics&, juce::Rectangle<int> area, const Palette&);
 
-/** Bare metal: `base` lit from above, horizontal brushing and a soft diagonal sheen, clipped to a rounded rect. */
-void paintBrushedMetal (juce::Graphics&, juce::Rectangle<float> r, juce::Colour base, float corner = 0.0f, float brushing = 1.0f);
+/** Bare metal of colour `base`, clipped to a rounded rect: the room reflected in it (polished: bright top, crisp
+    horizon, bounce below; satin: a soft fall-off), hairline brushing and the light stretched across the grain. */
+void paintBrushedMetal (juce::Graphics&, juce::Rectangle<float> r, juce::Colour base, float corner = 0.0f, float brushing = 1.0f,
+                        bool polished = true);
 
 /** Film grain over an area (tiled, generated once): for drawn scenes, not for metal. */
 void paintGrain (juce::Graphics&, juce::Rectangle<int> area, float amount = 1.0f);

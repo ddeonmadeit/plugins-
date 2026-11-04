@@ -114,8 +114,9 @@ printed colour, no blue, green, teal, purple or neon.
 - Light comes from above: top edges catch it, parts cast soft shadows down onto the plate, anything cut into
   the metal is shaded under its top wall and lit on its lower lip.
 - Materials are in `dd_gui` (dd_Theme): `paintBackdrop` (darker brushed chassis), `dd::gui::Panel` /
-  `paintFaceplate` (raised brushed plate, machined edge, silver Phillips screws), `paintBrushedMetal` (any
-  metal surface, cached brushed texture + sheen), `paintInset` (window milled into the plate: chamfer, smoked
+  `paintFaceplate` (raised plate, polished machined edges, silver Phillips screws), `paintBrushedMetal` (any
+  metal surface: polished = the studio reflected with a crisp horizon above the middle, satin for the chassis;
+  fine hairline brushing, light stretched across the grain), `paintInset` (window milled into the plate: chamfer, smoked
   glass), `paintBezel` (silver frame around a scene window), `paintLamp` (chrome bezel, glowing glass).
   Knobs (LookAndFeel) are machined silver: knurled skirt, polished chamfer, spun top (cached image), black
   pointer groove, sitting in a backlit slot that glows in the knob's accent. Keys are silver with engraved
@@ -126,7 +127,9 @@ printed colour, no blue, green, teal, purple or neon.
   `LookAndFeel` built from `dd::gui::onSilver (palette)` so their labels engrave dark.
 - Use `LookAndFeel::font()` / `display()` for all text (embedded font, identical on macOS and Linux).
 - **No flat, dull or muddy objects** (owner, Afterglow 1.0 feedback): everything has depth (shadows, bevels,
-  sockets, inner shadows, glows); metal needs its sheen and brushing, never a flat fill.
+  sockets, inner shadows, glows); metal needs its sheen and brushing, never a flat fill. Owner on the first
+  metal pass: coarse streaky brushing looked fake and flat; the brushing must be fine hairlines and the
+  metal clearly shiny (strong reflections), while engraved labels stay readable on the brightest band.
 - Drawn scenes (Kitroom's kit, Sunburst's stage, Afterglow's horizon) are seen through a silver-bezelled
   window: dark room, warm tungsten spotlights from above, film grain and vignette, crisp labels on top.
 - Check a change at `snapshot --scale 2` too: brushing, chamfers and glows only read right up close.
