@@ -10,7 +10,9 @@
     "KING",
     "TRIP HOP",
     "80S",
-    "2000S"
+    "2000S",
+    "SOFT",
+    "UNIQUE"
   ],
   "targetLufs": -18.0,
   "toleranceLu": 2.0,

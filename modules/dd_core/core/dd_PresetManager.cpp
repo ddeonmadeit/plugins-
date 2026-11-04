@@ -231,9 +231,99 @@ void PresetManager::loadRelative (int delta)
 {
     if (presets.isEmpty())
         return;
+    if (browsingFavourites)
+    {
+        const auto favs = getFavouriteIndices();
+        if (! favs.isEmpty())
+        {
+            const int at = favs.indexOf (currentIndex);
+            const int n = favs.size();
+            const int next = at < 0 ? (delta > 0 ? 0 : n - 1) : ((at + delta) % n + n) % n;
+            loadPreset (favs[next]);
+            return;
+        }
+        browsingFavourites = false;   // nothing starred any more: back to all presets
+    }
     const int n = presets.size();
     const int start = currentIndex < 0 ? (delta > 0 ? -1 : 0) : currentIndex;
     loadPreset (((start + delta) % n + n) % n);
+}
+
+//==============================================================================
+void PresetManager::loadFavouritesIfChanged() const
+{
+    const auto f = getFavouritesFile();
+    const auto stamp = f.existsAsFile() ? f.getLastModificationTime() : juce::Time();
+    const auto size = f.existsAsFile() ? f.getSize() : (juce::int64) -1;
+    if (stamp == favouritesStamp && size == favouritesSize)
+        return;
+    favouritesStamp = stamp;
+    favouritesSize = size;
+    favourites.clear();
+    juce::var parsed;
+    if (f.existsAsFile() && juce::JSON::parse (f.loadFileAsString(), parsed).wasOk())
+        if (auto* list = parsed.getProperty ("favourites", juce::var()).getArray())
+            for (const auto& item : *list)
+                favourites.addIfNotAlreadyThere (item.getProperty ("category", "").toString() + "\n" + item.getProperty ("name", "").toString());
+}
+
+void PresetManager::saveFavourites() const
+{
+    juce::Array<juce::var> list;
+    for (const auto& k : favourites)
+    {
+        auto* o = new juce::DynamicObject();
+        o->setProperty ("category", k.upToFirstOccurrenceOf ("\n", false, false));
+        o->setProperty ("name", k.fromFirstOccurrenceOf ("\n", false, false));
+        list.add (juce::var (o));
+    }
+    auto* root = new juce::DynamicObject();
+    root->setProperty ("favourites", list);
+    const auto f = getFavouritesFile();
+    f.getParentDirectory().createDirectory();
+    f.replaceWithText (juce::JSON::toString (juce::var (root)));
+    favouritesStamp = f.getLastModificationTime();
+    favouritesSize = f.getSize();
+}
+
+bool PresetManager::isFavourite (int index) const
+{
+    if (! juce::isPositiveAndBelow (index, presets.size()))
+        return false;
+    loadFavouritesIfChanged();
+    return favourites.contains (favouriteKey (presets.getReference (index)));
+}
+
+void PresetManager::setFavourite (int index, bool shouldBeFavourite)
+{
+    if (! juce::isPositiveAndBelow (index, presets.size()))
+        return;
+    loadFavouritesIfChanged();
+    const auto key = favouriteKey (presets.getReference (index));
+    if (shouldBeFavourite == favourites.contains (key))
+        return;
+    if (shouldBeFavourite)
+        favourites.add (key);
+    else
+        favourites.removeString (key);
+    saveFavourites();
+    sendChangeMessage();
+}
+
+juce::Array<int> PresetManager::getFavouriteIndices() const
+{
+    loadFavouritesIfChanged();
+    juce::Array<int> out;
+    for (int i = 0; i < presets.size(); ++i)
+        if (favourites.contains (favouriteKey (presets.getReference (i))))
+            out.add (i);
+    return out;
+}
+
+void PresetManager::setBrowsingFavourites (bool shouldBrowse)
+{
+    browsingFavourites = shouldBrowse;
+    sendChangeMessage();
 }
 
 void PresetManager::loadInit()

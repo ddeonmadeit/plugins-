@@ -10,7 +10,7 @@ using kitroom::MP;
 
 const juce::StringArray& KitroomProcessor::categoryOrder()
 {
-    static const juce::StringArray order { "STUDIO", "LIVE ROOM", "VINTAGE", "TIGHT", "BIG", "YEEZUS", "MOSHC0RE", "KING", "TRIP HOP", "80S", "2000S", "USER" };
+    static const juce::StringArray order { "STUDIO", "LIVE ROOM", "VINTAGE", "TIGHT", "BIG", "YEEZUS", "MOSHC0RE", "KING", "TRIP HOP", "80S", "2000S", "SOFT", "UNIQUE", "USER" };
     return order;
 }
 

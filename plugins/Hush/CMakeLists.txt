@@ -2,7 +2,7 @@ dd_add_plugin(Hush
     PRODUCT_NAME "Hush"
     PLUGIN_CODE  Hush
     KIND         EFFECT
-    VERSION      1.0.0
+    VERSION      1.1.0
     PRESETS_DIR  Presets
     SOURCES
         Source/PluginProcessor.cpp

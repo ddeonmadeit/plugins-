@@ -75,10 +75,55 @@ void Key::paintButton (juce::Graphics& g, bool over, bool down)
 }
 
 //==============================================================================
+juce::Path starPath (juce::Rectangle<float> area)
+{
+    juce::Path p;
+    const float r = std::min (area.getWidth(), area.getHeight()) * 0.5f;
+    p.addStar (area.getCentre().translated (0.0f, r * 0.06f), 5, r * 0.42f, r, 0.0f);
+    return p;
+}
+
+void StarKey::paintButton (juce::Graphics& g, bool over, bool down)
+{
+    Key::paintButton (g, over, down);
+    const auto& t = tokens();
+    auto area = getLocalBounds().toFloat().withTrimmedBottom (3.0f).translated (0.0f, down ? 3.0f : 0.0f);
+    const auto star = starPath (area.withSizeKeepingCentre (area.getHeight() * 0.48f, area.getHeight() * 0.48f));
+    if (starred)
+    {
+        g.setColour (juce::Colour (0xffff9652).withAlpha (0.35f));
+        g.strokePath (star, juce::PathStrokeType (3.5f, juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
+        g.setColour (juce::Colour (0xffffd9a0));
+        g.fillPath (star);
+    }
+    else
+    {
+        g.setColour (over ? t.cream100 : t.cream300);
+        g.strokePath (star, juce::PathStrokeType (1.4f, juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
+    }
+}
+
+namespace
+{
+std::unique_ptr<juce::Drawable> menuStar()
+{
+    auto d = std::make_unique<juce::DrawablePath>();
+    d->setPath (starPath ({ 0.0f, 0.0f, 16.0f, 16.0f }));
+    d->setFill (juce::Colour (0xffe0793f));
+    return d;
+}
+} // namespace
+
 PresetBar::PresetBar (dd::PresetManager& manager) : pm (manager)
 {
-    for (auto* k : { &prevKey, &catKey, &nameKey, &nextKey, &saveKey, &menuKey })
+    for (auto* k : { &prevKey, &catKey, &nameKey, (Key*) &starKey, &nextKey, &saveKey, &menuKey })
         addAndMakeVisible (k);
+    starKey.setTooltip ("Favourite: star this preset. Your favourites are kept through updates; pick FAVOURITES in the category key to step through just them.");
+    starKey.onClick = [this]
+    {
+        if (pm.getCurrentIndex() >= 0)
+            pm.toggleFavourite (pm.getCurrentIndex());
+    };
     prevKey.setTooltip ("Previous preset");
     nextKey.setTooltip ("Next preset");
     catKey.setTooltip ("Preset category");
@@ -98,9 +143,11 @@ PresetBar::~PresetBar() { pm.removeChangeListener (this); }
 
 void PresetBar::refresh()
 {
-    const auto cat = pm.getCurrentCategory();
+    const auto cat = pm.isBrowsingFavourites() ? juce::String (dd::PresetManager::kFavouritesCategory) : pm.getCurrentCategory();
     catKey.setLabel (cat.isEmpty() ? juce::String ("-") : cat, false);
-    // A star marks a sound edited since it was loaded or saved (only a new name rises in).
+    starKey.setStarred (pm.isFavourite (pm.getCurrentIndex()));
+    starKey.setEnabled (pm.getCurrentIndex() >= 0);
+    // An asterisk marks a sound edited since it was loaded or saved (only a new name rises in).
     const auto name = pm.getCurrentName();
     nameKey.setLabel (name + (pm.isModified() ? " *" : ""), name != shownName);
     shownName = name;
@@ -114,16 +161,36 @@ void PresetBar::showCategories()
 {
     juce::PopupMenu m;
     const auto cats = pm.getCategories();
+    const auto favs = pm.getFavouriteIndices();
+    {
+        juce::PopupMenu::Item fav (juce::String (dd::PresetManager::kFavouritesCategory) + "  (" + juce::String (favs.size()) + ")");
+        fav.itemID = 10000;
+        fav.isEnabled = ! favs.isEmpty();
+        fav.isTicked = pm.isBrowsingFavourites();
+        fav.image = menuStar();
+        m.addItem (std::move (fav));
+        m.addSeparator();
+    }
     for (int i = 0; i < cats.size(); ++i)
-        m.addItem (i + 1, cats[i], true, cats[i] == pm.getCurrentCategory());
+        m.addItem (i + 1, cats[i], true, ! pm.isBrowsingFavourites() && cats[i] == pm.getCurrentCategory());
     juce::Component::SafePointer<PresetBar> safe (this);
     m.showMenuAsync (juce::PopupMenu::Options().withTargetComponent (&catKey), [safe, cats] (int r)
     {
         if (safe == nullptr || r <= 0)
             return;
-        const auto idx = safe->pm.getIndicesInCategory (cats[r - 1]);
+        auto& manager = safe->pm;
+        if (r == 10000)
+        {
+            const auto f = manager.getFavouriteIndices();
+            manager.setBrowsingFavourites (true);
+            if (! f.isEmpty() && ! f.contains (manager.getCurrentIndex()))
+                manager.loadPreset (f.getFirst());
+            return;
+        }
+        manager.setBrowsingFavourites (false);
+        const auto idx = manager.getIndicesInCategory (cats[r - 1]);
         if (! idx.isEmpty())
-            safe->pm.loadPreset (idx.getFirst());
+            manager.loadPreset (idx.getFirst());
     });
 }
 
@@ -132,9 +199,26 @@ void PresetBar::showPresets()
     juce::PopupMenu m;
     const auto cats = pm.getCategories();
     const auto current = pm.getCurrentCategory();
-    // The current category's presets first; every other category one level down.
+    auto item = [this] (int idx)
+    {
+        juce::PopupMenu::Item it (pm.get (idx).name);
+        it.itemID = idx + 1;
+        it.isTicked = idx == pm.getCurrentIndex();
+        if (pm.isFavourite (idx))
+            it.image = menuStar();
+        return it;
+    };
+    // Favourites first, then the current category's presets; every other category one level down.
+    const auto favs = pm.getFavouriteIndices();
+    if (! favs.isEmpty())
+    {
+        m.addSectionHeader (dd::PresetManager::kFavouritesCategory);
+        for (int idx : favs)
+            m.addItem (item (idx));
+        m.addSectionHeader (current);
+    }
     for (int idx : pm.getIndicesInCategory (current))
-        m.addItem (idx + 1, pm.get (idx).name, true, idx == pm.getCurrentIndex());
+        m.addItem (item (idx));
     m.addSeparator();
     for (auto& c : cats)
     {
@@ -142,14 +226,17 @@ void PresetBar::showPresets()
             continue;
         juce::PopupMenu sub;
         for (int idx : pm.getIndicesInCategory (c))
-            sub.addItem (idx + 1, pm.get (idx).name, true, idx == pm.getCurrentIndex());
+            sub.addItem (item (idx));
         m.addSubMenu (c, sub);
     }
     juce::Component::SafePointer<PresetBar> safe (this);
     m.showMenuAsync (juce::PopupMenu::Options().withTargetComponent (&nameKey), [safe] (int r)
     {
-        if (safe != nullptr && r > 0)
-            safe->pm.loadPreset (r - 1);
+        if (safe == nullptr || r <= 0)
+            return;
+        if (safe->pm.isBrowsingFavourites() && ! safe->pm.isFavourite (r - 1))
+            safe->pm.setBrowsingFavourites (false);
+        safe->pm.loadPreset (r - 1);
     });
 }
 
@@ -246,6 +333,8 @@ void PresetBar::resized()
     saveKey.setBounds (r.removeFromRight (64));
     r.removeFromRight (5);
     nextKey.setBounds (r.removeFromRight (small));
+    r.removeFromRight (5);
+    starKey.setBounds (r.removeFromRight (small));
     r.removeFromRight (5);
     catKey.setBounds (r.removeFromLeft (juce::jlimit (90, 150, r.getWidth() / 3)));
     r.removeFromLeft (5);

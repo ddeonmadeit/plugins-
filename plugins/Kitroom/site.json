@@ -9,7 +9,8 @@
     "Close, overhead and room mics per piece and for the whole kit, plus tune, decay, glue and width",
     "Kit-bus Drive (8 distortion types), bit Crush and Tone, for anything from warm tape to broken industrial",
     "General MIDI key map shown in FL Studio note names; re-learn any key from your keyboard",
-    "52 kit presets: studio, live room, vintage and jazz, tight funk and soul, big rooms, Yeezus, moshc0re, KING, trip hop, 80s and 2000s"
+    "67 kit presets: studio, live room, vintage and jazz, tight funk and soul, big rooms, Yeezus, moshc0re, KING, trip hop, 80s, 2000s, plus SOFT (brushes, soft touch, close and intimate) and UNIQUE (doom, crushed, folded, gong room)",
+    "Favourites: star the presets you love and browse just those; your stars survive updates"
   ],
   "installTips": [
     "The .pkg also installs the drum sound library (about 230 MB). With the .zip, Install.command copies it for you.",
@@ -17,9 +18,10 @@
   ],
   "previewNote": "on the same five-bar 96 BPM groove: ghost notes, open hat, a ride bar, a tom fill and crashes ringing out.",
   "whatsNew": {
-    "version": "1.10.0",
+    "version": "1.11.0",
     "items": [
-      "Gimme Dat Knock (2000S): the dry Neptunes kit from the song DEON sent, matched hit by hit: a short, punchy kick tuned up, a tight high snare, a woody cross-stick (side stick) for the 3-3-2 knock pattern, dark closed hats, no room"
+      "Favourites: press the star key just right of the preset name to star a preset, then find all your starred sounds in FAVOURITES at the top of the category list (the arrows step through just those). Stars are kept across updates, in every project",
+      "15 new kits in two new categories. SOFT (gentle, natural, warm): Brushes Ballad, Feather Touch, Bedroom Close, Soft Jazz Club, Lo-fi Felt, Church Hall, Folk Porch. UNIQUE (instruments and characters you won't find elsewhere in the plugin): Doom Tuned Down, Piccolo Pop, Crushed Box, Smashed Room, Mono 1965, Folded Metal, Junkyard, Gong Room"
     ]
   }
 }

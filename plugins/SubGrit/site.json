@@ -8,15 +8,18 @@
     "Moog-style ladder filter, glide, release dive, tempo-synced LFO",
     "8 distortion types at 4x oversampling with Sub Keep for heavy-but-full low end",
     "Chorus, delay and space on the top only, so the sub stays mono",
-    "POLY switch: play chords with any preset (it stays put when you change presets)"
+    "POLY switch: play chords with any preset (it stays put when you change presets)",
+    "131 presets: Travis, Mike Dean, untiljapan, Ye, Yeezus, moshc0re, KING, trip hop, SAFE, 80s, 2000s, bounce 808s, plus SOFT (felt sub, upright, fretless, arco) and UNIQUE (talk box, envelope quack, kalimba, didgeridoo)",
+    "Favourites: star the presets you love and browse just those; your stars survive updates"
   ],
   "installTips": [
     "Notes play at real pitch: the classic 808 range is C2–C3 in FL's piano roll (or use the Octave knob)."
   ],
   "whatsNew": {
-    "version": "1.11.0",
+    "version": "1.12.0",
     "items": [
-      "Gimme Dat Bass (2000S): the rubbery Neptunes synth bass, matched to the song DEON sent: a resonant 12 dB filter that pops on every note, a little tube drive, legato slides. Short funky phrases with rests and chromatic walk-downs"
+      "Favourites: press the star key just right of the preset name to star a preset, then find all your starred sounds in FAVOURITES at the top of the category list (the arrows step through just those). Stars are kept across updates, in every project",
+      "22 new basses in two new categories. SOFT (gentle, natural, warm): Felt Sub, Upright Thumb, Fretless Glide, Warm Round Moog, Dub Sine, Velvet Pluck, Pillow Square, Arco Bass, Dusty Felt 808, Night Swell. UNIQUE (instruments and characters you won't find elsewhere in the plugin): Talk Box Bass, Envelope Quack, Boing Bass, Sample And Hold, Gated Pulse, Fold Growl, Rectified Organ, Chip Bass, Kalimba Bass, Didgeridoo, Bomb Drop, Steel Drum Bass"
     ]
   }
 }

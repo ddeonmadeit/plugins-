@@ -10,7 +10,8 @@
     "Palm mute (also on the mod wheel), hammer-ons and slides on legato notes, vibrato, humanize, double-tracking for wide stereo guitars",
     "Pedalboard: compressor, overdrive, fuzz, chorus, tempo-synced tremolo and delay; amp with Clean, Crunch and Lead channels, a 1x12 or 4x12 cabinet and mic placement, plus a room",
     "TAPE STOP: slow the guitar to a halt like a tape machine powering down, then automate it at the end of a beat",
-    "44 presets, each a different guitar part: acoustic, clean, crunch and heavy, plus Travis Scott, Mike Dean, Yeezus, moshc0re, trip hop, 80s, 2000s and SAFE"
+    "60 presets, each a different guitar part: acoustic, clean, crunch and heavy, plus Travis Scott, Mike Dean, Yeezus, moshc0re, trip hop, 80s, 2000s, SOFT, UNIQUE and SAFE",
+    "Favourites: star the presets you love and browse just those; your stars survive updates"
   ],
   "installTips": [
     "The .pkg also installs the guitar sample library (about 130 MB). With the .zip, Install.command copies it for you.",
@@ -19,9 +20,10 @@
   ],
   "previewNote": "on the same 80 BPM part: strummed Em, C and G chords (down and up strokes), then a single-note riff.",
   "whatsNew": {
-    "version": "1.6.0",
+    "version": "1.7.0",
     "items": [
-      "Gimme Dat Stabs (2000S): the typical 2000s Pharrell guitar, matched to the song DEON sent: a warm jazz box played clean and dry, hard-picked triad stabs that ring a little, lightly double-tracked, with slides into chord tones"
+      "Favourites: press the star key just right of the preset name to star a preset, then find all your starred sounds in FAVOURITES at the top of the category list (the arrows step through just those). Stars are kept across updates, in every project",
+      "15 new guitars in two new categories. SOFT (gentle, natural, warm): Thumb Nylon, Whisper Strum, Warm Jazz Thumb, Nylon Pair, Lullaby Tremolo, Felt Neck Pickup, Porch Fingerstyle. UNIQUE (instruments and characters you won't find elsewhere in the plugin): Baritone Twang, Twelve String Jangle, Bowed Sustain, Desert Buzz, Plucky Banjo, Broken Radio, Velvet Fuzz, Cathedral Echoes"
     ]
   }
 }

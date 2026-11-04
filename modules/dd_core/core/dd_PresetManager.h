@@ -97,6 +97,21 @@ public:
     bool deleteUserPreset (int index);
     juce::File getUserPresetDirectory() const { return userDir; }
 
+    //==============================================================================
+    // Favourites: any preset (factory or the user's) can be starred. The stars live in
+    // Music/<company>/<plugin>/Favourites.json, next to the user presets, so updates never touch them, and
+    // every open instance of the plugin sees the same list.
+    static constexpr const char* kFavouritesCategory = "FAVOURITES";
+    bool isFavourite (int index) const;
+    void setFavourite (int index, bool shouldBeFavourite);
+    void toggleFavourite (int index) { setFavourite (index, ! isFavourite (index)); }
+    /** Starred presets that exist, in the usual category order. */
+    juce::Array<int> getFavouriteIndices() const;
+    /** While browsing favourites, previous / next step through the starred presets only. */
+    void setBrowsingFavourites (bool shouldBrowse);
+    bool isBrowsingFavourites() const noexcept { return browsingFavourites; }
+    juce::File getFavouritesFile() const { return userDir.getSiblingFile ("Favourites.json"); }
+
     /** True once a parameter has changed since the preset was loaded or saved. */
     bool isModified() const noexcept { return modified.load(); }
 
@@ -132,6 +147,14 @@ private:
     std::vector<bool> perfParam;
     std::atomic<bool> modified { false };
     bool applying = false;
+
+    juce::String favouriteKey (const Preset& p) const { return p.category + "\n" + p.name; }
+    void loadFavouritesIfChanged() const;
+    void saveFavourites() const;
+    mutable juce::StringArray favourites;
+    mutable juce::Time favouritesStamp;
+    mutable juce::int64 favouritesSize = -1;
+    bool browsingFavourites = false;
 
     void sortFactory();
     void apply (const Preset&);

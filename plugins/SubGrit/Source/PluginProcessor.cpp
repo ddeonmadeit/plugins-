@@ -9,7 +9,7 @@ using sg::P;
 
 const juce::StringArray& SubGritProcessor::categoryOrder()
 {
-    static const juce::StringArray order { "TRAVIS", "MIKE DEAN", "UNTILJAPAN", "YE", "YEEZUS", "MOSHC0RE", "KING", "TRIP HOP", "SAFE", "80s", "2000s", "BOUNCE 808" };
+    static const juce::StringArray order { "TRAVIS", "MIKE DEAN", "UNTILJAPAN", "YE", "YEEZUS", "MOSHC0RE", "KING", "TRIP HOP", "SAFE", "80s", "2000s", "BOUNCE 808", "SOFT", "UNIQUE" };
     return order;
 }
 

@@ -24,7 +24,22 @@ private:
     double changedAt = 0.0;
 };
 
-/** Category + preset keys in a recessed tray: prev, category, the lit preset display, next, save, menu. */
+/** The favourite key: a star, lit (glowing amber) when the current preset is starred. */
+class StarKey : public Key
+{
+public:
+    StarKey() : Key ("") {}
+    void setStarred (bool s) { if (s != starred) { starred = s; setLit (s); repaint(); } }
+    void paintButton (juce::Graphics&, bool over, bool down) override;
+
+private:
+    bool starred = false;
+};
+
+/** A five-point star centred in `area` (for keys and menus). */
+juce::Path starPath (juce::Rectangle<float> area);
+
+/** Category + preset keys in a recessed tray: prev, category, the lit preset display, star, next, save, menu. */
 class PresetBar : public juce::Component, private juce::ChangeListener
 {
 public:
@@ -48,6 +63,7 @@ private:
 
     dd::PresetManager& pm;
     Key prevKey { "<" }, catKey { "" }, nameKey { "", true }, nextKey { ">" }, saveKey { "Save" }, menuKey { "..." };
+    StarKey starKey;
     juce::String description, shownName;
 };
 

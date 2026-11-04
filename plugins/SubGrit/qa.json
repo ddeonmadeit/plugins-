@@ -11,7 +11,9 @@
     "SAFE",
     "80s",
     "2000s",
-    "BOUNCE 808"
+    "BOUNCE 808",
+    "SOFT",
+    "UNIQUE"
   ],
   "targetLufs": -9.5,
   "toleranceLu": 1.5,

@@ -114,6 +114,44 @@ int main()
         const int mine = pm->indexOf ("Mine", "STUDIO");
         pm->deleteUserPreset (mine);
         check (pm->indexOf ("Mine", "STUDIO") < 0, "delete removes a user preset");
+
+        std::cout << "favourites\n";
+        check (pm->getFavouriteIndices().isEmpty(), "no favourites to start with");
+        const int lead = pm->indexOf ("Lead", "STUDIO");
+        pm->toggleFavourite (lead);
+        check (pm->isFavourite (lead) && ! pm->isFavourite (pm->indexOf ("Air", "80S")), "starring a preset marks only that one");
+        check (pm->getFavouritesFile().existsAsFile() && pm->getFavouritesFile().isAChildOf (home), "favourites are saved in the user folder");
+        check (! pm->getFavouritesFile().isAChildOf (pm->getUserPresetDirectory()), "and not among the preset files");
+        pm->saveUserPreset ("Pad", "STUDIO");
+        const int pad = pm->indexOf ("Pad", "STUDIO");
+        pm->setFavourite (pad, true);
+        check (pm->getFavouriteIndices().size() == 2, "user presets can be favourites too");
+        pm->loadPreset (pm->indexOf ("Air", "80S"));
+        pm->setBrowsingFavourites (true);
+        pm->loadRelative (1);
+        const int first = pm->getCurrentIndex();
+        pm->loadRelative (1);
+        const int second = pm->getCurrentIndex();
+        pm->loadRelative (1);
+        check (pm->isFavourite (first) && pm->isFavourite (second) && first != second && pm->getCurrentIndex() == first,
+               "browsing favourites steps through the starred presets only, and wraps");
+        pm->setBrowsingFavourites (false);
+        pm->rescanUserPresets();
+        check (pm->isFavourite (pm->indexOf ("Lead", "STUDIO")) && pm->isFavourite (pm->indexOf ("Pad", "STUDIO")), "favourites survive a rescan");
+
+        // Another open instance of the plugin sees a star set here.
+        TestProcessor other;
+        auto pm2 = makeManager (other);
+        pm->setFavourite (pm->indexOf ("Air", "80S"), true);
+        check (pm2->isFavourite (pm2->indexOf ("Air", "80S")), "another instance sees new favourites");
+    }
+    {
+        auto pm = makeManager (proc);
+        std::cout << "favourites after an update\n";
+        check (pm->isFavourite (pm->indexOf ("Lead", "STUDIO")) && pm->isFavourite (pm->indexOf ("Pad", "STUDIO")),
+               "favourites are still starred after an update");
+        pm->toggleFavourite (pm->indexOf ("Lead", "STUDIO"));
+        check (! pm->isFavourite (pm->indexOf ("Lead", "STUDIO")), "and can be un-starred");
     }
     home.deleteRecursively();
     std::cout << (failures == 0 ? "all passed\n" : "FAILED\n");

@@ -9,8 +9,9 @@
     "Dirt (8 distortion types), tape wow and saturation, lo-fi, Juno / Solina ensemble, phaser, dub delay, shimmer reverb, tempo pump and gate",
     "Drag the sun to set Motion and Tone; Swell, Tail, Blend, Grit, Echo and Space reshape any preset",
     "POLY switch: play chords with any preset, even the mono leads",
-    "109 presets: TAME IMPALA, MASSIVE ATTACK, BRENT FAIYAZ, MIKE DEAN, TRAVIS SCOTT, YEEZUS, MOSHC0RE, GUITAR, TRIP HOP, 80S, 2000S, SAFE",
-    "TAPE STOP: slow everything to a halt like a tape machine powering down, then automate it at the end of a beat"
+    "133 presets: TAME IMPALA, MASSIVE ATTACK, BRENT FAIYAZ, MIKE DEAN, TRAVIS SCOTT, YEEZUS, MOSHC0RE, GUITAR, TRIP HOP, 80S, 2000S, SOFT, UNIQUE, SAFE",
+    "TAPE STOP: slow everything to a halt like a tape machine powering down, then automate it at the end of a beat",
+    "Favourites: star the presets you love and browse just those; your stars survive updates"
   ],
   "installTips": [
     "Every macro's centre position is the preset as designed: double-click a knob, or the sun, to go back to it.",
@@ -20,10 +21,10 @@
   ],
   "previewNote": "on the same 120 BPM phrase: a held Dm9, an arpeggio over Bb, Fmaj7 stabs, then a legato melody. GUITAR presets play strummed Em, C and G chords at 80 BPM and a riff.",
   "whatsNew": {
-    "version": "1.10.0",
+    "version": "1.11.0",
     "items": [
-      "Presets you can make your own: Save opens a menu to save over the current preset (your version takes the factory preset's place and stays through updates), save as a new preset in any category, restore the factory version or delete one of yours; a star next to the name shows the sound has been edited. Your presets live in Music/ddeonmadeit/<plugin>/Presets and are never touched by an update",
-      "Fixed a rare crash when a host unloads the plugin"
+      "Favourites: press the star key just right of the preset name to star a preset, then find all your starred sounds in FAVOURITES at the top of the category list (the arrows step through just those). Stars are kept across updates, in every project",
+      "24 new sounds in two new categories. SOFT (gentle, natural, warm): Felt Upright, Wooden Flute, Hush Choir, Music Box, Dusk Marimba, Velvet Strings, Garden Harp, Harmonium, Glass Harmonica, Clay Ocarina, Cloud Bed, Late Vibes. UNIQUE (instruments and characters you won't find elsewhere in the plugin): Singing Bowl, Theremin, Bowed Cymbal, Prepared Piano, Steel Pan, Silk Koto, Paris Accordion, Toy Piano, Throat Drone, Wind Chimes, Water Drops, Haunted Music Box"
     ]
   }
 }
