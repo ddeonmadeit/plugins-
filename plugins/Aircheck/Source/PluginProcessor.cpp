@@ -9,7 +9,7 @@ using aircheck::P;
 
 const juce::StringArray& AircheckProcessor::categoryOrder()
 {
-    static const juce::StringArray order { "80S", "TRAVIS SCOTT", "YE", "TAME IMPALA", "R&B", "TRIP HOP", "MOSHC0RE", "STUDIO" };
+    static const juce::StringArray order { "80S", "2000S", "TRAVIS SCOTT", "YE", "TAME IMPALA", "R&B", "TRIP HOP", "MOSHC0RE", "STUDIO" };
     return order;
 }
 

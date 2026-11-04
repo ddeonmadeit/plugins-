@@ -9,7 +9,7 @@
     "Close, overhead and room mics per piece and for the whole kit, plus tune, decay, glue and width",
     "Kit-bus Drive (8 distortion types), bit Crush and Tone, for anything from warm tape to broken industrial",
     "General MIDI key map shown in FL Studio note names; re-learn any key from your keyboard",
-    "46 kit presets: studio, live room, vintage and jazz, tight funk and soul, big rooms, Yeezus, moshc0re, KING, trip hop and 80s"
+    "52 kit presets: studio, live room, vintage and jazz, tight funk and soul, big rooms, Yeezus, moshc0re, KING, trip hop, 80s and 2000s"
   ],
   "installTips": [
     "The .pkg also installs the drum sound library (about 230 MB). With the .zip, Install.command copies it for you.",
@@ -17,8 +17,9 @@
   ],
   "previewNote": "on the same five-bar 96 BPM groove: ghost notes, open hat, a ride bar, a tom fill and crashes ringing out.",
   "whatsNew": {
-    "version": "1.7.0",
+    "version": "1.8.0",
     "items": [
+      "2000s category, 6 new kits: the Neptunes' dry knock, Timbaland's bounce, Dr. Dre's heavy West Coast drums, a Kanye-style dusty soul break, N.E.R.D.'s live rock band and a crunk stadium kit (extreme)",
       "80s category, 6 new kits: the gated drum break of In The Air Tonight, a gated arena snare, an I'm Still Standing pop-rock kit, a dry Moroder disco kit, a drum-machine-era crunch (extreme) and a power-ballad kit (subtle)",
       "New look, matching the rawleads instrument design: a DARK / LITE switch in the top bar (every open plugin follows it, with a soft crossfade), keycap buttons that press in, the preset name on a lit smoked-amber key with a flickering lamp behind it, LED switches, glowing knob arcs, console displays and the Instrument Sans typeface"
     ]

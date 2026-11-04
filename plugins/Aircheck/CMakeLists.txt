@@ -2,7 +2,7 @@ dd_add_plugin(Aircheck
     PRODUCT_NAME "Aircheck"
     PLUGIN_CODE  Achk
     KIND         EFFECT
-    VERSION      1.0.0
+    VERSION      1.1.0
     PRESETS_DIR  Presets
     SOURCES
         Source/PluginProcessor.cpp

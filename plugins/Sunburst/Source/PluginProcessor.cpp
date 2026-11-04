@@ -10,7 +10,7 @@ using sunburst::P;
 const juce::StringArray& SunburstProcessor::categoryOrder()
 {
     static const juce::StringArray order { "ACOUSTIC", "CLEAN", "CRUNCH", "HEAVY", "TRAVIS SCOTT", "MIKE DEAN", "YEEZUS",
-                                           "MOSHC0RE", "TRIP HOP", "80S", "SAFE", "USER" };
+                                           "MOSHC0RE", "TRIP HOP", "80S", "2000S", "SAFE", "USER" };
     return order;
 }
 

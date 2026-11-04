@@ -2,7 +2,7 @@ dd_add_plugin(Kitroom
     PRODUCT_NAME "Kitroom"
     PLUGIN_CODE  Ktrm
     KIND         SYNTH
-    VERSION      1.7.0
+    VERSION      1.8.0
     PRESETS_DIR  Presets
     SOURCES
         Source/PluginProcessor.cpp

@@ -2,7 +2,7 @@ dd_add_plugin(Afterglow
     PRODUCT_NAME "Afterglow"
     PLUGIN_CODE  Aglw
     KIND         SYNTH
-    VERSION      1.8.0
+    VERSION      1.9.0
     PRESETS_DIR  Presets
     SOURCES
         Source/PluginProcessor.cpp
