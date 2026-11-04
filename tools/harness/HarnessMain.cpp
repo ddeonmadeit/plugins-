@@ -4,12 +4,13 @@
 
       <Plugin>Harness list
       <Plugin>Harness render  --out x.wav [--program N | --preset-file p.json] [--set id=value ...]
-                              [--phrase demo|single|slide|groove|chords|pads|mixed|guitar|drums|drumvel] [--sr 48000] [--block 256] [--mono]
+                              [--phrase demo|single|slide|groove|chords|pads|mixed|guitar|drums|drumvel|vocal] [--sr 48000] [--block 256] [--mono]
+                              [--input voice.wav]   effects: process this file instead of the test programme
                               [--bpm 79]   host tempo, transport playing from beat 0 (default: no host)
                               [--at 6.5:perfTapeStop=1 ...]   change a parameter at a time in seconds (like automation)
                               --phrase "notes:<note>,<start s>,<length s>,<velocity> ... [end=<s>]"   any notes (one-shots, loops)
       <Plugin>Harness render-all --outdir dir [--phrase demo] [--sr 48000] [--bpm 80]
-      <Plugin>Harness snapshot --out ui.png [--program N] [--scale 1]
+      <Plugin>Harness snapshot --out ui.png [--program N] [--scale 1] [--phrase vocal]   effects: what to play before the picture
       <Plugin>Harness stress  [--seconds 20] [--sr 48000] [--block 128]
       <Plugin>Harness dump-params    current values as preset-style JSON
       <Plugin>Harness param-info     ids, ranges, kinds and choice names (used by tools/qa/preset_lint.py)
@@ -179,6 +180,11 @@ std::vector<Note> phrase (const juce::String& name, double& totalSeconds)
         totalSeconds = 16.0 + 4.0;
         return out;
     }
+    if (name == "vocal")
+    {
+        totalSeconds = 8.5;   // effects only: a synthetic sung phrase on the input (vocalTestSignal), no MIDI
+        return {};
+    }
     if (name == "chords")
     {
         totalSeconds = 4.0;
@@ -280,6 +286,141 @@ juce::AudioBuffer<float> effectTestSignal (double sr, double seconds)
     return buf;
 }
 
+/**
+    Synthetic dry vocal for vocal effects: a sung two-phrase melody (A3..D4, then E3..B3) from a glottal
+    pulse train through interpolated vowel formants. Every note is deliberately off pitch (15..35 cents
+    sharp or flat), starts with a scoop from below and grows vibrato when held, so pitch correction can
+    be measured; sibilants, plosives and breaths test the de-esser, gate and unvoiced handling.
+*/
+juce::AudioBuffer<float> vocalTestSignal (double sr, double seconds)
+{
+    struct SungNote { float midi, start, length, cents; int vowel; char onset; bool hissAfter; };
+    static const SungNote notes[] = {
+        { 57, 0.30f, 0.55f,  28, 0, 's', false }, { 60, 0.88f, 0.47f, -32, 1, ' ', false },
+        { 62, 1.38f, 0.95f,  18, 2, ' ', false }, { 60, 2.36f, 0.44f, -22, 0, 't', false },
+        { 57, 2.83f, 1.22f,  35, 3, ' ', false },
+        { 52, 4.45f, 0.40f, -26, 4, 'k', false }, { 55, 4.88f, 0.44f,  22, 0, ' ', false },
+        { 57, 5.35f, 0.46f, -15, 1, ' ', false }, { 59, 5.84f, 0.52f,  30, 0, ' ', false },
+        { 57, 6.39f, 1.15f, -18, 2, ' ', true } };
+    // F1..F4 (Hz) for ah, ee, oh, oo, eh.
+    static const float formants[5][4] = { { 730, 1090, 2440, 3400 }, { 300, 2250, 3000, 3700 }, { 470, 830, 2600, 3400 },
+                                          { 330, 760, 2400, 3300 }, { 540, 1800, 2500, 3500 } };
+    static const float fAmp[4] = { 1.0f, 0.55f, 0.22f, 0.1f };
+    static const float fBw[4] = { 80, 100, 140, 200 };
+
+    const int n = (int) (seconds * sr);
+    juce::AudioBuffer<float> buf (2, n);
+    buf.clear();
+    juce::Random rnd (7);
+    double phase = 0.0;
+    float jitter = 0.0f, lpNoise = 0.0f;
+    float curF[4] = { 730, 1090, 2440, 3400 };
+    float z1[4] {}, z2[4] {};
+    float hpS1 = 0.0f, hpS2 = 0.0f;
+    const int numNotes = (int) (sizeof (notes) / sizeof (notes[0]));
+    auto* out = buf.getWritePointer (0);
+
+    for (int i = 0; i < n; ++i)
+    {
+        const float t = (float) (i / sr);
+        // The note sounding now (or the one just ended / about to start within a phrase, for legato).
+        int cur = -1;
+        for (int k = 0; k < numNotes; ++k)
+            if (t >= notes[k].start - 0.04f && t < notes[k].start + notes[k].length + 0.06f)
+                cur = k;
+        float voice = 0.0f, noise = 0.0f;
+        if (cur >= 0)
+        {
+            const auto& nt = notes[cur];
+            const float age = t - nt.start;
+            const float scoop = -0.7f * std::exp (-std::max (0.0f, age) / 0.045f);
+            const float vibDepth = 0.26f * juce::jlimit (0.0f, 1.0f, (age - 0.35f) / 0.3f);
+            jitter += (rnd.nextFloat() - 0.5f) * 0.002f - jitter * 0.001f;
+            const float midi = nt.midi + nt.cents * 0.01f + scoop + vibDepth * std::sin (juce::MathConstants<float>::twoPi * 5.3f * age) + jitter;
+            const float f0 = 440.0f * std::exp2 ((midi - 69.0f) / 12.0f);
+            const float env = juce::jlimit (0.0f, 1.0f, (age + 0.04f) / 0.05f) * juce::jlimit (0.0f, 1.0f, (nt.start + nt.length + 0.06f - t) / 0.07f);
+
+            phase += f0 / sr;
+            if (phase >= 1.0) phase -= 1.0;
+            float src = 0.0f;
+            const int K = std::max (1, (int) (7000.0f / f0));
+            for (int h = 1; h <= K; ++h)
+                src += std::sin ((float) (juce::MathConstants<double>::twoPi * h * phase)) / std::pow ((float) h, 0.95f);
+            src = src * 0.18f + (rnd.nextFloat() - 0.5f) * 0.04f;
+
+            // Formants glide toward this note's vowel over ~40 ms.
+            float y = 0.0f;
+            for (int f = 0; f < 4; ++f)
+            {
+                curF[f] += (formants[nt.vowel][f] - curF[f]) * (float) (1.0 - std::exp (-1.0 / (0.04 * sr)));
+                const float r = std::exp (-juce::MathConstants<float>::pi * fBw[f] / (float) sr);
+                const float th = juce::MathConstants<float>::twoPi * curF[f] / (float) sr;
+                const float a1 = -2.0f * r * std::cos (th), a2 = r * r;
+                const float g = (1.0f - r) * std::sqrt (1.0f - 2.0f * r * std::cos (2.0f * th) + r * r);
+                const float yf = g * src - a1 * z1[f] - a2 * z2[f];
+                z2[f] = z1[f];
+                z1[f] = yf;
+                y += fAmp[f] * yf;
+            }
+            voice = y * env * 9.0f;
+
+            // Consonants: a sibilant before 's' notes and after the last one, short bursts for t / k.
+            const float w = rnd.nextFloat() * 2.0f - 1.0f;
+            if (nt.onset == 's' && age < 0.0f && age > -0.12f)  noise += w * 0.5f;
+            if (nt.onset == 't' && age < 0.0f && age > -0.02f)  noise += w * 0.6f;
+            if (nt.onset == 'k' && age < 0.0f && age > -0.03f)  noise += w * 0.45f;
+            if (nt.hissAfter && t > nt.start + nt.length && t < nt.start + nt.length + 0.12f) noise += w * 0.45f;
+        }
+        // Breath between the phrases.
+        if (t > 4.08f && t < 4.36f)
+        {
+            lpNoise += ((rnd.nextFloat() * 2.0f - 1.0f) - lpNoise) * 0.2f;
+            noise += lpNoise * 0.08f * std::sin (juce::MathConstants<float>::pi * (t - 4.08f) / 0.28f);
+        }
+        // Sibilants are high-passed noise (~5 kHz and up).
+        const float hp1 = noise - hpS1;
+        hpS1 += 0.5f * hp1;
+        const float hp2 = hp1 - hpS2;
+        hpS2 += 0.5f * hp2;
+        out[i] = voice + hp2;
+    }
+    const float pk = buf.getMagnitude (0, 0, n);
+    if (pk > 0.0f)
+        buf.applyGain (0, 0, n, 0.5f / pk);   // peaks at -6 dBFS like a well-recorded take
+    buf.copyFrom (1, 0, buf, 0, 0, n);
+    return buf;
+}
+
+juce::File gInputFile;   // --input: an audio file to run through an effect instead of the test programme
+
+/** Loads --input at the render rate (resampled if needed). */
+juce::AudioBuffer<float> loadInputFile (double sr, double& seconds)
+{
+    juce::AudioFormatManager fm;
+    fm.registerBasicFormats();
+    std::unique_ptr<juce::AudioFormatReader> reader (fm.createReaderFor (gInputFile));
+    if (reader == nullptr)
+    {
+        std::cerr << "error: cannot read " << gInputFile.getFullPathName() << "\n";
+        seconds = 0.1;
+        return juce::AudioBuffer<float> (2, (int) (0.1 * sr));
+    }
+    const int len = (int) reader->lengthInSamples;
+    juce::AudioBuffer<float> raw (2, len);
+    reader->read (&raw, 0, len, 0, true, true);
+    const double ratio = reader->sampleRate / sr;
+    const int outLen = (int) (len / ratio);
+    seconds = outLen / sr + 2.5;   // room for tails
+    juce::AudioBuffer<float> res (2, (int) (seconds * sr));
+    res.clear();
+    for (int ch = 0; ch < 2; ++ch)
+    {
+        juce::LagrangeInterpolator li;
+        li.process (ratio, raw.getReadPointer (ch), res.getWritePointer (ch), outLen);
+    }
+    return res;
+}
+
 // A host transport for --bpm: playing from beat 0, so tempo-synced LFOs, delays and pumps lock to the notes.
 struct FixedPlayHead : juce::AudioPlayHead
 {
@@ -310,6 +451,12 @@ juce::AudioBuffer<float> renderPhrase (juce::AudioProcessor& proc, const juce::S
 
     double total = 0.0;
     auto notes = phrase (phraseName, total);
+    juce::AudioBuffer<float> fileInput;
+    if (gInputFile.existsAsFile())
+    {
+        fileInput = loadInputFile (sr, total);
+        notes.clear();
+    }
 
     FixedPlayHead playHead;
     playHead.bpm = bpm;
@@ -325,7 +472,10 @@ juce::AudioBuffer<float> renderPhrase (juce::AudioProcessor& proc, const juce::S
     proc.setRateAndBufferSizeDetails (sr, block);
     proc.setNonRealtime (true); // plugins that stream or load samples must finish loading first
     proc.prepareToPlay (sr, block);
-    const auto input = isEffect ? effectTestSignal (sr, total) : juce::AudioBuffer<float>();
+    const auto input = ! isEffect ? juce::AudioBuffer<float>()
+                     : fileInput.getNumSamples() > 0 ? fileInput
+                     : phraseName == "vocal" ? vocalTestSignal (sr, total)
+                     : effectTestSignal (sr, total);
 
     const int totalSamples = (int) (total * sr);
     juce::AudioBuffer<float> out (2, totalSamples);
@@ -520,7 +670,25 @@ int cmdSnapshot (juce::AudioProcessor& proc, const Args& a)
     proc.setNonRealtime (true);   // plugins that stream samples finish loading before the picture
     proc.prepareToPlay (48000.0, 256);
 
-    // Feed some audio so meters / scopes have something to draw.
+    // Feed some audio so meters / scopes have something to draw. Effects get their test programme
+    // (the sung phrase with --phrase vocal), stopped mid-note so the displays are full.
+    const bool isEffect = proc.getBusCount (true) > 0 && proc.getChannelCountOfBus (true, 0) > 0;
+    if (isEffect)
+    {
+        proc.setPlayConfigDetails (2, 2, 48000.0, 256);
+        proc.prepareToPlay (48000.0, 256);
+        const double seconds = 3.6;
+        const auto input = a.get ("--phrase", "demo") == "vocal" ? vocalTestSignal (48000.0, seconds) : effectTestSignal (48000.0, seconds);
+        juce::AudioBuffer<float> buf (2, 256);
+        juce::MidiBuffer midi;
+        for (int pos = 0; pos + 256 <= input.getNumSamples(); pos += 256)
+        {
+            for (int ch = 0; ch < 2; ++ch)
+                buf.copyFrom (ch, 0, input, ch, pos, 256);
+            proc.processBlock (buf, midi);
+        }
+    }
+    else
     {
         juce::AudioBuffer<float> buf (2, 256);
         juce::MidiBuffer midi;
@@ -629,6 +797,8 @@ int main (int argc, char* argv[])
         a.raw.add (juce::String::fromUTF8 (argv[i]));
 
     const auto cmd = a.raw.isEmpty() ? juce::String ("list") : a.raw[0];
+    if (a.has ("--input"))
+        gInputFile = juce::File::getCurrentWorkingDirectory().getChildFile (a.get ("--input"));
     std::unique_ptr<juce::AudioProcessor> proc (createPluginFilter());
 
     // Render presets as designed: performance switches ("perf*" on/off, e.g. Poly) off unless --perf is given.

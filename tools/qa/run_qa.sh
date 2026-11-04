@@ -45,9 +45,9 @@ echo "== stress"
 
 echo "== UI snapshot"
 if command -v xvfb-run > /dev/null; then
-    xvfb-run -a -s "-screen 0 2560x1600x24" "$HARNESS" snapshot --out "$OUT/ui.png"
+    xvfb-run -a -s "-screen 0 2560x1600x24" "$HARNESS" snapshot --out "$OUT/ui.png" --phrase "$(cfg phrase demo)"
 else
-    "$HARNESS" snapshot --out "$OUT/ui.png" || echo "(snapshot skipped: no display)"
+    "$HARNESS" snapshot --out "$OUT/ui.png" --phrase "$(cfg phrase demo)" || echo "(snapshot skipped: no display)"
 fi
 
 if [[ -n "${PLUGINVAL:-}" && -d "$VST3" ]]; then
