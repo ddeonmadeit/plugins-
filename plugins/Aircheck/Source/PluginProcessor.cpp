@@ -9,7 +9,7 @@ using aircheck::P;
 
 const juce::StringArray& AircheckProcessor::categoryOrder()
 {
-    static const juce::StringArray order { "80S", "2000S", "TRAVIS SCOTT", "YE", "TAME IMPALA", "R&B", "TRIP HOP", "MOSHC0RE", "STUDIO" };
+    static const juce::StringArray order { "DEON", "80S", "2000S", "TRAVIS SCOTT", "YE", "TAME IMPALA", "R&B", "TRIP HOP", "MOSHC0RE", "STUDIO" };
     return order;
 }
 
@@ -51,16 +51,20 @@ void AircheckProcessor::prepareToPlay (double sampleRate, int)
     gate.prepare (sr);
     mic.prepare (sr);
     preamp.prepare (sr, kChunk);
-    eq.prepare (sr);
+    proEq.prepare (sr);
+    rider.prepare (sr);
     comp.prepare (sr);
+    smooth.prepare (sr);
+    air.prepare (sr, kChunk);
+    dimension.prepare (sr);
+    limiter.prepare (sr);
+    dryAlign.prepare (kChunk, comp.getLatency() + smooth.getLatency());
     deesser.prepare (sr);
     doubler.prepare (sr);
     vocoder.prepare (sr);
     tape.prepare (sr);
     delay.prepare (sr, 2.5f);
     reverb.prepare (sr);
-    clipper.prepare (sr, kChunk);
-    clipper.reset();
     pitchCounter = 0;
     duckEnv = gateEnv = revGate = 0.0f;
     revHold = 0;
@@ -76,7 +80,8 @@ void AircheckProcessor::prepareToPlay (double sampleRate, int)
     tuneMixSm.setCurrentAndTargetValue (pitchActive ? 1.0f : 0.0f);
     delay.setTime ((float) (0.25 * sr), true);
 
-    setLatencySamples (psola.getLatency() + (int) std::lround (preamp.getLatency()) + comp.getLatency() + clipper.getLatency());
+    setLatencySamples (psola.getLatency() + (int) std::lround (preamp.getLatency() + air.getLatency())
+                       + comp.getLatency() + smooth.getLatency() + limiter.getLatency());
 }
 
 void AircheckProcessor::readSettings()
@@ -93,22 +98,27 @@ void AircheckProcessor::readSettings()
     formantRatio = dd::semitonesToRatio (params.get (P::tuneFormant));
     pitchActive = tuneOn || params.getInt (P::tuneTranspose) != 0 || std::abs (params.get (P::tuneFormant)) > 0.01f;
 
-    eqSettings.lowCut = params.get (P::eqLowCut);
-    eqSettings.lsHz = params.get (P::eqLsFreq);
-    eqSettings.lsDb = params.get (P::eqLsGain);
-    eqSettings.p1Hz = params.get (P::eq1Freq);
-    eqSettings.p1Db = params.get (P::eq1Gain);
-    eqSettings.p1Q = params.get (P::eq1Q);
-    eqSettings.p2Hz = params.get (P::eq2Freq);
-    eqSettings.p2Db = params.get (P::eq2Gain);
-    eqSettings.p2Q = params.get (P::eq2Q);
-    eqSettings.p3Hz = params.get (P::eq3Freq);
-    eqSettings.p3Db = params.get (P::eq3Gain);
-    eqSettings.p3Q = params.get (P::eq3Q);
-    eqSettings.hsHz = params.get (P::eqHsFreq);
-    eqSettings.hsDb = params.get (P::eqHsGain);
-    eqSettings.highCut = params.get (P::eqHighCut);
-    eq.set (eqSettings);
+    // The eight EQ bands (parameters b1On..b8Place, nine per band, in table order).
+    for (int i = 0; i < aircheck::ProEq::kBands; ++i)
+    {
+        const int base = (int) P::b1On + i * 9;
+        auto& b = bands[(size_t) i];
+        b.on = params.getBool ((P) base);
+        b.type = params.getInt ((P) (base + 1));
+        b.hz = params.get ((P) (base + 2));
+        b.db = params.get ((P) (base + 3));
+        b.q = params.get ((P) (base + 4));
+        b.slope = params.getInt ((P) (base + 5));
+        b.dynRange = params.get ((P) (base + 6));
+        b.dynThresh = params.get ((P) (base + 7));
+        b.place = params.getInt ((P) (base + 8));
+    }
+    proEq.set (bands);
+
+    smoothSettings.depth = params.get (P::smoothDepth);
+    smoothSettings.sharpness = params.get (P::smoothSharp);
+    smoothSettings.lowHz = params.get (P::smoothLow);
+    smoothSettings.highHz = std::max (params.get (P::smoothHigh), smoothSettings.lowHz * 1.5f);
 
     compSettings.type = params.getInt (P::compType);
     compSettings.amount = params.get (P::compAmount);
@@ -116,6 +126,7 @@ void AircheckProcessor::readSettings()
     compSettings.releaseMs = params.get (P::compRelease);
     compSettings.ratio = params.get (P::compRatio);
     compSettings.mix = params.get (P::compMix);
+    compSettings.scHpf = params.get (P::compScHpf);
 
     mic.setType (params.getInt (P::micType));
 
@@ -171,6 +182,10 @@ void AircheckProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
     scope.push (buffer.getReadPointer (0), numCh > 1 ? buffer.getReadPointer (1) : nullptr, numSamples);
     compGr.store (comp.getGainReductionDb(), std::memory_order_relaxed);
     deessGr.store (deesser.getReductionDb(), std::memory_order_relaxed);
+    smoothGr.store (smooth.getActivityDb(), std::memory_order_relaxed);
+    limitGr.store (limiter.getGainReductionDb(), std::memory_order_relaxed);
+    for (int i = 0; i < aircheck::ProEq::kBands; ++i)
+        bandDynDb[(size_t) i].store (proEq.getDynamicDb (i), std::memory_order_relaxed);
 }
 
 void AircheckProcessor::processChunk (float* L, float* R, int n)
@@ -210,17 +225,23 @@ void AircheckProcessor::processChunk (float* L, float* R, int n)
     // The shifter's output time for this chunk, and the dry signal at the same moment (after the
     // preamp's oversampling delay too, so a dry/wet blend never combs).
     const int64_t r0 = psola.getWritePosition() + n - psola.getLatency();
-    const double osLat = preamp.getLatency() + comp.getLatency();
+
     psola.process (L, R, n, formantRatio);
     for (int i = 0; i < n; ++i)
     {
         const int64_t t = r0 - n + i;
-        dryL[(size_t) i] = psola.readInput (0, (double) t - osLat);
-        dryR[(size_t) i] = psola.readInput (1, (double) t - osLat);
+        dryL[(size_t) i] = psola.readInput (0, (double) t);
+        dryR[(size_t) i] = psola.readInput (1, (double) t);
         const float tm = tuneMixSm.getNextValue();
         const float bl = psola.readInput (0, (double) t), br = psola.readInput (1, (double) t);
         L[i] = bl + (L[i] - bl) * tm;
         R[i] = br + (R[i] - br) * tm;
+    }
+
+    {
+        float* dry[2] = { dryL.data(), dryR.data() };
+        juce::dsp::AudioBlock<float> block (dry, 2, (size_t) n);
+        dryAlign.process (block);
     }
 
     // Mic voicing and preamp.
@@ -229,19 +250,37 @@ void AircheckProcessor::processChunk (float* L, float* R, int n)
     {
         float* chans[2] = { L, R };
         juce::dsp::AudioBlock<float> block (chans, 2, (size_t) n);
-        preamp.process (block, params.getInt (P::preType), params.get (P::preDrive));
+        preamp.process (block, params.getInt (P::preType), params.get (P::preDrive), params.get (P::preTone), params.get (P::preMix));
     }
 
-    // EQ (the analyzer sees both sides of it), compressor, de-esser.
-    preEq.push (L, R, n);
-    for (int i = 0; i < n; ++i)
-        eq.process (L[i], R[i]);
-    postEq.push (L, R, n);
-    const float deessAmt = params.get (P::deess), deessHz = params.get (P::deessFreq);
+    // EQ (the analyzer sees both sides of it) before the dynamics, or after them ("EQ Post"), then the
+    // rider, compressor and de-esser.
+    const bool eqPost = params.getBool (P::eqPost);
+    auto runEq = [&]
+    {
+        preEq.push (L, R, n);
+        for (int i = 0; i < n; ++i)
+            proEq.process (L[i], R[i]);
+        postEq.push (L, R, n);
+    };
+    if (! eqPost)
+        runEq();
+    const float deessAmt = params.get (P::deess), deessHz = params.get (P::deessFreq), riderAmt = params.get (P::rider);
     for (int i = 0; i < n; ++i)
     {
+        rider.process (L[i], R[i], riderAmt);
         comp.process (L[i], R[i], compSettings);
         deesser.process (L[i], R[i], deessAmt, deessHz);
+    }
+    if (eqPost)
+        runEq();
+
+    // Resonance smoothing and air.
+    smooth.process (L, R, n, smoothSettings);
+    {
+        float* chans[2] = { L, R };
+        juce::dsp::AudioBlock<float> block (chans, 2, (size_t) n);
+        air.process (block, params.get (P::airMid), params.get (P::airHigh));
     }
 
     // Vocoder, playing the sung (corrected) pitch.
@@ -283,6 +322,13 @@ void AircheckProcessor::processChunk (float* L, float* R, int n)
             L[i] += a * dbl * 0.8f;
             R[i] += b * dbl * 0.8f;
         }
+    {
+        const float rate = params.get (P::chRate), depth = params.get (P::chDepth), chMix = params.get (P::chMix);
+        const int dimMode = params.getInt (P::dimMode);
+        const float dimMix = params.get (P::dimMix);
+        for (int i = 0; i < n; ++i)
+            dimension.process (L[i], R[i], rate, depth, chMix, dimMode, dimMix);
+    }
     const float tapeAmt = params.get (P::tape);
     if (tapeAmt > 0.001f)
         for (int i = 0; i < n; ++i)
@@ -327,26 +373,26 @@ void AircheckProcessor::processChunk (float* L, float* R, int n)
         R[i] = vr + dr + rr;
     }
 
-    // Dry / wet and output level, then the safety clipper (so output gain can never push past 0 dBFS).
+    // Dry / wet, output level, then the true-peak limiter, always in: nothing passes -1 dBTP.
+    const float limitAmt = params.get (P::limit);
     for (int i = 0; i < n; ++i)
     {
         const float m = mixSm.getNextValue();
         const float g = outGainSm.getNextValue();
         L[i] = (dryL[(size_t) i] + (L[i] - dryL[(size_t) i]) * m) * g;
         R[i] = (dryR[(size_t) i] + (R[i] - dryR[(size_t) i]) * m) * g;
+        limiter.process (L[i], R[i], limitAmt);
         if (dd::isBad (L[i]) || dd::isBad (R[i]))
         {
             // Never pass NaN/Inf on: silence this chunk and start the stateful parts fresh.
             std::fill (L, L + n, 0.0f);
             std::fill (R, R + n, 0.0f);
-            comp.reset(); deesser.reset(); eq.reset(); mic.reset(); vocoder.reset(); doubler.reset();
-            delay.reset(); reverb.reset(); tape.reset(); preamp.reset();
+            comp.reset(); deesser.reset(); proEq.reset(); mic.reset(); vocoder.reset(); doubler.reset();
+            delay.reset(); reverb.reset(); tape.reset(); preamp.reset(); smooth.reset(); air.reset();
+            rider.reset(); dimension.reset(); limiter.reset(); dryAlign.reset();
             break;
         }
     }
-    float* chans[2] = { L, R };
-    juce::dsp::AudioBlock<float> block (chans, 2, (size_t) n);
-    clipper.process (block, 0.0f);
 }
 
 int AircheckProcessor::getNumPrograms()           { return std::max (1, presets.getNumFactoryPresets()); }
@@ -381,9 +427,33 @@ void AircheckProcessor::setStateInformation (const void* data, int sizeInBytes)
         {
             auto tree = juce::ValueTree::fromXml (*xml);
             dd::replaceStateExactly (apvts, tree);
+            migrateLegacyEq (tree);
             presets.readState (tree);
             editorScale = juce::jlimit (0.6f, 1.8f, (float) tree.getProperty ("uiScale", 1.0f));
         }
+}
+
+void AircheckProcessor::migrateLegacyEq (const juce::ValueTree& saved)
+{
+    // Sessions from 1.0 / 1.1 had a fixed six-band EQ: carry its settings into the eight bands.
+    for (const auto& child : saved)
+        if (child.getProperty ("id").toString() == "b1Type")
+            return;
+    auto get = [this] (const char* id) { return apvts.getRawParameterValue (id)->load(); };
+    auto set = [this] (const juce::String& id, float v) { if (auto* p = apvts.getParameter (id)) p->setValueNotifyingHost (p->convertTo0to1 (v)); };
+    auto band = [&] (int n, bool on, int type, float hz, float db, float q, int slope)
+    {
+        const auto b = "b" + juce::String (n);
+        set (b + "On", on ? 1.0f : 0.0f); set (b + "Type", (float) type); set (b + "Freq", hz);
+        set (b + "Gain", db); set (b + "Q", q); set (b + "Slope", (float) slope);
+    };
+    band (1, get ("eqLowCut") > 21.0f, 3, get ("eqLowCut"), 0.0f, 0.71f, 1);
+    band (2, std::abs (get ("eqLsGain")) > 0.05f, 1, get ("eqLsFreq"), get ("eqLsGain"), 0.7f, 1);
+    band (3, std::abs (get ("eq1Gain")) > 0.05f, 0, get ("eq1Freq"), get ("eq1Gain"), get ("eq1Q"), 1);
+    band (4, std::abs (get ("eq2Gain")) > 0.05f, 0, get ("eq2Freq"), get ("eq2Gain"), get ("eq2Q"), 1);
+    band (5, std::abs (get ("eq3Gain")) > 0.05f, 0, get ("eq3Freq"), get ("eq3Gain"), get ("eq3Q"), 1);
+    band (6, std::abs (get ("eqHsGain")) > 0.05f, 2, get ("eqHsFreq"), get ("eqHsGain"), 0.7f, 1);
+    band (7, get ("eqHighCut") < 21500.0f, 4, std::min (get ("eqHighCut"), 20000.0f), 0.0f, 0.71f, 1);
 }
 
 juce::AudioProcessorEditor* AircheckProcessor::createEditor() { return new AircheckEditor (*this); }

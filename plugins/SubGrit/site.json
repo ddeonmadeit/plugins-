@@ -14,11 +14,10 @@
     "Notes play at real pitch: the classic 808 range is C2–C3 in FL's piano roll (or use the Octave knob)."
   ],
   "whatsNew": {
-    "version": "1.9.0",
+    "version": "1.10.0",
     "items": [
-      "2000s category, 7 new basses: the Neptunes' Frontin' Moog, a minimal Drop It Like It's Hot sub, the Grindin' boom, Timbaland's rubbery synth bass, Dr. Dre's In Da Club sub, a crunk 808 (extreme) and a slow-jam sub (subtle)",
-      "80s category, 7 new basses: the Push It To The Limit octave bass, a Moroder echo pulse, the driving pick bass of I'm Still Standing, synth-funk, a Minimoog, an arena overdrive (extreme) and a soft Moog sub (subtle)",
-      "New look, matching the rawleads instrument design: a DARK / LITE switch in the top bar (every open plugin follows it, with a soft crossfade), keycap buttons that press in, the preset name on a lit smoked-amber key with a flickering lamp behind it, LED switches, glowing knob arcs, console displays and the Instrument Sans typeface"
+      "Presets you can make your own: Save opens a menu to save over the current preset (your version takes the factory preset's place and stays through updates), save as a new preset in any category, restore the factory version or delete one of yours; a star next to the name shows the sound has been edited. Your presets live in Music/ddeonmadeit/<plugin>/Presets and are never touched by an update",
+      "Fixed a rare crash when a host unloads the plugin"
     ]
   }
 }

@@ -1,16 +1,16 @@
 {
   "publish": true,
   "tagline": "A whole analog vocal chain with pitch correction and a visual EQ, voiced after famous records",
-  "description": "Put it on a vocal and pick a record: Phil Collins' In The Air Tonight, Pharrell and SexyBack-era Timberlake, Travis Scott hard tune, 808s-era Kanye, Tame Impala, R&B, trip hop and more. Underneath is a full chain you can change: pitch correction (key, scale, retune speed, humanize, flex, formant), mic voicing, tube preamp, a six-band EQ you drag on a live analyzer, FET / opto / vintage-limiter compression, de-esser, doubler, a vocoder that follows your voice, tape, tape delay and reverb.",
+  "description": "Put it on a vocal and pick a record: Phil Collins' In The Air Tonight, Pharrell and SexyBack-era Timberlake, Travis Scott hard tune, 808s-era Kanye, Tame Impala, R&B, trip hop and more. Underneath is a full chain you can change: pitch correction (key, scale, retune speed, humanize, flex, formant), mic voicing, saturation, an eight-band dynamic EQ you drag on a live analyzer, a vocal rider, FET / opto / vintage-limiter / VCA compression, de-esser, a resonance smoother, air, doubler, chorus and Dimension, a vocoder that follows your voice, tape, tape delay, reverb and a true-peak limiter.",
   "accent": "#e0793f",
   "highlights": [
     "In The Air Tonight (Phil Collins, 1981): a dynamic mic into a cheap old limiter at 6:1 with a slow attack, almost dry with a dark tape echo, plus the vocoder version for the second verse",
     "Pitch correction that keeps the voice natural: notes are moved whole periods at a time (PSOLA), so vowels and timbre stay put; retune speed from instant (the robotic effect) to gentle, humanize for held notes, flex for slides, natural vibrato kept or flattened, transpose and formant shift",
-    "Visual EQ: drag the points of a six-band EQ (low cut, low shelf, three bands, high shelf, high cut) over a live analyzer of the voice before and after; scroll for width",
-    "Analog chain: dynamic / condenser / ribbon / radio / lo-fi mic voicing, tube, tape, console or crunch preamp, and FET, opto, vintage-limiter or VCA compression with a gain-reduction meter",
-    "De-esser, doubler (automatic double tracking), tape saturation, a tape delay that ducks under the voice, and plate, room, hall, chamber and 80s gated reverbs",
+    "Visual EQ: eight bands you drag over a live analyzer of the voice before and after; each can be a bell, shelf, cut up to 48 dB/oct, notch, band-pass or tilt, on stereo, mid or side, and dynamic (it moves with the level in its band). Analog-matched curves stay true up to 20 kHz",
+    "Analog chain: mic voicing, tube / tape / console / crunch saturation (4x oversampled, tone, parallel mix), a vocal rider, and FET, opto, vintage-limiter or VCA compression with a sidechain filter and gain-reduction meter",
+    "Smooth (a resonance suppressor that tames harsh frequencies only while they ring), Air (mid and high air that stays smooth on esses), de-esser, doubler, chorus and Dimension widening, tape, a tape delay that ducks under the voice, plate / room / hall / chamber / gated reverbs and a true-peak limiter",
     "Vocoder that plays the note you sing (and the chord of your key) with string, robot, choir or brass voices: no MIDI needed",
-    "30 presets, each a different record or job: 80s, 2000s, Travis Scott, Ye, Tame Impala, R&B, trip hop, moshc0re and studio essentials"
+    "31 presets, each a different record or job: DEON, 80s, 2000s, Travis Scott, Ye, Tame Impala, R&B, trip hop, moshc0re and studio essentials"
   ],
   "installTips": [
     "Put Aircheck first on the vocal track (FL Studio: Mixer > vocal insert > slot 1), then pick a preset.",
@@ -19,9 +19,14 @@
   ],
   "previewNote": "on a synthetic sung test phrase (slightly off pitch on purpose), so you hear the chain and the correction, not a real singer.",
   "whatsNew": {
-    "version": "1.1.0",
+    "version": "1.2.0",
     "items": [
-      "2000s category, 7 new vocal styles: Pharrell's stacked falsetto, a Drop It Like It's Hot whisper, Justin Timberlake's distorted SexyBack vocal, T-Pain hard tune, Kanye's chipmunk soul (pitched up with the formants raised), Timbaland's low ad-libs and a crunk hype shout (extreme)"
+      "DEON: DEON's own chain (Spaced & Warm) built in: gate, a 1176 at 12:1, presence at 1.6 and 6.4 kHz and a 12 kHz air shelf after the compressor, a high de-esser, chorus into Dimension 2, a dark half-note ping-pong and a studio reverb",
+      "New EQ: eight bands, each a bell, shelf, 12-48 dB/oct cut, notch, band-pass or tilt, on stereo, mid or side, and optionally dynamic; analog-matched curves that keep their shape all the way to 20 kHz; before or after the compressor",
+      "Smooth: finds harsh resonances as they happen and turns down only those frequencies, only while they ring",
+      "Air: a mid and a high air band that open up breathy detail without making loud esses harsh",
+      "Saturation rebuilt (4x oversampled, tone and parallel mix), a vocal rider, a sidechain filter on the compressor, a true-peak limiter, chorus and Dimension widening; every preset reworked to use them",
+      "Presets you can make your own: Save opens a menu to save over the current preset (your version takes the factory preset's place and stays through updates), save as a new preset in any category, restore the factory version or delete one of yours; a star next to the name shows the sound has been edited. Your presets live in Music/ddeonmadeit/<plugin>/Presets and are never touched by an update"
     ]
   }
 }

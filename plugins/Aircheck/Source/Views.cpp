@@ -136,70 +136,95 @@ void PitchView::paint (juce::Graphics& g)
 }
 
 //==============================================================================
-const std::array<EqView::Node, 7>& EqView::nodes()
+namespace
 {
-    static const std::array<Node, 7> n {{
-        { "Low Cut", "eqLowCut", nullptr, nullptr }, { "Low", "eqLsFreq", "eqLsGain", nullptr },
-        { "Band 1", "eq1Freq", "eq1Gain", "eq1Q" },  { "Band 2", "eq2Freq", "eq2Gain", "eq2Q" },
-        { "Band 3", "eq3Freq", "eq3Gain", "eq3Q" },  { "High", "eqHsFreq", "eqHsGain", nullptr },
-        { "High Cut", "eqHighCut", nullptr, nullptr } }};
-    return n;
-}
+juce::String bandId (int band, const char* what) { return "b" + juce::String (band + 1) + what; }
+} // namespace
 
 EqView::EqView (AircheckProcessor& p) : proc (p)
 {
-    eq.prepare (48000.0);
     fftData.assign (8192, 0.0f);
     window.resize (4096);
     for (size_t i = 0; i < window.size(); ++i)
         window[i] = 0.5f - 0.5f * std::cos (juce::MathConstants<float>::twoPi * (float) i / (float) (window.size() - 1));
-    for (auto& nd : nodes())
-        for (auto* id : { nd.freqId, nd.gainId, nd.qId })
-            if (id != nullptr)
-                proc.apvts.addParameterListener (id, this);
+    for (int b = 0; b < aircheck::ProEq::kBands; ++b)
+        for (auto* what : { "On", "Type", "Freq", "Gain", "Q", "Slope", "Dyn", "Thresh", "Place" })
+            proc.apvts.addParameterListener (bandId (b, what), this);
     startTimerHz (30);
 }
 
 EqView::~EqView()
 {
-    for (auto& nd : nodes())
-        for (auto* id : { nd.freqId, nd.gainId, nd.qId })
-            if (id != nullptr)
-                proc.apvts.removeParameterListener (id, this);
+    for (int b = 0; b < aircheck::ProEq::kBands; ++b)
+        for (auto* what : { "On", "Type", "Freq", "Gain", "Q", "Slope", "Dyn", "Thresh", "Place" })
+            proc.apvts.removeParameterListener (bandId (b, what), this);
 }
 
 juce::Rectangle<float> EqView::plot() const { return getLocalBounds().toFloat().reduced (2.0f, 4.0f).reduced (14.0f, 12.0f).withTrimmedBottom (12.0f); }
 float EqView::xForHz (float hz) const   { const auto p = plot(); return p.getX() + p.getWidth() * std::log (hz / 20.0f) / std::log (1000.0f); }
 float EqView::hzForX (float x) const    { const auto p = plot(); return 20.0f * std::pow (1000.0f, (x - p.getX()) / p.getWidth()); }
-float EqView::yForDb (float db) const   { const auto p = plot(); return p.getCentreY() - db / 20.0f * p.getHeight() * 0.5f; }
-float EqView::dbForY (float y) const    { const auto p = plot(); return (p.getCentreY() - y) / (p.getHeight() * 0.5f) * 20.0f; }
-float EqView::value (const char* id) const { return proc.apvts.getRawParameterValue (id)->load(); }
+float EqView::yForDb (float db) const   { const auto p = plot(); return p.getCentreY() - db / 24.0f * p.getHeight() * 0.5f; }
+float EqView::dbForY (float y) const    { const auto p = plot(); return (p.getCentreY() - y) / (p.getHeight() * 0.5f) * 24.0f; }
+float EqView::value (const juce::String& id) const { return proc.apvts.getRawParameterValue (id)->load(); }
 
-void EqView::setValue (const char* id, float v)
+void EqView::setValue (const juce::String& id, float v, bool gesture)
 {
     if (auto* prm = proc.apvts.getParameter (id))
+    {
+        if (gesture) prm->beginChangeGesture();
         prm->setValueNotifyingHost (prm->convertTo0to1 (prm->getNormalisableRange().snapToLegalValue (v)));
+        if (gesture) prm->endChangeGesture();
+    }
 }
 
-juce::Point<float> EqView::nodePos (int i) const
+std::array<aircheck::BandSettings, aircheck::ProEq::kBands> EqView::readBands() const
 {
-    const auto& nd = nodes()[(size_t) i];
-    const float hz = value (nd.freqId);
-    const float db = nd.gainId != nullptr ? value (nd.gainId) : juce::jlimit (-18.0f, 0.0f, eq.responseDb (hz));
-    return { juce::jlimit (plot().getX(), plot().getRight(), xForHz (hz)), yForDb (db) };
+    std::array<aircheck::BandSettings, aircheck::ProEq::kBands> out {};
+    for (int b = 0; b < aircheck::ProEq::kBands; ++b)
+    {
+        auto& s = out[(size_t) b];
+        s.on = value (bandId (b, "On")) >= 0.5f;
+        s.type = (int) value (bandId (b, "Type"));
+        s.hz = value (bandId (b, "Freq"));
+        s.db = value (bandId (b, "Gain"));
+        s.q = value (bandId (b, "Q"));
+        s.slope = (int) value (bandId (b, "Slope"));
+        s.dynRange = value (bandId (b, "Dyn"));
+        s.dynThresh = value (bandId (b, "Thresh"));
+        s.place = (int) value (bandId (b, "Place"));
+    }
+    return out;
+}
+
+juce::Point<float> EqView::nodePos (int b) const
+{
+    const auto& s = bands[(size_t) b];
+    float db = s.db;
+    if (! aircheck::isGainType (s.type))
+        db = (float) juce::jlimit (-24.0, 0.0, aircheck::ProEq::responseDb ({ s }, s.hz, 48000.0) * 0.5);
+    if (s.type == (int) aircheck::BandType::Tilt)
+        db = s.db * 0.5f;
+    return { juce::jlimit (plot().getX(), plot().getRight(), xForHz (s.hz)), yForDb (db) };
 }
 
 int EqView::nodeAt (juce::Point<float> p) const
 {
     int best = -1;
     float bestD = 14.0f;
-    for (int i = 0; i < (int) nodes().size(); ++i)
-        if (const float d = nodePos (i).getDistanceFrom (p); d < bestD)
-        {
-            bestD = d;
-            best = i;
-        }
+    for (int b = 0; b < aircheck::ProEq::kBands; ++b)
+    {
+        // Off bands can still be picked up (to switch them back on), but lit ones win.
+        const float d = nodePos (b).getDistanceFrom (p) + (bands[(size_t) b].on ? 0.0f : 4.0f);
+        if (d < bestD) { bestD = d; best = b; }
+    }
     return best;
+}
+
+void EqView::setSelected (int b)
+{
+    selected = juce::jlimit (0, aircheck::ProEq::kBands - 1, b);
+    curveDirty = true;
+    repaint();
 }
 
 void EqView::analyse (dd::ScopeBuffer& src, std::vector<float>& smooth)
@@ -240,20 +265,19 @@ void EqView::timerCallback()
 
 void EqView::updateCurve()
 {
+    bands = readBands();
+    const auto p = plot();
+    const size_t w = (size_t) std::max (2, (int) p.getWidth());
+    curve.resize (w);
+    bandCurve.resize (w);
+    const auto& sel = bands[(size_t) selected];
+    for (size_t i = 0; i < w; ++i)
     {
-        aircheck::VocalEq::Settings st;
-        st.lowCut = value ("eqLowCut");  st.lsHz = value ("eqLsFreq");  st.lsDb = value ("eqLsGain");
-        st.p1Hz = value ("eq1Freq");     st.p1Db = value ("eq1Gain");   st.p1Q = value ("eq1Q");
-        st.p2Hz = value ("eq2Freq");     st.p2Db = value ("eq2Gain");   st.p2Q = value ("eq2Q");
-        st.p3Hz = value ("eq3Freq");     st.p3Db = value ("eq3Gain");   st.p3Q = value ("eq3Q");
-        st.hsHz = value ("eqHsFreq");    st.hsDb = value ("eqHsGain");  st.highCut = value ("eqHighCut");
-        eq.set (st);
-        const auto p = plot();
-        curve.resize ((size_t) std::max (2, (int) p.getWidth()));
-        for (size_t i = 0; i < curve.size(); ++i)
-            curve[i] = eq.responseDb (hzForX (p.getX() + (float) i));
-        curveDirty = false;
+        const double hz = hzForX (p.getX() + (float) i);
+        curve[i] = (float) aircheck::ProEq::responseDb (bands, hz, 48000.0);
+        bandCurve[i] = sel.on ? (float) aircheck::ProEq::responseDb ({ sel }, hz, 48000.0) : 0.0f;
     }
+    curveDirty = false;
 }
 
 void EqView::resized()
@@ -271,7 +295,7 @@ void EqView::paint (juce::Graphics& g)
     dd::gui::paintConsole (g, r, 12.0f, dd::gui::lampBloom (dd::gui::animationTime()));
     const auto p = plot();
 
-    // Grid: decades and the vocal landmarks, +-6 / 12 / 18 dB.
+    // Grid: decades and the vocal landmarks, +-6 / 12 / 18 / 24 dB.
     g.setFont (dd::gui::LookAndFeel::font (8.5f, 600));
     for (float hz : { 50.0f, 100.0f, 200.0f, 500.0f, 1000.0f, 2000.0f, 5000.0f, 10000.0f })
     {
@@ -318,48 +342,68 @@ void EqView::paint (juce::Graphics& g)
     if (! postSpec.empty())
     {
         auto fill = specPath (postSpec, true);
-        g.setGradientFill (juce::ColourGradient (kGlow.withAlpha (0.28f), 0.0f, p.getY() + p.getHeight() * 0.3f,
+        g.setGradientFill (juce::ColourGradient (kGlow.withAlpha (0.24f), 0.0f, p.getY() + p.getHeight() * 0.3f,
                                                  kGlow.withAlpha (0.03f), 0.0f, p.getBottom(), false));
         g.fillPath (fill);
         g.setColour (kDimText.withAlpha (0.35f));
         g.strokePath (specPath (preSpec, false), juce::PathStrokeType (1.0f));
     }
 
-    // The EQ curve.
-    if (curve.size() > 1)
+    auto curvePath = [&] (const std::vector<float>& c)
     {
-        juce::Path c;
-        for (size_t i = 0; i < curve.size(); ++i)
+        juce::Path path;
+        for (size_t i = 0; i < c.size(); ++i)
         {
-            const float y = juce::jlimit (p.getY() - 2.0f, p.getBottom() + 2.0f, yForDb (curve[i]));
-            if (i == 0) c.startNewSubPath (p.getX(), y);
-            else        c.lineTo (p.getX() + (float) i, y);
+            const float y = juce::jlimit (p.getY() - 2.0f, p.getBottom() + 2.0f, yForDb (c[i]));
+            if (i == 0) path.startNewSubPath (p.getX(), y);
+            else        path.lineTo (p.getX() + (float) i, y);
         }
-        glowStroke (g, c, 2.0f, 0.12f);
+        return path;
+    };
+    // The selected band's own contribution as a soft filled shape, then the total curve.
+    if (bands[(size_t) selected].on && bandCurve.size() > 1)
+    {
+        auto shape = curvePath (bandCurve);
+        shape.lineTo (p.getRight(), yForDb (0.0f));
+        shape.lineTo (p.getX(), yForDb (0.0f));
+        shape.closeSubPath();
+        g.setColour (kGlow.withAlpha (0.12f));
+        g.fillPath (shape);
     }
+    if (curve.size() > 1)
+        glowStroke (g, curvePath (curve), 2.0f, 0.12f);
 
-    // Nodes: LEDs on the curve; the active one is lit and labelled.
-    for (int i = 0; i < (int) nodes().size(); ++i)
+    // Nodes: numbered LEDs; dynamic bands show how far their gain is moving right now.
+    for (int b = 0; b < aircheck::ProEq::kBands; ++b)
     {
-        const auto pos = nodePos (i);
-        const bool active = i == hover || i == drag;
-        const auto& nd = nodes()[(size_t) i];
-        const bool engaged = nd.gainId != nullptr ? std::abs (value (nd.gainId)) > 0.05f
-                                                  : (i == 0 ? value (nd.freqId) > 21.0f : value (nd.freqId) < 21500.0f);
-        dd::gui::paintLamp (g, pos, active ? 6.5f : 5.0f, kGlow, engaged || active ? 1.0f : 0.25f);
+        const auto& s = bands[(size_t) b];
+        const auto pos = nodePos (b);
+        const bool active = b == hover || b == drag || b == selected;
+        if (s.on && aircheck::isGainType (s.type) && std::abs (s.dynRange) > 0.05f)
+        {
+            const float moving = proc.bandDynDb[(size_t) b].load();
+            g.setColour (kGlow.withAlpha (0.25f));
+            g.fillRect (pos.x - 1.5f, std::min (pos.y, yForDb (s.db + s.dynRange)), 3.0f, std::abs (yForDb (s.db + s.dynRange) - pos.y));
+            g.setColour (kTrace.withAlpha (0.9f));
+            g.fillEllipse (pos.x - 3.0f, yForDb (s.db + moving) - 3.0f, 6.0f, 6.0f);
+        }
+        dd::gui::paintLamp (g, pos, active ? 7.0f : 5.5f, kGlow, s.on ? 1.0f : 0.15f);
+        g.setFont (dd::gui::LookAndFeel::font (8.0f, 700));
+        g.setColour (s.on ? juce::Colour (0xff1a0f08) : kDimText.withAlpha (0.6f));
+        g.drawText (juce::String (b + 1), juce::Rectangle<float> (pos.x - 6.0f, pos.y - 6.0f, 12.0f, 12.0f), juce::Justification::centred);
     }
-    if (const int i = drag >= 0 ? drag : hover; i >= 0)
+    if (const int b = drag >= 0 ? drag : hover; b >= 0)
     {
-        const auto& nd = nodes()[(size_t) i];
-        const float hz = value (nd.freqId);
-        juce::String text = juce::String (nd.name).toUpperCase() + "   "
-                          + (hz >= 1000.0f ? juce::String (hz / 1000.0f, 2) + " kHz" : juce::String (juce::roundToInt (hz)) + " Hz");
-        if (nd.gainId != nullptr)
-            text << "   " << (value (nd.gainId) > 0.0f ? "+" : "") << juce::String (value (nd.gainId), 1) << " dB";
-        if (nd.qId != nullptr)
-            text << "   Q " << juce::String (value (nd.qId), 2);
-        const auto pos = nodePos (i);
-        auto box = juce::Rectangle<float> (pos.x - 110.0f, pos.y - 30.0f, 220.0f, 16.0f).constrainedWithin (p);
+        const auto& s = bands[(size_t) b];
+        juce::String text = "BAND " + juce::String (b + 1) + "  " + aircheck::bandTypeNames()[s.type].toUpperCase() + "   "
+                          + (s.hz >= 1000.0f ? juce::String (s.hz / 1000.0f, 2) + " kHz" : juce::String (juce::roundToInt (s.hz)) + " Hz");
+        if (aircheck::isGainType (s.type))
+            text << "   " << (s.db > 0.0f ? "+" : "") << juce::String (s.db, 1) << " dB";
+        text << "   Q " << juce::String (s.q, 2);
+        if (! s.on)
+            text << "   (OFF)";
+        const auto pos = nodePos (b);
+        auto box = juce::Rectangle<float> (pos.x - 150.0f, pos.y - 30.0f, 300.0f, 16.0f).constrainedWithin (p);
         dd::gui::drawGlowing (g, text, box, kLitText, dd::gui::LookAndFeel::font (10.0f, 600).withExtraKerningFactor (0.06f));
     }
 }
@@ -379,78 +423,152 @@ void EqView::mouseExit (const juce::MouseEvent&) { hover = -1; repaint(); }
 
 void EqView::mouseDown (const juce::MouseEvent& e)
 {
-    drag = nodeAt (e.position);
-    if (drag < 0)
+    const int b = nodeAt (e.position);
+    if (b < 0)
         return;
-    const auto& nd = nodes()[(size_t) drag];
-    for (auto* id : { nd.freqId, nd.gainId })
-        if (id != nullptr)
-            if (auto* prm = proc.apvts.getParameter (id))
-                prm->beginChangeGesture();
+    if (e.mods.isPopupMenu())
+    {
+        setValue (bandId (b, "On"), bands[(size_t) b].on ? 0.0f : 1.0f, true);
+        return;
+    }
+    setSelected (b);
+    if (onSelect)
+        onSelect (b);
+    drag = b;
+    for (auto* what : { "Freq", "Gain", "On" })
+        if (auto* prm = proc.apvts.getParameter (bandId (b, what)))
+            prm->beginChangeGesture();
+    if (! bands[(size_t) b].on)
+        setValue (bandId (b, "On"), 1.0f);   // grabbing an off band switches it on
 }
 
 void EqView::mouseDrag (const juce::MouseEvent& e)
 {
     if (drag < 0)
         return;
-    const auto& nd = nodes()[(size_t) drag];
-    setValue (nd.freqId, hzForX (e.position.x));
-    if (nd.gainId != nullptr)
-        setValue (nd.gainId, juce::jlimit (-18.0f, 18.0f, dbForY (e.position.y)));
+    setValue (bandId (drag, "Freq"), hzForX (e.position.x));
+    if (aircheck::isGainType (bands[(size_t) drag].type))
+        setValue (bandId (drag, "Gain"), juce::jlimit (-24.0f, 24.0f, dbForY (e.position.y) * (bands[(size_t) drag].type == (int) aircheck::BandType::Tilt ? 2.0f : 1.0f)));
 }
 
 void EqView::mouseUp (const juce::MouseEvent&)
 {
     if (drag < 0)
         return;
-    const auto& nd = nodes()[(size_t) drag];
-    for (auto* id : { nd.freqId, nd.gainId })
-        if (id != nullptr)
-            if (auto* prm = proc.apvts.getParameter (id))
-                prm->endChangeGesture();
+    for (auto* what : { "Freq", "Gain", "On" })
+        if (auto* prm = proc.apvts.getParameter (bandId (drag, what)))
+            prm->endChangeGesture();
     drag = -1;
 }
 
 void EqView::mouseDoubleClick (const juce::MouseEvent& e)
 {
-    const int i = nodeAt (e.position);
-    if (i < 0)
-        return;
-    const auto& nd = nodes()[(size_t) i];
-    auto reset = [this] (const char* id, float v)
+    const int b = nodeAt (e.position);
+    if (b >= 0)
     {
-        if (auto* prm = proc.apvts.getParameter (id))
+        if (aircheck::isGainType (bands[(size_t) b].type))
+            setValue (bandId (b, "Gain"), 0.0f, true);
+        else
+            setValue (bandId (b, "On"), 0.0f, true);
+        return;
+    }
+    // Empty space: the first free band becomes a bell right there.
+    for (int f = 0; f < aircheck::ProEq::kBands; ++f)
+        if (! bands[(size_t) f].on)
         {
-            prm->beginChangeGesture();
-            setValue (id, v);
-            prm->endChangeGesture();
+            setValue (bandId (f, "Type"), 0.0f, true);
+            setValue (bandId (f, "Freq"), hzForX (e.position.x), true);
+            setValue (bandId (f, "Gain"), juce::jlimit (-24.0f, 24.0f, dbForY (e.position.y)), true);
+            setValue (bandId (f, "Q"), 1.0f, true);
+            setValue (bandId (f, "On"), 1.0f, true);
+            setSelected (f);
+            if (onSelect)
+                onSelect (f);
+            return;
         }
-    };
-    if (nd.gainId != nullptr)
-        reset (nd.gainId, 0.0f);
-    else
-        reset (nd.freqId, i == 0 ? 20.0f : 22000.0f);   // cut filters: off
 }
 
 void EqView::mouseWheelMove (const juce::MouseEvent& e, const juce::MouseWheelDetails& w)
 {
-    const int i = nodeAt (e.position);
-    if (i < 0 || nodes()[(size_t) i].qId == nullptr)
+    const int b = nodeAt (e.position);
+    if (b < 0)
         return;
-    const char* id = nodes()[(size_t) i].qId;
-    if (auto* prm = proc.apvts.getParameter (id))
+    setValue (bandId (b, "Q"), value (bandId (b, "Q")) * std::exp (w.deltaY * 1.2f), true);
+}
+
+//==============================================================================
+BandStrip::BandStrip (AircheckProcessor& p) : proc (p)
+{
+    for (auto* b : { &prev, &next })
     {
-        prm->beginChangeGesture();
-        setValue (id, value (id) * std::exp (w.deltaY * 1.2f));
-        prm->endChangeGesture();
+        addAndMakeVisible (*b);
+        b->setTooltip ("Previous / next band (or click a point on the curve)");
     }
+    post = std::make_unique<dd::gui::Toggle> (proc.apvts, "eqPost", "EQ", "POST", "PRE");
+    addAndMakeVisible (*post);
+    prev.onClick = [this] { if (onBandChange) onBandChange ((band + aircheck::ProEq::kBands - 1) % aircheck::ProEq::kBands); };
+    next.onClick = [this] { if (onBandChange) onBandChange ((band + 1) % aircheck::ProEq::kBands); };
+    setBand (0);
+}
+
+void BandStrip::setBand (int b)
+{
+    if (b == band)
+        return;
+    band = b;
+    controls.clear();
+    auto& s = proc.apvts;
+    const auto a = dd::gui::sunset::orange;
+    controls.push_back (std::make_unique<dd::gui::Toggle> (s, bandId (b, "On"), "On"));
+    controls.push_back (std::make_unique<dd::gui::Choice> (s, bandId (b, "Type"), "Type"));
+    controls.push_back (std::make_unique<dd::gui::Knob> (s, bandId (b, "Freq"), "Freq", a));
+    controls.push_back (std::make_unique<dd::gui::Knob> (s, bandId (b, "Gain"), "Gain", a));
+    controls.push_back (std::make_unique<dd::gui::Knob> (s, bandId (b, "Q"), "Q", a));
+    controls.push_back (std::make_unique<dd::gui::Choice> (s, bandId (b, "Slope"), "Slope"));
+    auto dyn = std::make_unique<dd::gui::Knob> (s, bandId (b, "Dyn"), "Dynamic", a);
+    dyn->getSlider().setTooltip ("Dynamic EQ: how far the gain moves when this band gets loud (negative = cut harder when loud)");
+    controls.push_back (std::move (dyn));
+    controls.push_back (std::make_unique<dd::gui::Knob> (s, bandId (b, "Thresh"), "Threshold", a));
+    controls.push_back (std::make_unique<dd::gui::Choice> (s, bandId (b, "Place"), "Stereo"));
+    for (auto& c : controls)
+        addAndMakeVisible (*c);
+    resized();
+    repaint();
+}
+
+void BandStrip::resized()
+{
+    // Cell 0: the band number with arrows; then one 64 px cell per control.
+    constexpr int cw = dd::gui::Panel::kCellW;
+    auto r = getLocalBounds();
+    auto first = r.removeFromLeft (cw).withTrimmedTop (34).withSizeKeepingCentre (cw - 8, 22);
+    prev.setBounds (first.removeFromLeft (first.getWidth() / 2).reduced (1, 0));
+    next.setBounds (first.reduced (1, 0));
+    for (size_t i = 0; i < controls.size(); ++i)
+    {
+        auto cell = r.removeFromLeft (cw);
+        if (dynamic_cast<dd::gui::Choice*> (controls[i].get()) != nullptr)
+            controls[i]->setBounds (cell.withSizeKeepingCentre (cell.getWidth(), 52).translated (0, -8));
+        else
+            controls[i]->setBounds (cell);
+    }
+    if (post != nullptr)
+        post->setBounds (r.removeFromLeft (cw));
+}
+
+void BandStrip::paint (juce::Graphics& g)
+{
+    const auto cell = getLocalBounds().removeFromLeft (dd::gui::Panel::kCellW).toFloat();
+    dd::gui::drawCaption (g, "Band", cell.withHeight (16.0f), juce::Justification::centred, 9.5f);
+    dd::gui::drawGlowing (g, juce::String (band + 1), cell.withTrimmedTop (12.0f).withHeight (22.0f), kLitText,
+                          dd::gui::LookAndFeel::font (18.0f, 700));
 }
 
 //==============================================================================
 void GrMeter::timerCallback()
 {
-    comp = std::max (proc.compGr.load(), comp * 0.85f);
-    ess = std::max (proc.deessGr.load(), ess * 0.85f);
+    va = std::max (a ? a() : 0.0f, va * 0.85f);
+    vb = std::max (b ? b() : 0.0f, vb * 0.85f);
     repaint();
 }
 
@@ -460,16 +578,18 @@ void GrMeter::paint (juce::Graphics& g)
     auto r = getLocalBounds().toFloat();
     g.setFont (dd::gui::LookAndFeel::font (9.5f, 700).withExtraKerningFactor (0.1f));
     g.setColour (t.cream500);
-    g.drawText ("GR", r.removeFromTop (16.0f), juce::Justification::centred);
-    auto tray = r.withSizeKeepingCentre (30.0f, r.getHeight() - 8.0f).withTrimmedBottom (4.0f);
+    g.drawText (label.toUpperCase(), r.removeFromTop (16.0f), juce::Justification::centred);
+    auto tray = r.withSizeKeepingCentre (b ? 30.0f : 20.0f, r.getHeight() - 8.0f).withTrimmedBottom (4.0f);
     dd::gui::paintTray (g, tray, 6.0f, 0.8f);
     auto inner = tray.reduced (5.0f, 5.0f);
     constexpr int segs = 12;
     const float segH = inner.getHeight() / (float) segs;
-    for (int k = 0; k < 2; ++k)
+    const int cols = b ? 2 : 1;
+    for (int k = 0; k < cols; ++k)
     {
-        const float v = k == 0 ? comp : ess;
-        const auto col = inner.withWidth (inner.getWidth() * 0.5f - 1.0f).translated ((float) k * inner.getWidth() * 0.5f + (float) k, 0.0f);
+        const float v = k == 0 ? va : vb;
+        const float cw = inner.getWidth() / (float) cols;
+        const auto col = inner.withWidth (cw - (cols > 1 ? 1.0f : 0.0f)).translated ((float) k * cw, 0.0f);
         for (int sIdx = 0; sIdx < segs; ++sIdx)
         {
             const bool lit = v > (float) sIdx * 2.0f + 0.5f;   // 2 dB per segment, from the top down

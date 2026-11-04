@@ -4,9 +4,12 @@
 #include <dd_core/dd_core.h>
 #include <dd_dsp/dd_dsp.h>
 
+#include "Air.h"
 #include "Chain.h"
 #include "Params.h"
 #include "Pitch.h"
+#include "ProEq.h"
+#include "Smooth.h"
 
 /** Sung pitch and corrected pitch over time, written by the audio thread, read by the pitch display. */
 class PitchHistory
@@ -68,7 +71,8 @@ public:
     dd::PresetManager presets;
     dd::ScopeBuffer scope, preEq, postEq;   // output; the EQ analyzer's before / after
     PitchHistory pitchHistory;
-    std::atomic<float> compGr { 0.0f }, deessGr { 0.0f };
+    std::atomic<float> compGr { 0.0f }, deessGr { 0.0f }, smoothGr { 0.0f }, limitGr { 0.0f };
+    std::array<std::atomic<float>, aircheck::ProEq::kBands> bandDynDb {};
     float editorScale = 1.0f;
 
     static const juce::StringArray& categoryOrder();
@@ -77,6 +81,7 @@ private:
     static constexpr int kChunk = aircheck::Psola::kMaxBlock;
     void processChunk (float* L, float* R, int n);
     void readSettings();
+    void migrateLegacyEq (const juce::ValueTree& savedState);
 
     aircheck::ParamCache params;
     double sr = 44100.0, bpm = 120.0;
@@ -88,19 +93,25 @@ private:
     aircheck::Gate gate;
     aircheck::MicVoicing mic;
     aircheck::Preamp preamp;
-    aircheck::VocalEq eq;
+    aircheck::ProEq proEq;
+    aircheck::Rider rider;
     aircheck::Compressor comp;
+    aircheck::Smooth smooth;
+    aircheck::Air air;
+    aircheck::Dimension dimension;
+    aircheck::Limiter limiter;
+    aircheck::DryAlign dryAlign;
     aircheck::DeEsser deesser;
     aircheck::Doubler doubler;
     aircheck::Vocoder vocoder;
     dd::Tape tape;
     dd::StereoDelay delay;
     dd::Space reverb;
-    dd::Clipper clipper;
 
     // Resolved once per block.
     aircheck::TuneSettings tune;
-    aircheck::VocalEq::Settings eqSettings;
+    std::array<aircheck::BandSettings, aircheck::ProEq::kBands> bands {};
+    aircheck::Smooth::Settings smoothSettings;
     aircheck::Compressor::Settings compSettings;
     bool tuneOn = false, pitchActive = false;
     float lastCorrection = 0.0f, formantRatio = 1.0f;

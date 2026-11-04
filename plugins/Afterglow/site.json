@@ -20,11 +20,10 @@
   ],
   "previewNote": "on the same 120 BPM phrase: a held Dm9, an arpeggio over Bb, Fmaj7 stabs, then a legato melody. GUITAR presets play strummed Em, C and G chords at 80 BPM and a riff.",
   "whatsNew": {
-    "version": "1.9.0",
+    "version": "1.10.0",
     "items": [
-      "2000s category, 10 new instruments: a Rock Your Body clav, a Neptunes suitcase EP, a Clipse dark stab, the Drop It Like It's Hot chords (subtle), Dr. Dre's In Da Club strings and West Coast piano, Timbaland's Get Ur Freak On tumbi, a Kanye soul-sample chop, a crunk lead and the SexyBack fuzz stab (extreme)",
-      "80s category, 10 new instruments: the Push It To The Limit Jupiter lead and sitar-like arpeggio, a DX tine electric piano, an I'm Still Standing piano, funk DI guitar chops, an orchestra hit, poly brass, a Juno pad, a Moroder machine (extreme) and ballad bells (subtle)",
-      "New look, matching the rawleads instrument design: a DARK / LITE switch in the top bar (every open plugin follows it, with a soft crossfade), keycap buttons that press in, the preset name on a lit smoked-amber key with a flickering lamp behind it, LED switches, glowing knob arcs, console displays and the Instrument Sans typeface"
+      "Presets you can make your own: Save opens a menu to save over the current preset (your version takes the factory preset's place and stays through updates), save as a new preset in any category, restore the factory version or delete one of yours; a star next to the name shows the sound has been edited. Your presets live in Music/ddeonmadeit/<plugin>/Presets and are never touched by an update",
+      "Fixed a rare crash when a host unloads the plugin"
     ]
   }
 }

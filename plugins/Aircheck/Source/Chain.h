@@ -111,7 +111,12 @@ private:
 };
 
 //==============================================================================
-/** Preamp colour, 2x oversampled. drive 0 = clean. */
+/**
+    Preamp saturation, 4x oversampled. Tube: asymmetric, its bias rising with the level so louder
+    passages get more even harmonics. Tape: soft symmetrical compression with a top end that softens as
+    it is driven. Console: transformer-style, the lows saturate first. Crunch: hard and forward.
+    tone tilts the result around 1 kHz; mix blends it with the clean signal (parallel saturation).
+*/
 class Preamp
 {
 public:
@@ -119,41 +124,84 @@ public:
     {
         sr = newSr;
         os.initProcessing ((size_t) maxBlock);
-        for (auto& d : dc) d.prepare (sr * 2.0);
-        for (auto& t : tapeLp) t.setCutoff (13000.0f, sr * 2.0);
+        const double osr = sr * 4.0;
+        for (int ch = 0; ch < 2; ++ch)
+        {
+            dc[ch].prepare (osr);
+            tapeLp[ch].setCutoff (14000.0f, osr);
+            lowBand[ch].setCutoff (220.0f, osr);
+        }
+        envCoef = dd::onePoleCoef (0.03f, osr);
+        lastTone = 99.0f;
         reset();
     }
 
     void reset()
     {
         os.reset();
-        for (auto& d : dc) d.reset();
-        for (auto& t : tapeLp) t.reset();
+        for (int ch = 0; ch < 2; ++ch)
+        {
+            dc[ch].reset(); tapeLp[ch].reset(); lowBand[ch].reset();
+            tilt[ch][0].reset(); tilt[ch][1].reset();
+            env[ch] = 0.0f;
+        }
     }
 
     float getLatency() const noexcept { return os.getLatencyInSamples(); }
 
-    void process (juce::dsp::AudioBlock<float>& block, int type, float drive) noexcept
+    void process (juce::dsp::AudioBlock<float>& block, int type, float drive, float tone = 0.0f, float mix = 1.0f) noexcept
     {
+        if (std::abs (tone - lastTone) > 0.001f)
+        {
+            lastTone = tone;
+            for (int ch = 0; ch < 2; ++ch)
+            {
+                tilt[ch][0].set (dd::Biquad::Type::LowShelf, 1000.0f, 0.5f, -tone * 4.0f, sr * 4.0);
+                tilt[ch][1].set (dd::Biquad::Type::HighShelf, 1000.0f, 0.5f, tone * 4.0f, sr * 4.0);
+            }
+        }
+        if (type == 1)
+            for (auto& t : tapeLp)
+                t.setCutoff (16000.0f - 8000.0f * drive, sr * 4.0);
         auto up = os.processSamplesUp (block);
         const float g = 1.0f + 14.0f * drive * drive;
         const float comp = 1.0f / std::pow (g, 0.72f);
-        const float bias = 0.18f * drive;
-        for (size_t ch = 0; ch < up.getNumChannels(); ++ch)
+        mix *= juce::jlimit (0.0f, 1.0f, drive * 25.0f);   // drive 0 = untouched (the curves are never quite linear)
+        for (size_t ch = 0; ch < up.getNumChannels() && ch < 2; ++ch)
         {
             auto* d = up.getChannelPointer (ch);
             for (size_t i = 0; i < up.getNumSamples(); ++i)
             {
-                const float x = d[i] * g;
+                const float clean = d[i];
+                const float x = clean * g;
+                const float a = std::abs (clean);
+                env[ch] = a + (env[ch] - a) * envCoef;
                 float y;
                 switch (type)
                 {
-                    case 1:   y = tapeLp[ch].lp (dd::softClipCubic (x * 0.8f) * 1.25f); break;
-                    case 2:   y = x - 0.08f * x * x * x / (1.0f + 0.3f * x * x); y = dd::kneeClip (y, 0.85f); break;
-                    case 3:   y = dd::kneeClip (x + 0.25f * x * std::abs (x), 0.5f); break;
-                    default:  y = std::tanh (x + bias) - std::tanh (bias); break;
+                    case 1:   // tape
+                        y = tapeLp[ch].lp (dd::softClipCubic (x * 0.8f) * 1.25f);
+                        break;
+                    case 2:   // console: transformer lows saturate first
+                    {
+                        const float lo = lowBand[ch].lp (x);
+                        y = x + 0.5f * drive * (std::tanh (lo * 1.8f) / 1.8f - lo);
+                        y = dd::kneeClip (y - 0.06f * y * y * y / (1.0f + 0.3f * y * y), 0.88f);
+                        break;
+                    }
+                    case 3:   // crunch
+                        y = dd::kneeClip (x + 0.25f * x * std::abs (x), 0.5f);
+                        break;
+                    default:  // tube: the bias follows the level
+                    {
+                        const float bias = 0.12f * drive + 0.5f * std::min (env[ch] * g, 1.0f) * drive;
+                        y = std::tanh (x + bias) - std::tanh (bias);
+                        break;
+                    }
                 }
-                d[i] = dc[ch].process (y) * comp;
+                y = dc[ch].process (y) * comp;
+                y = tilt[ch][1].process (tilt[ch][0].process (y));
+                d[i] = clean + (y - clean) * mix;
             }
         }
         os.processSamplesDown (block);
@@ -162,9 +210,13 @@ public:
 private:
     using OS = juce::dsp::Oversampling<float>;
     double sr = 48000.0;
-    OS os { 2, 1, OS::filterHalfBandPolyphaseIIR, true, false };
+    // Linear-phase FIR halfbands with whole-sample latency: the dry path can be delayed exactly, so a
+    // dry / wet blend never combs or dulls.
+    OS os { 2, 2, OS::filterHalfBandFIREquiripple, true, true };
     dd::DcBlocker dc[2];
-    dd::OnePole tapeLp[2];
+    dd::OnePole tapeLp[2], lowBand[2];
+    dd::Biquad tilt[2][2];
+    float env[2] {}, envCoef = 0.0f, lastTone = 99.0f;
 };
 
 //==============================================================================
@@ -245,7 +297,7 @@ private:
 class Compressor
 {
 public:
-    struct Settings { int type = 1; float amount = 0.3f, attackMs = 3.0f, releaseMs = 120.0f, ratio = 4.0f, mix = 1.0f; };
+    struct Settings { int type = 1; float amount = 0.3f, attackMs = 3.0f, releaseMs = 120.0f, ratio = 4.0f, mix = 1.0f, scHpf = 20.0f; };
 
     void prepare (double newSr)
     {
@@ -263,6 +315,7 @@ public:
         gr = 0.0f; rms = 0.0f; memory = 0.0f;
         for (auto& d : dc) d.reset();
         for (auto& d : delay) d.reset();
+        for (auto& f : scHp) f.reset();
     }
 
     /** The compressor always delays the audio by this much (FET / VCA look ahead by it). */
@@ -283,7 +336,18 @@ public:
             return;
         }
         const bool ahead = s.type == 0 || s.type == 3;
-        const float dl = ahead ? inL : l, dr = ahead ? inR : r;
+        float dl = ahead ? inL : l, dr = ahead ? inR : r;
+        // Sidechain high-pass: plosives and low rumble don't pump the voice.
+        if (std::abs (s.scHpf - lastScHz) > 0.5f)
+        {
+            lastScHz = s.scHpf;
+            for (auto& f : scHp) f.set (dd::Biquad::Type::HighPass, s.scHpf, 0.707f, 0.0f, sr);
+        }
+        if (s.scHpf > 21.0f)
+        {
+            dl = scHp[0].process (dl);
+            dr = scHp[1].process (dr);
+        }
         const float thr = -4.0f - 34.0f * s.amount;
         float level;
         if (s.type == 1)
@@ -342,8 +406,10 @@ private:
     double sr = 48000.0;
     float gr = 0.0f, rms = 0.0f, memory = 0.0f, rmsCoef = 0.0f, memCoef = 0.0f;
     int lookahead = 1;
+    float lastScHz = -1.0f;
     dd::DcBlocker dc[2];
     dd::DelayBuffer delay[2];
+    dd::Biquad scHp[2];
 };
 
 //==============================================================================
@@ -589,5 +655,257 @@ private:
     dd::Drift vibrato;
     dd::Rng rng;
     float att = 0.0f, rel = 0.0f, glide = 0.0f, hz = 0.0f, unvoicedMix = 1.0f;
+};
+
+//==============================================================================
+/**
+    Vocal rider: rides the level of the performance toward a steady loudness before the compressor,
+    the way an engineer rides a fader (slow, about a third of a second; never pumps). Holds still in
+    the gaps so it doesn't pull up breaths and room noise.
+*/
+class Rider
+{
+public:
+    void prepare (double newSr)
+    {
+        sr = newSr;
+        rmsCoef = dd::onePoleCoef (0.3f, sr);
+        moveCoef = dd::onePoleCoef (0.25f, sr);
+        reset();
+    }
+    void reset() { ms = 0.0f; gainDb = 0.0f; }
+
+    void process (float& l, float& r, float amount) noexcept
+    {
+        if (amount <= 0.001f)
+        {
+            gainDb *= 0.999f;
+            if (std::abs (gainDb) > 0.01f) { const float g = dd::dbToGain (gainDb); l *= g; r *= g; }
+            return;
+        }
+        const float x2 = 0.5f * (l * l + r * r);
+        ms = x2 + (ms - x2) * rmsCoef;
+        const float levelDb = 10.0f * std::log10 (ms + 1.0e-12f);
+        if (levelDb > -50.0f)
+        {
+            const float want = juce::jlimit (-12.0f, 12.0f, -20.0f - levelDb) * amount;
+            gainDb = want + (gainDb - want) * moveCoef;
+        }
+        const float g = dd::dbToGain (gainDb);
+        l *= g;
+        r *= g;
+    }
+
+    float getGainDb() const noexcept { return gainDb; }
+
+private:
+    double sr = 48000.0;
+    float ms = 0.0f, gainDb = 0.0f, rmsCoef = 0.0f, moveCoef = 0.0f;
+};
+
+//==============================================================================
+/**
+    Transparent lookahead true-peak limiter (ceiling -1 dBTP). It watches the waveform between samples
+    (4x polyphase interpolation, as BS.1770 meters do), holds the lowest gain any peak in the lookahead
+    window needs, and ramps into it with a moving average timed to arrive exactly with the peak, so it never
+    overshoots; release is smooth. drive pushes the voice into it, 0..12 dB.
+*/
+class Limiter
+{
+public:
+    void prepare (double newSr)
+    {
+        sr = newSr;
+        look = std::max (8, (int) std::lround (0.0015 * sr));
+        hold = look + kTaps;                    // also covers the interpolator's own delay
+        delaySamples = look + kTaps / 2 + 1;
+        for (auto& d : delay) d.prepare (delaySamples + 8);
+        need.assign ((size_t) hold, 1.0f);
+        box.assign ((size_t) look, 1.0f);
+        release = 1.0f - std::exp (-1.0f / (0.06f * (float) sr));
+        // Kaiser-windowed sinc, 97 taps (odd, so the phases sit exactly at 1/4, 1/2 and 3/4 of a sample;
+        // long enough to stay accurate right up to Nyquist, where bright vocals peak between samples).
+        const int total = 4 * (kTaps - 1) + 1;
+        const double centre = (total - 1) * 0.5, beta = 6.0;
+        for (auto& ph : phase) ph.fill (0.0f);
+        auto bessel0 = [] (double x) { double sum = 1.0, term = 1.0; for (int k = 1; k < 25; ++k) { term *= (x / (2.0 * k)) * (x / (2.0 * k)); sum += term; } return sum; };
+        for (int n = 0; n < total; ++n)
+        {
+            const double t = ((double) n - centre) / 4.0;
+            const double sinc = std::abs (t) < 1.0e-9 ? 1.0 : std::sin (juce::MathConstants<double>::pi * t) / (juce::MathConstants<double>::pi * t);
+            const double r = ((double) n - centre) / centre;
+            const double w = bessel0 (beta * std::sqrt (std::max (0.0, 1.0 - r * r))) / bessel0 (beta);
+            phase[(size_t) (n % 4)][(size_t) (n / 4)] = (float) (sinc * w);
+        }
+        reset();
+    }
+
+    void reset()
+    {
+        for (auto& d : delay) d.reset();
+        std::fill (need.begin(), need.end(), 1.0f);
+        std::fill (box.begin(), box.end(), 1.0f);
+        for (auto& h : hist) h.fill (0.0f);
+        boxSum = (double) look;
+        follow = gain = 1.0f;
+        needIdx = boxIdx = hpos = 0;
+    }
+
+    int getLatency() const noexcept { return delaySamples; }
+
+    void process (float& l, float& r, float drive) noexcept
+    {
+        constexpr float ceiling = 0.891f;
+        const float in = dd::dbToGain (drive * 12.0f);
+        const float xl = l * in, xr = r * in;
+        delay[0].push (xl);
+        delay[1].push (xr);
+
+        hpos = (hpos + 1) % kTaps;
+        hist[0][(size_t) hpos] = xl;
+        hist[1][(size_t) hpos] = xr;
+        float peak = std::max (std::abs (xl), std::abs (xr));
+        for (size_t ch = 0; ch < 2; ++ch)
+            for (size_t ph = 1; ph < 4; ++ph)
+            {
+                float acc = 0.0f;
+                for (int k = 0; k < kTaps; ++k)
+                    acc += phase[ph][(size_t) k] * hist[ch][(size_t) ((hpos - k + kTaps) % kTaps)];
+                peak = std::max (peak, std::abs (acc));
+            }
+        need[(size_t) needIdx] = peak > ceiling ? ceiling / peak : 1.0f;
+        needIdx = (needIdx + 1) % hold;
+        float lowest = 1.0f;
+        for (float v : need) lowest = std::min (lowest, v);
+
+        // Instant attack on the held minimum, smooth release; then the moving average shapes the ramp.
+        follow = lowest < follow ? lowest : follow + (lowest - follow) * release;
+        boxSum += (double) follow - (double) box[(size_t) boxIdx];
+        box[(size_t) boxIdx] = follow;
+        boxIdx = (boxIdx + 1) % look;
+        gain = (float) (boxSum / (double) look);
+
+        l = delay[0].readInt (delaySamples + 1) * gain;
+        r = delay[1].readInt (delaySamples + 1) * gain;
+    }
+
+    float getGainReductionDb() const noexcept { return -dd::gainToDb (gain); }
+
+private:
+    static constexpr int kTaps = 25;   // per phase (97-tap windowed-sinc interpolator)
+    double sr = 48000.0, boxSum = 0.0;
+    int look = 72, hold = 97, delaySamples = 85, needIdx = 0, boxIdx = 0, hpos = 0;
+    dd::DelayBuffer delay[2];
+    std::vector<float> need, box;
+    std::array<std::array<float, kTaps>, 2> hist {};
+    std::array<std::array<float, kTaps>, 4> phase {};
+    float follow = 1.0f, gain = 1.0f, release = 0.001f;
+};
+
+//==============================================================================
+inline const juce::StringArray& dimensionModeNames()
+{
+    static const juce::StringArray n { "Off", "1", "2", "3", "4" };
+    return n;
+}
+
+/**
+    Chorus (a CE-5 style stereo chorus: rate and depth) then Dimension (the Roland SDD-320 idea: two dark
+    bucket-brigade-like lines swept in opposite phase and cross-mixed, so the voice widens without an
+    obvious wobble; modes 1-4 from subtle to deep). Either can be used alone.
+*/
+class Dimension
+{
+public:
+    void prepare (double newSr)
+    {
+        sr = newSr;
+        for (auto& d : lines) d.prepare ((int) (0.03 * sr));
+        for (auto& f : dark) f.setCutoff (8500.0f, sr);
+        reset();
+    }
+    void reset() { for (auto& d : lines) d.reset(); for (auto& f : dark) f.reset(); chPhase = dimPhase = 0.0; }
+
+    void process (float& l, float& r, float rateHz, float depth, float chorusMix, int dimMode, float dimMix) noexcept
+    {
+        lines[0].push (l);
+        lines[1].push (r);
+        if (chorusMix > 0.001f)
+        {
+            chPhase += rateHz / sr;
+            if (chPhase >= 1.0) chPhase -= 1.0;
+            const float mL = std::sin (dd::kTwoPi * (float) chPhase), mR = std::sin (dd::kTwoPi * (float) (chPhase + 0.25));
+            const float base = 0.007f * (float) sr, span = (0.0005f + depth * 0.006f) * (float) sr;
+            l += dark[0].lp (lines[0].read (base + span * (0.5f + 0.5f * mL))) * chorusMix;
+            r += dark[1].lp (lines[1].read (base + span * (0.5f + 0.5f * mR))) * chorusMix;
+        }
+        const float mono = 0.5f * (l + r);
+        lines[2].push (mono);
+        lines[3].push (mono);
+        if (dimMode > 0 && dimMix > 0.001f)
+        {
+            static constexpr float rates[4] { 0.22f, 0.28f, 0.42f, 0.5f }, depths[4] { 0.35f, 0.55f, 0.75f, 1.0f };
+            const int m = juce::jlimit (0, 3, dimMode - 1);
+            dimPhase += rates[m] / sr;
+            if (dimPhase >= 1.0) dimPhase -= 1.0;
+            auto tri = [] (double p) { const float x = (float) (p - std::floor (p)); return x < 0.5f ? 4.0f * x - 1.0f : 3.0f - 4.0f * x; };
+            const float base = 0.0065f * (float) sr, span = 0.0016f * depths[m] * (float) sr;
+            const float d1 = dark[2].lp (lines[2].read (base + span * tri (dimPhase)));
+            const float d2 = dark[3].lp (lines[3].read (base + span * tri (dimPhase + 0.5)));
+            l += (0.8f * d1 - 0.35f * d2) * dimMix;
+            r += (0.8f * d2 - 0.35f * d1) * dimMix;
+        }
+    }
+
+private:
+    double sr = 48000.0, chPhase = 0.0, dimPhase = 0.0;
+    dd::DelayBuffer lines[4];
+    dd::OnePole dark[4];
+};
+
+//==============================================================================
+/**
+    The dry path for the Mix knob, delayed through the same structure as the wet chain (the preamp's
+    4x and the air's 2x oversamplers, bypassed, with the compressor's and smoother's delays between), so
+    dry and wet line up in phase at every frequency and any blend is clean.
+*/
+class DryAlign
+{
+public:
+    void prepare (int maxBlock, int middleDelay)
+    {
+        os4.initProcessing ((size_t) maxBlock);
+        os2.initProcessing ((size_t) maxBlock);
+        delay = middleDelay;
+        for (auto& d : lines) d.prepare (delay + 8);
+        reset();
+    }
+    void reset() { os4.reset(); os2.reset(); for (auto& d : lines) d.reset(); }
+
+    void process (juce::dsp::AudioBlock<float>& block) noexcept
+    {
+        auto up = os4.processSamplesUp (block);
+        juce::ignoreUnused (up);
+        os4.processSamplesDown (block);
+        for (size_t ch = 0; ch < block.getNumChannels() && ch < 2; ++ch)
+        {
+            auto* d = block.getChannelPointer (ch);
+            for (size_t i = 0; i < block.getNumSamples(); ++i)
+            {
+                lines[ch].push (d[i]);
+                d[i] = lines[ch].readInt (delay + 1);
+            }
+        }
+        auto up2 = os2.processSamplesUp (block);
+        juce::ignoreUnused (up2);
+        os2.processSamplesDown (block);
+    }
+
+private:
+    using OS = juce::dsp::Oversampling<float>;
+    OS os4 { 2, 2, OS::filterHalfBandFIREquiripple, true, true };
+    OS os2 { 2, 1, OS::filterHalfBandFIREquiripple, true, true };
+    dd::DelayBuffer lines[2];
+    int delay = 0;
 };
 } // namespace aircheck

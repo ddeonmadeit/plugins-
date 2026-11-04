@@ -19,11 +19,10 @@
   ],
   "previewNote": "on the same 80 BPM part: strummed Em, C and G chords (down and up strokes), then a single-note riff.",
   "whatsNew": {
-    "version": "1.4.0",
+    "version": "1.5.0",
     "items": [
-      "2000s category, 4 new guitar parts: a Like I Love You Latin acoustic strum, the palm-muted Lose Yourself riff, N.E.R.D.-style rap-rock power chords and a slow-jam clean (subtle)",
-      "80s category, 5 new guitar parts: an I'm Still Standing pop-rock rhythm, the decade's chorus clean, arena power chords, an arena lead solo and synth-pop muted plucks (subtle)",
-      "New look, matching the rawleads instrument design: a DARK / LITE switch in the top bar (every open plugin follows it, with a soft crossfade), keycap buttons that press in, the preset name on a lit smoked-amber key with a flickering lamp behind it, LED switches, glowing knob arcs, console displays and the Instrument Sans typeface; the pedals' footswitches are keycaps that light up amber when the pedal is on"
+      "Presets you can make your own: Save opens a menu to save over the current preset (your version takes the factory preset's place and stays through updates), save as a new preset in any category, restore the factory version or delete one of yours; a star next to the name shows the sound has been edited. Your presets live in Music/ddeonmadeit/<plugin>/Presets and are never touched by an update",
+      "Fixed a rare crash when a host unloads the plugin"
     ]
   }
 }

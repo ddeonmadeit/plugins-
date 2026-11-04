@@ -20,6 +20,21 @@ enum class P
     dlyMix, dlySync, dlyDiv, dlyMs, dlyFeedback, dlyTone, dlyPingPong, dlyDuck,
     revMix, revType, revSize, revPreDelay, revTone,
     mix, outGain,
+    // 1.2: the eight-band dynamic EQ (the six legacy eq* parameters above are kept for old sessions only),
+    // saturation tone / mix, rider, sidechain filter, resonance smoothing, air, chorus / dimension, limiter.
+    b1On, b1Type, b1Freq, b1Gain, b1Q, b1Slope, b1Dyn, b1Thresh, b1Place,
+    b2On, b2Type, b2Freq, b2Gain, b2Q, b2Slope, b2Dyn, b2Thresh, b2Place,
+    b3On, b3Type, b3Freq, b3Gain, b3Q, b3Slope, b3Dyn, b3Thresh, b3Place,
+    b4On, b4Type, b4Freq, b4Gain, b4Q, b4Slope, b4Dyn, b4Thresh, b4Place,
+    b5On, b5Type, b5Freq, b5Gain, b5Q, b5Slope, b5Dyn, b5Thresh, b5Place,
+    b6On, b6Type, b6Freq, b6Gain, b6Q, b6Slope, b6Dyn, b6Thresh, b6Place,
+    b7On, b7Type, b7Freq, b7Gain, b7Q, b7Slope, b7Dyn, b7Thresh, b7Place,
+    b8On, b8Type, b8Freq, b8Gain, b8Q, b8Slope, b8Dyn, b8Thresh, b8Place,
+    preTone, preMix, rider, compScHpf,
+    smoothDepth, smoothSharp, smoothLow, smoothHigh,
+    airMid, airHigh,
+    chRate, chDepth, chMix, dimMode, dimMix,
+    limit, eqPost,
     count
 };
 

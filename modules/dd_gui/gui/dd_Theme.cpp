@@ -113,42 +113,49 @@ namespace
     }
 
     /** Matte molded grain: fine, neutral, a few light and dark flecks. */
-    const juce::Image& grainImage()
+    juce::Image makeGrain()
     {
-        static const juce::Image image = []
-        {
-            constexpr int n = 160;
-            std::vector<float> v ((size_t) (n * n));
-            juce::Random rnd (0x5eed);
-            for (auto& x : v)
-                x = rnd.nextFloat() + rnd.nextFloat() - 1.0f;
-            auto at = [&] (int x, int y) { return v[(size_t) (((y + n) % n) * n + (x + n) % n)]; };
-            juce::Image im (juce::Image::ARGB, n, n, true, juce::SoftwareImageType());
-            juce::Image::BitmapData bd (im, juce::Image::BitmapData::writeOnly);
-            for (int y = 0; y < n; ++y)
-                for (int x = 0; x < n; ++x)
-                {
-                    const float s = 0.6f * at (x, y) + 0.1f * (at (x + 1, y) + at (x - 1, y) + at (x, y + 1) + at (x, y - 1));
-                    const float a = std::min (1.0f, std::abs (s));
-                    bd.setPixelColour (x, y, s > 0.0f ? juce::Colours::white.withAlpha (a * 0.5f) : juce::Colours::black.withAlpha (a * 0.6f));
-                }
-            return im;
-        }();
-        return image;
+        constexpr int n = 160;
+        std::vector<float> v ((size_t) (n * n));
+        juce::Random rnd (0x5eed);
+        for (auto& x : v)
+            x = rnd.nextFloat() + rnd.nextFloat() - 1.0f;
+        auto at = [&] (int x, int y) { return v[(size_t) (((y + n) % n) * n + (x + n) % n)]; };
+        juce::Image im (juce::Image::ARGB, n, n, true, juce::SoftwareImageType());
+        juce::Image::BitmapData bd (im, juce::Image::BitmapData::writeOnly);
+        for (int y = 0; y < n; ++y)
+            for (int x = 0; x < n; ++x)
+            {
+                const float s = 0.6f * at (x, y) + 0.1f * (at (x + 1, y) + at (x - 1, y) + at (x, y + 1) + at (x, y - 1));
+                const float a = std::min (1.0f, std::abs (s));
+                bd.setPixelColour (x, y, s > 0.0f ? juce::Colours::white.withAlpha (a * 0.5f) : juce::Colours::black.withAlpha (a * 0.6f));
+            }
+        return im;
     }
 
     /** The chassis' faint vertical striation: a 1 px light line every 3 px. */
-    const juce::Image& striationImage()
+    juce::Image makeStriation()
     {
-        static const juce::Image image = []
-        {
-            juce::Image im (juce::Image::ARGB, 3, 4, true, juce::SoftwareImageType());
-            for (int y = 0; y < 4; ++y)
-                im.setPixelAt (0, y, rgba (255, 248, 235, 0.028f));
-            return im;
-        }();
-        return image;
+        juce::Image im (juce::Image::ARGB, 3, 4, true, juce::SoftwareImageType());
+        for (int y = 0; y < 4; ++y)
+            im.setPixelAt (0, y, rgba (255, 248, 235, 0.028f));
+        return im;
     }
+} // namespace
+
+/** Cached textures, released with JUCE's shutdown objects rather than by static destruction at unload
+    (which can run after the plugin's JUCE has gone and corrupt the heap). */
+struct TextureCache : private juce::DeletedAtShutdown
+{
+    juce::Image grain = makeGrain(), striation = makeStriation();
+    ~TextureCache() override { clearSingletonInstance(); }
+    JUCE_DECLARE_SINGLETON_INLINE (TextureCache, false)
+};
+
+namespace
+{
+    const juce::Image& grainImage()     { return TextureCache::getInstance()->grain; }
+    const juce::Image& striationImage() { return TextureCache::getInstance()->striation; }
 
     /** A soft cast shadow below a rounded rect, built from stacked translucent layers (box-shadow blur). */
     void castShadow (juce::Graphics& g, juce::Rectangle<float> r, float corner, float dy, float blur, float spread, juce::Colour c)

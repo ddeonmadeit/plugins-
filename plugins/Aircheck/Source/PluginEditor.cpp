@@ -15,15 +15,18 @@ AircheckEditor::Content::Content (AircheckProcessor& p)
       description (topBar.presets()),
       tune ("Pitch Correction", 7, 4, kA),
       eq ("Equalizer", 11, 4, kA),
-      voice ("Mic & Preamp", 3, 1, kA),
-      comp ("Compressor", 7, 1, kA),
-      deess ("De-Esser", 2, 1, kA),
+      voice ("Mic & Saturation", 5, 1, kA),
+      comp ("Dynamics", 9, 1, kA),
+      deess ("De-Esser", 3, 1, kA),
+      smooth ("Smooth", 5, 1, kA),
+      air ("Air", 2, 1, kA),
       dbl ("Double", 2, 1, kA),
+      chorus ("Chorus / Dimension", 5, 1, kA),
       vocoder ("Vocoder", 3, 1, kA),
       delay ("Tape Delay", 8, 1, kA),
       reverb ("Reverb", 5, 1, kA),
       tapeP ("Tape", 1, 1, kA),
-      output ("Output", 2, 1, kA)
+      output ("Output", 3, 1, kA)
 {
     auto& s = p.apvts;
 
@@ -48,33 +51,51 @@ AircheckEditor::Content::Content (AircheckProcessor& p)
     tune.add<Knob> (s, "gate", "Gate", kA).getSlider().setTooltip ("Turns down breaths and room noise between phrases. Fully left = off.");
     tune.place (6, 3);
 
-    eq.add<EqView> (p);
+    auto& view = eq.add<EqView> (p);
     eq.place (0, 0, 11, 3);
-    int col = 0;
-    for (auto [id, title] : { std::pair { "eqLowCut", "Low Cut" }, { "eqLsGain", "Low" }, { "eq1Freq", "Freq 1" }, { "eq1Gain", "Gain 1" },
-                              { "eq2Freq", "Freq 2" }, { "eq2Gain", "Gain 2" }, { "eq3Freq", "Freq 3" }, { "eq3Gain", "Gain 3" },
-                              { "eqHsFreq", "High Freq" }, { "eqHsGain", "High" }, { "eqHighCut", "High Cut" } })
-    {
-        eq.add<Knob> (s, id, title, kA).getSlider().setTooltip ("Or drag the points on the curve; scroll on a point for its width (Q)");
-        eq.place (col++, 3);
-    }
+    auto& strip = eq.add<BandStrip> (p);
+    eq.place (0, 3, 11, 1);
+    view.onSelect = [&strip] (int b) { strip.setBand (b); };
+    strip.onBandChange = [&view, &strip] (int b) { view.setSelected (b); strip.setBand (b); };
 
     voice.add<Choice> (s, "micType", "Mic");
-    voice.add<Choice> (s, "preType", "Preamp");
+    voice.add<Choice> (s, "preType", "Saturation");
     voice.add<Knob> (s, "preDrive", "Drive", kA);
+    voice.add<Knob> (s, "preTone", "Tone", kA).getSlider().setTooltip ("Tilts the saturated sound darker or brighter around 1 kHz");
+    voice.add<Knob> (s, "preMix", "Mix", kA).getSlider().setTooltip ("Blend the saturated voice with the clean one (parallel saturation)");
 
+    comp.add<Knob> (s, "rider", "Rider", kA).getSlider().setTooltip ("Vocal rider: evens out loud and quiet phrases before the compressor, like riding a fader");
     comp.add<Choice> (s, "compType", "Type");
     comp.add<Knob> (s, "compAmount", "Comp", kA);
     comp.add<Knob> (s, "compAttack", "Attack", kA);
     comp.add<Knob> (s, "compRelease", "Release", kA);
     comp.add<Knob> (s, "compRatio", "Ratio", kA);
+    comp.add<Knob> (s, "compScHpf", "SC Filter", kA).getSlider().setTooltip ("Sidechain high-pass: lows and plosives stop pumping the compressor");
     comp.add<Knob> (s, "compMix", "Mix", kA).getSlider().setTooltip ("Blend the compressed voice with the uncompressed one (parallel compression)");
-    comp.add<GrMeter> (p);
+    comp.add<GrMeter> ("GR", [&p] { return p.compGr.load(); });
 
     deess.add<Knob> (s, "deess", "Amount", kA);
     deess.add<Knob> (s, "deessFreq", "Freq", kA);
+    deess.add<GrMeter> ("Ess", [&p] { return p.deessGr.load(); });
+
+    smooth.add<Knob> (s, "smoothDepth", "Smooth", kA).getSlider().setTooltip ("Finds harsh resonances as they happen and turns down only those frequencies, only while they ring");
+    smooth.add<Knob> (s, "smoothSharp", "Sharpness", kA).getSlider().setTooltip ("Low: broad, gentle reductions. High: only narrow, whistly peaks");
+    smooth.add<Knob> (s, "smoothLow", "Focus Low", kA);
+    smooth.add<Knob> (s, "smoothHigh", "Focus High", kA);
+    smooth.add<GrMeter> ("Cut", [&p] { return p.smoothGr.load(); });
+
+    air.add<Knob> (s, "airMid", "Mid Air", kA).getSlider().setTooltip ("Presence that opens up quiet details (2.5-9 kHz) without making loud consonants harsh");
+    air.add<Knob> (s, "airHigh", "High Air", kA).getSlider().setTooltip ("Sheen above 9 kHz, lifted more on breathy, quiet parts than on sibilants");
+
     dbl.add<Knob> (s, "dblMix", "Double", kA).getSlider().setTooltip ("Two extra takes, a little late and out of step, panned wide");
     dbl.add<Knob> (s, "dblWidth", "Width", kA);
+
+    chorus.add<Knob> (s, "chMix", "Chorus", kA).getSlider().setTooltip ("A classic stereo chorus (amount; 0 = off)");
+    chorus.add<Knob> (s, "chRate", "Rate", kA);
+    chorus.add<Knob> (s, "chDepth", "Depth", kA);
+    chorus.add<Choice> (s, "dimMode", "Dimension");   // 1-4: subtle to deep widening without an obvious wobble
+    chorus.add<Knob> (s, "dimMix", "Dim Mix", kA);
+
     vocoder.add<Knob> (s, "vocMix", "Vocoder", kA).getSlider().setTooltip ("A 16-band vocoder playing the note you sing (plus the chord): no MIDI needed");
     vocoder.add<Choice> (s, "vocCarrier", "Carrier");
     vocoder.add<Choice> (s, "vocChord", "Chord");
@@ -96,12 +117,13 @@ AircheckEditor::Content::Content (AircheckProcessor& p)
 
     tapeP.add<Knob> (s, "tape", "Tape", kA).getSlider().setTooltip ("Tape machine: saturation, a softer top and a little wow and flutter");
     output.add<Knob> (s, "mix", "Mix", kA);
+    output.add<Knob> (s, "limit", "Limit", kA).getSlider().setTooltip ("Lookahead limiter: push the voice into a -1 dB ceiling without clipping");
     output.add<Knob> (s, "outGain", "Output", kA);
 
     addAndMakeVisible (topBar);
     description.setHint (juce::String ("ddeonmadeit  v") + DD_PLUGIN_VERSION);
     addAndMakeVisible (description);
-    for (auto* c : { &tune, &eq, &voice, &comp, &deess, &dbl, &vocoder, &delay, &reverb, &tapeP, &output })
+    for (auto* c : { &tune, &eq, &voice, &comp, &deess, &smooth, &air, &dbl, &chorus, &vocoder, &delay, &reverb, &tapeP, &output })
         addAndMakeVisible (c);
     addAndMakeVisible (atmosphere);
 }
@@ -137,7 +159,8 @@ void AircheckEditor::Content::resized()
         }
     };
     row ({ &tune, &eq });
-    row ({ &voice, &comp, &deess, &dbl, &vocoder });
+    row ({ &voice, &comp, &deess });
+    row ({ &smooth, &air, &dbl, &chorus, &vocoder });
     row ({ &delay, &reverb, &tapeP, &output });
 }
 

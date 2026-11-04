@@ -20,8 +20,9 @@ private:
 };
 
 /**
-    The visual EQ: the curve over a live analyzer of the voice before (faint) and after the EQ.
-    Drag a node to move its band (frequency and gain), scroll on it for Q, double-click to reset.
+    The visual EQ: eight bands over a live analyzer of the voice before (faint) and after the EQ.
+    Click a point to select its band, drag to move it, scroll for Q, right-click to switch it on or off,
+    double-click a point to reset its gain, double-click empty space to add a band there.
 */
 class EqView : public juce::Component, private juce::Timer, private juce::AudioProcessorValueTreeState::Listener
 {
@@ -39,41 +40,63 @@ public:
     void mouseDoubleClick (const juce::MouseEvent&) override;
     void mouseWheelMove (const juce::MouseEvent&, const juce::MouseWheelDetails&) override;
 
-private:
-    struct Node { const char* name; const char* freqId; const char* gainId; const char* qId; };
-    static const std::array<Node, 7>& nodes();
+    void setSelected (int band);
+    int getSelected() const noexcept { return selected; }
+    std::function<void (int)> onSelect;
 
+private:
     void timerCallback() override;
     void updateCurve();
     void parameterChanged (const juce::String&, float) override { curveDirty = true; }
+    std::array<aircheck::BandSettings, aircheck::ProEq::kBands> readBands() const;
     juce::Rectangle<float> plot() const;
     float xForHz (float hz) const;
     float hzForX (float x) const;
     float yForDb (float db) const;
     float dbForY (float y) const;
-    juce::Point<float> nodePos (int i) const;
+    juce::Point<float> nodePos (int band) const;
     int nodeAt (juce::Point<float>) const;
-    float value (const char* id) const;
-    void setValue (const char* id, float v);
+    float value (const juce::String& id) const;
+    void setValue (const juce::String& id, float v, bool gesture = false);
     void analyse (dd::ScopeBuffer& src, std::vector<float>& smooth);
 
     AircheckProcessor& proc;
-    aircheck::VocalEq eq;
-    std::vector<float> curve, preSpec, postSpec, fftData, window;
+    std::array<aircheck::BandSettings, aircheck::ProEq::kBands> bands {};
+    std::vector<float> curve, bandCurve, preSpec, postSpec, fftData, window;
     juce::dsp::FFT fft { 12 };
     std::atomic<bool> curveDirty { true };   // set from whichever thread changes a band
-    int hover = -1, drag = -1;
+    int hover = -1, drag = -1, selected = 0;
 };
 
-/** Gain reduction of the compressor (and the de-esser beside it), as a lit segment column. */
+/** The selected EQ band's controls (rebuilt when another band is selected). */
+class BandStrip : public juce::Component
+{
+public:
+    explicit BandStrip (AircheckProcessor&);
+    void setBand (int band);
+    void resized() override;
+    void paint (juce::Graphics&) override;
+    std::function<void (int)> onBandChange;   // arrows on the strip
+
+private:
+    AircheckProcessor& proc;
+    int band = -1;
+    std::vector<std::unique_ptr<juce::Component>> controls;
+    std::unique_ptr<dd::gui::Toggle> post;   // EQ before or after the dynamics (not per band)
+    juce::TextButton prev { "<" }, next { ">" };
+};
+
+/** A segment column for one or two gain-reduction readings. */
 class GrMeter : public juce::Component, private juce::Timer
 {
 public:
-    explicit GrMeter (AircheckProcessor& p) : proc (p) { startTimerHz (30); }
+    GrMeter (juce::String caption, std::function<float()> first, std::function<float()> second = {})
+        : label (std::move (caption)), a (std::move (first)), b (std::move (second)) { startTimerHz (30); }
     void paint (juce::Graphics&) override;
 
 private:
     void timerCallback() override;
-    AircheckProcessor& proc;
-    float comp = 0.0f, ess = 0.0f;
+    juce::String label;
+    std::function<float()> a, b;
+    float va = 0.0f, vb = 0.0f;
 };
