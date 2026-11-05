@@ -338,6 +338,9 @@ void LookAndFeel::drawRotarySlider (juce::Graphics& g, int x, int y, int w, int 
     const auto bounds = juce::Rectangle<int> (x, y, w, h).toFloat();
     const float R = std::min (bounds.getWidth(), bounds.getHeight()) * 0.5f - 1.0f;
     const auto c = bounds.getCentre();
+    // Knobs that animate (dd::gui::Knob) draw where their sweep has got to, not the final value.
+    if (const auto* shownPos = s.getProperties().getVarPointer ("ddShownPos"))
+        pos = (float) *shownPos;
     const float angle = startAngle + pos * (endAngle - startAngle);
     const bool enabled = s.isEnabled();
     const bool bipolar = s.getMinimum() < 0.0 && s.getMaximum() > 0.0;

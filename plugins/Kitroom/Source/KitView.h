@@ -53,6 +53,8 @@ private:
     KitroomProcessor& proc;
     std::vector<Piece> pieces;            // back to front
     std::array<float, kr::kNumSlots> flash {};
+    std::array<float, kr::kNumSlots> hitAge {}, hitVel {};   // seconds since the last hit, and how hard: drives the motion
+    juce::AffineTransform swingFor (const Piece&) const;
     juce::Image darkness;                 // static light mask: black except where the spots fall
     int hover = -1;
 };

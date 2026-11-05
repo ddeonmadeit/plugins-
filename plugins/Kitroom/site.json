@@ -20,13 +20,11 @@
   ],
   "previewNote": "on the same five-bar 96 BPM groove: ghost notes, open hat, a ride bar, a tom fill and crashes ringing out.",
   "whatsNew": {
-    "version": "1.12.0",
+    "version": "1.13.0",
     "items": [
-      "Punch knob on every piece: a harder attack and a tighter body on its close mic (half as much on the overheads), while the room mics stay exactly as recorded, so a kit can hit hard and still sound natural",
-      "Punchy pieces to swap in: two tight, knocking kicks and a cracking snare (with real rimshots) from the Aasimonster kit, and the studio kick played from its front mic",
-      "Clap: a new piece on D#3 (the General MIDI clap key), drawn as a sample pad beside the ride. Real hand claps from the Versilian library (tight three-person, loose gospel group, solo), placed in the studio kit's own room. Clap on Snare layers it on every snare hit",
-      "PUNCH: 10 new kits. Punch Studio, Knock Room, Trap Clap, Boom Bap Smack, Gospel Hands, Arena Punch, Soul Clap Pocket, Drill Slap, Muldjord Thump, Dry Punch Funk",
-      "Your projects and presets sound exactly as before: Punch starts at 0 and the clap plays only when you ask for it"
+      "The kit moves: cymbals swing and tip on their stands when you hit them, drum heads ripple and jump, the kick's front head breathes out",
+      "Hover over any knob or switch and the line under the top bar explains what it does, in plain words",
+      "Knobs sweep to their new positions when you change presets or automate them, instead of jumping"
     ]
   }
 }

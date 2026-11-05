@@ -133,7 +133,22 @@ KitView::KitView (KitroomProcessor& p) : proc (p)
     hat.outline.addEllipse (hat.box.translated (0, 10));
     pieces.push_back (hat);
 
-    startTimerHz (30);
+    hitAge.fill (10.0f);
+    startTimerHz (60);
+}
+
+juce::AffineTransform KitView::swingFor (const Piece& p) const
+{
+    // A struck cymbal rocks on its stand and tips toward you and back, settling over a second or so.
+    const float age = hitAge[(size_t) p.slot], v = hitVel[(size_t) p.slot];
+    if (age > 2.5f || v <= 0.0f)
+        return {};
+    const float decay = std::exp (-age * (p.shape == Shape::HiHat ? 4.0f : 2.2f));
+    const float big = p.shape == Shape::Ride || p.shape == Shape::Crash ? 1.0f : 0.7f;
+    const float angle = big * v * 0.09f * decay * std::sin (age * kPi * 2.0f * 2.4f);
+    const float tip = 1.0f + big * v * 0.35f * decay * std::sin (age * kPi * 2.0f * 3.1f + 1.1f);
+    const auto c = p.box.getCentre();
+    return juce::AffineTransform::scale (1.0f, tip, c.x, c.y).rotated (angle, c.x, c.y);
 }
 
 juce::Colour KitView::finishFor (int slot) const
@@ -154,9 +169,17 @@ void KitView::timerCallback()
     bool any = false;
     for (int s = 0; s < kr::kNumSlots; ++s)
     {
-        flash[(size_t) s] = std::max (flash[(size_t) s] * 0.8f, proc.takeHit (s));
+        const float hit = proc.takeHit (s);
+        if (hit > 0.0f)
+        {
+            hitAge[(size_t) s] = 0.0f;
+            hitVel[(size_t) s] = hit;
+        }
+        else
+            hitAge[(size_t) s] += 1.0f / 60.0f;
+        flash[(size_t) s] = std::max (flash[(size_t) s] * 0.894f, hit);   // same fade as before, at 60 frames a second
         if (flash[(size_t) s] < 0.01f) flash[(size_t) s] = 0.0f;
-        any = any || flash[(size_t) s] > 0.0f || proc.isSlotLoading (s);
+        any = any || flash[(size_t) s] > 0.0f || hitAge[(size_t) s] < 2.5f || proc.isSlotLoading (s);
     }
     if (any || proc.getLearnTarget() >= 0)
         repaint();
@@ -630,26 +653,53 @@ void KitView::paint (juce::Graphics& g)
             case Shape::China:
             case Shape::Crash:
             case Shape::Ride:
+            {
                 drawStand (g, p.box.getCentreX(), p.box.getCentreY(), kFloorY, true);
+                juce::Graphics::ScopedSaveState ss (g);
+                g.addTransform (swingFor (p));
                 drawCymbal (g, p.box, glow, p.shape == Shape::China);
                 break;
+            }
             case Shape::HiHat:
             {
                 drawStand (g, p.box.getCentreX(), p.box.getCentreY(), kFloorY, true);
                 g.setColour (juce::Colour (0xff222222));
                 g.fillRoundedRectangle (p.box.getCentreX() - 14, kFloorY - 6, 34, 9, 2);
                 drawCymbal (g, p.box.translated (0, 10), glow * 0.6f, false);
+                juce::Graphics::ScopedSaveState ss (g);
+                g.addTransform (swingFor (p));
                 drawCymbal (g, p.box, glow, false);
                 break;
             }
             case Shape::Kick:
+            {
+                // The front head breathes out on the hit.
+                const float age = hitAge[(size_t) p.slot], v = hitVel[(size_t) p.slot];
+                const float pulse = age < 0.6f ? 1.0f + 0.022f * v * std::exp (-age * 9.0f) * std::cos (age * kPi * 2.0f * 6.0f) : 1.0f;
+                juce::Graphics::ScopedSaveState ss (g);
+                g.addTransform (juce::AffineTransform::scale (pulse, pulse, p.box.getCentreX(), p.box.getCentreY()));
                 drawKick (g, p, glow);
                 break;
+            }
             case Shape::Snare:
             case Shape::RackTom:
             case Shape::FloorTom:
+            {
+                // The drum jumps a hair on its stand, and a ripple runs out across the head.
+                const float age = hitAge[(size_t) p.slot], v = hitVel[(size_t) p.slot];
+                const float jump = age < 0.5f ? -1.6f * v * std::exp (-age * 11.0f) * std::cos (age * kPi * 2.0f * 9.0f) : 0.0f;
+                juce::Graphics::ScopedSaveState ss (g);
+                g.addTransform (juce::AffineTransform::translation (0.0f, jump));
                 drawDrum (g, p, glow);
+                if (age < 0.4f)
+                {
+                    const float frac = age / 0.4f;
+                    const auto ring = p.box.reduced (p.box.getWidth() * 0.5f * (1.0f - frac) * 0.9f, p.box.getHeight() * 0.5f * (1.0f - frac) * 0.9f);
+                    g.setColour (kCream.withAlpha (0.4f * v * (1.0f - frac)));
+                    g.drawEllipse (ring, 1.4f);
+                }
                 break;
+            }
             case Shape::Pad:
                 drawPad (g, p, glow);
                 break;

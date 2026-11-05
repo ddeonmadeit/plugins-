@@ -2,8 +2,46 @@
 
 namespace dd::gui
 {
-/** Rotary knob bound to a parameter: caption above, live value below, double-click resets. */
-class Knob : public juce::Component
+/**
+    Hover help. Controls bound to a parameter carry its id ("ddParam") and their caption ("ddTitle"); any other
+    component can carry its own text with setHelp(). HoverHelp watches the mouse inside one editor window and
+    reports the help for whatever is under it, looked up in the plugin's table (param id -> plain words).
+*/
+void setHelp (juce::Component& c, const juce::String& title, const juce::String& text);
+/** Marks a custom control as bound to a parameter, so its help comes from the plugin's table. */
+void tagParam (juce::Component& c, const juce::String& paramId, const juce::String& title);
+
+class HoverHelp : private juce::MouseListener
+{
+public:
+    explicit HoverHelp (juce::Component& insideEditor);
+    ~HoverHelp() override;
+
+    void setTable (std::map<juce::String, juce::String> byParamId) { table = std::move (byParamId); }
+    bool isActive() const noexcept { return text.isNotEmpty(); }
+    const juce::String& getTitle() const noexcept { return title; }
+    const juce::String& getText() const noexcept { return text; }
+
+    std::function<void()> onChange;
+
+    /** Tests and headless snapshots: every HoverHelp reacts as if the mouse had moved onto `c`. */
+    static void simulateHover (juce::Component& c);
+
+private:
+    void mouseEnter (const juce::MouseEvent& e) override { update (e, false); }
+    void mouseMove (const juce::MouseEvent& e) override  { update (e, false); }
+    void mouseDrag (const juce::MouseEvent& e) override  { update (e, false); }
+    void mouseExit (const juce::MouseEvent& e) override  { update (e, true); }
+    void update (const juce::MouseEvent&, bool leaving);
+
+    juce::Component& owner;
+    std::map<juce::String, juce::String> table;
+    juce::String title, text;
+};
+
+/** Rotary knob bound to a parameter: caption above, live value below, double-click resets. When the value
+    changes from outside (a preset, automation) the knob sweeps to it instead of jumping. */
+class Knob : public juce::Component, private juce::Timer
 {
 public:
     Knob (juce::AudioProcessorValueTreeState& state, const juce::String& paramId, const juce::String& title,
@@ -19,12 +57,15 @@ public:
 
 private:
     void updateValueText();
+    void valueChanged();
+    void timerCallback() override;
 
     float labelScale = 1.0f;
     juce::RangedAudioParameter* param = nullptr;
     juce::Slider slider;
     juce::String title, valueText;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> attachment;
+    float shown = 0.0f;   // drawn position 0..1, easing toward the real one
 };
 
 /** Combo box bound to a choice parameter, with a caption above. */

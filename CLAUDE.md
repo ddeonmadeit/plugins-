@@ -40,7 +40,8 @@ modules/dd_core           PresetManager (JSON factory + user presets), param <->
 modules/dd_take           capture-then-edit plugins (Contour, Hush): TakeEngine (transfer state machine, worker, take files,
                           state, sample-rate changes, crossfaded playback, bounce; subclasses add their model), TakeStore,
                           CaptureFifo, Published<T> (hazard-pointer hand-over), SpanSet, offline pitch tracker, FLAC takes
-modules/dd_gui            house look (see "Visual style"): DARK/LITE theme tokens, LookAndFeel, Knob/Choice/Toggle/LampSwitch,
+modules/dd_gui            house look (see "Visual style"): DARK/LITE theme tokens, LookAndFeel, Knob (eases to new values)/Choice/Toggle/LampSwitch,
+                          HoverHelp (controls carry their param id; DescriptionLine::setHelpTable explains whatever is under the mouse),
                           grid Panel, TopBar + PresetBar keys + DescriptionLine, Atmosphere, console Scope, TapeStopControl,
                           materials (keycaps, lit keys, trays, switches, console, wells), embedded Instrument Sans (fonts/, SIL OFL)
 plugins/<Name>/           one plugin: CMakeLists.txt, Source/, Presets/<CATEGORY>/NN_Name.json, qa.json,
@@ -74,7 +75,7 @@ H=build/plugins/SubGrit/SubGrit_Harness_artefacts/Release/SubGrit_Harness
 $H list                                                    # factory presets (= host programs)
 $H render --program 3 --out /tmp/x.wav                     # one preset, demo phrase
 $H render --preset-file p.json --set cutoff=300 --out x.wav  # audition JSON without rebuilding
-xvfb-run -a -s "-screen 0 2560x1600x24" $H snapshot --out ui.png   # look at the editor
+xvfb-run -a -s "-screen 0 2560x1600x24" $H snapshot --out ui.png   # look at the editor (--hover x,y: as if pointing there)
 ```
 
 Linux build deps (already present in the dev container image): ninja, libasound2-dev, libx11-dev,
@@ -104,6 +105,9 @@ libfreetype-dev, libfontconfig1-dev, xvfb; Python: numpy, scipy, soundfile, matp
 - Presets: JSON in real units, **every parameter listed** (run `tools/qa/preset_fill.py`), loudness-matched
   through the output gain param (`tools/qa/normalize_presets.py`). File names must be unique across folders
   (binary data uses the bare file name). Category order comes from the processor's `categoryOrder()`.
+- Every control explains itself: give the editor's DescriptionLine (or a scene's HoverHelp) a help table with one
+  plain-words line per parameter id, and `dd::gui::setHelp` / `tagParam` for custom controls. The owner does not
+  read manuals; if a knob needs explaining, its help line is where it goes.
 - Code style follows JUCE: 4 spaces, `func (args)` with a space, braces on new lines, sparse comments that
   explain why. Build must stay warning-free under `juce_recommended_warning_flags`.
 - Don't commit `build/`, `qa-out/`, `dist/`.
@@ -156,7 +160,7 @@ Every plugin follows it exactly; it replaced the earlier brushed-brown-metal loo
 
 | Plugin | Kind | Code | Notes |
 | --- | --- | --- | --- |
-| SubGrit | synth | Sgrt | 808 + distorted bass, POLY switch. 131 presets: TRAVIS, MIKE DEAN, UNTILJAPAN, YE, YEEZUS, MOSHC0RE, KING, TRIP HOP, SAFE, 80s, 2000s, BOUNCE 808, SOFT, UNIQUE |
+| SubGrit | synth | Sgrt | 808 + distorted bass, POLY switch. Simple panel by default (SubView speaker + six bipolar macros mBoom/mPunch/mGrit/mTone/mLength/mGlide that bend the preset, 0 = as designed); ALL KNOBS shows the full engine (`allKnobs`, saved per session). 131 presets: TRAVIS, MIKE DEAN, UNTILJAPAN, YE, YEEZUS, MOSHC0RE, KING, TRIP HOP, SAFE, 80s, 2000s, BOUNCE 808, SOFT, UNIQUE |
 | Kitroom | synth | Ktrm | Live acoustic drum kit from multi-mic DrumGizmo recordings (CC BY 4.0: DRS, Muldjord, Aasimonster) plus real hand claps (VCSL, CC0) placed in the DRS room: drawn kit UI (the clap is a sample pad, slot 11 on GM key 39), GM keys, swappable pieces, close/OH/room mics, per-piece Punch (a per-voice attack/body envelope on close + overheads, rooms untouched), Clap on Snare, bus drive/crush/tone. Parameters added after 1.11 are appended to the layout. 78 presets: STUDIO, LIVE ROOM, VINTAGE, TIGHT, PUNCH, BIG, YEEZUS, MOSHC0RE, KING, TRIP HOP, 80S, 2000S, SOFT, UNIQUE. Local QA needs `KITROOM_LIBRARY` (build it with `plugins/Kitroom/library/build_library.py`) |
 | Sunburst | synth | Sbst | Sampled acoustic + electric guitars (CC0: Karoryfer Shinyguitar / Emilyguitar / Black And Green, FreePats nylon), six-string engine (string assignment, strum, hammer-on / slide legato, palm mute, double-track), String Noise knob, pedalboard (comp, drive, fuzz, chorus, synced trem, delay), Clean / Crunch / Lead amp + cab + room. Drawn guitar UI with lit strings. TAPE STOP. 60 presets: ACOUSTIC, CLEAN, CRUNCH, HEAVY, TRAVIS SCOTT, MIKE DEAN, YEEZUS, MOSHC0RE, TRIP HOP, 80S, 2000S, SOFT, UNIQUE, SAFE. Local QA needs `SUNBURST_LIBRARY` (`plugins/Sunburst/library/build_library.py`) |
 | Afterglow | synth | Aglw | Pads, keys, plucks, leads, bells, soundscapes, electric guitar. Deep two-layer engine (12 sources incl. pluck, organ, mallet, sync, Electric guitar string) + Dirt amp + CAB + strum + FX, but the panel is macro-first: a sunset "orb" display (Motion / Tone), 6 macros, POLY switch, TAPE STOP. 133 presets (each a different role): TAME IMPALA, MASSIVE ATTACK, BRENT FAIYAZ, MIKE DEAN, TRAVIS SCOTT, YEEZUS, MOSHC0RE, GUITAR, TRIP HOP, 80S, 2000S, SOFT, UNIQUE, SAFE |

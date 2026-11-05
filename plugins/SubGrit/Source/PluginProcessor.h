@@ -45,11 +45,16 @@ public:
 
     /** Editor zoom, saved with the session. Message thread only. */
     float editorScale = 1.0f;
+    /** The editor shows every engine knob (true) or the simple macro panel (false). Saved with the session. */
+    bool allKnobs = false;
+    /** Last note played (the simple panel shows it), -1 before any. */
+    std::atomic<int> lastNote { -1 };
 
 private:
     static constexpr int kChunk = 64;
 
     sg::VoiceParams buildVoiceParams() const;
+    float glideMs() const noexcept;
     void processChunk (float* L, float* R, int n, double bpm);
     void updateFxSettings (double bpm);
 

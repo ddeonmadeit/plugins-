@@ -7,6 +7,13 @@
 
 using sg::P;
 
+namespace
+{
+/** Macro bend for a 0..1 amount (as Afterglow): m = 0 keeps the preset's value, m < 0 scales it toward 0,
+    m > 0 moves it toward `ceiling`. */
+float bend01 (float v, float m, float ceiling) noexcept { return m >= 0.0f ? v + m * (ceiling - v) : v * (1.0f + m); }
+} // namespace
+
 const juce::StringArray& SubGritProcessor::categoryOrder()
 {
     static const juce::StringArray order { "TRAVIS", "MIKE DEAN", "UNTILJAPAN", "YE", "YEEZUS", "MOSHC0RE", "KING", "TRIP HOP", "SAFE", "80s", "2000s", "BOUNCE 808", "SOFT", "UNIQUE" };
@@ -81,23 +88,40 @@ void SubGritProcessor::prepareToPlay (double sampleRate, int)
     setLatencySamples (dirt.getLatency() + clipper.getLatency());
 }
 
+float SubGritProcessor::glideMs() const noexcept
+{
+    // Slide: none at -1, the preset's at 0, a long 600 ms slide at +1.
+    return bend01 (params.get (P::glide), params.get (P::mGlide), 600.0f);
+}
+
 sg::VoiceParams SubGritProcessor::buildVoiceParams() const
 {
+    // The simple panel's macros bend the preset around itself; at 0 every value is exactly the preset's.
+    const float boom = params.get (P::mBoom), punch = params.get (P::mPunch), grit = params.get (P::mGrit);
+    const float tone = params.get (P::mTone), length = params.get (P::mLength);
+
     sg::VoiceParams v;
     v.pitchShift = (float) params.getInt (P::octave) * 12.0f + (float) params.getInt (P::tune) + params.get (P::fine) * 0.01f;
     v.bend = engine.getBend();
-    const float glideMs = params.get (P::glide);
-    v.glideCoef = glideMs > 0.5f ? dd::onePoleCoef (glideMs * 0.001f / 3.0f, sr) : 0.0f;
-    v.punchAmt = params.get (P::pitchAmt);
+    const float glide = glideMs();
+    v.glideCoef = glide > 0.5f ? dd::onePoleCoef (glide * 0.001f / 3.0f, sr) : 0.0f;
+    // Punch: the pitch drop and knock at the start of each note, and how fast it speaks.
+    const float pitchPunch = params.get (P::pitchAmt);
+    v.punchAmt = punch >= 0.0f ? pitchPunch + punch * ((pitchPunch < 0.0f ? -18.0f : 18.0f) - pitchPunch) * 0.7f
+                               : pitchPunch * (1.0f + punch);
     v.punchTimeMs = params.get (P::pitchTime);
     v.diveAmt = params.get (P::diveAmt);
     v.diveTimeMs = params.get (P::diveTime);
     v.velocitySens = params.get (P::velocity);
     v.drift = params.get (P::drift);
 
-    v.bodyLevel = params.get (P::bodyLevel);
-    v.bodyDrive = params.get (P::bodyDrive);
-    v.clickLevel = params.get (P::clickLevel);
+    // Boom: more is a fuller, louder 808; less keeps the 808 audible but thinner (lower and rounder
+    // harmonics give way: less level, more drive so it still reads on small speakers).
+    v.bodyLevel = boom >= 0.0f ? bend01 (params.get (P::bodyLevel), boom, 1.0f) : params.get (P::bodyLevel) * (1.0f + 0.45f * boom);
+    // Grit and brightness both add the 808's harmonics; thinning the boom does too.
+    const float bodyHarm = std::max ({ grit, 0.0f }) + std::max (0.0f, tone) * 0.5f + std::max (0.0f, -boom) * 0.5f;
+    v.bodyDrive = grit < 0.0f ? params.get (P::bodyDrive) * (1.0f + grit) : bend01 (params.get (P::bodyDrive), std::min (1.0f, bodyHarm), 0.85f);
+    v.clickLevel = bend01 (params.get (P::clickLevel), punch, 0.7f);
     v.clickTone = params.get (P::clickTone);
 
     const P oscIds[2][8] = {
@@ -118,15 +142,21 @@ sg::VoiceParams SubGritProcessor::buildVoiceParams() const
     v.noiseColor = params.get (P::noiseColor);
 
     v.filterMode = params.getInt (P::filterMode);
-    v.cutoff = params.get (P::cutoff);
+    v.cutoff = juce::jlimit (20.0f, 20000.0f, params.get (P::cutoff) * std::exp2 (tone * 2.5f));
     v.resonance = params.get (P::resonance);
-    v.filterDrive = params.get (P::filterDrive);
+    v.filterDrive = bend01 (params.get (P::filterDrive), grit, 0.9f);
     v.filterEnv = params.get (P::filterEnv);
     v.keyTrack = params.get (P::keyTrack);
     v.bodyToFilter = params.getBool (P::bodyToFilter);
 
     v.fA = params.get (P::fAttack); v.fD = params.get (P::fDecay); v.fS = params.get (P::fSustain); v.fR = params.get (P::fRelease);
     v.aA = params.get (P::aAttack); v.aD = params.get (P::aDecay); v.aS = params.get (P::aSustain); v.aR = params.get (P::aRelease);
+    // Punch below 0 softens the attack (up to 16x slower), above 0 sharpens it.
+    v.aA = juce::jlimit (0.1f, 5000.0f, punch < 0.0f ? v.aA * std::exp2 (-punch * 4.0f) : v.aA * (1.0f - 0.8f * punch));
+    // Length: shorter or longer notes (decay, release, and a little more sustain when longer).
+    v.aD = juce::jlimit (5.0f, 12000.0f, v.aD * std::exp2 (length * 2.5f));
+    v.aR = juce::jlimit (5.0f, 8000.0f, v.aR * std::exp2 (length * 2.0f));
+    v.aS = bend01 (v.aS, std::max (0.0f, length) * 0.4f, 1.0f);
 
     v.lfoPitch = params.get (P::lfoPitch);
     v.lfoCutoff = params.get (P::lfoCutoff);
@@ -136,7 +166,11 @@ sg::VoiceParams SubGritProcessor::buildVoiceParams() const
 
 void SubGritProcessor::updateFxSettings (double bpm)
 {
-    const float eq[4] = { params.get (P::eqSub), params.get (P::eqMidFreq), params.get (P::eqMidGain), params.get (P::eqHighCut) };
+    // Boom moves the sub shelf; Tone opens a presence lift when bright and closes the high cut when dark.
+    const float boom = params.get (P::mBoom), tone = params.get (P::mTone);
+    const float eq[4] = { juce::jlimit (-12.0f, 12.0f, params.get (P::eqSub) + boom * (boom >= 0.0f ? 6.0f : 9.0f)), params.get (P::eqMidFreq),
+                          juce::jlimit (-12.0f, 12.0f, params.get (P::eqMidGain) + std::max (0.0f, tone) * 5.0f),
+                          juce::jlimit (500.0f, 20000.0f, std::min (20000.0f, params.get (P::eqHighCut)) * std::exp2 (std::min (0.0f, tone) * 3.5f)) };
     if (! std::equal (std::begin (eq), std::end (eq), std::begin (lastEq)))
     {
         std::copy (std::begin (eq), std::end (eq), std::begin (lastEq));
@@ -175,7 +209,7 @@ void SubGritProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mid
     es.mono = params.getInt (P::voiceMode) == 0 && ! params.getBool (P::perfPoly);
     es.legato = params.getBool (P::legato);
     es.glideAlways = params.getInt (P::glideMode) == 1;
-    es.glideMs = params.get (P::glide);
+    es.glideMs = glideMs();
     es.bendRange = (float) params.getInt (P::bendRange);
     engine.setSettings (es);
 
@@ -217,6 +251,8 @@ void SubGritProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mid
                 if (t > done) { segEnd = t; break; }
                 vp.bend = engine.getBend();
                 engine.handleMidi (meta.getMessage(), vp);
+                if (meta.getMessage().isNoteOn())
+                    lastNote.store (meta.getMessage().getNoteNumber(), std::memory_order_relaxed);
                 if (meta.getMessage().isPitchWheel())
                     vp.bend = engine.getBend();
                 ++midiIt;
@@ -257,11 +293,13 @@ void SubGritProcessor::processChunk (float* L, float* R, int n, double)
 
         dd::Dirt::Params dp;
         dp.type = (dd::DirtType) params.getInt (P::dirtType);
-        dp.drive = params.get (P::dirtDrive);
-        dp.tone = params.get (P::dirtTone);
+        const float grit = params.get (P::mGrit);
+        dp.drive = bend01 (params.get (P::dirtDrive), grit, 1.0f);
+        dp.tone = juce::jlimit (-1.0f, 1.0f, params.get (P::dirtTone) + params.get (P::mTone) * 0.5f);
         dp.bias = params.get (P::dirtBias);
-        dp.mix = params.get (P::dirtMix);
-        dp.subKeep = params.get (P::subKeep);
+        dp.mix = bend01 (params.get (P::dirtMix), grit, 1.0f);
+        // More Boom keeps more of the sub clean under the distortion.
+        dp.subKeep = bend01 (params.get (P::subKeep), std::max (0.0f, params.get (P::mBoom)), 1.0f);
         dp.xoverHz = params.get (P::xover);
 
         // LFO > Dirt uses the chunk's mean LFO value (the Dirt smooths drive internally).
@@ -313,7 +351,7 @@ void SubGritProcessor::processChunk (float* L, float* R, int n, double)
     {
         float* chans[2] = { L, R };
         juce::dsp::AudioBlock<float> block (chans, 2, (size_t) n);
-        clipper.process (block, params.get (P::clip));
+        clipper.process (block, bend01 (params.get (P::clip), params.get (P::mGrit) * 0.5f, 0.8f));
     }
 
     bool bad = false;
@@ -370,6 +408,7 @@ void SubGritProcessor::getStateInformation (juce::MemoryBlock& destData)
     auto state = apvts.copyState();
     presets.writeState (state);
     state.setProperty ("uiScale", editorScale, nullptr);
+    state.setProperty ("allKnobs", allKnobs, nullptr);
     if (auto xml = state.createXml())
         copyXmlToBinary (*xml, destData);
 }
@@ -384,6 +423,7 @@ void SubGritProcessor::setStateInformation (const void* data, int sizeInBytes)
             dd::replaceStateExactly (apvts, tree);
             presets.readState (tree);
             editorScale = juce::jlimit (0.6f, 1.8f, (float) tree.getProperty ("uiScale", 1.0f));
+            allKnobs = (bool) tree.getProperty ("allKnobs", false);
             dd::keepOldDefault (apvts, tree, "perfPoly", 0.0f);
         }
     }

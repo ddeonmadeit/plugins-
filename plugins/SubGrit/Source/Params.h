@@ -24,6 +24,8 @@ enum class P
     spaceMix, spaceSize,
     glue, clip, width, outGain,
     perfPoly,   // performance switch: belongs to the instance, never to a preset (see dd::isPerformanceParam)
+    // Macros (the simple front panel, 1.13): bipolar, 0 = the preset as designed. Appended so older sessions load.
+    mBoom, mPunch, mGrit, mTone, mLength, mGlide,
     count
 };
 

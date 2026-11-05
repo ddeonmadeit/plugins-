@@ -1,9 +1,10 @@
 {
   "publish": true,
   "tagline": "808 + distorted bass engine",
-  "description": "Grungy, distorted 808s and synth basses that stay full: the Dirt section distorts the top while Sub Keep blends the clean sub back underneath. 108 presets in Travis Scott, Mike Dean, untiljapan, Ye, Yeezus, KING, moshc0re, SAFE, trip-hop, 80s and 2000s styles, plus regular bouncy 808s.",
+  "description": "Grungy, distorted 808s and synth basses that stay full. Start on the simple panel (six macros that bend any preset: Boom, Punch, Grit, Tone, Length, Slide) or open ALL KNOBS for the whole engine, where the Dirt section distorts the top while Sub Keep keeps the clean sub underneath. 131 presets in Travis Scott, Mike Dean, untiljapan, Ye, Yeezus, KING, moshc0re, SAFE, trip-hop, 80s, 2000s, soft and unique styles, plus regular bouncy 808s.",
   "accent": "#ff5a1f",
   "highlights": [
+    "Simple front panel: six macros (Boom, Punch, Grit, Tone, Length, Slide) over a speaker that moves with the bass; ALL KNOBS opens the full engine, and every control explains itself when you point at it",
     "808 body with punch, warmth and knock, plus two unison synth oscillators",
     "Moog-style ladder filter, glide, release dive, tempo-synced LFO",
     "8 distortion types at 4x oversampling with Sub Keep for heavy-but-full low end",
@@ -16,10 +17,13 @@
     "Notes play at real pitch: the classic 808 range is C2–C3 in FL's piano roll (or use the Octave knob)."
   ],
   "whatsNew": {
-    "version": "1.12.0",
+    "version": "1.13.0",
     "items": [
-      "Favourites: press the star key just right of the preset name to star a preset, then find all your starred sounds in FAVOURITES at the top of the category list (the arrows step through just those). Stars are kept across updates, in every project",
-      "22 new basses in two new categories. SOFT (gentle, natural, warm): Felt Sub, Upright Thumb, Fretless Glide, Warm Round Moog, Dub Sine, Velvet Pluck, Pillow Square, Arco Bass, Dusty Felt 808, Night Swell. UNIQUE (instruments and characters you won't find elsewhere in the plugin): Talk Box Bass, Envelope Quack, Boing Bass, Sample And Hold, Gated Pulse, Fold Growl, Rectified Organ, Chip Bass, Kalimba Bass, Didgeridoo, Bomb Drop, Steel Drum Bass"
+      "A simple front panel: a speaker that pumps with your bass and six plain macros (Boom, Punch, Grit, Tone, Length, Slide). Each one bends the preset around itself: the centre is always the preset as designed, and the ends say what they do (thin / huge, soft / hard, clean / dirty, dark / bright, short / long, none / long)",
+      "ALL KNOBS (top bar) still opens every control of the engine, with clearer names (Pitch Drop, Drop Time, To Filter, Sub Split...), and SubGrit remembers which view you use per project",
+      "Hover over any knob or switch and the line under the top bar explains what it does, in plain words",
+      "Knobs sweep to their new positions when you change presets or automate them, instead of jumping",
+      "Your projects sound exactly as before: the macros start in the centre"
     ]
   }
 }

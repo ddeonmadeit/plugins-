@@ -17,6 +17,43 @@ const juce::Colour kFeelAccent = dd::gui::sunset::yellow;
 using dd::gui::Knob;
 } // namespace
 
+namespace
+{
+/** What every control does, in plain words: shown under the top bar while the mouse is over it. */
+std::map<juce::String, juce::String> kitroomHelp()
+{
+    std::map<juce::String, juce::String> h {
+        { "masterClose",     "All close mics: the punchy, dry sound of each drum." },
+        { "masterOverheads", "The two mics above the kit: the whole kit and the cymbals in stereo." },
+        { "masterRoom",      "The room mics: the space around the kit. Up for big, down for tight." },
+        { "velCurve",        "How your playing strength maps to hits: Soft makes quiet notes louder, Hard keeps the loud hits for hard notes." },
+        { "humanize",        "Small random changes in level, like a real drummer." },
+        { "glue",            "Bus compression that pulls the kit together and makes it punchier." },
+        { "clip",            "Soft clipping on the kit: louder and denser, peaks rounded off." },
+        { "width",           "Stereo width of the kit (the lows stay in the middle)." },
+        { "outGain",         "Final volume." },
+        { "drive",           "Distortion on the whole kit." },
+        { "driveType",       "Distortion flavour: Tape (warm), Tube (rich), Fuzz, Clip (hard), Fold (metallic), Crush (lo-fi), Rectify, Amp." },
+        { "crush",           "Bit crusher: gritty, lo-fi, sampler-style drums." },
+        { "tone",            "Darker or brighter kit." },
+        { "clapOnSnare",     "Every snare hit (not the sidestick) also plays the clap, at the same strength." },
+    };
+    for (int s = 0; s < kr::kNumSlots; ++s)
+    {
+        const juce::String id = kr::slots()[(size_t) s].id, name = juce::String (kr::slots()[(size_t) s].name).toLowerCase();
+        h[id + "Volume"]    = "Volume of the " + name + ".";
+        h[id + "Pan"]       = "Left or right. Auto: where the " + name + " sits in the overheads.";
+        h[id + "Tune"]      = "Tunes the " + name + " up or down, in semitones.";
+        h[id + "Decay"]     = "How long the " + name + " rings: Natural is the full recording, lower chokes it shorter.";
+        h[id + "Close"]     = "The " + name + "'s close mic: punch and detail.";
+        h[id + "Overheads"] = "How much of the " + name + " you hear in the overhead mics.";
+        h[id + "Room"]      = "How much of the " + name + " you hear in the room mics.";
+        h[id + "Punch"]     = "A harder attack and a tighter body on the " + name + "'s close mic; the room stays natural.";
+    }
+    return h;
+}
+} // namespace
+
 KitroomEditor::Content::Content (KitroomProcessor& p)
     : proc (p),
       topBar (p.presets, "KIT", "ROOM", "Live Drum Kit / Multi-Mic"),
@@ -51,6 +88,7 @@ KitroomEditor::Content::Content (KitroomProcessor& p)
     description.setHint (juce::String ("Click a piece to edit it  /  ddeonmadeit v") + DD_PLUGIN_VERSION);
     dd::gui::markRaised (element, 14.0f);
     addAndMakeVisible (topBar);
+    description.setHelpTable (kitroomHelp());
     addAndMakeVisible (description);
     addAndMakeVisible (kit);
     addAndMakeVisible (element);

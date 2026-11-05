@@ -20,10 +20,10 @@
   ],
   "previewNote": "on the same 80 BPM part: strummed Em, C and G chords (down and up strokes), then a single-note riff.",
   "whatsNew": {
-    "version": "1.7.0",
+    "version": "1.8.0",
     "items": [
-      "Favourites: press the star key just right of the preset name to star a preset, then find all your starred sounds in FAVOURITES at the top of the category list (the arrows step through just those). Stars are kept across updates, in every project",
-      "15 new guitars in two new categories. SOFT (gentle, natural, warm): Thumb Nylon, Whisper Strum, Warm Jazz Thumb, Nylon Pair, Lullaby Tremolo, Felt Neck Pickup, Porch Fingerstyle. UNIQUE (instruments and characters you won't find elsewhere in the plugin): Baritone Twang, Twelve String Jangle, Bowed Sustain, Desert Buzz, Plucky Banjo, Broken Radio, Velvet Fuzz, Cathedral Echoes"
+      "Hover over any knob or switch and the line under the top bar explains what it does, in plain words",
+      "Knobs sweep to their new positions when you change presets or automate them, instead of jumping"
     ]
   }
 }

@@ -434,6 +434,13 @@ DescriptionLine::DescriptionLine (PresetBar& b) : bar (b)
         startTimerHz (60);
         repaint();
     };
+    // Help and description swap quickly, so reading across the panel is not a slideshow.
+    help.onChange = [this]
+    {
+        changedAt = juce::Time::getMillisecondCounterHiRes() - 170.0;
+        startTimerHz (60);
+        repaint();
+    };
     setInterceptsMouseClicks (false, false);
 }
 
@@ -459,8 +466,23 @@ void DescriptionLine::paint (juce::Graphics& g)
         r.removeFromRight (16.0f);
     }
     g.setOpacity (rise);
+    const auto line = r.translated (0.0f, 6.0f * (1.0f - rise));
+    if (help.isActive())
+    {
+        // The control's name lit like a caption, then what it does.
+        const auto capFont = LookAndFeel::font (10.5f, 700).withExtraKerningFactor (0.1f);
+        const auto cap = help.getTitle().toUpperCase();
+        const float capW = cap.isEmpty() ? 0.0f : juce::GlyphArrangement::getStringWidth (capFont, cap) + 12.0f;
+        g.setFont (capFont);
+        g.setColour (t.signalGlow);
+        g.drawText (cap, line.withWidth (capW), juce::Justification::centredLeft, false);
+        g.setFont (LookAndFeel::font (12.5f, 400));
+        g.setColour (t.cream100);
+        g.drawFittedText (help.getText(), line.withTrimmedLeft (capW).toNearestInt(), juce::Justification::centredLeft, 1, 0.85f);
+        return;
+    }
     g.setFont (LookAndFeel::font (12.5f, 400));
     g.setColour (t.cream300);
-    g.drawFittedText (text, r.translated (0.0f, 6.0f * (1.0f - rise)).toNearestInt(), juce::Justification::centredLeft, 1, 0.9f);
+    g.drawFittedText (text, line.toNearestInt(), juce::Justification::centredLeft, 1, 0.85f);
 }
 } // namespace dd::gui

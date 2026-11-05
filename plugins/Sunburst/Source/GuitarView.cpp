@@ -39,6 +39,7 @@ void softShadow (juce::Graphics& g, const juce::Path& p, float spread, float alp
 //==============================================================================
 GuitarView::GuitarView (SunburstProcessor& p) : proc (p)
 {
+    dd::gui::tagParam (*this, "guitar", "Guitar");
     proc.apvts.addParameterListener ("guitar", this);
     startTimerHz (30);
 }
@@ -534,6 +535,7 @@ PedalView::PedalView (juce::AudioProcessorValueTreeState& s, const juce::String&
           repaint();
       })
 {
+    dd::gui::tagParam (*this, onId, n + " pedal");
     period = 4.2 + 0.37 * (double) (n.hashCode() & 7);   // each pedal's lamp flickers in its own rhythm
     getProperties().set ("ddFlickerPeriod", period);
     setMouseCursor (juce::MouseCursor::PointingHandCursor);

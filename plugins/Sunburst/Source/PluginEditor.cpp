@@ -14,6 +14,70 @@ dd::gui::Palette sunburstPalette()
 } // namespace
 
 //==============================================================================
+namespace
+{
+/** What every control does, in plain words: shown under the top bar while the mouse is over it. */
+std::map<juce::String, juce::String> sunburstHelp()
+{
+    return {
+        { "guitar",      "Which guitar plays: click the arrows or the name. Six real guitars, recorded note by note." },
+        { "stringNoise", "Finger squeaks, string damping, slide scrapes and pick ticks: from very real to completely clean." },
+        { "pick",        "How the strings are played: soft fingers (left) to a hard pick (right)." },
+        { "mute",        "Palm mute: the hand resting on the strings for a short, chunky sound. The mod wheel mutes too." },
+        { "tone",        "Darker or brighter guitar." },
+        { "ring",        "How long notes keep ringing after you let go." },
+        { "strum",       "Chords are strummed: the time between strings. 0 plays all strings at once." },
+        { "legato",      "Notes played while another is held: Hammer (hammer-on) or Slide (the pitch glides), instead of a new pick." },
+        { "slideTime",   "How long a slide takes." },
+        { "vibrato",     "Finger vibrato on held notes." },
+        { "humanize",    "Small changes in timing and level, like a real player." },
+        { "velCurve",    "How strongly your playing strength changes the sound: harder keys play harder-picked notes." },
+        { "bendRange",   "How far the pitch wheel bends, in semitones." },
+        { "transpose",   "Moves the guitar up or down in semitones (a baritone is about -5)." },
+        { "doubleTrack", "A second take of the part, panned to the other side: wide, big guitars." },
+        { "body",        "Acoustic guitars: how much of the wooden body and air you hear." },
+
+        { "compOn",      "Compressor pedal: evens out the playing and adds sustain. Click to switch it on." },
+        { "compAmount",  "How hard the compressor squeezes." },
+        { "driveOn",     "Overdrive pedal: warm, crunchy breakup. Click to switch it on." },
+        { "driveGain",   "How much the overdrive breaks up." },
+        { "driveTone",   "Darker or brighter overdrive." },
+        { "fuzzOn",      "Fuzz pedal: thick, buzzing, sustaining distortion. Click to switch it on." },
+        { "fuzzGain",    "How much fuzz." },
+        { "chorusOn",    "Chorus pedal: a shimmering, doubled sound. Click to switch it on." },
+        { "chorusRate",  "Chorus speed." },
+        { "chorusDepth", "How deep the chorus swirls." },
+        { "tremOn",      "Tremolo pedal: the volume pulses in time with the song. Click to switch it on." },
+        { "tremDiv",     "Tremolo speed as a note length." },
+        { "tremDepth",   "How deep the tremolo pulses." },
+        { "delayOn",     "Delay pedal: echoes in time with the song. Click to switch it on." },
+        { "delayDiv",    "Echo time as a note length." },
+        { "delayFeedback","How many times the echo repeats." },
+        { "delayMix",    "How loud the echoes are." },
+
+        { "ampOn",       "The amplifier: switch it on for electric guitar tone (off for a clean acoustic or DI)." },
+        { "ampModel",    "Amp channel: Clean, Crunch (edge of breakup) or Lead (high gain)." },
+        { "ampGain",     "How hard the amp is driven." },
+        { "ampBass",     "Amp bass." },
+        { "ampMid",      "Amp mids: where the guitar sits in a mix." },
+        { "ampTreble",   "Amp treble." },
+        { "ampPresence", "Amp presence: the top-end bite." },
+        { "ampLevel",    "Amp volume." },
+        { "cabOn",       "The speaker cabinet the amp plays through." },
+        { "cabType",     "1x12 combo (tight) or 4x12 stack (big)." },
+        { "cabMic",      "Where the mic is on the speaker: the centre (bright) to the edge (dark)." },
+        { "reverbOn",    "The room the guitar is played in." },
+        { "reverbMix",   "How much room you hear." },
+        { "reverbSize",  "How big the room is." },
+        { "width",       "Stereo width." },
+        { "glue",        "Gentle compression that holds the sound together." },
+        { "outGain",     "Final volume." },
+        { "perfTapeStop","Tape stop: the guitar slows to a halt like a tape machine powering down. Automate it at the end of a beat." },
+        { "perfTapeTime","How long the tape stop takes." },
+    };
+}
+} // namespace
+
 SunburstEditor::Content::Content (SunburstProcessor& p)
     : proc (p),
       topBar (p.presets, "SUN", "BURST", "Acoustic / Electric Guitar"),
@@ -105,6 +169,7 @@ SunburstEditor::Content::Content (SunburstProcessor& p)
     topBar.addRight (tapeStop, 196);
     addAndMakeVisible (topBar);
     description.setHint (juce::String ("ddeonmadeit  v") + DD_PLUGIN_VERSION);
+    description.setHelpTable (sunburstHelp());
     addAndMakeVisible (description);
     addAndMakeVisible (guitar);
     addAndMakeVisible (playing);

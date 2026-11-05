@@ -88,6 +88,12 @@
     "glue": 0.65,
     "clip": 0.8,
     "width": 1.2,
-    "outGain": -7.6
+    "outGain": -7.6,
+    "mBoom": 0.0,
+    "mPunch": 0.0,
+    "mGrit": 0.0,
+    "mTone": 0.0,
+    "mLength": 0.0,
+    "mGlide": 0.0
   }
 }

@@ -52,4 +52,5 @@ private:
     std::vector<juce::Point<float>> stars;
     float level = 0.0f, time = 0.0f;
     bool dragging = false, overSun = false;
+    dd::gui::HoverHelp help { *this };   // the description gives way to what the control under the mouse does
 };

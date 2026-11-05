@@ -94,18 +94,21 @@ private:
     std::vector<std::pair<juce::Component*, int>> right;
 };
 
-/** The preset's description under the top rail, rising in when the preset changes. */
+/** The preset's description under the top rail, rising in when the preset changes. While the mouse is over
+    a control, it explains that control instead (setHelpTable: param id -> what it does, in plain words). */
 class DescriptionLine : public juce::Component, private juce::Timer
 {
 public:
     explicit DescriptionLine (PresetBar& bar);
     void paint (juce::Graphics&) override;
     void setHint (const juce::String& rightHint) { hint = rightHint; repaint(); }
+    void setHelpTable (std::map<juce::String, juce::String> byParamId) { help.setTable (std::move (byParamId)); }
 
 private:
     void timerCallback() override;
     PresetBar& bar;
     juce::String text, hint;
     double changedAt = 0.0;
+    HoverHelp help { *this };
 };
 } // namespace dd::gui

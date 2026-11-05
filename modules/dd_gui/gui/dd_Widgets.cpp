@@ -18,9 +18,98 @@ namespace
 }
 
 //==============================================================================
+namespace
+{
+    const juce::Identifier kParamProp ("ddParam"), kTitleProp ("ddTitle"), kHelpProp ("ddHelp");
+}
+
+void tagParam (juce::Component& c, const juce::String& paramId, const juce::String& title)
+{
+    c.getProperties().set (kParamProp, paramId);
+    c.getProperties().set (kTitleProp, title);
+}
+
+void setHelp (juce::Component& c, const juce::String& title, const juce::String& text)
+{
+    c.getProperties().set (kTitleProp, title);
+    c.getProperties().set (kHelpProp, text);
+}
+
+namespace
+{
+    juce::Array<HoverHelp*>& hoverHelpers()
+    {
+        static juce::Array<HoverHelp*> all;   // message thread only
+        return all;
+    }
+}
+
+HoverHelp::HoverHelp (juce::Component& insideEditor) : owner (insideEditor)
+{
+    juce::Desktop::getInstance().addGlobalMouseListener (this);
+    hoverHelpers().add (this);
+}
+
+HoverHelp::~HoverHelp()
+{
+    hoverHelpers().removeFirstMatchingValue (this);
+    juce::Desktop::getInstance().removeGlobalMouseListener (this);
+}
+
+void HoverHelp::simulateHover (juce::Component& c)
+{
+    const juce::MouseEvent e (juce::Desktop::getInstance().getMainMouseSource(), c.getLocalBounds().getCentre().toFloat(),
+                              juce::ModifierKeys(), juce::MouseInputSource::defaultPressure, 0.0f, 0.0f, 0.0f, 0.0f,
+                              &c, &c, juce::Time::getCurrentTime(), {}, juce::Time::getCurrentTime(), 0, false);
+    for (auto* h : hoverHelpers())
+        h->update (e, false);
+}
+
+void HoverHelp::update (const juce::MouseEvent& e, bool leaving)
+{
+    juce::String newTitle, newText;
+    auto* c = e.eventComponent;
+    // Only this editor's window: every open plugin window shares the desktop's mouse.
+    const bool ours = c != nullptr && owner.getTopLevelComponent() != nullptr && c->getTopLevelComponent() == owner.getTopLevelComponent();
+    if (ours && ! leaving)
+    {
+        for (auto* p = c; p != nullptr; p = p->getParentComponent())
+        {
+            const auto& props = p->getProperties();
+            if (props.contains (kHelpProp))
+            {
+                newTitle = props[kTitleProp].toString();
+                newText = props[kHelpProp].toString();
+                break;
+            }
+            if (props.contains (kParamProp))
+            {
+                if (auto it = table.find (props[kParamProp].toString()); it != table.end())
+                {
+                    newTitle = props[kTitleProp].toString();
+                    newText = it->second;
+                }
+                break;
+            }
+        }
+    }
+    else if (! ours && text.isEmpty())
+        return;
+
+    if (newText != text || newTitle != title)
+    {
+        title = newTitle;
+        text = newText;
+        if (onChange)
+            onChange();
+    }
+}
+
+//==============================================================================
 Knob::Knob (juce::AudioProcessorValueTreeState& state, const juce::String& paramId, const juce::String& t, juce::Colour accent)
     : title (t)
 {
+    tagParam (*this, paramId, t);
     param = state.getParameter (paramId);
     jassert (param != nullptr);
 
@@ -35,9 +124,42 @@ Knob::Knob (juce::AudioProcessorValueTreeState& state, const juce::String& param
 
     attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment> (state, paramId, slider);
     slider.setDoubleClickReturnValue (true, param->convertFrom0to1 (param->getDefaultValue()));
-    slider.onValueChange = [this] { updateValueText(); repaint(); };
+    slider.onValueChange = [this] { valueChanged(); };
     slider.setTooltip (param->getName (64));
+    shown = (float) slider.valueToProportionOfLength (slider.getValue());
+    slider.getProperties().set ("ddShownPos", shown);
     updateValueText();
+}
+
+void Knob::valueChanged()
+{
+    updateValueText();
+    const float target = (float) slider.valueToProportionOfLength (slider.getValue());
+    if (slider.isMouseButtonDown() || ! isShowing())
+    {
+        // Under the hand the knob follows exactly; nobody to animate for when hidden.
+        shown = target;
+        stopTimer();
+    }
+    else if (! isTimerRunning())
+        startTimerHz (60);
+    slider.getProperties().set ("ddShownPos", shown);
+    slider.repaint();
+    repaint();
+}
+
+void Knob::timerCallback()
+{
+    // Ease toward the value (about 60 ms time constant): a preset change sweeps, automation glides.
+    const float target = (float) slider.valueToProportionOfLength (slider.getValue());
+    shown += (target - shown) * 0.24f;
+    if (std::abs (target - shown) < 0.002f)
+    {
+        shown = target;
+        stopTimer();
+    }
+    slider.getProperties().set ("ddShownPos", shown);
+    slider.repaint();
 }
 
 void Knob::updateValueText()
@@ -68,6 +190,7 @@ void Knob::paint (juce::Graphics& g)
 Choice::Choice (juce::AudioProcessorValueTreeState& state, const juce::String& paramId, const juce::String& t)
     : title (t)
 {
+    tagParam (*this, paramId, t);
     auto* p = dynamic_cast<juce::AudioParameterChoice*> (state.getParameter (paramId));
     jassert (p != nullptr);
     if (p != nullptr)
@@ -130,6 +253,7 @@ Toggle::Toggle (juce::AudioProcessorValueTreeState& state, const juce::String& p
       }),
       title (t), onText (onT), offText (offT)
 {
+    tagParam (*this, paramId, t);
     attachment.sendInitialUpdate();
     setMouseCursor (juce::MouseCursor::PointingHandCursor);
 }
@@ -168,6 +292,8 @@ LampSwitch::LampSwitch (juce::RangedAudioParameter& p, const juce::String& l, ju
       }),
       label (l)
 {
+    if (auto* withId = dynamic_cast<juce::AudioProcessorParameterWithID*> (&p))
+        tagParam (*this, withId->paramID, l);
     attachment.sendInitialUpdate();
     setMouseCursor (juce::MouseCursor::PointingHandCursor);
 }

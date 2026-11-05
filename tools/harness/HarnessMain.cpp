@@ -12,7 +12,7 @@
                               [--at 6.5:perfTapeStop=1 ...]   change a parameter at a time in seconds (like automation)
                               --phrase "notes:<note>,<start s>,<length s>,<velocity> ... [end=<s>]"   any notes (one-shots, loops)
       <Plugin>Harness render-all --outdir dir [--phrase demo] [--sr 48000] [--bpm 80]
-      <Plugin>Harness snapshot --out ui.png [--program N] [--scale 1] [--phrase vocal]   effects: what to play before the picture
+      <Plugin>Harness snapshot --out ui.png [--program N] [--scale 1] [--phrase vocal] [--hover x,y]   effects: what to play before the picture
       <Plugin>Harness stress  [--seconds 20] [--sr 48000] [--block 128]
       <Plugin>Harness dump-params    current values as preset-style JSON
       <Plugin>Harness param-info     ids, ranges, kinds and choice names (used by tools/qa/preset_lint.py)
@@ -22,6 +22,7 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <dd_core/dd_core.h>
+#include <dd_gui/dd_gui.h>
 
 #include <chrono>
 #include <iostream>
@@ -809,6 +810,18 @@ int cmdSnapshot (juce::AudioProcessor& proc, const Args& a)
         return 1;
     }
     const float scale = a.get ("--scale", "1").getFloatValue();
+
+    // --hover x,y: what a user sees while pointing at that spot (hover help, for now): the control there is
+    // handed to every HoverHelp as if the mouse had moved onto it.
+    if (a.has ("--hover"))
+    {
+        const auto xy = juce::StringArray::fromTokens (a.get ("--hover"), ",", "");
+        ed->setVisible (true);   // hit-testing skips invisible components, and this editor is never put on screen
+        if (auto* target = ed->getComponentAt (xy[0].getIntValue(), xy[1].getIntValue()))
+            dd::gui::HoverHelp::simulateHover (*target);
+        else
+            std::cerr << "hover: nothing at " << a.get ("--hover") << "\n";
+    }
 
     auto img = ed->createComponentSnapshot (ed->getLocalBounds(), true, scale);
     const juce::File out (a.get ("--out", "ui.png"));

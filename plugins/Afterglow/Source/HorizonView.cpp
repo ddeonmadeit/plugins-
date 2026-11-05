@@ -23,6 +23,26 @@ juce::Path ridgePath (const std::array<float, 128>& heights, float x0, float w, 
 
 HorizonView::HorizonView (AfterglowProcessor& p) : proc (p)
 {
+    help.setTable ({
+        { "mSwell",  "Slower or faster start to every note: from instant to a slow swell. Centre is the preset as designed (double-click)." },
+        { "mTail",   "Shorter or longer fade after you let go. Centre is the preset as designed." },
+        { "mBlend",  "The balance between the two sound layers (A and B, top right). Centre is the preset as designed." },
+        { "mGrit",   "Clean or saturated: tape, distortion and lo-fi. Centre is the preset as designed." },
+        { "mEcho",   "Less or more echo. Centre is the preset as designed." },
+        { "mSpace",  "A smaller or bigger room around the sound. Centre is the preset as designed." },
+        { "distOn",  "Dirt: distortion, from warm to broken." },
+        { "tapeOn",  "Tape: a warm tape machine, slightly wobbly." },
+        { "ensOn",   "Ensemble: the lush, wide chorus of old string machines and Junos." },
+        { "phaserOn","Phaser: a slow sweeping swirl." },
+        { "delayOn", "Delay: echoes in time with the song." },
+        { "reverbOn","Reverb: the room or hall around the sound." },
+        { "pumpOn",  "Pump: the volume ducks on every beat, like sidechain compression." },
+        { "cabOn",   "Cab: plays the sound through a guitar speaker cabinet." },
+        { "perfPoly","On: play chords with any preset. Off: each preset's own mode (mono or legato leads). Stays as you set it." },
+        { "perfTapeStop", "Tape stop: everything slows to a halt like a tape machine powering down. Automate it at the end of a beat." },
+        { "perfTapeTime", "How long the tape stop takes." },
+    });
+    help.onChange = [this] { repaint(); };
     motion = proc.apvts.getParameter ("mMotion");
     tone = proc.apvts.getParameter ("mTone");
 
@@ -312,10 +332,24 @@ void HorizonView::paintText (juce::Graphics& g) const
                           dd::gui::LookAndFeel::font (12.0f, true).withExtraKerningFactor (0.28f), juce::Justification::topLeft);
     dd::gui::drawPrinted (g, pm.getCurrentName(), r.removeFromTop (46.0f), kCream,
                           dd::gui::LookAndFeel::display (38.0f).withExtraKerningFactor (0.03f), juce::Justification::centredLeft);
-    g.setColour (kTan);
-    g.setFont (dd::gui::LookAndFeel::font (14.0f));
-    g.drawFittedText (pm.getCurrentDescription(), r.removeFromTop (40.0f).withWidth (std::min (r.getWidth(), 520.0f)).toNearestInt(),
-                      juce::Justification::topLeft, 2, 1.0f);
+    const auto descArea = r.removeFromTop (40.0f).withWidth (std::min (r.getWidth(), 520.0f));
+    if (help.isActive())
+    {
+        // What the control under the mouse does, in place of the description.
+        auto line = descArea;
+        g.setColour (sunset::amber);
+        g.setFont (dd::gui::LookAndFeel::font (11.0f, true).withExtraKerningFactor (0.14f));
+        g.drawText (help.getTitle().toUpperCase(), line.removeFromTop (16.0f), juce::Justification::centredLeft, false);
+        g.setColour (kCream);
+        g.setFont (dd::gui::LookAndFeel::font (14.0f));
+        g.drawFittedText (help.getText(), line.toNearestInt(), juce::Justification::topLeft, 2, 1.0f);
+    }
+    else
+    {
+        g.setColour (kTan);
+        g.setFont (dd::gui::LookAndFeel::font (14.0f));
+        g.drawFittedText (pm.getCurrentDescription(), descArea.toNearestInt(), juce::Justification::topLeft, 2, 1.0f);
+    }
 
     // Layer badges, top right.
     auto badges = getLocalBounds().toFloat().reduced (22.0f, 20.0f).removeFromTop (24.0f);

@@ -32,7 +32,7 @@ const std::array<ParamSpec, (size_t) kNumParams>& table()
 
         { P::bodyLevel,  "bodyLevel",  "808 Level",    K::Float,  0, 1, 0.85f, 0, U::Percent, nullptr },
         { P::bodyDrive,  "bodyDrive",  "808 Warmth",   K::Float,  0, 1, 0.15f, 0, U::Percent, nullptr },
-        { P::pitchAmt,   "pitchAmt",   "Punch",        K::Float, -24, 48, 9, 0, U::Semis, nullptr },
+        { P::pitchAmt,   "pitchAmt",   "Pitch Punch",  K::Float, -24, 48, 9, 0, U::Semis, nullptr },
         { P::pitchTime,  "pitchTime",  "Punch Time",   K::Float,  1, 1000, 45, 80, U::Ms, nullptr },
         { P::clickLevel, "clickLevel", "Knock",        K::Float,  0, 1, 0.15f, 0, U::Percent, nullptr },
         { P::clickTone,  "clickTone",  "Knock Tone",   K::Float,  0, 1, 0.5f, 0, U::Percent, nullptr },
@@ -120,6 +120,13 @@ const std::array<ParamSpec, (size_t) kNumParams>& table()
         { P::width,      "width",      "Width",        K::Float, 0, 1.5f, 1, 0, U::Percent, nullptr },
         { P::outGain,    "outGain",    "Output",       K::Float, -24, 12, 0, 0, U::Db, nullptr },
         { P::perfPoly,   "perfPoly",   "Poly Keys",    K::Bool,   0, 1, 1, 0, U::None, nullptr },
+
+        { P::mBoom,      "mBoom",      "Boom",         K::Float, -1, 1, 0, 0, U::Bipolar, nullptr },
+        { P::mPunch,     "mPunch",     "Punch",        K::Float, -1, 1, 0, 0, U::Bipolar, nullptr },
+        { P::mGrit,      "mGrit",      "Grit",         K::Float, -1, 1, 0, 0, U::Bipolar, nullptr },
+        { P::mTone,      "mTone",      "Tone",         K::Float, -1, 1, 0, 0, U::Bipolar, nullptr },
+        { P::mLength,    "mLength",    "Length",       K::Float, -1, 1, 0, 0, U::Bipolar, nullptr },
+        { P::mGlide,     "mGlide",     "Slide",        K::Float, -1, 1, 0, 0, U::Bipolar, nullptr },
     }};
     return t;
 }
