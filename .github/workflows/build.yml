@@ -1,6 +1,7 @@
 name: Build plugins
 
-# Pushes to any branch: build + QA every plugin, upload installers as an artifact.
+# Pushes to any branch: build + QA the plugins the push changed (every plugin when shared code changed;
+# tools/ci/pick_plugins.sh), upload installers as an artifact.
 # Releases (GitHub Release "<Plugin> <version>", tag <Plugin>-v<version>) happen when:
 #   - a push to main contains a plugin with "publish": true in its site.json whose VERSION has no release yet
 #     (so shipping an update = bump VERSION in plugins/<Plugin>/CMakeLists.txt and push), or
@@ -79,6 +80,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Pick plugins
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BEFORE: ${{ github.event.before }}
+        run: |
+          picked="$(tools/ci/pick_plugins.sh)"
+          all="$(python3 tools/ci/plugin_meta.py --names | tr '\n' ' ')"
+          echo "PLUGINS=$picked" >> "$GITHUB_ENV"
+          if [[ "$(echo $picked)" == "$(echo $all)" ]]; then echo "ALL_PLUGINS=1" >> "$GITHUB_ENV"; fi
+          echo "Building: ${picked:-nothing}"
+
       - name: Restore sample libraries
         uses: actions/cache/restore@v4
         with:
@@ -97,6 +109,7 @@ jobs:
           done
 
       - name: Install dependencies
+        if: env.PLUGINS != ''
         run: |
           sudo apt-get update
           sudo apt-get install -y ninja-build xvfb ffmpeg libasound2-dev libx11-dev libxrandr-dev libxinerama-dev \
@@ -104,40 +117,50 @@ jobs:
             python3-numpy python3-scipy python3-soundfile python3-matplotlib
 
       - name: Cache JUCE
+        if: env.PLUGINS != ''
         uses: actions/cache@v4
         with:
           path: build/_deps
           key: juce-linux-${{ hashFiles('CMakeLists.txt') }}
 
       - name: Configure
+        if: env.PLUGINS != ''
         run: cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
 
       - name: Build harnesses and VST3s
+        if: env.PLUGINS != ''
         run: |
           targets=""
-          for p in $(python3 tools/ci/plugin_meta.py --names); do targets="$targets ${p}_Harness ${p}_VST3"; done
-          cmake --build build --parallel --target $targets dd_tests contour_tests hush_tests
+          for p in $PLUGINS; do targets="$targets ${p}_Harness ${p}_VST3"; done
+          if [[ -n "$ALL_PLUGINS" ]]; then targets="$targets dd_tests contour_tests hush_tests"; fi
+          cmake --build build --parallel --target $targets
 
       - name: Unit tests (shared modules)
+        if: env.ALL_PLUGINS != ''
         run: |
           build/tools/tests/dd_tests_artefacts/Release/dd_tests
           build/tools/tests/contour_tests_artefacts/Release/contour_tests
           build/tools/tests/hush_tests_artefacts/Release/hush_tests
 
       - name: Get pluginval
+        if: env.PLUGINS != ''
         run: |
           curl -sSL -o pluginval.zip https://github.com/Tracktion/pluginval/releases/latest/download/pluginval_Linux.zip
           unzip -q pluginval.zip -d pluginval
 
-      - name: QA every plugin
+      - name: QA the plugins
+        if: env.PLUGINS != ''
         run: |
-          for p in $(python3 tools/ci/plugin_meta.py --names); do
+          for p in $PLUGINS; do
             PLUGINVAL=$PWD/pluginval/pluginval tools/qa/run_qa.sh "$p"
           done
 
       - name: Render previews for the download site
         run: |
-          for p in $(python3 tools/ci/plugin_meta.py --names); do
+          # Plugins not rebuilt keep their published previews (the site job copies them back).
+          mkdir -p site-previews
+          echo "previews of the plugins built in this run" > site-previews/README.txt
+          for p in $PLUGINS; do
             python3 tools/site/make_previews.py "$p" site-previews
           done
 
@@ -187,11 +210,12 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_INPUT: ${{ github.event.inputs.release }}
+          BEFORE: ${{ github.event.before }}
         run: |
           set -eo pipefail
           meta() { python3 tools/ci/plugin_meta.py --only "$1" | python3 -c "import json,sys; p=json.load(sys.stdin)[0]; print($2)"; }
           released() { gh release view "$1" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; }
-          releases=""; only=""
+          releases=""; only=""; nothing=""
           if [[ "$GITHUB_REF" == refs/tags/*-v* ]]; then
             plugin="${GITHUB_REF_NAME%-v*}"; version="${GITHUB_REF_NAME##*-v}"
             python3 tools/ci/plugin_meta.py --only "$plugin" > /dev/null || { echo "::error::No plugin named '$plugin' in plugins/"; exit 1; }
@@ -211,10 +235,23 @@ jobs:
               fi
             done
           fi
+          if [[ "$GITHUB_EVENT_NAME" == push && "$GITHUB_REF" != refs/tags/* ]]; then
+            # Branch pushes build only what changed (plus releases due on main).
+            picked="$(BEFORE="$BEFORE" tools/ci/pick_plugins.sh)"
+            if [[ "$(echo $picked)" != "$(python3 tools/ci/plugin_meta.py --names | tr '\n' ' ' | xargs)" ]]; then
+              only="$(echo $picked | tr ' ' ',')"
+              [[ -n "$only" ]] || nothing=1
+            fi
+          fi
           if [[ -n "$only" ]]; then echo "DD_ONLY=$only" >> "$GITHUB_ENV"; fi
           echo "RELEASES=$(echo $releases)" >> "$GITHUB_ENV"
-          echo "PLUGINS=$(python3 tools/ci/plugin_meta.py ${only:+--only $only} --names | tr '\n' ' ')" >> "$GITHUB_ENV"
-          echo "Building: $(python3 tools/ci/plugin_meta.py ${only:+--only $only} --names | tr '\n' ' ')  Releasing: $(echo ${releases:-nothing})"
+          if [[ -n "$nothing" ]]; then
+            echo "PLUGINS=" >> "$GITHUB_ENV"
+            echo "Building: nothing"
+          else
+            echo "PLUGINS=$(python3 tools/ci/plugin_meta.py ${only:+--only $only} --names | tr '\n' ' ')" >> "$GITHUB_ENV"
+            echo "Building: $(python3 tools/ci/plugin_meta.py ${only:+--only $only} --names | tr '\n' ' ')  Releasing: $(echo ${releases:-nothing})"
+          fi
 
       - name: Cache JUCE
         uses: actions/cache@v4
@@ -223,12 +260,14 @@ jobs:
           key: juce-macos-${{ hashFiles('CMakeLists.txt') }}
 
       - name: Configure (arm64 + x86_64)
+        if: env.PLUGINS != ''
         run: |
           brew install ninja || true
           cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DDD_BUILD_HARNESS=OFF \
                 -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0
 
       - name: Build
+        if: env.PLUGINS != ''
         run: |
           targets=""
           for p in $PLUGINS; do targets="$targets ${p}_VST3 ${p}_AU"; done
@@ -237,15 +276,18 @@ jobs:
       # Developer ID signing + notarization switch on by themselves once the owner adds the secrets
       # (see .claude/skills/mac-release/SKILL.md); without them everything is ad-hoc signed as before.
       - name: Developer ID certificates
+        if: env.PLUGINS != ''
         env:
           MACOS_CERTS_P12: ${{ secrets.MACOS_CERTS_P12 }}
           MACOS_CERTS_PASSWORD: ${{ secrets.MACOS_CERTS_PASSWORD }}
         run: tools/ci/macos_signing.sh
 
       - name: Sign and package
+        if: env.PLUGINS != ''
         run: tools/ci/package_macos.sh build dist libraries
 
       - name: Validate Audio Units (auval)
+        if: env.PLUGINS != ''
         run: |
           mkdir -p ~/Library/Audio/Plug-Ins/Components
           python3 - <<'PY' > au_list.txt
@@ -263,6 +305,7 @@ jobs:
           done < au_list.txt
 
       - name: Validate VST3 (pluginval)
+        if: env.PLUGINS != ''
         run: |
           curl -sSL -o pluginval.zip https://github.com/Tracktion/pluginval/releases/latest/download/pluginval_macOS.zip
           unzip -q pluginval.zip -d pluginval
@@ -287,6 +330,7 @@ jobs:
           echo "DD_NOTARIZED=1" >> "$GITHUB_ENV"
 
       - name: Upload installers
+        if: env.PLUGINS != ''
         uses: actions/upload-artifact@v4
         with:
           name: macOS-installers
@@ -323,6 +367,12 @@ jobs:
         with:
           name: site-previews
           path: site-previews
+
+      - name: Keep the previews of plugins not rebuilt
+        run: |
+          mkdir -p old-site site-previews
+          if git fetch --depth 1 origin gh-pages; then git archive FETCH_HEAD | tar -x -C old-site; fi
+          python3 tools/site/reuse_previews.py old-site site-previews
 
       - name: Build site from the current releases
         env:

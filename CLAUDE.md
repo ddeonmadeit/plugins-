@@ -10,6 +10,8 @@ live once it has a release. **Releasing = version bump**: when a push to `main` 
 `site.json` has `"publish": true` and whose `VERSION` (in its CMakeLists.txt) has no release yet, CI builds,
 validates and releases it as `<Name>-v<version>`. New plugins start with `"publish": false`; flip it when the
 owner is happy. To ship an update, bump `VERSION` and push. Details: `.claude/skills/mac-release/SKILL.md`.
+A push builds only the plugins it changed plus releases due (`tools/ci/pick_plugins.sh`; shared code = all, CI / site / docs = none),
+and the site keeps the published previews of plugins not rebuilt, so a one-plugin change is live in ~15 min.
 
 Installers aren't notarized yet (that needs the owner's Apple Developer ID; CI is ready for it, see the
 mac-release skill), so a double-clicked .pkg gets macOS's "Apple could not verify" warning. The no-warning
