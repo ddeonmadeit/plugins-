@@ -1,0 +1,21 @@
+{
+  "name": "Rising Lift",
+  "category": "MOTION",
+  "author": "DEON",
+  "description": "Floats from the floor to the ceiling and back over four bars.",
+  "params": {
+    "posX": 0.0,
+    "posY": 0.4,
+    "posZ": 0.5,
+    "width": 0.4,
+    "room": "Concert Hall",
+    "size": 0.5,
+    "roomLevel": 0.5,
+    "motion": "Rise",
+    "motionRate": "4 Bars",
+    "motionAmount": 1.0,
+    "doppler": 0.5,
+    "mix": 1.0,
+    "outGain": 0.8
+  }
+}

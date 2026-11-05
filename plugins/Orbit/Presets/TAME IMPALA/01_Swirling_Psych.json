@@ -1,0 +1,21 @@
+{
+  "name": "Swirling Psych",
+  "category": "TAME IMPALA",
+  "author": "DEON",
+  "description": "Wide, swirling figure eights in a warm room.",
+  "params": {
+    "posX": 0.0,
+    "posY": 0.5,
+    "posZ": 0.4,
+    "width": 0.8,
+    "room": "Living Room",
+    "size": 0.5,
+    "roomLevel": 0.6,
+    "motion": "Figure 8",
+    "motionRate": "2 Bars",
+    "motionAmount": 0.5,
+    "doppler": 0.5,
+    "mix": 1.0,
+    "outGain": 0.4
+  }
+}

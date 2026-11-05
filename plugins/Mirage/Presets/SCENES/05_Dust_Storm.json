@@ -1,0 +1,15 @@
+{
+  "name": "Dust Storm",
+  "category": "SCENES",
+  "author": "DEON",
+  "description": "Thick grain like an old print, fast scrolling, low dunes.",
+  "params": {
+    "react": 0.65,
+    "grain": 1.0,
+    "digital": 0.3,
+    "speed": 0.8,
+    "eclipse": 0.25,
+    "dunes": 0.4,
+    "heat": 0.5
+  }
+}

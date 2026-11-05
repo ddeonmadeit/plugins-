@@ -1,0 +1,21 @@
+{
+  "name": "Lonerism Hall",
+  "category": "TAME IMPALA",
+  "author": "DEON",
+  "description": "Spread across a hall, swaying slowly from side to side.",
+  "params": {
+    "posX": 0.0,
+    "posY": 0.7,
+    "posZ": 0.4,
+    "width": 1.0,
+    "room": "Concert Hall",
+    "size": 0.5,
+    "roomLevel": 0.65,
+    "motion": "Pendulum",
+    "motionRate": "8 Bars",
+    "motionAmount": 0.3,
+    "doppler": 0.5,
+    "mix": 1.0,
+    "outGain": -1.0
+  }
+}

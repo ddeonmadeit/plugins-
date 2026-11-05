@@ -1,0 +1,10 @@
+Resources/hrtf.bin is derived from:
+
+  The Viking HRTF dataset v2
+  Simone Spagnol, Riccardo Miccini and Runar Unnthorsson (2020)
+  https://doi.org/10.5281/zenodo.4160401
+  License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Changes: four of the 21 pinna sets (subjects L, G, A, E), equalised against a blend of the diffuse field
+and the frontal response, spectrally smoothed, mirrored left/right, rebuilt as 64-tap minimum-phase filters
+on a uniform 5 degree grid, quantised to 16 bits. Built by make_hrtf.py in this folder.

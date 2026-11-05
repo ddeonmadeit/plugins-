@@ -1,0 +1,21 @@
+{
+  "name": "Fly By",
+  "category": "MOTION",
+  "author": "DEON",
+  "description": "Rushes from far in front to far behind, past your right side, bending in pitch like a passing car.",
+  "params": {
+    "posX": 0.3,
+    "posY": 0.0,
+    "posZ": 0.4,
+    "width": 0.1,
+    "room": "Warehouse",
+    "size": 0.5,
+    "roomLevel": 0.4,
+    "motion": "Fly By",
+    "motionRate": "1 Bar",
+    "motionAmount": 0.95,
+    "doppler": 1.0,
+    "mix": 1.0,
+    "outGain": 3.5
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "Ad-libs Behind You",
+  "category": "TRAVIS SCOTT",
+  "author": "DEON",
+  "description": "Ad-libs drifting behind and above you in a dark club.",
+  "params": {
+    "posX": 0.4,
+    "posY": -0.5,
+    "posZ": 0.6,
+    "width": 0.3,
+    "room": "Club",
+    "size": 0.5,
+    "roomLevel": 0.6,
+    "motion": "Wander",
+    "motionRate": "4 Bars",
+    "motionAmount": 0.3,
+    "doppler": 0.5,
+    "mix": 1.0,
+    "outGain": 3.2
+  }
+}

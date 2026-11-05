@@ -1,0 +1,24 @@
+{
+  "publish": true,
+  "tagline": "Put any sound anywhere in a real room around your head: move it, widen it, fly it around, all in 3D",
+  "description": "Orbit places a sound in a room as you would hear it from your own seat. Drag a glowing light around a 3D room to put the sound in front of you, behind you, above or below, near or far; set how wide it is; pick the room (studio, booth, living room, bathroom, car, club, warehouse, concert hall, cathedral, arena, cave or open air) and how big it is. Motion makes it travel on its own in time with the song: orbit your head, swing, fly past with a real Doppler pitch bend, rise, spiral or wander. Every move is a parameter, so you can automate all of it. On headphones it is true binaural 3D, made from measured human-ear responses; on speakers it stays clean.",
+  "accent": "#e0793f",
+  "highlights": [
+    "A drawn 3D room you can see into: the sound is a lamp hanging in the space with its shadow and height, your head in the middle, width shown as an arc of light, the first reflections drawn as rays off the walls, rings of light on every hit, and walls that glow while the room rings. Look from behind your head, from above like a map, or from the side; right-drag to turn the view",
+    "Real 3D on headphones: head-related filters measured on a KEMAR mannequin (Viking HRTF dataset, four choices of ears), smooth interaural timing and near-ear loudness, so sounds sit behind and above you, not just left and right",
+    "Twelve real rooms with their own size, walls and echo: 24 early reflections per side from the actual room shape, a dense late reverb with the room's own decay, and a Size knob that shrinks or grows the space. Switching rooms keeps your mix level",
+    "The fourth dimension: Motion paths locked to your song's tempo (orbit, pendulum, figure 8, fly-by, rise, spiral, wander), how far it travels, and Doppler for the pitch bend of a sound rushing past",
+    "Width from the listener's seat: from a single point to a sound spread across half the horizon",
+    "Automate everything: dragging the light records Left / Right, Front / Back and Height as automation in FL Studio",
+    "Zero latency, mono-safe low end (the bass stays centred), and a Speakers mode for monitors",
+    "40 presets: around you, rooms, motion, Travis Scott ad-libs, Tame Impala swirl, trip hop distance and mix tools",
+    "Head-related filters from The Viking HRTF dataset v2 (Spagnol, Miccini and Unnthorsson, 2020), CC BY 4.0"
+  ],
+  "installTips": [
+    "Put Orbit on any mixer insert (FL Studio: Mixer > track > empty slot > Orbit). Drag the light in the room to move the sound; Shift-drag or scroll to raise it.",
+    "Listen on headphones for full 3D (in front, behind, above). On speakers switch on SPEAKERS in the top bar.",
+    "Try the EARS choices with a sound placed behind you: the one where it really sounds behind you suits your ears best.",
+    "To automate a move in FL Studio, right-click Left / Right, Front / Back or Height and choose Create automation clip, or arm recording and drag the light while the song plays."
+  ],
+  "previewNote": "on the test programme. Listen on headphones: Orbit is 3D audio."
+}

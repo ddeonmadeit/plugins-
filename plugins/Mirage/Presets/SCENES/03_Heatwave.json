@@ -1,0 +1,15 @@
+{
+  "name": "Heatwave",
+  "category": "SCENES",
+  "author": "DEON",
+  "description": "Hot and shimmering: tall dunes, more orange, everything moving hard.",
+  "params": {
+    "react": 0.85,
+    "grain": 0.7,
+    "digital": 0.6,
+    "speed": 0.5,
+    "eclipse": 0.0,
+    "dunes": 0.85,
+    "heat": 0.8
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "Gentle Widen",
+  "category": "MIX",
+  "author": "DEON",
+  "description": "Stays in front, just wider and a touch of room: widen a part without moving it.",
+  "params": {
+    "posX": 0.0,
+    "posY": 0.4,
+    "posZ": 0.4,
+    "width": 1.0,
+    "room": "Studio",
+    "size": 0.5,
+    "roomLevel": 0.25,
+    "motion": "Static",
+    "motionRate": "1 Bar",
+    "motionAmount": 0.5,
+    "doppler": 0.5,
+    "mix": 1.0,
+    "outGain": -6.0
+  }
+}

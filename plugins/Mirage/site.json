@@ -1,0 +1,22 @@
+{
+  "publish": true,
+  "tagline": "A wide, animated visualiser of your song: a grainy sunset over dunes that move with the sound, on an orange control panel",
+  "description": "Mirage watches your music and draws it: put it on the master and stretch its window under the tracks while you screen-record FL Studio. A big window shows a grainy sun setting over sand dunes. The near dune is the live waveform, the far dunes are the spectrum drifting away into the distance, the sun swells with the low end and can be eclipsed, and every hit sends a ring of light out. Underneath is a deck of instruments drawn like an old phosphor screen: level meters, an oscilloscope, a scrolling waveform, a spectrum, a stereo field reticle, and a thermal-camera strip of the whole spectrum. Everything is red, orange and a little yellow, nothing else. The sound passes through untouched.",
+  "accent": "#ff6a1f",
+  "highlights": [
+    "Made for screen recordings: a wide window you can stretch to any size (it remembers it with the project) to sit under the playlist",
+    "The dune window: a risograph-grainy sunset where the near dune is your live waveform, the far ones the spectrum moments ago, a sun that pulses with the bass, an eclipse, heat shimmer, rings of light on hits",
+    "Phosphor control screen over it: pixel mesh, scanlines, crosshairs and live readouts (peak, low end and its frequency, energy, tempo, bar and time)",
+    "Instrument deck: L / R level meters with peak hold, a triggered oscilloscope, a scrolling waveform history, a 40-band LED spectrum and a stereo field reticle",
+    "Thermal strip: the spectrum as a heat camera, scrolling along the bottom",
+    "Seven automatable controls (React, Grain, Digital, Speed, Eclipse, Dunes, Heat) and six scenes: Desert, Eclipse, Heatwave, Signal, Dust Storm, Dusk",
+    "Strictly red, orange and a little Tarantino yellow: every pixel goes through one colour ramp",
+    "Zero latency, the audio is not changed at all"
+  ],
+  "installTips": [
+    "Put Mirage on the master insert (FL Studio: Mixer > Master > empty slot > Mirage) so it sees the whole song.",
+    "Detach the plugin window (the arrow menu at the top left of the plugin window > Detached), then drag its bottom-right corner to stretch it under the playlist. It keeps its size in the project.",
+    "Click the scene name in the middle of the header to step through the looks; drag any of the CONTROL dials up and down to change them (you can automate them too)."
+  ],
+  "previewNote": "Mirage does not change the sound; the preview is the test programme passing through."
+}

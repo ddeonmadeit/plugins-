@@ -1,0 +1,21 @@
+{
+  "name": "Spiral Up",
+  "category": "MOTION",
+  "author": "DEON",
+  "description": "Circles and climbs through a cathedral.",
+  "params": {
+    "posX": 0.0,
+    "posY": 0.5,
+    "posZ": 0.4,
+    "width": 0.3,
+    "room": "Cathedral",
+    "size": 0.5,
+    "roomLevel": 0.55,
+    "motion": "Spiral",
+    "motionRate": "1 Bar",
+    "motionAmount": 0.6,
+    "doppler": 0.5,
+    "mix": 1.0,
+    "outGain": 2.5
+  }
+}

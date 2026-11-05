@@ -1,0 +1,21 @@
+{
+  "name": "Tiled Bathroom",
+  "category": "ROOMS",
+  "author": "DEON",
+  "description": "Hard tiles: bright, boxy, splashy.",
+  "params": {
+    "posX": 0.0,
+    "posY": 0.6,
+    "posZ": 0.4,
+    "width": 0.3,
+    "room": "Bathroom",
+    "size": 0.5,
+    "roomLevel": 0.55,
+    "motion": "Static",
+    "motionRate": "1 Bar",
+    "motionAmount": 0.5,
+    "doppler": 0.5,
+    "mix": 1.0,
+    "outGain": 2.2
+  }
+}

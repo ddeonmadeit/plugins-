@@ -1,0 +1,7 @@
+{
+  "categories": ["SCENES"],
+  "targetLufs": -14.0,
+  "toleranceLu": 30.0,
+  "similarBelow": 0.0,
+  "phrase": "demo"
+}

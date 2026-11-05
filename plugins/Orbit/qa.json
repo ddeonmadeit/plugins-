@@ -1,0 +1,9 @@
+{
+  "categories": ["AROUND YOU", "ROOMS", "MOTION", "TRAVIS SCOTT", "TAME IMPALA", "TRIP HOP", "MIX"],
+  "targetLufs": -16.0,
+  "toleranceLu": 2.0,
+  "similarBelow": 0.0,
+  "phrase": "demo",
+  "previewPhrase": "vocal",
+  "previewBacking": false
+}

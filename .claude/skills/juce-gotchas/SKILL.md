@@ -47,3 +47,15 @@ description: JUCE 9 / CMake API details and pitfalls already hit in this repo (c
   preset's mix: the first note of every offline render (QA, previews) was distorted even with Dirt off.
   Snap smoothers to their targets (`setCurrentAndTargetValue`) on the first process after a reset; look for a
   loud, bright first 10-20 ms in renders as the symptom.
+
+## Images drawn invisible
+
+`Graphics::drawImage` / `drawImageAt` composite with the context's current opacity, which `setColour`
+sets too: after `g.setColour (c.withAlpha (0.0f))` an image draws at 0 % (Mirage's window went black this
+way). Call `g.setOpacity (1.0f)` right before drawing an image.
+
+## Resizable editors that remember their size
+
+`setResizeLimits` resizes the editor at once, so `resized()` runs before your own `setSize`. If
+`resized()` stores the size in the processor (to keep it in the session), read the stored size into locals
+first, then call `setResizable`, `setResizeLimits` and `setSize` (Mirage's editor).

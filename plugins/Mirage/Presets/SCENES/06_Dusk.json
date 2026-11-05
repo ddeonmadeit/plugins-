@@ -1,0 +1,15 @@
+{
+  "name": "Dusk",
+  "category": "SCENES",
+  "author": "DEON",
+  "description": "Deep reds, slow and low: for soft songs.",
+  "params": {
+    "react": 0.45,
+    "grain": 0.7,
+    "digital": 0.6,
+    "speed": 0.25,
+    "eclipse": 0.35,
+    "dunes": 0.5,
+    "heat": 0.15
+  }
+}

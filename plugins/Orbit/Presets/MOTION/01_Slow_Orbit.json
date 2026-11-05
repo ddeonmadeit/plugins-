@@ -1,0 +1,21 @@
+{
+  "name": "Slow Orbit",
+  "category": "MOTION",
+  "author": "DEON",
+  "description": "Circles your head once every four bars.",
+  "params": {
+    "posX": 0.0,
+    "posY": 0.5,
+    "posZ": 0.4,
+    "width": 0.2,
+    "room": "Living Room",
+    "size": 0.5,
+    "roomLevel": 0.5,
+    "motion": "Orbit",
+    "motionRate": "4 Bars",
+    "motionAmount": 0.5,
+    "doppler": 0.5,
+    "mix": 1.0,
+    "outGain": 0.4
+  }
+}

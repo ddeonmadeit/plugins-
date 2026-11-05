@@ -1,0 +1,21 @@
+{
+  "name": "Head Spin",
+  "category": "MOTION",
+  "author": "DEON",
+  "description": "Spins round your head every beat: a rotating-speaker whirl.",
+  "params": {
+    "posX": 0.0,
+    "posY": 0.35,
+    "posZ": 0.4,
+    "width": 0.2,
+    "room": "Studio",
+    "size": 0.5,
+    "roomLevel": 0.35,
+    "motion": "Orbit",
+    "motionRate": "1/4",
+    "motionAmount": 0.35,
+    "doppler": 0.3,
+    "mix": 1.0,
+    "outGain": -5.4
+  }
+}

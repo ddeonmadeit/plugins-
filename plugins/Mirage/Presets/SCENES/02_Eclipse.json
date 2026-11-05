@@ -1,0 +1,15 @@
+{
+  "name": "Eclipse",
+  "category": "SCENES",
+  "author": "DEON",
+  "description": "The moon slides over the sun; the dunes go dark and glow at the rim.",
+  "params": {
+    "react": 0.65,
+    "grain": 0.75,
+    "digital": 0.6,
+    "speed": 0.5,
+    "eclipse": 0.88,
+    "dunes": 0.6,
+    "heat": 0.42
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "Concrete Warehouse",
+  "category": "ROOMS",
+  "author": "DEON",
+  "description": "Concrete and steel: big, bright and hard.",
+  "params": {
+    "posX": 0.0,
+    "posY": 0.35,
+    "posZ": 0.4,
+    "width": 0.6,
+    "room": "Warehouse",
+    "size": 0.5,
+    "roomLevel": 0.5,
+    "motion": "Static",
+    "motionRate": "1 Bar",
+    "motionAmount": 0.5,
+    "doppler": 0.5,
+    "mix": 1.0,
+    "outGain": -0.2
+  }
+}

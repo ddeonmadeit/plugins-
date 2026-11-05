@@ -1,0 +1,21 @@
+{
+  "name": "Whisper In Your Ear",
+  "category": "AROUND YOU",
+  "author": "DEON",
+  "description": "Right at your right ear in a padded booth, close enough to feel the breath.",
+  "params": {
+    "posX": 0.32,
+    "posY": 0.03,
+    "posZ": 0.42,
+    "width": 0.0,
+    "room": "Vocal Booth",
+    "size": 0.5,
+    "roomLevel": 0.3,
+    "motion": "Static",
+    "motionRate": "1 Bar",
+    "motionAmount": 0.5,
+    "doppler": 0.5,
+    "mix": 1.0,
+    "outGain": -3.0
+  }
+}

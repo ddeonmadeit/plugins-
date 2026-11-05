@@ -1,0 +1,21 @@
+{
+  "name": "Firefly",
+  "category": "MOTION",
+  "author": "DEON",
+  "description": "A small light wandering round the room, never quite repeating.",
+  "params": {
+    "posX": 0.0,
+    "posY": 0.3,
+    "posZ": 0.4,
+    "width": 0.0,
+    "room": "Living Room",
+    "size": 0.5,
+    "roomLevel": 0.5,
+    "motion": "Wander",
+    "motionRate": "4 Bars",
+    "motionAmount": 0.7,
+    "doppler": 0.5,
+    "mix": 1.0,
+    "outGain": -0.7
+  }
+}

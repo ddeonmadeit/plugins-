@@ -1,0 +1,15 @@
+{
+  "name": "Signal",
+  "category": "SCENES",
+  "author": "DEON",
+  "description": "The control screen on top: mesh, scanlines and readouts, a calm sun.",
+  "params": {
+    "react": 0.55,
+    "grain": 0.45,
+    "digital": 1.0,
+    "speed": 0.5,
+    "eclipse": 0.15,
+    "dunes": 0.6,
+    "heat": 0.5
+  }
+}

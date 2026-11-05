@@ -1,0 +1,15 @@
+{
+  "name": "Desert",
+  "category": "SCENES",
+  "author": "DEON",
+  "description": "The sun setting over the dunes, grain and a working screen: the everyday look.",
+  "params": {
+    "react": 0.65,
+    "grain": 0.7,
+    "digital": 0.6,
+    "speed": 0.5,
+    "eclipse": 0.25,
+    "dunes": 0.6,
+    "heat": 0.5
+  }
+}
