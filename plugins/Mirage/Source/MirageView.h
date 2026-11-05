@@ -46,7 +46,6 @@ public:
 
     void paint (juce::Graphics&) override;
     void resized() override;
-    void mouseUp (const juce::MouseEvent&) override;
 
 private:
     void timerCallback() override;
@@ -81,7 +80,6 @@ private:
     float s = 1.0f;                   // scale: height / 440
     juce::Rectangle<float> header, window, deck, thermal;
     juce::Rectangle<float> pLevels, pScope, pWave, pSpectrum, pReticle, pControls;
-    juce::Rectangle<float> prevKey, nextKey, sceneArea;
     juce::Image windowImg, thermalImg, frameImg, chromeImg;
     float chromeScale = 0.0f;
 

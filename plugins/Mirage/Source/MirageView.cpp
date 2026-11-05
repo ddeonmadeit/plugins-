@@ -179,11 +179,6 @@ void MirageView::resized()
     for (int i = 0; i < dials.size(); ++i)
         dials[i]->setBounds (c.withX (c.getX() + w * (float) i).withWidth (w).toNearestInt());
 
-    // Header keys: the scene selector in the middle.
-    const float keyW = 22.0f * s;
-    sceneArea = juce::Rectangle<float> (220.0f * s, header.getHeight()).withCentre (header.getCentre());
-    prevKey = sceneArea.withWidth (keyW);
-    nextKey = sceneArea.withX (sceneArea.getRight() - keyW).withWidth (keyW);
     buildStatics();
 }
 
@@ -554,19 +549,7 @@ void MirageView::drawHeader (juce::Graphics& g)
 {
     const float dot = 2.4f * s;
     auto h = header;
-    DotFont::draw (g, "MIRAGE", h, dot, kOrange, juce::Justification::centredLeft);
-    DotFont::draw (g, "SIGNAL TOPOGRAPHY  //  DDEONMADEIT", h.withTrimmedLeft (DotFont::width ("MIRAGE", dot) + 16.0f * s), 1.25f * s, kRed,
-                   juce::Justification::centredLeft, 0.6f);
-
-    // Scene selector.
-    const auto& pm = proc.presets;
-    const auto name = pm.getCurrentIndex() >= 0 && pm.getCurrentIndex() < pm.getNumFactoryPresets() ? pm.get (pm.getCurrentIndex()).name : juce::String ("CUSTOM");
-    juce::Path frame;
-    frame.addRoundedRectangle (sceneArea.reduced (0.0f, 2.0f * s), 6.0f * s);
-    glowStroke (g, frame, kRed.withAlpha (0.8f), 1.0f * s);
-    DotFont::draw (g, "<", prevKey, 1.6f * s, kOrange, juce::Justification::centred);
-    DotFont::draw (g, ">", nextKey, 1.6f * s, kOrange, juce::Justification::centred);
-    DotFont::draw (g, name.toUpperCase(), sceneArea, 1.6f * s, kYellow.interpolatedWith (kOrange, 0.55f), juce::Justification::centred);
+    DotFont::draw (g, "DEON", h, dot, kOrange, juce::Justification::centredLeft);
 
     // Transport readouts.
     const double bpm = proc.transport.bpm.load(), ppq = std::max (0.0, proc.transport.ppq.load());
@@ -916,17 +899,4 @@ void MirageView::drawThermalHud (juce::Graphics& g)
     g.fillRect (cx, t.getY(), 1.0f * s, t.getHeight());
 }
 
-void MirageView::mouseUp (const juce::MouseEvent& e)
-{
-    auto& pm = proc.presets;
-    const int n = pm.getNumFactoryPresets();
-    if (n <= 0)
-        return;
-    const int cur = std::max (0, pm.getCurrentIndex());
-    if (prevKey.expanded (4.0f).contains (e.position))
-        pm.loadPreset ((cur - 1 + n) % n);
-    else if (nextKey.expanded (4.0f).contains (e.position) || sceneArea.contains (e.position))
-        pm.loadPreset ((cur + 1) % n);
-    repaint();
-}
 } // namespace mirage

@@ -9,14 +9,20 @@
     "Phosphor control screen over it: pixel mesh, scanlines, crosshairs and live readouts (peak, low end and its frequency, energy, tempo, bar and time)",
     "Instrument deck: L / R level meters with peak hold, a triggered oscilloscope, a scrolling waveform history, a 40-band LED spectrum and a stereo field reticle",
     "Thermal strip: the spectrum as a heat camera, scrolling along the bottom",
-    "Seven automatable controls (React, Grain, Digital, Speed, Eclipse, Dunes, Heat) and six scenes: Desert, Eclipse, Heatwave, Signal, Dust Storm, Dusk",
+    "Seven automatable controls (React, Grain, Digital, Speed, Eclipse, Dunes, Heat) and six scenes in the host's preset menu: Desert, Eclipse, Heatwave, Signal, Dust Storm, Dusk",
     "Strictly red, orange and a little Tarantino yellow: every pixel goes through one colour ramp",
     "Zero latency, the audio is not changed at all"
   ],
   "installTips": [
     "Put Mirage on the master insert (FL Studio: Mixer > Master > empty slot > Mirage) so it sees the whole song.",
     "Detach the plugin window (the arrow menu at the top left of the plugin window > Detached), then drag its bottom-right corner to stretch it under the playlist. It keeps its size in the project.",
-    "Click the scene name in the middle of the header to step through the looks; drag any of the CONTROL dials up and down to change them (you can automate them too)."
+    "Drag any of the CONTROL dials up and down to change the look (you can automate them too). The six scenes are in FL Studio's preset menu for the plugin (the arrow at the top left of the plugin window > Presets)."
   ],
-  "previewNote": "Mirage does not change the sound; the preview is the test programme passing through."
+  "previewNote": "Mirage does not change the sound; the preview is the test programme passing through.",
+  "whatsNew": {
+    "version": "1.0.1",
+    "items": [
+      "The header now just says DEON, with the tempo, bar and time on the right: a cleaner top bar for recordings. Scenes are picked from FL Studio's preset menu"
+    ]
+  }
 }
