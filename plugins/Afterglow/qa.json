@@ -13,6 +13,9 @@
     "2000S",
     "SOFT",
     "UNIQUE",
+    "LIVE",
+    "PADS",
+    "ARPS",
     "SAFE"
   ],
   "targetLufs": -14.0,

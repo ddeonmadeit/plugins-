@@ -33,6 +33,9 @@ private:
         HorizonView horizon;
         std::vector<std::unique_ptr<dd::gui::Knob>> macros;
         std::vector<std::unique_ptr<dd::gui::LampSwitch>> switches;
+        dd::gui::LampSwitch arpSwitch;
+        juce::ComboBox arpRate;
+        std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> arpRateAttachment;
         juce::Rectangle<int> deck;
         dd::gui::Atmosphere atmosphere;
     };

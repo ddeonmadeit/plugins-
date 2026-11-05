@@ -1,30 +1,38 @@
 {
   "publish": true,
-  "tagline": "Pads, keys, plucks and soundscapes, artist-inspired",
-  "description": "A two-layer synth for pads, keys, plucks, leads, bells and soundscapes, played from a sunset horizon instead of a wall of knobs: drag the sun for motion and tone, shape the rest with six macros. 109 presets inspired by Tame Impala, Massive Attack, Brent Faiyaz, Mike Dean, Travis Scott, Yeezus, moshc0re, SAFE and trip hop, plus a modelled electric guitar, from bare and soft to extreme.",
+  "tagline": "Pads, keys, arps, real instruments and soundscapes",
+  "description": "A two-layer synth for pads, keys, plucks, leads, bells and soundscapes, now with real recorded instruments (string section, pizzicato and tremolo strings, solo violin, grand and upright piano, harp, flute, clarinet, tenor sax, harmonica, french horn, trumpet, trombone, pipe organ, vibraphone, marimba, glockenspiel, tubular bells) and an arpeggiator that follows FL Studio's tempo. Played from a sunset horizon instead of a wall of knobs: drag the sun for motion and tone, shape the rest with six macros. 179 presets inspired by Tame Impala, Massive Attack, Brent Faiyaz, Mike Dean, Travis Scott, Yeezus, moshc0re, SAFE and trip hop, plus live instruments, pads, arps and a modelled electric guitar.",
   "accent": "#ec7d2e",
   "highlights": [
+    "Real instruments: 19 recorded instruments (strings, piano, harp, woodwinds, brass, organ, mallets) with their dynamics, looped so held notes sustain forever; layer them with the synth or each other",
+    "Arpeggiator in time with the song: up, down, up-down, random, as played or chord stabs, 1/4 to 1/32 with triplets, 1-4 octaves, gate and swing",
     "Twelve sources per layer: Juno-style analog, string machine, formant choir, FM glass, electric piano, pitched air, sine, plucked string, drawbar organ, mallets (marimba, vibes, kalimba, glock, steel), hard sync and a modelled electric guitar",
     "Electric guitar: a picked string heard through a magnetic pickup (neck to bridge), into the Dirt amp and a CAB speaker (1x12 combo or 4x12 stack); chords strum low to high",
     "Dirt (8 distortion types), tape wow and saturation, lo-fi, Juno / Solina ensemble, phaser, dub delay, shimmer reverb, tempo pump and gate",
     "Drag the sun to set Motion and Tone; Swell, Tail, Blend, Grit, Echo and Space reshape any preset",
     "POLY switch: play chords with any preset, even the mono leads",
-    "133 presets: TAME IMPALA, MASSIVE ATTACK, BRENT FAIYAZ, MIKE DEAN, TRAVIS SCOTT, YEEZUS, MOSHC0RE, GUITAR, TRIP HOP, 80S, 2000S, SOFT, UNIQUE, SAFE",
+    "179 presets: TAME IMPALA, MASSIVE ATTACK, BRENT FAIYAZ, MIKE DEAN, TRAVIS SCOTT, YEEZUS, MOSHC0RE, GUITAR, TRIP HOP, 80S, 2000S, SOFT, UNIQUE, LIVE (real instruments), PADS, ARPS, SAFE",
     "TAPE STOP: slow everything to a halt like a tape machine powering down, then automate it at the end of a beat",
     "Favourites: star the presets you love and browse just those; your stars survive updates"
   ],
   "installTips": [
+    "The .pkg also installs the live-instrument library (about 100 MB). With the .zip, Install.command copies it for you.",
     "Every macro's centre position is the preset as designed: double-click a knob, or the sun, to go back to it.",
+    "ARP (bottom right) arpeggiates whatever you hold; the menu beside it sets the speed. The ARPS presets have it on.",
     "Pump, gate, delay and synced LFOs follow FL Studio's tempo.",
     "Guitar presets: play chords as voicings within one or two octaves (like a real neck), around C2-C5 in FL's piano roll; the POLY switch must be on for chords.",
     "TAPE STOP: in FL Studio, right-click the switch > Create automation clip, then draw it on where the beat should stop. It stays silent until switched off again."
   ],
   "previewNote": "on the same 120 BPM phrase: a held Dm9, an arpeggio over Bb, Fmaj7 stabs, then a legato melody. GUITAR presets play strummed Em, C and G chords at 80 BPM and a riff.",
   "whatsNew": {
-    "version": "1.11.0",
+    "version": "1.12.0",
     "items": [
-      "Favourites: press the star key just right of the preset name to star a preset, then find all your starred sounds in FAVOURITES at the top of the category list (the arrows step through just those). Stars are kept across updates, in every project",
-      "24 new sounds in two new categories. SOFT (gentle, natural, warm): Felt Upright, Wooden Flute, Hush Choir, Music Box, Dusk Marimba, Velvet Strings, Garden Harp, Harmonium, Glass Harmonica, Clay Ocarina, Cloud Bed, Late Vibes. UNIQUE (instruments and characters you won't find elsewhere in the plugin): Singing Bowl, Theremin, Bowed Cymbal, Prepared Piano, Steel Pan, Silk Koto, Paris Accordion, Toy Piano, Throat Drone, Wind Chimes, Water Drops, Haunted Music Box"
+      "Real instruments: a new LIVE source plays 19 recorded instruments (VSCO 2 and VCSL, public domain): string section, pizzicato and tremolo strings, solo violin, grand and upright piano, harp, flute, clarinet, tenor sax, harmonica, french horn, trumpet, trombone, pipe organ, vibraphone, marimba, glockenspiel and tubular bells. Velocity picks the recorded dynamic; sustained instruments loop seamlessly so you can hold them as long as you like",
+      "LIVE: 24 presets, from Concert Grand and Felt Piano to String Section, Trap Flute, Soul Horns, Strings And Horns and Piano And Strings",
+      "Arpeggiator: ARP on the front panel with its speed beside it; up, down, up-down, random, as played or chord stabs, 1-4 octaves, gate and swing, in time with FL Studio",
+      "ARPS: 12 presets (Upside Arp, Trance Pluck Arp, Harp Cascade, Pizzicato Run, Marimba Rain, Lo-fi Piano Arp...) and PADS: 10 more pads, synth and real (Bowed Swell, Horn Swell, Choir Mist, Glass Cathedral...)",
+      "Hover over any knob or switch and the description in the window explains it in plain words; knobs sweep to new presets instead of jumping",
+      "Your projects sound exactly as before"
     ]
   }
 }

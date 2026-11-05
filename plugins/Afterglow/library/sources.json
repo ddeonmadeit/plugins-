@@ -1,0 +1,5058 @@
+{
+ "comment": "Afterglow's live instruments: VSCO 2 CE and VCSL by Versilian Studios LLC, both CC0 1.0 (public domain). Each file is fetched from GitHub at a pinned commit and checked against its md5; 'note' is the true MIDI note (most files are named an octave low, checked against a pitch estimate when this list was made).",
+ "repos": {
+  "vsco": {
+   "name": "sgossner/VSCO-2-CE",
+   "commit": "440300901dfe9275fd84e0b7763af1f8443ae62e"
+  },
+  "vcsl": {
+   "name": "sgossner/VCSL",
+   "commit": "c1ea7bcc3c7309650ab0da9d15c9cd1fbc4a4c7e"
+  }
+ },
+ "processing": {
+  "sampleRate": 44100,
+  "loopedSeconds": 2.6,
+  "loopSeconds": 1.1,
+  "crossfadeMs": 160,
+  "tailFloorDb": -64.0,
+  "preRollMs": 3.0,
+  "loudnessMs": 250.0,
+  "targetLoudnessDb": -18.0,
+  "peakCeilingDb": -0.5
+ },
+ "instruments": [
+  {
+   "id": "strings",
+   "name": "String Section",
+   "family": "strings",
+   "loop": true,
+   "files": [
+    {
+     "repo": "vsco",
+     "path": "Strings/Cello Section/susvib/susvib_C1_v1_1.wav",
+     "note": 36,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "de3d332f6fb5838da8666beb9e47e843"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Cello Section/susvib/susvib_C1_v3_1.wav",
+     "note": 36,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "b0ddeab2a42114d5f3b3b94e1c591640"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Cello Section/susvib/susvib_E1_v1_1.wav",
+     "note": 40,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "4cfcc2670ec73427ca2794b287855e04"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Cello Section/susvib/susvib_E1_v3_1.wav",
+     "note": 40,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "d5a2443277f5f270901fecb0e810e279"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Cello Section/susvib/susvib_G1_v1_1.wav",
+     "note": 43,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "af9d433dcd77301c6ab7d51bc55c17de"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Cello Section/susvib/susvib_G1_v3_1.wav",
+     "note": 43,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "c6b51a4d6920c888df00f5a71cae74e0"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Cello Section/susvib/susvib_B1_v1_1.wav",
+     "note": 47,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "e354ee17dd38f4ac955a192d7a810b60"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Cello Section/susvib/susvib_B1_v3_1.wav",
+     "note": 47,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "b537671f83448172f11a6370d2a64cd5"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Cello Section/susvib/susvib_D2_v1_1.wav",
+     "note": 50,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "691d9190be2166d4934e1c5e2dd42feb"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Cello Section/susvib/susvib_D2_v3_1.wav",
+     "note": 50,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "fa84c8af67539c1ec55ba93feb4345dc"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Viola Section/susvib/ViolaEns_susvib_E2_v1_1.wav",
+     "note": 52,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "59b98b78770e952469209ed41a68ada8"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Viola Section/susvib/ViolaEns_susvib_E2_v2_1.wav",
+     "note": 52,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "f461fc1742a831cc2c05ab0fd37f8c5d"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Viola Section/susvib/ViolaEns_susvib_G2_v1_1.wav",
+     "note": 55,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "af8c9654e7ae1bbed5ea1f55c14ee1b7"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Viola Section/susvib/ViolaEns_susvib_G2_v2_1.wav",
+     "note": 55,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "cfb37838758b2c1893739df5fb168dad"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Viola Section/susvib/ViolaEns_susvib_B2_v1_1.wav",
+     "note": 59,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "4ed68ced661abbe5bfae7fac623a14ac"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Viola Section/susvib/ViolaEns_susvib_B2_v2_1.wav",
+     "note": 59,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "c914b955a9ef4ff997deb8cef87e56d7"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/susVib/VlnEns_susVib_D3_v1.wav",
+     "note": 62,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "874cea7468771954256cd1c0762cad53"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/susVib/VlnEns_susVib_D3_v2.wav",
+     "note": 62,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "7c27b284ff76fd3029b555d141c14238"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/susVib/VlnEns_susVib_F#3_v1.wav",
+     "note": 66,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "17c290eb83739e384cf224c76b23f7ce"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/susVib/VlnEns_susVib_F#3_v2.wav",
+     "note": 66,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "1f1a7d7d756f4183bf4277525292b6b1"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/susVib/VlnEns_susVib_A3_v1.wav",
+     "note": 69,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "3f3ad8a696ab8839477c3d45bc37885a"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/susVib/VlnEns_susVib_A3_v2.wav",
+     "note": 69,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "e892386c31bc175b9af6fc9333a40412"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/susVib/VlnEns_susVib_C4_v1.wav",
+     "note": 72,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "512c939bb1de6b0839ae5e1d882e4a43"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/susVib/VlnEns_susVib_C4_v2.wav",
+     "note": 72,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "2473eb442da77de45059badd0eee764a"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/susVib/VlnEns_susVib_E4_v1.wav",
+     "note": 76,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "c6e569b06472bcf270eb7d472b2f0900"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/susVib/VlnEns_susVib_E4_v2.wav",
+     "note": 76,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "84ec02dda35685d743c7b25eabf59b32"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/susVib/VlnEns_susVib_G4_v1.wav",
+     "note": 79,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "83661609e3afac5a82d91bdbfce5acd0"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/susVib/VlnEns_susVib_G4_v2.wav",
+     "note": 79,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "4b1ec2cdcf1fd66da01967ed32b21585"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/susVib/VlnEns_susVib_B4_v1.wav",
+     "note": 83,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "afc7e4da262d3e207dc67a4b292113e6"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/susVib/VlnEns_susVib_B4_v2.wav",
+     "note": 83,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "646ff1ed19e1b7508d3212c47960db8c"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/susVib/VlnEns_susVib_D5_v1.wav",
+     "note": 86,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "8434744baf8c60cfed14da809ce65e27"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/susVib/VlnEns_susVib_D5_v2.wav",
+     "note": 86,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "ad30e416b65be9fb8302bd9916604e33"
+    }
+   ]
+  },
+  {
+   "id": "pizz",
+   "name": "Pizzicato Strings",
+   "family": "strings",
+   "loop": false,
+   "maxSeconds": 1.6,
+   "files": [
+    {
+     "repo": "vsco",
+     "path": "Strings/Cello Section/pizzT/pizzT_C1_v1_RR1.wav",
+     "note": 36,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "d4e8ec98132f028c5026a4a0f16c2ee8"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Cello Section/pizzT/pizzT_C1_v2_RR1.wav",
+     "note": 36,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "2a55906cb003986e39aa0871efeccafa"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Cello Section/pizzT/pizzT_E1_v1_RR1.wav",
+     "note": 40,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "37b866d90b456329f8518143274be28f"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Cello Section/pizzT/pizzT_E1_v2_RR1.wav",
+     "note": 40,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "b8dfbb1c5925624c5bdc6219c9e38c9e"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Cello Section/pizzT/pizzT_G1_v1_RR1.wav",
+     "note": 43,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "67ba9ca8d2379debef044ee8b9925680"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Cello Section/pizzT/pizzT_G1_v2_RR1.wav",
+     "note": 43,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "bfcbbeca319f86f166ec7cf393dfc47c"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Cello Section/pizzT/pizzT_B1_v1_RR1.wav",
+     "note": 47,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "b2d0ecc6387445efddb06b025b6836ab"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Cello Section/pizzT/pizzT_B1_v2_RR1.wav",
+     "note": 47,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "fb405753624f9d4671815da1c26c5ae3"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Cello Section/pizzT/pizzT_D2_v1_RR1.wav",
+     "note": 50,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "5cc0f474a55e068966ec3ef1185d13c5"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Cello Section/pizzT/pizzT_D2_v2_RR1.wav",
+     "note": 50,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "657d5b7d4628761a2b4f2945a7568c0a"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Viola Section/pizz/ViolaEns_pizz_E2_v1_rr1.wav",
+     "note": 52,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "59be2646a74e933b09ab7af90939af93"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Viola Section/pizz/ViolaEns_pizz_E2_v2_rr1.wav",
+     "note": 52,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "daac2d5e71b3aa2a16a9fda00b913d49"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Viola Section/pizz/ViolaEns_pizz_G2_v1_rr1.wav",
+     "note": 55,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "97e09996ebf2ebbf6a9da6a2e066bcc1"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Viola Section/pizz/ViolaEns_pizz_G2_v2_rr1.wav",
+     "note": 55,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "f7e2367c1f403f1f3ea869de00b6ced9"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Viola Section/pizz/ViolaEns_pizz_B2_v1_rr1.wav",
+     "note": 59,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "500d150d5d80b0c0a8762c7fbce30061"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Viola Section/pizz/ViolaEns_pizz_B2_v2_rr1.wav",
+     "note": 59,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "ce068fe90ea330c6c2d1c162a32c1c9d"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/Pizz/VlnEns_Pizz_D3_v1_rr1.wav",
+     "note": 62,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "051e908d1b930b7957da2d57ed6094e4"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/Pizz/VlnEns_Pizz_D3_v2_rr1.wav",
+     "note": 62,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "bb0228c6bd453706422026c58488d8b7"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/Pizz/VlnEns_Pizz_F#3_v1_rr1.wav",
+     "note": 66,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "15f031389e26301f9067ffd20b53dfd0"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/Pizz/VlnEns_Pizz_F#3_v2_rr1.wav",
+     "note": 66,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "3708f5485f877efd66e4a46cd4e47e84"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/Pizz/VlnEns_Pizz_A3_v1_rr1.wav",
+     "note": 69,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "28acd524a1a407bde665ef2ebbb9e160"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/Pizz/VlnEns_Pizz_A3_v2_rr1.wav",
+     "note": 69,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "010daa2717630083c61f7d20ddf397c8"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/Pizz/VlnEns_Pizz_C4_v1_rr1.wav",
+     "note": 72,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "e8389d11c8f650c29b0267801ef6b72e"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/Pizz/VlnEns_Pizz_C4_v2_rr1.wav",
+     "note": 72,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "ded10614f629f46cef5009d4e98f6486"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/Pizz/VlnEns_Pizz_E4_v1_rr1.wav",
+     "note": 76,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "02a1e0900dd4d0afefe294fc4f36eed0"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/Pizz/VlnEns_Pizz_E4_v2_rr1.wav",
+     "note": 76,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "8f198faf5a50f8a772fcd2758ba59590"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/Pizz/VlnEns_Pizz_G4_v1_rr1.wav",
+     "note": 79,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "0ad9d063084677f621b1341afbfb308f"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/Pizz/VlnEns_Pizz_G4_v2_rr1.wav",
+     "note": 79,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "f7d05fa0e50882a29d41aa3c2a395d9c"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/Pizz/VlnEns_Pizz_B4_v1_rr1.wav",
+     "note": 83,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "04293d3edb96cd0172b15aae087833eb"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/Pizz/VlnEns_Pizz_B4_v2_rr1.wav",
+     "note": 83,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "e15fe9a573bc10deb6ff82a2570099f6"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/Pizz/VlnEns_Pizz_D5_v1_rr1.wav",
+     "note": 86,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "ef9a1d74396f52e7bc20123b3a246dc4"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/Pizz/VlnEns_Pizz_D5_v2_rr1.wav",
+     "note": 86,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "73dbce5eab0b46174843b291a576df0e"
+    }
+   ]
+  },
+  {
+   "id": "trem",
+   "name": "Tremolo Strings",
+   "family": "strings",
+   "loop": true,
+   "files": [
+    {
+     "repo": "vsco",
+     "path": "Strings/Cello Section/trem/trem_C1_v2_1.wav",
+     "note": 36,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "7a4798b1ed3311858e4265ba1eaa9b76"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Cello Section/trem/trem_E1_v1_1.wav",
+     "note": 40,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "04bbfa80f1b1e8647196521838230ecc"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Cello Section/trem/trem_E1_v2_1.wav",
+     "note": 40,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "3e405fa7879e97cfac0e737fbf8564a4"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Cello Section/trem/trem_G1_v1_1.wav",
+     "note": 43,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "df45ecf17c224609e836d585f585f3e9"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Cello Section/trem/trem_G1_v2_1.wav",
+     "note": 43,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "9c3299992063aece7d150549fc44a12f"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Cello Section/trem/trem_B1_v1_1.wav",
+     "note": 47,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "373f95968af74feeaabbabc68ebaa662"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Cello Section/trem/trem_D2_v1_1.wav",
+     "note": 50,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "6154b6fd85e72c2f9c4075acecaf4d18"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Cello Section/trem/trem_D2_v2_1.wav",
+     "note": 50,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "459f3742c346173f40535936ebbc5582"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Viola Section/trem/Violas_trem_E2_v1_rr1.wav",
+     "note": 52,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "69fb1ea22b2f1bb73758a997db423305"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Viola Section/trem/Violas_trem_E2_v2_rr1.wav",
+     "note": 52,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "4d922ce884682f9f6262aadd1b29d090"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Viola Section/trem/Violas_trem_G2_v1_rr1.wav",
+     "note": 55,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "41edca11a0dae1ca971f9b0c4b796bc4"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Viola Section/trem/Violas_trem_G2_v2_rr1.wav",
+     "note": 55,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "4be5e08591cb2e7e44a34d409bdc7cba"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Viola Section/trem/Violas_trem_B2_v1_rr1.wav",
+     "note": 59,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "f0df151cab6836de3206b89c789e4b13"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Viola Section/trem/Violas_trem_B2_v2_rr1.wav",
+     "note": 59,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "718da8902e6ad5a2288c50ac7a698d1c"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/Trem/VlnEns_Trem_D3_v1.wav",
+     "note": 62,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "0faf2d75b276ac366bc27c67f60f8131"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/Trem/VlnEns_Trem_D3_v2.wav",
+     "note": 62,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "a4e69a3df402185c2adf8250a13605cf"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/Trem/VlnEns_Trem_F#3_v1.wav",
+     "note": 66,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "5678868f49e8846f0f94b441182d024f"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/Trem/VlnEns_Trem_A3_v1.wav",
+     "note": 69,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "a1c2d73fe6ce951dbdda478177c39ead"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/Trem/VlnEns_Trem_A3_v2.wav",
+     "note": 69,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "6d508ed549fd089cd52dcc1a77e3f85a"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/Trem/VlnEns_Trem_C4_v1.wav",
+     "note": 72,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "24bb58d4e9307a12ef873d8c99286aa8"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/Trem/VlnEns_Trem_C4_v2.wav",
+     "note": 72,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "1f9279fe976493f4ef1efe2d08ae283b"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/Trem/VlnEns_Trem_E4_v1.wav",
+     "note": 76,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "8e4bd67764d9db69a6a38df49a786d3d"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/Trem/VlnEns_Trem_E4_v2.wav",
+     "note": 76,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "e2b2b657cc8687d791043c72472a2d15"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/Trem/VlnEns_Trem_G4_v1.wav",
+     "note": 79,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "52278155f822c0cb67616511d350f38f"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/Trem/VlnEns_Trem_G4_v2.wav",
+     "note": 79,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "76a69752aae35ce88cd7c0b617eeb81f"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/Trem/VlnEns_Trem_B4_v1.wav",
+     "note": 83,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "7d470100c4c1b225d5e7769fa29360ea"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/Trem/VlnEns_Trem_B4_v2.wav",
+     "note": 83,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "6e8ebdf7382a1f08e391c23e0203d04b"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/Trem/VlnEns_Trem_D5_v1.wav",
+     "note": 86,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "3b9164869acca2958a70566b78e2d42a"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Violin Section/Trem/VlnEns_Trem_D5_v2.wav",
+     "note": 86,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "08178fc1cef27d96baa6d5ae3ea7ddb2"
+    }
+   ]
+  },
+  {
+   "id": "violin",
+   "name": "Solo Violin",
+   "family": "strings",
+   "loop": true,
+   "files": [
+    {
+     "repo": "vsco",
+     "path": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_G3_p.wav",
+     "note": 55,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "6b4b4fd39df2b9f491b496ab4e634bb1"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_G3_f.wav",
+     "note": 55,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "2c961130c88945255ef7593427084273"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_A3_p.wav",
+     "note": 57,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "edd3b13efa47b27f74e9e1e8fb736256"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_A3_f.wav",
+     "note": 57,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "bee204adfcd89db3320dac96c28bb7c1"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_C4_p.wav",
+     "note": 60,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "e70f3c7c35d8266d1f5482513959a2e6"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_C4_f.wav",
+     "note": 60,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "d52caa17a218139e4585b1617f465aad"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_E4_p.wav",
+     "note": 64,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "466c1ad835feb7e0592870ceb97ea41f"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_E4_f.wav",
+     "note": 64,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "5872f072f41ea82f2f62cf63321b559e"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_G4_p.wav",
+     "note": 67,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "dc1e3a8e99524c0b2ff44a5e9fdfcfd9"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_G4_f.wav",
+     "note": 67,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "de50bf00601c45f944598f27e733ace9"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_A4_p.wav",
+     "note": 69,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "4a87f61098e4c46b31270d76e5901082"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_A4_f.wav",
+     "note": 69,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "c957c8b39b581158818f07d4389a98a3"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_C5_p.wav",
+     "note": 72,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "6fed11e735252fdb3b191ee926ca3fd0"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_C5_f.wav",
+     "note": 72,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "af0cc421e4139e6a200ad9db180bf106"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_E5_p.wav",
+     "note": 76,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "ed009126afc24653afed4911ca94f7cd"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_E5_f.wav",
+     "note": 76,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "69ce202210961e4f1be3b501470a4610"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_G5_p.wav",
+     "note": 79,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "559eefc819c3c967eea1b054cfb9395d"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_G5_f.wav",
+     "note": 79,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "71c1f8430515de1fcb9d00cc1bb2755d"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_A5_p.wav",
+     "note": 81,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "79bc25775ea240edaa381706701c0305"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_A5_f.wav",
+     "note": 81,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "9dcdbb42ad0a40789ba36d5f6fe193d4"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_C6_p.wav",
+     "note": 84,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "978afc2b5e84be2960c05fc55593c494"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_C6_f.wav",
+     "note": 84,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "44a9c39073465e28b9c47196cecb3bbd"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_E6_p.wav",
+     "note": 88,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "4dbdfd125cfdf9f4caccb35b08555105"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_E6_f.wav",
+     "note": 88,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "1b9b817f9d75af28249e03aa98a4db41"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_G6_p.wav",
+     "note": 91,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "9b45d9bf66ba5ea8b8aac1db4b196a2b"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_G6_f.wav",
+     "note": 91,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "a473af9da7aa2c09a7bed9a8e5252230"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_A6_p.wav",
+     "note": 93,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "ba58841f98a00e4d3f55039302f1dabb"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_A6_f.wav",
+     "note": 93,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "1aaaba111d6a2aada84b56e37333d124"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_C7_p.wav",
+     "note": 96,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "ccfc6aa7709da289e952c51ef560e49a"
+    },
+    {
+     "repo": "vsco",
+     "path": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_C7_f.wav",
+     "note": 96,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "fd8739eef4e2a4ed0d6d6bbdafc08257"
+    }
+   ]
+  },
+  {
+   "id": "flute",
+   "name": "Flute",
+   "family": "winds",
+   "loop": true,
+   "files": [
+    {
+     "repo": "vsco",
+     "path": "Woodwinds/Flute/susvib/LDFlute_susvib_C3_v1_1.wav",
+     "note": 60,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "52cf808ea8dcb788fdabb9a1c2b8558c"
+    },
+    {
+     "repo": "vsco",
+     "path": "Woodwinds/Flute/susvib/LDFlute_susvib_E3_v1_1.wav",
+     "note": 64,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "d37e392048b37508929e39eb1befb827"
+    },
+    {
+     "repo": "vsco",
+     "path": "Woodwinds/Flute/susvib/LDFlute_susvib_A3_v1_1.wav",
+     "note": 69,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "ecef046668b81934f29d0106c3bd09b7"
+    },
+    {
+     "repo": "vsco",
+     "path": "Woodwinds/Flute/susvib/LDFlute_susvib_C4_v1_1.wav",
+     "note": 72,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "f5dc7ac5545ee228f3e1e6186dd8dd4c"
+    },
+    {
+     "repo": "vsco",
+     "path": "Woodwinds/Flute/susvib/LDFlute_susvib_E4_v1_1.wav",
+     "note": 76,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "9d133ac6cc1ad231ea5032357bd349aa"
+    },
+    {
+     "repo": "vsco",
+     "path": "Woodwinds/Flute/susvib/LDFlute_susvib_A4_v1_1.wav",
+     "note": 81,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "15ff0e4ddd054e6f4664aaf40d9c4556"
+    },
+    {
+     "repo": "vsco",
+     "path": "Woodwinds/Flute/susvib/LDFlute_susvib_C5_v1_1.wav",
+     "note": 84,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "84958963a455baf8572ef641a52f961f"
+    },
+    {
+     "repo": "vsco",
+     "path": "Woodwinds/Flute/susvib/LDFlute_susvib_E5_v1_1.wav",
+     "note": 88,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "dcca464e678a57787f4c0a70c8de37b9"
+    },
+    {
+     "repo": "vsco",
+     "path": "Woodwinds/Flute/susvib/LDFlute_susvib_A5_v1_1.wav",
+     "note": 93,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "2441e4b632a0db137a8b75fd7d59fddd"
+    },
+    {
+     "repo": "vsco",
+     "path": "Woodwinds/Flute/susvib/LDFlute_susvib_C6_v1_1.wav",
+     "note": 96,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "a6f96653ac4fb5bd73eecff522dd7eac"
+    }
+   ]
+  },
+  {
+   "id": "clarinet",
+   "name": "Clarinet",
+   "family": "winds",
+   "loop": true,
+   "files": [
+    {
+     "repo": "vsco",
+     "path": "Woodwinds/Clarinet/susLong/DCClar_susLong_D2_v1_rr1_sum.wav",
+     "note": 50,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "f14571cfe40f28b5e53edd277f4f63ce"
+    },
+    {
+     "repo": "vsco",
+     "path": "Woodwinds/Clarinet/susLong/DCClar_susLong_D2_v2_rr1_sum.wav",
+     "note": 50,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "100d37392ffff21b3f23081c99c01c9d"
+    },
+    {
+     "repo": "vsco",
+     "path": "Woodwinds/Clarinet/susLong/DCClar_susLong_D2_v3_rr1_sum.wav",
+     "note": 50,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "e19181cdd7daf43cb9cca2259cde9e22"
+    },
+    {
+     "repo": "vsco",
+     "path": "Woodwinds/Clarinet/susLong/DCClar_susLong_F2_v1_rr1_sum.wav",
+     "note": 53,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "ea65e438e28e86542bedb1f157f2765d"
+    },
+    {
+     "repo": "vsco",
+     "path": "Woodwinds/Clarinet/susLong/DCClar_susLong_F2_v2_rr1_sum.wav",
+     "note": 53,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "ecf0bbd508eb2d2c360650fb75aa5fe6"
+    },
+    {
+     "repo": "vsco",
+     "path": "Woodwinds/Clarinet/susLong/DCClar_susLong_F2_v3_rr1_sum.wav",
+     "note": 53,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "8d229e9158b3599bf278857ff5722ca9"
+    },
+    {
+     "repo": "vsco",
+     "path": "Woodwinds/Clarinet/susLong/DCClar_susLong_A#2_v1_rr1_sum.wav",
+     "note": 58,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "88d8d6ef8db5dd6dd993a44948c731aa"
+    },
+    {
+     "repo": "vsco",
+     "path": "Woodwinds/Clarinet/susLong/DCClar_susLong_A#2_v2_rr1_sum.wav",
+     "note": 58,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "5984d70cb9e589a7a01b7452e5e2225c"
+    },
+    {
+     "repo": "vsco",
+     "path": "Woodwinds/Clarinet/susLong/DCClar_susLong_A#2_v3_rr1_sum.wav",
+     "note": 58,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "b008f807c6cd68d7bc79b16f3bfaa165"
+    },
+    {
+     "repo": "vsco",
+     "path": "Woodwinds/Clarinet/susLong/DCClar_susLong_D3_v1_rr1_sum.wav",
+     "note": 62,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "5e7e1fa0b066f1a994ed197e119448e0"
+    },
+    {
+     "repo": "vsco",
+     "path": "Woodwinds/Clarinet/susLong/DCClar_susLong_D3_v2_rr1_sum.wav",
+     "note": 62,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "f9d5a0f1ec75bc1a6c159dc3b9a7f268"
+    },
+    {
+     "repo": "vsco",
+     "path": "Woodwinds/Clarinet/susLong/DCClar_susLong_D3_v3_rr1_sum.wav",
+     "note": 62,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "d2ddd5f45f04e661e0fbd9ab162ae632"
+    },
+    {
+     "repo": "vsco",
+     "path": "Woodwinds/Clarinet/susLong/DCClar_susLong_F3_v1_rr1_sum.wav",
+     "note": 65,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "ebe11bf057ee32923c76e7e3dcf1f263"
+    },
+    {
+     "repo": "vsco",
+     "path": "Woodwinds/Clarinet/susLong/DCClar_susLong_F3_v2_rr1_sum.wav",
+     "note": 65,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "70fd56e6c7e467a7341da710516e232b"
+    },
+    {
+     "repo": "vsco",
+     "path": "Woodwinds/Clarinet/susLong/DCClar_susLong_F3_v3_rr1_sum.wav",
+     "note": 65,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "b4f66d1dfcbf456a169721fcccb1a0d9"
+    },
+    {
+     "repo": "vsco",
+     "path": "Woodwinds/Clarinet/susLong/DCClar_susLong_A#3_v1_rr1_sum.wav",
+     "note": 70,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "bbff3a99953368155044d99dc53b2b27"
+    },
+    {
+     "repo": "vsco",
+     "path": "Woodwinds/Clarinet/susLong/DCClar_susLong_A#3_v2_rr1_sum.wav",
+     "note": 70,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "d587137d84e5a35186b522ea24670476"
+    },
+    {
+     "repo": "vsco",
+     "path": "Woodwinds/Clarinet/susLong/DCClar_susLong_A#3_v3_rr1_sum.wav",
+     "note": 70,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "b2009015fc4777c4e202b35b52ee665b"
+    },
+    {
+     "repo": "vsco",
+     "path": "Woodwinds/Clarinet/susLong/DCClar_susLong_D4_v1_rr1_sum.wav",
+     "note": 74,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "fdf7530bd14c65ca035d45a3344e2a16"
+    },
+    {
+     "repo": "vsco",
+     "path": "Woodwinds/Clarinet/susLong/DCClar_susLong_D4_v2_rr1_sum.wav",
+     "note": 74,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "11e35d08d4fc11c4a2dbe3e1ae70fd29"
+    },
+    {
+     "repo": "vsco",
+     "path": "Woodwinds/Clarinet/susLong/DCClar_susLong_D4_v3_rr1_sum.wav",
+     "note": 74,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "2db82fc1053cb34161421fe8c6c3d978"
+    },
+    {
+     "repo": "vsco",
+     "path": "Woodwinds/Clarinet/susLong/DCClar_susLong_F4_v1_rr1_sum.wav",
+     "note": 77,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "ac79f08fc949fa1ba4398c17e0994bd4"
+    },
+    {
+     "repo": "vsco",
+     "path": "Woodwinds/Clarinet/susLong/DCClar_susLong_F4_v2_rr1_sum.wav",
+     "note": 77,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "ef09d98e27e029c9a4c6144af638927f"
+    },
+    {
+     "repo": "vsco",
+     "path": "Woodwinds/Clarinet/susLong/DCClar_susLong_F4_v3_rr1_sum.wav",
+     "note": 77,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "fff620790031e0f8859c72ec5d42eb6c"
+    },
+    {
+     "repo": "vsco",
+     "path": "Woodwinds/Clarinet/susLong/DCClar_susLong_A#4_v1_rr1_sum.wav",
+     "note": 82,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "3517b327d4a7cab8fe95fe804bcf8d37"
+    },
+    {
+     "repo": "vsco",
+     "path": "Woodwinds/Clarinet/susLong/DCClar_susLong_A#4_v2_rr1_sum.wav",
+     "note": 82,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "e4e3329021316bdcb9c93d62aad4ea08"
+    },
+    {
+     "repo": "vsco",
+     "path": "Woodwinds/Clarinet/susLong/DCClar_susLong_A#4_v3_rr1_sum.wav",
+     "note": 82,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "1bb81ee239e08b577819b530a977ea6b"
+    },
+    {
+     "repo": "vsco",
+     "path": "Woodwinds/Clarinet/susLong/DCClar_susLong_D5_v1_rr1_sum.wav",
+     "note": 86,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "28034788d1e948d3ac22c3a1f8e662f7"
+    },
+    {
+     "repo": "vsco",
+     "path": "Woodwinds/Clarinet/susLong/DCClar_susLong_D5_v2_rr1_sum.wav",
+     "note": 86,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "0b5fefa62f1d699d222ea71159cf3ba0"
+    },
+    {
+     "repo": "vsco",
+     "path": "Woodwinds/Clarinet/susLong/DCClar_susLong_D5_v3_rr1_sum.wav",
+     "note": 86,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "7d366b456071afea7fdbef17f6b23743"
+    },
+    {
+     "repo": "vsco",
+     "path": "Woodwinds/Clarinet/susLong/DCClar_susLong_F#5_v1_rr1_sum.wav",
+     "note": 90,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "fe3869184a3277afbdaf3b031a51f2d2"
+    },
+    {
+     "repo": "vsco",
+     "path": "Woodwinds/Clarinet/susLong/DCClar_susLong_F#5_v2_rr1_sum.wav",
+     "note": 90,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "b11e8be1f696a9224a5372770948f7ab"
+    },
+    {
+     "repo": "vsco",
+     "path": "Woodwinds/Clarinet/susLong/DCClar_susLong_F#5_v3_rr1_sum.wav",
+     "note": 90,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "02972704beed8e9c3a344e86915999fd"
+    }
+   ]
+  },
+  {
+   "id": "horn",
+   "name": "French Horn",
+   "family": "brass",
+   "loop": true,
+   "files": [
+    {
+     "repo": "vsco",
+     "path": "Brass/F Horn/sus/MOHorn_sus_A0_v1_1.wav",
+     "note": 33,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "72058c98668d48c2a1e04e2a0e18fa90"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/F Horn/sus/MOHorn_sus_C1_v1_1.wav",
+     "note": 36,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "2cc5127dbb420234e08bc636337ea444"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/F Horn/sus/MOHorn_sus_C1_v2_1.wav",
+     "note": 36,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "4f3e58c7556dd92492a0b3b1296d8dd4"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/F Horn/sus/MOHorn_sus_C1_v3_1.wav",
+     "note": 36,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "399fec63d386bbcfd8920e8f305c2b93"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/F Horn/sus/MOHorn_sus_D#1_v1_1.wav",
+     "note": 39,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "3cc251be5451c36dfadb19e0e33e5229"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/F Horn/sus/MOHorn_sus_D#1_v2_1.wav",
+     "note": 39,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "a467c61a90f53a87d69cf47bb0e75b07"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/F Horn/sus/MOHorn_sus_D#1_v3_1.wav",
+     "note": 39,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "74086d70aec59c931f193c2d7d32f076"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/F Horn/sus/MOHorn_sus_G1_v1_1.wav",
+     "note": 43,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "3a3363d85426f671d0538c50e83b3081"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/F Horn/sus/MOHorn_sus_G1_v2_1.wav",
+     "note": 43,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "9973c1cfe1aa991e7b5b6465e1afc567"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/F Horn/sus/MOHorn_sus_G1_v3_1.wav",
+     "note": 43,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "d1e9d17087cecf394b7925b5aea3f6f4"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/F Horn/sus/MOHorn_sus_A#1_v1_1.wav",
+     "note": 46,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "f4558275dfd3606c28d7043bb086db6d"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/F Horn/sus/MOHorn_sus_A#1_v2_1.wav",
+     "note": 46,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "161076941777533147ccadc5560dfed5"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/F Horn/sus/MOHorn_sus_A#1_v3_1.wav",
+     "note": 46,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "bf62d237bc0cd1e9bd173d7ba5cc6a36"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/F Horn/sus/MOHorn_sus_D2_v1_1.wav",
+     "note": 50,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "a2c9d6efe4e916d51f6646aa33f60b2a"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/F Horn/sus/MOHorn_sus_D2_v2_1.wav",
+     "note": 50,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "c4d23c34559d380f11c3bb4bbecca199"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/F Horn/sus/MOHorn_sus_D2_v3_1.wav",
+     "note": 50,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "45182f91cc55c87f9aa4f801cd2b6863"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/F Horn/sus/MOHorn_sus_D2_v4_1.wav",
+     "note": 50,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "5570a6d748eac98cc71cf9234fa00b25"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/F Horn/sus/MOHorn_sus_F2_v1_1.wav",
+     "note": 53,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "07dbcaa6ca3c4cc0b11db4bd962a44e4"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/F Horn/sus/MOHorn_sus_F2_v2_1.wav",
+     "note": 53,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "2dd4da1ea634f804d967ccd2d7523704"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/F Horn/sus/MOHorn_sus_F2_v3_1.wav",
+     "note": 53,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "9c64313fe4723e47c46db147d90f3d59"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/F Horn/sus/MOHorn_sus_A2_v1_1.wav",
+     "note": 57,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "8073d487c44dcebc7be9dd8ea1ca7e20"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/F Horn/sus/MOHorn_sus_A2_v2_1.wav",
+     "note": 57,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "3c839a21ec6eb1595c64ddb5d1603182"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/F Horn/sus/MOHorn_sus_A2_v3_1.wav",
+     "note": 57,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "62bb0c192e40e4ae2d32a263acb32a58"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/F Horn/sus/MOHorn_sus_C3_v1_1.wav",
+     "note": 60,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "285772745c6847498f465201ca7d580f"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/F Horn/sus/MOHorn_sus_C3_v2_1.wav",
+     "note": 60,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "f407b17c703a2c06dc54daaca3066928"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/F Horn/sus/MOHorn_sus_C3_v3_1.wav",
+     "note": 60,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "ed474146cdcfed862574ac775daddade"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/F Horn/sus/MOHorn_sus_C3_v4_1.wav",
+     "note": 60,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "abe0c437018026d4223c7d0ff28f3deb"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/F Horn/sus/MOHorn_sus_D4_v1_1.wav",
+     "note": 74,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "50d645bc412b91294566a211c2b0fc86"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/F Horn/sus/MOHorn_sus_F4_v1_1.wav",
+     "note": 77,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "0b14a203b6ac17a38e4c9014b1f5968f"
+    }
+   ]
+  },
+  {
+   "id": "trumpet",
+   "name": "Trumpet",
+   "family": "brass",
+   "loop": true,
+   "files": [
+    {
+     "repo": "vsco",
+     "path": "Brass/Trumpet/susvib/Sum_SHTrumpet_susvib_F2_v1_rr1.wav",
+     "note": 53,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "c5d72f7ad59961b4edd84d0f4bc20431"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Trumpet/susvib/Sum_SHTrumpet_susvib_F2_v2_rr1.wav",
+     "note": 53,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "90759cbe0107eb6ad7122e8c5d8c3430"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Trumpet/susvib/Sum_SHTrumpet_susvib_A2_v1_rr1.wav",
+     "note": 57,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "0b5ab2ad2e735db5bef5ba7b0e08fe68"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Trumpet/susvib/Sum_SHTrumpet_susvib_A2_v2_rr1.wav",
+     "note": 57,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "ce1faf8336ca3334248bbbb5a3ea6296"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Trumpet/susvib/Sum_SHTrumpet_susvib_C3_v1_rr1.wav",
+     "note": 60,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "3ed958e1d60510c6cc5a3315ea1324ae"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Trumpet/susvib/Sum_SHTrumpet_susvib_C3_v2_rr1.wav",
+     "note": 60,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "1f07d33d56f9d6830a7a23290d11b9ed"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Trumpet/susvib/Sum_SHTrumpet_susvib_D#3_v1_rr1.wav",
+     "note": 63,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "4ad74551de0a0c0c9b0adb9a55956601"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Trumpet/susvib/Sum_SHTrumpet_susvib_D#3_v2_rr1.wav",
+     "note": 63,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "b880e8c4d1b981337b90d22ea806abb3"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Trumpet/susvib/Sum_SHTrumpet_susvib_F3_v1_rr1.wav",
+     "note": 65,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "f5083a094c0fb0cf844006b96c317eb8"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Trumpet/susvib/Sum_SHTrumpet_susvib_F3_v2_rr1.wav",
+     "note": 65,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "c3c7414e8f11a9f8f766c2cd37c95c74"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Trumpet/susvib/Sum_SHTrumpet_susvib_G3_v1_rr1.wav",
+     "note": 67,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "d82596a7795bd0bc52e5a11d130b62eb"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Trumpet/susvib/Sum_SHTrumpet_susvib_G3_v2_rr1.wav",
+     "note": 67,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "8db0a03c03a3e8f44dd13967098d3ab0"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Trumpet/susvib/Sum_SHTrumpet_susvib_A#3_v1_rr1.wav",
+     "note": 70,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "04b07cd5a9562aac395b35ef72190dc5"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Trumpet/susvib/Sum_SHTrumpet_susvib_A#3_v2_rr1.wav",
+     "note": 70,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "f01f573c52251a027a12f822f1e5348c"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Trumpet/susvib/Sum_SHTrumpet_susvib_D4_v1_rr1.wav",
+     "note": 74,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "3410c52d7ab2f01ba98657a05f80e3bf"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Trumpet/susvib/Sum_SHTrumpet_susvib_D4_v2_rr1.wav",
+     "note": 74,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "f95ce8a1282b9131dac659a26c73b0aa"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Trumpet/susvib/Sum_SHTrumpet_susvib_F4_v1_rr1.wav",
+     "note": 77,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "b3e2d427d1faccc2f0f7079d50688ea2"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Trumpet/susvib/Sum_SHTrumpet_susvib_F4_v2_rr1.wav",
+     "note": 77,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "e3ffcac5d1d7b4d70892811d919b7941"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Trumpet/susvib/Sum_SHTrumpet_susvib_A4_v1_rr1.wav",
+     "note": 81,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "7553421788bf79e29d6ae5ed0c234d1e"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Trumpet/susvib/Sum_SHTrumpet_susvib_A4_v2_rr1.wav",
+     "note": 81,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "96abcadac03b836faf934e5ec6af5b04"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Trumpet/susvib/Sum_SHTrumpet_susvib_C5_v1_rr1.wav",
+     "note": 84,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "0b5733b5dc84ea79528152e1e3b31c53"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Trumpet/susvib/Sum_SHTrumpet_susvib_C5_v2_rr1.wav",
+     "note": 84,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "0b90783a1a77d43070fdf55fa25e20ba"
+    }
+   ]
+  },
+  {
+   "id": "trombone",
+   "name": "Trombone",
+   "family": "brass",
+   "loop": true,
+   "files": [
+    {
+     "repo": "vsco",
+     "path": "Brass/Tenor Trombone/sus/tenortbn_sus_A#0_v1_1.wav",
+     "note": 34,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "a9126b2841f1440554adec25bdcc4601"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Tenor Trombone/sus/tenortbn_sus_A#0_v2_1.wav",
+     "note": 34,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "afbcab0ffce42b9cc8b11b26b7eb1f91"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Tenor Trombone/sus/tenortbn_sus_C#1_v1_1.wav",
+     "note": 37,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "d25e9f408b1776ee4b06d7e7597bb702"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Tenor Trombone/sus/tenortbn_sus_C#1_v2_1.wav",
+     "note": 37,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "c3780e2d27cb91d02e4e3ca3de7f150c"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Tenor Trombone/sus/tenortbn_sus_D#1_v1_1.wav",
+     "note": 39,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "99afd6ec3035ed95a52636c99cf4ed01"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Tenor Trombone/sus/tenortbn_sus_D#1_v2_1.wav",
+     "note": 39,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "545803734e2fa3f77d48ceb512c844e6"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Tenor Trombone/sus/tenortbn_sus_D#1_v3_1.wav",
+     "note": 39,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "2bf2ee0d6a3816dd2eb47a3b5f3613ce"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Tenor Trombone/sus/tenortbn_sus_F1_v1_1.wav",
+     "note": 41,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "7974c4f3931baf188f2da65fc27c5354"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Tenor Trombone/sus/tenortbn_sus_F1_v2_1.wav",
+     "note": 41,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "68b6659a7428204d008e91ac0b1ef863"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Tenor Trombone/sus/tenortbn_sus_F1_v3_1.wav",
+     "note": 41,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "57e22bb4a4cd8c10c9a42c7719f7cffa"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Tenor Trombone/sus/tenortbn_sus_A#1_v1_1.wav",
+     "note": 46,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "54d594c3ba6c83f5e878fa3e4d777926"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Tenor Trombone/sus/tenortbn_sus_A#1_v2_1.wav",
+     "note": 46,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "8f274b49a66d8448dfcdccf3e9cbf3c6"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Tenor Trombone/sus/tenortbn_sus_A#1_v3_1.wav",
+     "note": 46,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "ed401ab7f3a8e995b73c9629d47ee842"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Tenor Trombone/sus/tenortbn_sus_D2_v1_1.wav",
+     "note": 50,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "8ca482556849194df66569606b915a3a"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Tenor Trombone/sus/tenortbn_sus_D2_v2_1.wav",
+     "note": 50,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "57f17a5ab07e184257c9755f90e4e13e"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Tenor Trombone/sus/tenortbn_sus_D2_v3_1.wav",
+     "note": 50,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "9f54e1ca47f93e6c5bf5f86abf8757d1"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Tenor Trombone/sus/tenortbn_sus_F2_v1_1.wav",
+     "note": 53,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "2f0be086ebcfb6d2375dbbe9e38738ad"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Tenor Trombone/sus/tenortbn_sus_F2_v2_1.wav",
+     "note": 53,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "282382b927b9f8aae24c6dce65b4fed7"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Tenor Trombone/sus/tenortbn_sus_F2_v3_1.wav",
+     "note": 53,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "07bf9da4d7c263c44125a5f7d9bd62e1"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Tenor Trombone/sus/tenortbn_sus_C3_v1_1.wav",
+     "note": 60,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "eadddbe4f55915d4543a189ec46e516a"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Tenor Trombone/sus/tenortbn_sus_C3_v2_1.wav",
+     "note": 60,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "bac623ad2ce7d8373ead39a70be47ec0"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Tenor Trombone/sus/tenortbn_sus_C3_v3_1.wav",
+     "note": 60,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "56156efce1e0429bbacc2695dce38e4d"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Tenor Trombone/sus/tenortbn_sus_C#3_v1_1.wav",
+     "note": 61,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "954f71a26a63a9b44ca6d0da9edbe566"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Tenor Trombone/sus/tenortbn_sus_C#3_v2_1.wav",
+     "note": 61,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "8b1fb43ca05c5645145dfb6a7a19926d"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Tenor Trombone/sus/tenortbn_sus_C#3_v3_1.wav",
+     "note": 61,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "43fcf61a6818a6c80824a3c0e387bfd3"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Tenor Trombone/sus/tenortbn_sus_D#3_v1_1.wav",
+     "note": 63,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "f41421fdcaff6614db79b97ebc5e8f4e"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Tenor Trombone/sus/tenortbn_sus_D#3_v2_1.wav",
+     "note": 63,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "fc0fbff3e46c16af2528032639e6058c"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Tenor Trombone/sus/tenortbn_sus_D#3_v3_1.wav",
+     "note": 63,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "24a137269f109c589a437079234edc76"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Tenor Trombone/sus/tenortbn_sus_F3_v1_1.wav",
+     "note": 65,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "fd2eeed5f2e55d63aefeabd1fe2094bb"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Tenor Trombone/sus/tenortbn_sus_F3_v2_1.wav",
+     "note": 65,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "14d79333b35bc6e4f70000de619c60aa"
+    },
+    {
+     "repo": "vsco",
+     "path": "Brass/Tenor Trombone/sus/tenortbn_sus_F3_v3_1.wav",
+     "note": 65,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "663c8709ef41935c91205ee19a204aab"
+    }
+   ]
+  },
+  {
+   "id": "grand",
+   "name": "Grand Piano",
+   "family": "keys",
+   "loop": false,
+   "maxSeconds": 5.5,
+   "files": [
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_A#0_vl2_rr1.wav",
+     "note": 22,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "ed6c338596de300d9138c5e17fc95e79"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_A#0_vl3_rr1.wav",
+     "note": 22,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "f8db2ad9e605ec50b59283361938ed3d"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_A#0_vl4_rr1.wav",
+     "note": 22,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "059446fd39395b0290a5bf8fd3f76d2d"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_C1_vl2_rr1.wav",
+     "note": 24,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "5fa9c266a0800dc7b48bf8c249decd7e"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_C1_vl3_rr1.wav",
+     "note": 24,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "4d07d8ccc73e2488595fdcdcf6cfc8bb"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_C1_vl4_rr1.wav",
+     "note": 24,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "75645c24a1179e345c542ea7d22e0a61"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_D1_vl2_rr1.wav",
+     "note": 26,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "ac353b4c72644e41d986e83530376a71"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_D1_vl3_rr1.wav",
+     "note": 26,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "a08d871640aefd3b3996e50015219833"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_D1_vl4_rr1.wav",
+     "note": 26,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "34d46cf89bbbb9d2887a881b76784177"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_E1_vl2_rr1.wav",
+     "note": 28,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "04bc066894e8a8a82846a9fa9166f268"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_E1_vl3_rr1.wav",
+     "note": 28,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "c796c332adf04c036e9530a2168ee357"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_E1_vl4_rr1.wav",
+     "note": 28,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "5962ea03158e7fe3b30806262e260d6f"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_F#1_vl2_rr1.wav",
+     "note": 30,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "47a879e971c0a26d195672bf7d2205f2"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_F#1_vl3_rr1.wav",
+     "note": 30,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "9150d4883a18983287e9bd5ec65a4e28"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_F#1_vl4_rr1.wav",
+     "note": 30,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "4d79a532ac1cfdbb4ebc4f7d3054b8d4"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_G#1_vl2_rr1.wav",
+     "note": 32,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "db6ea27a72e88f06c163f94d8f7c818f"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_G#1_vl3_rr1.wav",
+     "note": 32,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "d4402c6eb14d4c15d102f7748f50dc85"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_G#1_vl4_rr1.wav",
+     "note": 32,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "5be9383c331618c28f62631205198d0c"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_A#1_vl2_rr1.wav",
+     "note": 34,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "db3dac5dfeffb339ba4334493649d47e"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_A#1_vl3_rr1.wav",
+     "note": 34,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "02bbed72435d609a77b87e9302ffe20e"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_A#1_vl4_rr1.wav",
+     "note": 34,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "a152d400ac83f09ecb6b660d10d24c5c"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_C2_vl2_rr1.wav",
+     "note": 36,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "f7e1571f06bc16e0103d3e51ef8556ad"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_C2_vl3_rr1.wav",
+     "note": 36,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "64add2aa17ba3ec37078e591ed24ce1c"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_C2_vl4_rr1.wav",
+     "note": 36,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "3637213ce0f3f5541276712c94e3d1f0"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_D2_vl2_rr1.wav",
+     "note": 38,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "34d78aff6827357ed88cbbeb09e70ac9"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_D2_vl3_rr1.wav",
+     "note": 38,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "3f0899c84d60c7fa74305c04f13b95ca"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_D2_vl4_rr1.wav",
+     "note": 38,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "fd2c21bfbb223d63aad3abce895ec049"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_E2_vl2_rr1.wav",
+     "note": 40,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "8880fec5b9e939d7de776563ce8a6fd1"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_E2_vl3_rr1.wav",
+     "note": 40,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "51faacc03e781c04412ce9cad1aee885"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_E2_vl4_rr1.wav",
+     "note": 40,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "dc511c79a3d24bc9430cccf3294b27f9"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_F#2_vl2_rr1.wav",
+     "note": 42,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "234b0b27c94d9a109b828e13b2cfc624"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_F#2_vl3_rr1.wav",
+     "note": 42,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "2e9882e49cf9a1a406ee4e212f9e19a8"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_F#2_vl4_rr1.wav",
+     "note": 42,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "8b082978a8b27fceba08fe449cdb6a76"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_G#2_vl2_rr1.wav",
+     "note": 44,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "a7aa8ebc9f074845b06bfd53e6ba1519"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_G#2_vl3_rr1.wav",
+     "note": 44,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "dd0019b24aae1baf648d95db375d63fa"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_G#2_vl4_rr1.wav",
+     "note": 44,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "1549f48bc48605c39913423fcd931152"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_A#2_vl2_rr1.wav",
+     "note": 46,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "5e212659bb0d359dc6620236fce84bb4"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_A#2_vl3_rr1.wav",
+     "note": 46,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "38148b665e5472403c7b42a3b537d8bb"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_A#2_vl4_rr1.wav",
+     "note": 46,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "d7eb6ad77e55b76dbdbdbba987bf2ef2"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_C3_vl2_rr1.wav",
+     "note": 48,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "26ff90cfa4ca7833eaf0fbee0d26a70c"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_C3_vl3_rr1.wav",
+     "note": 48,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "396f207d880a25b1b118a6a2ea2c8f6a"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_C3_vl4_rr1.wav",
+     "note": 48,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "28834c46ded8c2b7855d008ce99251f8"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_D3_vl2_rr1.wav",
+     "note": 50,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "8f88ad30d3db6ed6373ca160b100e51c"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_D3_vl3_rr1.wav",
+     "note": 50,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "20b9bd31357e02bcd1b65f090446c218"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_D3_vl4_rr1.wav",
+     "note": 50,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "1faf8381fb8cbb0ee5183f7354a5e270"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_E3_vl2_rr1.wav",
+     "note": 52,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "81c470ed218471b4c6f6b934eccf2f35"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_E3_vl3_rr1.wav",
+     "note": 52,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "c64b207843de176d3ebe38263b816fcc"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_E3_vl4_rr1.wav",
+     "note": 52,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "f5ba30e160aac4215e31347df16e120d"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_F#3_vl2_rr1.wav",
+     "note": 54,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "69ab6c4b5a340b7c130f13d60a7bbc97"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_F#3_vl3_rr1.wav",
+     "note": 54,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "c58277bc4b16dafaba530b7141e183e2"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_F#3_vl4_rr1.wav",
+     "note": 54,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "f10b964ef9b7b7fbdeaaabc0652c3924"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_G#3_vl2_rr1.wav",
+     "note": 56,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "86708f6987ba3becacf3920e886202ad"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_G#3_vl3_rr1.wav",
+     "note": 56,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "9874048ac46f997a903b6f7a0ac44725"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_G#3_vl4_rr1.wav",
+     "note": 56,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "96bb28ff7878926ac2e260126f082661"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_A#3_vl2_rr1.wav",
+     "note": 58,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "6f13ed9c86fdce0d3a27f385343cc079"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_A#3_vl3_rr1.wav",
+     "note": 58,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "0c453a8ba02d86773645fef3c8032eeb"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_A#3_vl4_rr1.wav",
+     "note": 58,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "890b4430bf84d9319a54333246e0fdf0"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_C4_vl2_rr1.wav",
+     "note": 60,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "634041bbda72ef9d36f4378996c5ebf5"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_C4_vl3_rr1.wav",
+     "note": 60,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "a52cc70db19b11f10b27527cd2c0888e"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_C4_vl4_rr1.wav",
+     "note": 60,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "6b46a0353201db48c4d6357d5b688d4d"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_D4_vl2_rr1.wav",
+     "note": 62,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "1fe504b592bda41008af0cf9c24d8b13"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_D4_vl3_rr1.wav",
+     "note": 62,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "fdf5879ac90bd91f29371ca439a4e6a8"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_D4_vl4_rr1.wav",
+     "note": 62,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "ece80629c5e1964aa71b3f24c045dfaf"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_E4_vl2_rr1.wav",
+     "note": 64,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "68e939615d3cd7d90430770179638911"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_E4_vl3_rr1.wav",
+     "note": 64,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "29e502b5ad7225e6729d9697486bc1be"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_E4_vl4_rr1.wav",
+     "note": 64,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "e637044a7ea327ddf04a230955a64695"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_F#4_vl2_rr1.wav",
+     "note": 66,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "ba44a2fd22095e7977b9c37e743d6956"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_F#4_vl3_rr1.wav",
+     "note": 66,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "36d60fb5644bc14755dafb28e610746a"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_F#4_vl4_rr1.wav",
+     "note": 66,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "4475ac867d593e192aea93b2527bad8b"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_G#4_vl2_rr1.wav",
+     "note": 68,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "ccc7a186c24f5f3bfc8c1ce2aad1f48f"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_G#4_vl3_rr1.wav",
+     "note": 68,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "cecc6a2ab0c5d24ae811482730782057"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_G#4_vl4_rr1.wav",
+     "note": 68,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "109bd961f8f908f0cdaa5386688bf9f2"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_A#4_vl2_rr1.wav",
+     "note": 70,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "c64d410d35d4d6a47c5529221f7f6fe6"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_A#4_vl3_rr1.wav",
+     "note": 70,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "38e12d2352c2a40c6abce86f93ba05d2"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_A#4_vl4_rr1.wav",
+     "note": 70,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "c383a944bc92a381cd05a0271b676847"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_C5_vl2_rr1.wav",
+     "note": 72,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "2ad2bf5c0468b9783d8a867ffc73e264"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_C5_vl3_rr1.wav",
+     "note": 72,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "a3958136c82b480fd871697f2c459fb4"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_C5_vl4_rr1.wav",
+     "note": 72,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "eefb7904d3dbfb5cfa4a2cb2c12bf607"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_D5_vl2_rr1.wav",
+     "note": 74,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "8c3b905ee536ed1c59986a680dcd184a"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_D5_vl3_rr1.wav",
+     "note": 74,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "d835b1aa1b89baa03e06b18e058e52a3"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_D5_vl4_rr1.wav",
+     "note": 74,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "dfe5958c9e526a94c09a27fb0795c829"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_E5_vl2_rr1.wav",
+     "note": 76,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "2a7fb1a1e89abaac15e50b82980f5d94"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_E5_vl3_rr1.wav",
+     "note": 76,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "79214bd5b9532afcd4a4e4ebceeb0d33"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_E5_vl4_rr1.wav",
+     "note": 76,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "353435e15e82ae7f12dd60ce1a9677a8"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_F#5_vl2_rr1.wav",
+     "note": 78,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "d0a287319e30d7fd161c843fda5ec09e"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_F#5_vl3_rr1.wav",
+     "note": 78,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "ad7f38c38da821cb29d928c81cf573bb"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_F#5_vl4_rr1.wav",
+     "note": 78,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "6b5fabeac8f7fc0fdba6d9bdf2bb0461"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_G#5_vl2_rr1.wav",
+     "note": 80,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "400aded3dea8fd7488d4b1694b913ce7"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_G#5_vl3_rr1.wav",
+     "note": 80,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "ae52a5eac964dba66f39c2a0a8dd2dff"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_G#5_vl4_rr1.wav",
+     "note": 80,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "043c878a7ec60a9b51fcbb907d81760f"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_A#5_vl2_rr1.wav",
+     "note": 82,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "eaa0d1f1592b110f61a66d494da15bf9"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_A#5_vl3_rr1.wav",
+     "note": 82,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "58bb1dc40d0951372608f9a2a4abec91"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_A#5_vl4_rr1.wav",
+     "note": 82,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "653e2a316752fef4f48462c1d107b4a1"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_C6_vl2_rr1.wav",
+     "note": 84,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "ad4cc686514b366ea67a7ecc3fbfbfdc"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_C6_vl3_rr1.wav",
+     "note": 84,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "7f629508068371af161eaa33d0029082"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_C6_vl4_rr1.wav",
+     "note": 84,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "b04fd4df057ddc1cc706d711157e3553"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_D6_vl2_rr1.wav",
+     "note": 86,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "e7145080fb09bb9dc2be80ec67b5304a"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_D6_vl3_rr1.wav",
+     "note": 86,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "653fbe0c5919414c06441739a31513fc"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_D6_vl4_rr1.wav",
+     "note": 86,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "954cb8a2e8e10b8b53a33bae402cbf27"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_E6_vl2_rr1.wav",
+     "note": 88,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "a0b7553e3e9a983682c2c25bab635b66"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_E6_vl3_rr1.wav",
+     "note": 88,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "69bc58cef0dfc688ff64f511846df4ff"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_E6_vl4_rr1.wav",
+     "note": 88,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "052e954f6a0a5de219f30bb530b4c5c9"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_F#6_vl2_rr1.wav",
+     "note": 90,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "40490545eb06876e44f2abbb3a8571a4"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_F#6_vl3_rr1.wav",
+     "note": 90,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "9cd02c469336d91b26301e35004a3e9a"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_F#6_vl4_rr1.wav",
+     "note": 90,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "b7e6f6dfa14fc288a8660ed1e42877fe"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_G#6_vl2_rr1.wav",
+     "note": 92,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "fda10d4d41532eb6683f7b44638f44fe"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_G#6_vl3_rr1.wav",
+     "note": 92,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "f1cbaac13099affd67f16098c80f3615"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_G#6_vl4_rr1.wav",
+     "note": 92,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "abdb79f910063e6ca6fb1c6afcee1d96"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_A#6_vl2_rr1.wav",
+     "note": 94,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "4e74a8dca20b58f52d8b21378566f90c"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_A#6_vl3_rr1.wav",
+     "note": 94,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "14254d73bfec07115b7e326b7c98a8bd"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_A#6_vl4_rr1.wav",
+     "note": 94,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "ed7815f6c2b55fba24b491c7acd1872d"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_C7_vl2_rr1.wav",
+     "note": 96,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "cc6766b8de4ab7a64bf9e4a99e903a03"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_C7_vl3_rr1.wav",
+     "note": 96,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "3a0fcefd6ec8267e90f2004e63b77ed2"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_C7_vl4_rr1.wav",
+     "note": 96,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "9e41829eb20acb547a16df9f62f64741"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_D7_vl2_rr1.wav",
+     "note": 98,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "91c622567345ae4099a739517e7482a0"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_D7_vl3_rr1.wav",
+     "note": 98,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "440504b2de6d0ca139fc12be21f292c9"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_D7_vl4_rr1.wav",
+     "note": 98,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "59a0c9214c93f21482c3e1421de8265c"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_E7_vl2_rr1.wav",
+     "note": 100,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "3968fe015052da5aa379193e8c8cfeb9"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_E7_vl3_rr1.wav",
+     "note": 100,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "038d2d4b27cb331b8737ebcecef615ed"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_E7_vl4_rr1.wav",
+     "note": 100,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "5bfe213a69f7dee3955d2d13aefb2030"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_F#7_vl2_rr1.wav",
+     "note": 102,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "9ab84d1eb5b9c2e26352a7b33b1db635"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_F#7_vl3_rr1.wav",
+     "note": 102,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "f0f6ffaf0bdd817cb15dde804be0af0a"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_F#7_vl4_rr1.wav",
+     "note": 102,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "545ec25f4d92996c033c5aaaa970e134"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_G#7_vl2_rr1.wav",
+     "note": 104,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "07926988b6fe00bfb023e9778b829c06"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_G#7_vl3_rr1.wav",
+     "note": 104,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "2e3568cd4d4c9f8198b3e52ca1241bae"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Grand Piano, Steinway B/NoSus/JHPiano_NoSus_Close_G#7_vl4_rr1.wav",
+     "note": 104,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "5cbe1f9624421881c7b99df7df39a86b"
+    }
+   ]
+  },
+  {
+   "id": "upright",
+   "name": "Upright Piano",
+   "family": "keys",
+   "loop": false,
+   "maxSeconds": 5.0,
+   "files": [
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Upright Piano, Yamaha/Sustains/Upright1_Sus_C0_vl1_rr1.wav",
+     "note": 24,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "cdb4da1a28b1d899c0faa0eef2d41dec"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Upright Piano, Yamaha/Sustains/Upright1_Sus_C0_vl2_rr1.wav",
+     "note": 24,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "c7bb9f34b723fbd2bcdf1b872b472ab6"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Upright Piano, Yamaha/Sustains/Upright1_Sus_C0_vl3_rr1.wav",
+     "note": 24,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "6e774cb72a92c987f0f6d79d8f78ed5e"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Upright Piano, Yamaha/Sustains/Upright1_Sus_G0_vl1_rr1.wav",
+     "note": 31,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "4573875287019832d56090b05e64989d"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Upright Piano, Yamaha/Sustains/Upright1_Sus_G0_vl2_rr1.wav",
+     "note": 31,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "f9fad27fbb46157c10172eaaada1052d"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Upright Piano, Yamaha/Sustains/Upright1_Sus_G0_vl3_rr1.wav",
+     "note": 31,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "0ac45ea7d802e2b7d048bff1ec4313e4"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Upright Piano, Yamaha/Sustains/Upright1_Sus_C1_vl1_rr1.wav",
+     "note": 36,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "37af9c567f2aa0c5e1523ae45eb15706"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Upright Piano, Yamaha/Sustains/Upright1_Sus_C1_vl2_rr1.wav",
+     "note": 36,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "3d1043c0dd51941f0eb7d9ff26dd40aa"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Upright Piano, Yamaha/Sustains/Upright1_Sus_C1_vl3_rr1.wav",
+     "note": 36,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "0a7a4526278debb47ffc1c464319b1eb"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Upright Piano, Yamaha/Sustains/Upright1_Sus_G1_vl1_rr1.wav",
+     "note": 43,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "fd0d20c409e1e9ede27c2faaa6895165"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Upright Piano, Yamaha/Sustains/Upright1_Sus_G1_vl2_rr1.wav",
+     "note": 43,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "0b55ab010666eb0125949aa471011d46"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Upright Piano, Yamaha/Sustains/Upright1_Sus_G1_vl3_rr1.wav",
+     "note": 43,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "ad57c32ac1f63e7552affe1e8b29175a"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Upright Piano, Yamaha/Sustains/Upright1_Sus_C2_vl1_rr1.wav",
+     "note": 48,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "49a8eab7152e95e797d3f92f622cd593"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Upright Piano, Yamaha/Sustains/Upright1_Sus_C2_vl2_rr1.wav",
+     "note": 48,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "01cf4877a8f925a51d03b36a7e82d97e"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Upright Piano, Yamaha/Sustains/Upright1_Sus_C2_vl3_rr1.wav",
+     "note": 48,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "e5d561272f6893c9122de2c42f54a9cc"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Upright Piano, Yamaha/Sustains/Upright1_Sus_G2_vl1_rr1.wav",
+     "note": 55,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "32975f36fbad68c7c0532d71610dcdc7"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Upright Piano, Yamaha/Sustains/Upright1_Sus_G2_vl2_rr1.wav",
+     "note": 55,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "5d276f9f3529ae29d06cc831551064fe"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Upright Piano, Yamaha/Sustains/Upright1_Sus_G2_vl3_rr1.wav",
+     "note": 55,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "3e55d16bd96e46dbb48dd14d7d05174e"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Upright Piano, Yamaha/Sustains/Upright1_Sus_C3_vl1_rr1.wav",
+     "note": 60,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "a8f55edee9670ffcde7da6111849d15e"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Upright Piano, Yamaha/Sustains/Upright1_Sus_C3_vl2_rr1.wav",
+     "note": 60,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "fde305c2e2d0e8afc3d511de07e96404"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Upright Piano, Yamaha/Sustains/Upright1_Sus_C3_vl3_rr1.wav",
+     "note": 60,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "5250f23cfde9611b7a49f1f3c8016ccf"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Upright Piano, Yamaha/Sustains/Upright1_Sus_G3_vl1_rr1.wav",
+     "note": 67,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "a20bc606e981c66db03c9a229bf55496"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Upright Piano, Yamaha/Sustains/Upright1_Sus_G3_vl2_rr1.wav",
+     "note": 67,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "261f1a1033e2056e74dce33819a58ff5"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Upright Piano, Yamaha/Sustains/Upright1_Sus_G3_vl3_rr1.wav",
+     "note": 67,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "a791602bdff15e739aa17d548ffe3100"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Upright Piano, Yamaha/Sustains/Upright1_Sus_C4_vl1_rr1.wav",
+     "note": 72,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "d8a1b45df5cea33574ae2b99f6f9e576"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Upright Piano, Yamaha/Sustains/Upright1_Sus_C4_vl2_rr1.wav",
+     "note": 72,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "27c3281690a7cd04bcc3e4f993bf839b"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Upright Piano, Yamaha/Sustains/Upright1_Sus_C4_vl3_rr1.wav",
+     "note": 72,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "f032950bf29bcbe02b111c2491235dce"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Upright Piano, Yamaha/Sustains/Upright1_Sus_G4_vl1_rr1.wav",
+     "note": 79,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "80538329b8ef18d5e6d27aad6f81dcad"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Upright Piano, Yamaha/Sustains/Upright1_Sus_G4_vl2_rr1.wav",
+     "note": 79,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "73ba276595b3ad633d79278ce30fde6c"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Upright Piano, Yamaha/Sustains/Upright1_Sus_G4_vl3_rr1.wav",
+     "note": 79,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "9e3851f23d73ffcbee9950726ec10bb9"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Upright Piano, Yamaha/Sustains/Upright1_Sus_C5_vl1_rr1.wav",
+     "note": 84,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "0c89bd7be76748ba9fdd3c6bfda6a76d"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Upright Piano, Yamaha/Sustains/Upright1_Sus_C5_vl2_rr1.wav",
+     "note": 84,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "012fd2eb8207d0dff0abd32d50294fe9"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Upright Piano, Yamaha/Sustains/Upright1_Sus_C5_vl3_rr1.wav",
+     "note": 84,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "38774e50435185d0ab9db02766b08d13"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Upright Piano, Yamaha/Sustains/Upright1_Sus_G5_vl1_rr1.wav",
+     "note": 91,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "1f7ca8bf80c27a0cb3ef939943dbf109"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Upright Piano, Yamaha/Sustains/Upright1_Sus_G5_vl2_rr1.wav",
+     "note": 91,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "1b4855908fbc2c41949d387caa6af525"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Upright Piano, Yamaha/Sustains/Upright1_Sus_G5_vl3_rr1.wav",
+     "note": 91,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "2b8660501117daf8349e5514c8119a41"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Upright Piano, Yamaha/Sustains/Upright1_Sus_C6_vl2_rr1.wav",
+     "note": 96,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "168591a8ff59a01e203addb7676fcd3c"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Zithers/Upright Piano, Yamaha/Sustains/Upright1_Sus_C6_vl3_rr1.wav",
+     "note": 96,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "14d6c9766a5dff204936103635517ca2"
+    }
+   ]
+  },
+  {
+   "id": "organ",
+   "name": "Pipe Organ",
+   "family": "keys",
+   "loop": true,
+   "files": [
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Edge-blown Aerophones/Pipe Organ/Quiet/NT5_Man3Quiet_C1_rr1.wav",
+     "note": 36,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "ed062f6b349d3ec6caaed23d55137361"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Edge-blown Aerophones/Pipe Organ/Quiet/NT5_Man3Quiet_D#1_rr1.wav",
+     "note": 39,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "b2166aa453a260e4bcab6bb045fd4f4e"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Edge-blown Aerophones/Pipe Organ/Quiet/NT5_Man3Quiet_F#1_rr1.wav",
+     "note": 42,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "284b2c5bec7ac7d67fd5b0a027bbd735"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Edge-blown Aerophones/Pipe Organ/Quiet/NT5_Man3Quiet_A1_rr1.wav",
+     "note": 45,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "35ca19e9db628505c7436292566a182f"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Edge-blown Aerophones/Pipe Organ/Quiet/NT5_Man3Quiet_C2_rr1.wav",
+     "note": 48,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "f81d9ecf102f0c80954ddd49acb94b00"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Edge-blown Aerophones/Pipe Organ/Quiet/NT5_Man3Quiet_D#2_rr1.wav",
+     "note": 51,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "1ae9ea983532a64c19ccac3de8989178"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Edge-blown Aerophones/Pipe Organ/Quiet/NT5_Man3Quiet_F#2_rr1.wav",
+     "note": 54,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "e026098e339794cd9068175c18f3e534"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Edge-blown Aerophones/Pipe Organ/Quiet/NT5_Man3Quiet_A2_rr1.wav",
+     "note": 57,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "ed5996779d5191ea4c64819df57e208f"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Edge-blown Aerophones/Pipe Organ/Quiet/NT5_Man3Quiet_C3_rr1.wav",
+     "note": 60,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "5a29d4808f0f17e8fc3c87452c3e7aee"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Edge-blown Aerophones/Pipe Organ/Quiet/NT5_Man3Quiet_D#3_rr1.wav",
+     "note": 63,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "a65c345e250dc3bc818a2a863720384b"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Edge-blown Aerophones/Pipe Organ/Quiet/NT5_Man3Quiet_F#3_rr1.wav",
+     "note": 66,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "787d680768434ee2bf71cf5a50473f17"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Edge-blown Aerophones/Pipe Organ/Quiet/NT5_Man3Quiet_A3_rr1.wav",
+     "note": 69,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "0e18c12bdfb1d6ff00feb428e642d407"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Edge-blown Aerophones/Pipe Organ/Quiet/NT5_Man3Quiet_C4_rr1.wav",
+     "note": 72,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "2e3a4fd818fce9d2d964f11a83361cc5"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Edge-blown Aerophones/Pipe Organ/Quiet/NT5_Man3Quiet_D#4_rr1.wav",
+     "note": 75,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "55a205d889637981806db520a7d920d7"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Edge-blown Aerophones/Pipe Organ/Quiet/NT5_Man3Quiet_F#4_rr1.wav",
+     "note": 78,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "d8add18141fc541cc7f1f9d82820971e"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Edge-blown Aerophones/Pipe Organ/Quiet/NT5_Man3Quiet_A4_rr1.wav",
+     "note": 81,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "eed925eaf52917f9e6dd153b12f59fa3"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Edge-blown Aerophones/Pipe Organ/Quiet/NT5_Man3Quiet_C5_rr1.wav",
+     "note": 84,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "1f20b5327c77bb6a4672fbacdb0929cd"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Edge-blown Aerophones/Pipe Organ/Quiet/NT5_Man3Quiet_D#5_rr1.wav",
+     "note": 87,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "0f9ddadbe92d4f816498af2a829e7a98"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Edge-blown Aerophones/Pipe Organ/Quiet/NT5_Man3Quiet_F#5_rr1.wav",
+     "note": 90,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "0fd160a867c46e082b4235fba7836ad4"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Edge-blown Aerophones/Pipe Organ/Quiet/NT5_Man3Quiet_A5_rr1.wav",
+     "note": 93,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "23232497d4e3c3166da7ad398cb7ddef"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Edge-blown Aerophones/Pipe Organ/Quiet/NT5_Man3Quiet_C6_rr1.wav",
+     "note": 96,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "b6fb3789a94f919f113b5ef17a21c22a"
+    }
+   ]
+  },
+  {
+   "id": "harp",
+   "name": "Harp",
+   "family": "plucked",
+   "loop": false,
+   "maxSeconds": 4.0,
+   "files": [
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_E1_f1.wav",
+     "note": 28,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "cf1509ff4e172be55bf7c41a3fdcac34"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_G1_f1.wav",
+     "note": 31,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "9c4425f28284d669b23f27d395c31350"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_B1_mf1.wav",
+     "note": 35,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "454775e51984a976d18bd29c0f230e80"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_B1_f1.wav",
+     "note": 35,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "28e7c82dc16742d1f08fd4412b6596a7"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_D2_mf1.wav",
+     "note": 38,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "d994432f98f7592c27717562791d7ad0"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_D2_f1.wav",
+     "note": 38,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "c7fd0725b96f3c74edc3490481140cc5"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_F2_mf1.wav",
+     "note": 41,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "3e8bc05876e665b78ccf0d4d1f9545d3"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_F2_f1.wav",
+     "note": 41,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "33b05ac5ee9e9317647dfc70b661c03e"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_A2_mf1.wav",
+     "note": 45,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "861676a909973feec5f4b00d6061a325"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_A2_f1.wav",
+     "note": 45,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "2bcee6faf734e2f1af642b927efea6e3"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_E3_mf1.wav",
+     "note": 52,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "3a3fc09fa561ee8a4a8878a922f72445"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_E3_f1.wav",
+     "note": 52,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "237c99daf974a435b650dbfa1c0f1c5c"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_G3_mf1.wav",
+     "note": 55,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "01cee07f498098daeae143342151847d"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_G3_f1.wav",
+     "note": 55,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "24baf389c05991ad1a11ec2dcf647ccf"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_B3_mf1.wav",
+     "note": 59,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "c122f3fa119f63e90043b047e16c5d3a"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_B3_f1.wav",
+     "note": 59,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "a69241fc1a51c95104d79bb0947bcf29"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_D4_mf1.wav",
+     "note": 62,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "51813c7bbc89d26c56a413a8273067a3"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_D4_f1.wav",
+     "note": 62,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "0b6fb6cf1ef86044725afac9c32ea889"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_F4_mf1.wav",
+     "note": 65,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "0eb592d87e2bf77179838b44d3ee0fae"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_F4_f1.wav",
+     "note": 65,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "551e43d2a13437718725a2c98acc9b08"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_A4_mf1.wav",
+     "note": 69,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "9a14f626c9639da95cfd26bf647aeab0"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_A4_f1.wav",
+     "note": 69,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "d4aed2c7d4bd719de0074932a251832d"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_C5_mf1.wav",
+     "note": 72,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "c90a100e4ebab3894cd4366f5eafcddc"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_C5_f1.wav",
+     "note": 72,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "ee38345f44e2ed91ac67ff8be405762a"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_E5_mf1.wav",
+     "note": 76,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "33ca2d51eb858c453f725e507f75d34e"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_E5_f1.wav",
+     "note": 76,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "74554464a99954c87ebb387d26fcc78a"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_G5_mf1.wav",
+     "note": 79,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "001e1294089aaaabf375f08e6d9d6ef3"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_G5_f1.wav",
+     "note": 79,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "c5a19389dcdf92fe2c3a3d67f4c06344"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_B5_mf1.wav",
+     "note": 83,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "8e42cb5d3650b23a953e5fee814bb276"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_B5_f1.wav",
+     "note": 83,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "67e64a1fd5ff519d168af45235e5ee98"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_D6_mf1.wav",
+     "note": 86,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "9b5f93effbb0a885a4668e85df27b51c"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_D6_f1.wav",
+     "note": 86,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "20f033b8dc5c6e3bb1cdb930c1a7ee30"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_F6_mf1.wav",
+     "note": 89,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "a46edcb6e705d19ec2bce039445a335c"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_F6_f1.wav",
+     "note": 89,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "911be6102b1262d2315c23077f206cbc"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_A6_mf1.wav",
+     "note": 93,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "8f32e10b727a285e7030057a39c02144"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_A6_f1.wav",
+     "note": 93,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "43d2fdaea20beb97e5303b2bd2676fa3"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_B6_mf1.wav",
+     "note": 95,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "1de3d154563a8cae00db778729a2334c"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_B6_f1.wav",
+     "note": 95,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "577af6397280bef14a9df1330ad5b034"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_D7_f1.wav",
+     "note": 98,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "aa1db91aa301dd6b59358e6881e71c45"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_F7_f1.wav",
+     "note": 101,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "13db615106d2bff8a9d82e2bf555cc2d"
+    }
+   ]
+  },
+  {
+   "id": "vibes",
+   "name": "Vibraphone",
+   "family": "mallets",
+   "loop": false,
+   "maxSeconds": 4.5,
+   "files": [
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Vibraphone/Hard Mallets/Vibes_hard_F2_v2_rr1_Main.wav",
+     "note": 53,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "9584abc248916e4eb1cdf691b9bd5b3a"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Vibraphone/Hard Mallets/Vibes_hard_F2_v3_rr1_Main.wav",
+     "note": 53,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "6ba87786cc7fd2122af9c2f7e77e6c95"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Vibraphone/Hard Mallets/Vibes_hard_A2_v2_rr1_Main.wav",
+     "note": 57,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "b960aafa9138a3ac1e39430327243bda"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Vibraphone/Hard Mallets/Vibes_hard_A2_v3_rr1_Main.wav",
+     "note": 57,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "35447a5553159790bbb35ef33d62e48f"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Vibraphone/Hard Mallets/Vibes_hard_C3_v2_rr1_Main.wav",
+     "note": 60,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "94e60f3c32f5fdea3395e4b0064e0968"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Vibraphone/Hard Mallets/Vibes_hard_C3_v3_rr1_Main.wav",
+     "note": 60,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "b0ce84a49cfa606c27115badb6938e84"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Vibraphone/Hard Mallets/Vibes_hard_E3_v2_rr1_Main.wav",
+     "note": 64,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "02a53b0e38c7376a4e3f68817a40e228"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Vibraphone/Hard Mallets/Vibes_hard_E3_v3_rr1_Main.wav",
+     "note": 64,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "a767c1e108df0e43a6aea7d02ebb2861"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Vibraphone/Hard Mallets/Vibes_hard_G3_v2_rr1_Main.wav",
+     "note": 67,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "2f53116180520ecf50b0986021d48151"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Vibraphone/Hard Mallets/Vibes_hard_G3_v3_rr1_Main.wav",
+     "note": 67,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "c77e1bf7dbebab88e46335c4d6ddd5d5"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Vibraphone/Hard Mallets/Vibes_hard_B3_v2_rr1_Main.wav",
+     "note": 71,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "fc79ce38691b9c9c570661c3408decf3"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Vibraphone/Hard Mallets/Vibes_hard_B3_v3_rr1_Main.wav",
+     "note": 71,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "21006a92d3615ca8a19a07a5fced2350"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Vibraphone/Hard Mallets/Vibes_hard_D4_v2_rr1_Main.wav",
+     "note": 74,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "ecbc5e5ee5ddbcd7bd637564bb38d8f6"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Vibraphone/Hard Mallets/Vibes_hard_D4_v3_rr1_Main.wav",
+     "note": 74,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "239efda06a2374329c57693fcf0461a3"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Vibraphone/Hard Mallets/Vibes_hard_F4_v2_rr1_Main.wav",
+     "note": 77,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "714b1cc917e2ddfaab91410d62272a09"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Vibraphone/Hard Mallets/Vibes_hard_F4_v3_rr1_Main.wav",
+     "note": 77,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "2a75c04876aaaa911af6ba00e96c4078"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Vibraphone/Hard Mallets/Vibes_hard_A4_v2_rr1_Main.wav",
+     "note": 81,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "a44cd2eac26580b93066d229ed44f5c2"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Vibraphone/Hard Mallets/Vibes_hard_A4_v3_rr1_Main.wav",
+     "note": 81,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "c605ba6725c8aa8a0ecdc4f6a9be9caf"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Vibraphone/Hard Mallets/Vibes_hard_C5_v2_rr1_Main.wav",
+     "note": 84,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "c60b118532bcecaec235841f0296edc5"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Vibraphone/Hard Mallets/Vibes_hard_C5_v3_rr1_Main.wav",
+     "note": 84,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "4e76debfa69e0855a6d8f92f3df63bc1"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Vibraphone/Hard Mallets/Vibes_hard_E5_v2_rr1_Main.wav",
+     "note": 88,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "997bbd2ae70b26c51845af609f374d9c"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Vibraphone/Hard Mallets/Vibes_hard_E5_v3_rr1_Main.wav",
+     "note": 88,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "f0a9a38ff45ef24dbc323d778cc777bc"
+    }
+   ]
+  },
+  {
+   "id": "marimba",
+   "name": "Marimba",
+   "family": "mallets",
+   "loop": false,
+   "maxSeconds": 2.5,
+   "files": [
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Marimba/Marimba_hit_Outrigger_F1_soft_01.wav",
+     "note": 41,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "b70eb6d4f9d3f570051d3ccca1352818"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Marimba/Marimba_hit_Outrigger_F1_med_01.wav",
+     "note": 41,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "5707051a4384865c36453a8c9bc508fe"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Marimba/Marimba_hit_Outrigger_F1_loud_01.wav",
+     "note": 41,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "b66b86089b5543a9f4dbd7c4e986c728"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Marimba/Marimba_hit_Outrigger_C2_soft_01.wav",
+     "note": 48,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "496c13c4ad88a632e92fb0d557f4101a"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Marimba/Marimba_hit_Outrigger_C2_med_01.wav",
+     "note": 48,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "f3d67742557145536cc09dda64617f7a"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Marimba/Marimba_hit_Outrigger_C2_loud_01.wav",
+     "note": 48,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "ae6970d76646bad94a7c8380dc73780f"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Marimba/Marimba_hit_Outrigger_G2_soft_01.wav",
+     "note": 55,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "f9e2027386aceb3f025110b616c1e34d"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Marimba/Marimba_hit_Outrigger_G2_med_01.wav",
+     "note": 55,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "6777111f2e084386a91c05dcb42aa6b7"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Marimba/Marimba_hit_Outrigger_G2_loud_01.wav",
+     "note": 55,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "b72f9f558827caabe64dc3acd6a7c8d0"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Marimba/Marimba_hit_Outrigger_B2_soft_01.wav",
+     "note": 59,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "617de26da2f41e60ff4c1bb55ee0a6f4"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Marimba/Marimba_hit_Outrigger_B2_med_01.wav",
+     "note": 59,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "92fddcd93c189425daa706d732b53ea0"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Marimba/Marimba_hit_Outrigger_B2_loud_01.wav",
+     "note": 59,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "6e14d73917bb266586ec7af369143c92"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Marimba/Marimba_hit_Outrigger_F3_soft_01.wav",
+     "note": 65,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "00b8d238ed406f5be0ebd305a9d65887"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Marimba/Marimba_hit_Outrigger_F3_med_01.wav",
+     "note": 65,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "d1975f9a75c246cdc50bad1d2488ec78"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Marimba/Marimba_hit_Outrigger_F3_loud_01.wav",
+     "note": 65,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "f6e9c8988c32fd1d07aa583a8474c781"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Marimba/Marimba_hit_Outrigger_C4_soft_01.wav",
+     "note": 72,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "9032a9e99db0ff9556690a05d8f069d4"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Marimba/Marimba_hit_Outrigger_C4_med_01.wav",
+     "note": 72,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "1e261985a1ad8a4d4c5bcece707e5ab8"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Marimba/Marimba_hit_Outrigger_C4_loud_01.wav",
+     "note": 72,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "f2837d4a5e40f69d20351f3732c8ab3d"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Marimba/Marimba_hit_Outrigger_G4_soft_01.wav",
+     "note": 79,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "940e2c5d5756522758fdb6a7221f8c82"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Marimba/Marimba_hit_Outrigger_G4_med_01.wav",
+     "note": 79,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "0ded5c295b9ae26f9f0c966635515407"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Marimba/Marimba_hit_Outrigger_G4_loud_01.wav",
+     "note": 79,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "81d01de7b50ba1d9b2dbddf88fddc7f2"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Marimba/Marimba_hit_Outrigger_B4_soft_01.wav",
+     "note": 83,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "de0393b6f276ebc527bf00e5c97154e6"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Marimba/Marimba_hit_Outrigger_B4_med_01.wav",
+     "note": 83,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "d72540ade6958c0f1dbdb66e0e44865e"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Marimba/Marimba_hit_Outrigger_B4_loud_01.wav",
+     "note": 83,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "3969542271183b292c41c1a6189089de"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Marimba/Marimba_hit_Outrigger_F5_soft_01.wav",
+     "note": 89,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "0f0647dc044f6da96ec20d270df8175e"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Marimba/Marimba_hit_Outrigger_F5_med_01.wav",
+     "note": 89,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "e437cecc226afa065b50d799693b51dc"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Marimba/Marimba_hit_Outrigger_F5_loud_01.wav",
+     "note": 89,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "74a979a68731464b98b15e4dafb96113"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Marimba/Marimba_hit_Outrigger_C6_soft_01.wav",
+     "note": 96,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "4fe0a03f7b9fdee5b508e4658add5634"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Marimba/Marimba_hit_Outrigger_C6_med_01.wav",
+     "note": 96,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "213c5109c0ded8dc209ee60fb064dcca"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Marimba/Marimba_hit_Outrigger_C6_loud_01.wav",
+     "note": 96,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "a9f583e808ab33bae713f0b31c80707f"
+    }
+   ]
+  },
+  {
+   "id": "glock",
+   "name": "Glockenspiel",
+   "family": "mallets",
+   "loop": false,
+   "maxSeconds": 3.0,
+   "files": [
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Glockenspiel/glock_soft_G4_01.wav",
+     "note": 79,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "dea41a405c7dcdca868155a79ae8c334"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Glockenspiel/glock_medium_G4_01.wav",
+     "note": 79,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "7f5d2838bf4c1351875a689dba705145"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Glockenspiel/glock_loud_G4_01.wav",
+     "note": 79,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "7e7c1640a0481568e49dbd134f6fa64b"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Glockenspiel/glock_medium_C5_01.wav",
+     "note": 84,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "3c544c316b8b1b79b3706876364467b2"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Glockenspiel/glock_loud_C5_01.wav",
+     "note": 84,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "052725cc923142c25153ce8730e586e4"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Glockenspiel/glock_soft_G5_01.wav",
+     "note": 91,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "46c18b1d1c2c2f22a882c7e7fc91788e"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Glockenspiel/glock_medium_G5_01.wav",
+     "note": 91,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "b179eff2d02106e6511f63091b435ce1"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Glockenspiel/glock_loud_G5_01.wav",
+     "note": 91,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "130ca2a5e909a9d5395ff6f190d002e8"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Glockenspiel/glock_soft_C6_01.wav",
+     "note": 96,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "c5b9ceb61d890b978f17ae2f15fbc7f2"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Glockenspiel/glock_medium_C6_01.wav",
+     "note": 96,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "c6b53c98fd6976da62ebaf844659ae6e"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Glockenspiel/glock_loud_C6_01.wav",
+     "note": 96,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "e031d7de009f29d5a557c8a059699a08"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Glockenspiel/glock_soft_G6_01.wav",
+     "note": 103,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "b56441d8c0f8ff5cc22c461da4f0c659"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Glockenspiel/glock_medium_G6_01.wav",
+     "note": 103,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "4f7e4dade28ba66f178c81d39b2b3f2e"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Glockenspiel/glock_loud_G#6_01.wav",
+     "note": 104,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "8207cf86ad673d3e5ebca225d5d58d47"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Glockenspiel/glock_medium_C7_01.wav",
+     "note": 108,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "bc655c37fe7af327b72782e41c710423"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Glockenspiel/glock_loud_C7_01.wav",
+     "note": 108,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "01220ec15af87cb63c2cccad5a4c5d5a"
+    }
+   ]
+  },
+  {
+   "id": "bells",
+   "name": "Tubular Bells",
+   "family": "mallets",
+   "loop": false,
+   "maxSeconds": 5.0,
+   "files": [
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Tubular Bells 1/chimes_C3_f_rr1.wav",
+     "note": 60,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "9b18fb18338fd4e4628934581b7dcb35"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Tubular Bells 1/chimes_D3_ff_rr1.wav",
+     "note": 62,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "7a49784dc10bf3627d965f0beaaff010"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Tubular Bells 1/chimes_E3_pp_rr1.wav",
+     "note": 64,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "bd01c899c2c0ec43b0db5db0548f2afd"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Tubular Bells 1/chimes_F#3_p_rr1.wav",
+     "note": 66,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "8fa979c06012fea8bc25a5680479c996"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Tubular Bells 1/chimes_G#3_ff_rr1.wav",
+     "note": 68,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "096dcab57f7decffbcaccd0723b69d48"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Tubular Bells 1/chimes_A#3_pp_rr1.wav",
+     "note": 70,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "c1ddba395ac9fb5cffd5c660e82055db"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Tubular Bells 1/chimes_A#3_ff_rr1.wav",
+     "note": 70,
+     "dyn": 4,
+     "rr": 1,
+     "md5": "f7c0849137104308e9a451643e278975"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Tubular Bells 1/chimes_C4_p_rr1.wav",
+     "note": 72,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "b551264fcc30047171b79ef592191e4f"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Idiophones/Struck Idiophones/Tubular Bells 1/chimes_D4_p_rr1.wav",
+     "note": 74,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "a4c4c4872ce6a89536f8ba9d1b2e0b58"
+    }
+   ]
+  },
+  {
+   "id": "sax",
+   "name": "Tenor Sax",
+   "family": "winds",
+   "loop": true,
+   "files": [
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_G#1_vl2_rr1.wav",
+     "note": 44,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "8b776d69f1da85d3373e133dd3c87f7c"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_G#1_vl3_rr1.wav",
+     "note": 44,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "85f5e2e08568f569dc15c82927672254"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_A#1_vl2_rr1.wav",
+     "note": 46,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "b524fcfec1295c805ca13c2b5ebfeea7"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_A#1_vl3_rr1.wav",
+     "note": 46,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "a94cef5e829479ee1f8c658f61e9e652"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_C2_vl2_rr1.wav",
+     "note": 48,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "9ea1700a52453159deb2bb1faf30bd24"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_C2_vl3_rr1.wav",
+     "note": 48,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "69aa3f8f846537bb3996dc2336c95a10"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_D2_vl2_rr1.wav",
+     "note": 50,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "f41125aef6881854fb7bd3cd26d3670c"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_D2_vl3_rr1.wav",
+     "note": 50,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "968e7928628e18bf8bc4d4fcdeeeee34"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_E2_vl2_rr1.wav",
+     "note": 52,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "c3c99fca6f819ca74b3f8eb8e8fc4307"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_E2_vl3_rr1.wav",
+     "note": 52,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "4b53fdb317f10902e1da7a5e0578cd18"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_F#2_vl2_rr1.wav",
+     "note": 54,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "e561352502544fb72592d9b918f95cff"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_F#2_vl3_rr1.wav",
+     "note": 54,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "edc9639f1400b61b6ca70098ffdbb46c"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_G#2_vl2_rr1.wav",
+     "note": 56,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "902f628f767e01a0923ce0840000d7ab"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_G#2_vl3_rr1.wav",
+     "note": 56,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "882e889dc76e88590d2a39c7e379e7df"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_A#2_vl2_rr1.wav",
+     "note": 58,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "6467c8eddd2f841a5e8a429315019a7b"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_A#2_vl3_rr1.wav",
+     "note": 58,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "5d1eec78a7f757f69accc7cd3f68d915"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_C3_vl2_rr1.wav",
+     "note": 60,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "64f19fc4ab80c09da9a1f3c2294f01e9"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_C3_vl3_rr1.wav",
+     "note": 60,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "9bda17d5a0d48c17db742b08b970f3d9"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_D3_vl2_rr1.wav",
+     "note": 62,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "e37d319983e09e215076fadd218367ff"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_D3_vl3_rr1.wav",
+     "note": 62,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "fb8700bfaf8d54e005769b6e3f2d63bb"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_E3_vl2_rr1.wav",
+     "note": 64,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "cf3af85eed89c1c9285fb8e03b38540d"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_E3_vl3_rr1.wav",
+     "note": 64,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "4471c6f3a3ba72787fd2faaa4642d05e"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_F#3_vl2_rr1.wav",
+     "note": 66,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "486357de1184cafff51cef4ad617dffe"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_F#3_vl3_rr1.wav",
+     "note": 66,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "8bcc5700cbd772b66adead8671f9ecd7"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_G#3_vl2_rr1.wav",
+     "note": 68,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "cb40701b130362e1332b58110444c945"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_G#3_vl3_rr1.wav",
+     "note": 68,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "85371a74066032e249e6b86fd7e48d6d"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_A#3_vl2_rr1.wav",
+     "note": 70,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "f6de58f9798348be424201e4b04cb4c9"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_A#3_vl3_rr1.wav",
+     "note": 70,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "e80b3e827170bcde895de30a17e335f4"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_C4_vl2_rr1.wav",
+     "note": 72,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "fdf4ffd089e9ed24bde93df5729cc79d"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_C4_vl3_rr1.wav",
+     "note": 72,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "ab3154c137a1adef5cdcea97120d03df"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_D4_vl2_rr1.wav",
+     "note": 74,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "07fb596aca6698d2b5795ad5c4a68c6a"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_D4_vl3_rr1.wav",
+     "note": 74,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "aed73044b0a7ba59c1cbeee89847ab2c"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_E4_vl2_rr1.wav",
+     "note": 76,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "41dca1c5d068d9bd0889bfb4624a3952"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_E4_vl3_rr1.wav",
+     "note": 76,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "7302014db619ea95b405f5b46eeaf38d"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_F#4_vl2_rr1.wav",
+     "note": 78,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "ca6f3d34829909edd2d36444d8819abe"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_F#4_vl3_rr1.wav",
+     "note": 78,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "742827beb07281595c19e445626133cb"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_G#4_vl2_rr1.wav",
+     "note": 80,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "6cc8a4e9430813dc854fbc2270fe2c4b"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_G#4_vl3_rr1.wav",
+     "note": 80,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "8428a62f1eef2954177da3c9d13d60b3"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_A#4_vl2_rr1.wav",
+     "note": 82,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "502cf3c9fa9172fbdcfc39c85941baec"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_A#4_vl3_rr1.wav",
+     "note": 82,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "b7c06d7baf96e14075cc888345872da9"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_C5_vl2_rr1.wav",
+     "note": 84,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "bf3fc5b6c8e9d7b10eab0ab453d51ea6"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_C5_vl3_rr1.wav",
+     "note": 84,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "d7eb6cff3faaa5a099e5c8568f81b134"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_D5_vl2_rr1.wav",
+     "note": 86,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "6e39768e81572b156a868c6016ddace5"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_D5_vl3_rr1.wav",
+     "note": 86,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "2326aba42f3d2986b5e4a7ce457cd565"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_E5_vl2_rr1.wav",
+     "note": 88,
+     "dyn": 2,
+     "rr": 1,
+     "md5": "19afda7babb08b0f3baa8f1ad7d14877"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Reed Aerophones/Tenor Saxophone/Non-Vibrato/BrettTenor_NV_Main_E5_vl3_rr1.wav",
+     "note": 88,
+     "dyn": 3,
+     "rr": 1,
+     "md5": "2f72d761991d41a415a72a5e7c381d38"
+    }
+   ]
+  },
+  {
+   "id": "harmonica",
+   "name": "Harmonica",
+   "family": "winds",
+   "loop": true,
+   "files": [
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Free Aerophones/Harmonica-Hohner-Super64/Sustains/Normal/Hohner-Super64_Normal _C2.wav",
+     "note": 48,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "8575ba1964a2052eb321d43fc40a9d74"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Free Aerophones/Harmonica-Hohner-Super64/Sustains/Normal/Hohner-Super64_Normal _E2.wav",
+     "note": 52,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "7e8442d25fb3063d18e00e0bbb6bf1c1"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Free Aerophones/Harmonica-Hohner-Super64/Sustains/Normal/Hohner-Super64_Normal _G2.wav",
+     "note": 55,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "83a6b5afaa9fef04b9d14a853f00c8f3"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Free Aerophones/Harmonica-Hohner-Super64/Sustains/Normal/Hohner-Super64_Normal _C3.wav",
+     "note": 60,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "7e6f1dd84955626e4a1027a47473addd"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Free Aerophones/Harmonica-Hohner-Super64/Sustains/Normal/Hohner-Super64_Normal _E3.wav",
+     "note": 64,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "618f4b3021de2949151cf2cb95c9007e"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Free Aerophones/Harmonica-Hohner-Super64/Sustains/Normal/Hohner-Super64_Normal _G3.wav",
+     "note": 67,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "728dc710da627cc830d75803de138ce0"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Free Aerophones/Harmonica-Hohner-Super64/Sustains/Normal/Hohner-Super64_Normal _C4.wav",
+     "note": 72,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "3f4561cedd78c2478612e8e9aa4b4b65"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Free Aerophones/Harmonica-Hohner-Super64/Sustains/Normal/Hohner-Super64_Normal _E4.wav",
+     "note": 76,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "272870d2fcbce6203b66a32b0c598811"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Free Aerophones/Harmonica-Hohner-Super64/Sustains/Normal/Hohner-Super64_Normal _G4.wav",
+     "note": 79,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "1e80ad3415cd57e767e178eb7f4f8def"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Free Aerophones/Harmonica-Hohner-Super64/Sustains/Normal/Hohner-Super64_Normal _C5.wav",
+     "note": 84,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "3b7415a635f7d47b7741c50e79411aa1"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Free Aerophones/Harmonica-Hohner-Super64/Sustains/Normal/Hohner-Super64_Normal _E5.wav",
+     "note": 88,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "18b0fcc9df67fe8cdba76dff2c90d91b"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Free Aerophones/Harmonica-Hohner-Super64/Sustains/Normal/Hohner-Super64_Normal _G5.wav",
+     "note": 91,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "78404eaf40c159cb2af92243867922bd"
+    },
+    {
+     "repo": "vcsl",
+     "path": "Aerophones/Free Aerophones/Harmonica-Hohner-Super64/Sustains/Normal/Hohner-Super64_Normal _C6.wav",
+     "note": 96,
+     "dyn": 1,
+     "rr": 1,
+     "md5": "7ce09bd277054a5e11fba23454e06221"
+    }
+   ]
+  }
+ ]
+}

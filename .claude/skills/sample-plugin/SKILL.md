@@ -130,3 +130,22 @@ has the sound swap combo, articulation rows with key learn, and per-piece knobs.
   normalization never converges.
 - Doubles and rooms must stay mono below the low strings: Sunburst high-passes the side at 240 Hz (4th order);
   at 150 Hz double-tracked presets failed the analyzer's sub-mono check.
+
+## 8. Orchestral / live instruments (worked example: plugins/Afterglow, the Live source)
+
+- Sources: VSCO 2 CE and VCSL (Versilian Studios, CC0), fetched file by file from raw.githubusercontent.com at
+  pinned commits; `library/sources.json` lists every file with its md5 and its *true* MIDI note. Most of both
+  libraries name notes an octave low (C3 = middle C): measure every file's pitch (YIN) when you add instruments;
+  only the solo violin, Steinway grand and concert harp were named right. Bells and glockenspiel read unreliably
+  (inharmonic): pick the octave that lands them in their real range.
+- String sections: cellos below MIDI 52, violas 52-61, violins from 62, one section per recorded note.
+- Sustains get a loop the builder finds itself: in the steady part (after the attack), a whole number of pitch
+  periods long (~1.1 s), ending where a 2048-sample window best matches the one before the loop start, with a
+  160 ms equal-gain crossfade baked into the samples before loopEnd and a 64-frame guard after it (the start of
+  the loop) for interpolation. Measured wrap step: ~0.4x a typical sample step, no clicks. Measure a sustain's
+  loudness on its loop, not its first 250 ms (slow organ / bowed attacks read 3+ dB low otherwise).
+- 19 instruments, 609 samples = 97 MB of FLAC (one-shots capped at 2.5-5.5 s).
+- Plugin: `LiveLoader` takes the wanted instrument per layer through atomics (the audio thread never locks),
+  polls on its own thread, retires replaced instruments for 30 s. The voice picks the nearest recorded note in
+  the dynamic layer the velocity asks for on its first block and plays it at hz / rootHz (glide, bend and
+  vibrato stay smooth); offline renders wait for loading in processBlock.

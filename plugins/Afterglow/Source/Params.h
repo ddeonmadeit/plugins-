@@ -47,6 +47,10 @@ enum class P
     // Added in 1.6: tape stop. Performance controls like perfPoly: the instance's, never a preset's.
     perfTapeStop, perfTapeTime,
 
+    // Added in 1.12: the recorded instrument of each layer (Live source), and the arpeggiator.
+    aInstr, bInstr,
+    arpOn, arpMode, arpRate, arpOctaves, arpGate, arpSwing,
+
     count
 };
 
@@ -97,5 +101,11 @@ namespace choices
     const juce::StringArray& filterTypes();
     const juce::StringArray& voiceModes();
     const juce::StringArray& pumpModes();
+    const juce::StringArray& liveInstruments();
+    const juce::StringArray& arpModes();
+    const juce::StringArray& arpRates();
 }
+
+/** Beats per arpeggiator step for an arpRate choice. */
+double arpStepBeats (int rate) noexcept;
 } // namespace ag

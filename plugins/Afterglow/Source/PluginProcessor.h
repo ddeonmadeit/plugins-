@@ -4,13 +4,16 @@
 #include <dd_core/dd_core.h>
 #include <dd_dsp/dd_dsp.h>
 
+#include "Arp.h"
 #include "Engine.h"
+#include "Live.h"
 #include "Params.h"
 
 class AfterglowProcessor : public juce::AudioProcessor
 {
 public:
     AfterglowProcessor();
+    ~AfterglowProcessor() override;
 
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override {}
@@ -46,6 +49,10 @@ public:
     /** Smoothed output level and LFO 2 value for the display (audio thread writes, UI reads). */
     std::atomic<float> displayLevel { 0.0f }, displayMotion { 0.0f };
 
+    /** The recorded instruments (Live source). The library is missing when Afterglow was installed without it. */
+    ag::LiveLibrary liveLibrary;
+    bool isLiveLoading (int layer) const noexcept { return liveLoader != nullptr && liveLoader->isLoading (layer); }
+
 private:
     static constexpr int kChunk = ag::Voice::kBlock;
 
@@ -55,6 +62,9 @@ private:
 
     ag::ParamCache params;
     ag::Engine engine;
+    std::unique_ptr<ag::LiveLoader> liveLoader;
+    ag::Arpeggiator arp;
+    bool arpWasOn = false;
     dd::Lfo lfo2;
     double sr = 44100.0, freeBeat = 0.0, hostBeat = 0.0;
     bool hostPlaying = false;

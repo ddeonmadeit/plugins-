@@ -2,15 +2,36 @@
 
 #include <dd_dsp/dd_dsp.h>
 
+#include "Live.h"
+
 namespace ag
 {
 namespace choices
 {
-    const juce::StringArray& sources()     { static const juce::StringArray c { "Analog", "Strings", "Choir", "Glass", "Tines", "Air", "Sine", "Pluck", "Organ", "Mallet", "Sync", "Electric" }; return c; }
+    const juce::StringArray& sources()     { static const juce::StringArray c { "Analog", "Strings", "Choir", "Glass", "Tines", "Air", "Sine", "Pluck", "Organ", "Mallet", "Sync", "Electric", "Live" }; return c; }
     const juce::StringArray& noiseTypes()  { static const juce::StringArray c { "Hiss", "Vinyl", "Wind" }; return c; }
     const juce::StringArray& filterTypes() { static const juce::StringArray c { "Ladder", "LP 12", "BP 12", "HP 12" }; return c; }
     const juce::StringArray& voiceModes()  { static const juce::StringArray c { "Poly", "Mono", "Legato" }; return c; }
     const juce::StringArray& pumpModes()   { static const juce::StringArray c { "Duck", "Gate", "Trem" }; return c; }
+    const juce::StringArray& liveInstruments()
+    {
+        static const juce::StringArray c = []
+        {
+            juce::StringArray names;
+            for (auto& d : ag::liveInstruments())
+                names.add (d.name);
+            return names;
+        }();
+        return c;
+    }
+    const juce::StringArray& arpModes()    { static const juce::StringArray c { "Up", "Down", "Up Down", "Random", "As Played", "Chord" }; return c; }
+    const juce::StringArray& arpRates()    { static const juce::StringArray c { "1/4", "1/8", "1/8T", "1/16", "1/16T", "1/32" }; return c; }
+}
+
+double arpStepBeats (int rate) noexcept
+{
+    static constexpr double beats[] = { 1.0, 0.5, 1.0 / 3.0, 0.25, 1.0 / 6.0, 0.125 };
+    return beats[juce::jlimit (0, 5, rate)];
 }
 
 namespace
@@ -22,7 +43,7 @@ const std::array<ParamSpec, (size_t) kNumParams>& table()
 {
     static const std::array<ParamSpec, (size_t) kNumParams> t {{
         { P::aOn,       "aOn",       "A On",          K::Bool,   0, 1, 1, 0, U::None, nullptr },
-        { P::aSource,   "aSource",   "A Source",      K::Choice, 0, 11, 0, 0, U::None, &choices::sources() },
+        { P::aSource,   "aSource",   "A Source",      K::Choice, 0, 12, 0, 0, U::None, &choices::sources() },
         { P::aLevel,    "aLevel",    "A Level",       K::Float,  0, 1, 0.8f, 0, U::Percent, nullptr },
         { P::aOct,      "aOct",      "A Octave",      K::Int,   -3, 3, 0, 0, U::None, nullptr },
         { P::aSemi,     "aSemi",     "A Semi",        K::Int,  -12, 12, 0, 0, U::Semis, nullptr },
@@ -37,7 +58,7 @@ const std::array<ParamSpec, (size_t) kNumParams>& table()
         { P::aDrift,    "aDrift",    "A Drift",       K::Float,  0, 1, 0.2f, 0, U::Percent, nullptr },
 
         { P::bOn,       "bOn",       "B On",          K::Bool,   0, 1, 0, 0, U::None, nullptr },
-        { P::bSource,   "bSource",   "B Source",      K::Choice, 0, 11, 2, 0, U::None, &choices::sources() },
+        { P::bSource,   "bSource",   "B Source",      K::Choice, 0, 12, 2, 0, U::None, &choices::sources() },
         { P::bLevel,    "bLevel",    "B Level",       K::Float,  0, 1, 0.8f, 0, U::Percent, nullptr },
         { P::bOct,      "bOct",      "B Octave",      K::Int,   -3, 3, 0, 0, U::None, nullptr },
         { P::bSemi,     "bSemi",     "B Semi",        K::Int,  -12, 12, 0, 0, U::Semis, nullptr },
@@ -148,7 +169,16 @@ const std::array<ParamSpec, (size_t) kNumParams>& table()
         { P::cabType,    "cabType",    "Cabinet Type",   K::Choice, 0, 1, 0, 0, U::None, &dd::CabSim::typeNames() },
         { P::strum,      "strum",      "Strum",          K::Float,  0, 80, 0, 0, U::Ms, nullptr },
         { P::perfTapeStop, "perfTapeStop", "Tape Stop",      K::Bool,   0, 1, 0, 0, U::None, nullptr },
-        { P::perfTapeTime, "perfTapeTime", "Tape Stop Time", K::Choice, 0, 8, 3, 0, U::None, &dd::TapeStop::timeNames() }
+        { P::perfTapeTime, "perfTapeTime", "Tape Stop Time", K::Choice, 0, 8, 3, 0, U::None, &dd::TapeStop::timeNames() },
+
+        { P::aInstr,     "aInstr",     "A Instrument",   K::Choice, 0, 18, 0, 0, U::None, &choices::liveInstruments() },
+        { P::bInstr,     "bInstr",     "B Instrument",   K::Choice, 0, 18, 4, 0, U::None, &choices::liveInstruments() },
+        { P::arpOn,      "arpOn",      "Arp",            K::Bool,   0, 1, 0, 0, U::None, nullptr },
+        { P::arpMode,    "arpMode",    "Arp Mode",       K::Choice, 0, 5, 0, 0, U::None, &choices::arpModes() },
+        { P::arpRate,    "arpRate",    "Arp Rate",       K::Choice, 0, 5, 3, 0, U::None, &choices::arpRates() },
+        { P::arpOctaves, "arpOctaves", "Arp Octaves",    K::Int,    1, 4, 1, 0, U::None, nullptr },
+        { P::arpGate,    "arpGate",    "Arp Gate",       K::Float,  0.05f, 1.0f, 0.6f, 0, U::Percent, nullptr },
+        { P::arpSwing,   "arpSwing",   "Arp Swing",      K::Float,  0, 0.6f, 0, 0, U::Percent, nullptr }
     }};
     return t;
 }

@@ -2,10 +2,12 @@
 
 #include <dd_dsp/dd_dsp.h>
 
+#include "Live.h"
+
 namespace ag
 {
-enum class Source { Analog, Strings, Choir, Glass, Tines, Air, Sine, Pluck, Organ, Mallet, Sync, Electric };
-constexpr int kNumSources = 12;
+enum class Source { Analog, Strings, Choir, Glass, Tines, Air, Sine, Pluck, Organ, Mallet, Sync, Electric, Live };
+constexpr int kNumSources = 13;
 
 /** One layer's settings for a block, with the macros and global modulation already applied. */
 struct LayerParams
@@ -23,6 +25,7 @@ struct LayerParams
     float shapeOffset = 0.0f;   // global modulation (LFO 2) -> shape
     float pan = 0.0f;
     float drift = 0.2f;
+    const LiveInstrument* live = nullptr;   // Live source: the layer's recorded instrument (null while loading)
 };
 
 /**
@@ -41,6 +44,10 @@ struct LayerParams
       Sync     hard-sync saw: shape = slave ratio (sweep it with Shape Env), char blends the master saw back in
       Electric electric guitar string: picked near the bridge, heard through a magnetic pickup. shape = pickup
                (0 neck, warm and round .. 1 bridge, thin and bright), char = sustain (0 palm-muted .. 1 singing)
+      Live     a recorded instrument (strings, piano, brass, winds, mallets...): the nearest recorded note in the
+               dynamic layer the velocity asks for, played in tune and looped where it sustains. shape = which
+               recorded dynamic (0 softest .. 0.5 follows velocity .. 1 hardest), char = start into the note
+               past its attack (0 natural .. 1 a soft swell for pads). Unison is not used.
 */
 class Layer
 {
@@ -119,6 +126,8 @@ public:
         indexCoef = dd::onePoleCoef (0.25f + 0.9f * (1.0f - p.shape) * (0.6f + 0.4f * vel), sr);
         tineCoef = dd::onePoleCoef (p.source == Source::Organ ? 0.22f : 0.045f, sr);
         clickCoef = dd::onePoleCoef (p.source == Source::Mallet ? 0.0025f : (p.source == Source::Electric ? 0.0009f : 0.0012f), sr);
+        liveNeedsZone = true;
+        liveZone = nullptr;
         configure (p);
     }
 
@@ -128,6 +137,11 @@ public:
         if (! p.on || p.level <= 0.0001f)
             return;
         configure (p);
+        if (p.source == Source::Live)
+        {
+            renderLive (p, hz, L, R, n);
+            return;
+        }
         const int nv = voices;
 
         // Drift, PWM and the tone filters move slowly: update once per block.
@@ -212,7 +226,79 @@ public:
 private:
     // Per-source gain so every source is equally loud (measured on the pads phrase, one unison voice).
     static constexpr std::array<float, kNumSources> kSourceGain { 0.14f, 0.17f, 0.29f, 0.13f, 0.14f, 0.61f, 0.135f,
-                                                                  0.47f, 0.135f, 0.147f, 0.165f, 0.36f };
+                                                                  0.47f, 0.135f, 0.147f, 0.165f, 0.36f, 0.9f };
+
+    void renderLive (const LayerParams& p, const float* hz, float* L, float* R, int n) noexcept
+    {
+        const auto* inst = p.live;
+        if (inst == nullptr)
+            return;
+        if (liveNeedsZone || liveOwner != inst)
+        {
+            // The note sounding at the start (with the layer's octave / semitone offset) picks the recording.
+            const float noteF = 69.0f + 12.0f * std::log2 (std::max (1.0f, hz[0] * ratio[0]) / 440.0f);
+            const float t = juce::jlimit (0.0f, 1.0f, velocity + (p.shape - 0.5f) * 1.2f);
+            liveZone = inst->find (noteF, t, liveRoundRobin++);
+            liveOwner = inst;
+            liveNeedsZone = false;
+            livePos = 0.0;
+            if (liveZone != nullptr)
+            {
+                // Character starts into the note: past the attack of a sustain, or softening a struck note.
+                const double skip = liveZone->looped() ? std::min ((double) liveZone->loopStart, 0.35 * inst->sampleRate)
+                                                       : 0.05 * inst->sampleRate;
+                livePos = (double) p.character * skip;
+            }
+        }
+        const auto* z = liveZone;
+        if (z == nullptr || z->frames < 8)
+            return;
+
+        driftRatio[0] = std::exp2 (drift[0].process (rng) * p.drift * 9.0f / 1200.0f);
+        const double base = inst->sampleRate / sr / (double) z->rootHz() * (double) (ratio[0] * driftRatio[0]);
+        const float angle = (juce::jlimit (-1.0f, 1.0f, p.pan) + 1.0f) * dd::kPi * 0.25f;
+        const float gain = p.level * kSourceGain[(size_t) Source::Live] / 32767.0f;
+        const float gl = std::cos (angle) * 1.41421356f * gain, gr = std::sin (angle) * 1.41421356f * gain;
+        const int16_t* pcm = z->pcm.data();
+        const int last = z->frames - 3;
+        const bool looped = z->looped();
+        const double loopLen = looped ? (double) (z->loopEnd - z->loopStart) : 0.0;
+
+        for (int i = 0; i < n; ++i)
+        {
+            const int i0 = (int) livePos;
+            if (i0 >= last)
+            {
+                liveZone = nullptr;   // a struck note that has rung out
+                return;
+            }
+            const float f = (float) (livePos - (double) i0);
+            const int16_t* p0 = pcm + (size_t) std::max (0, i0 - 1) * 2;
+            const int16_t* p1 = pcm + (size_t) i0 * 2;
+            const int16_t* p2 = p1 + 2;
+            const int16_t* p3 = p1 + 4;
+            float out[2];
+            for (int c = 0; c < 2; ++c)
+            {
+                const float xm1 = p0[c], x0 = p1[c], x1 = p2[c], x2 = p3[c];
+                const float c1 = 0.5f * (x1 - xm1);
+                const float c2 = xm1 - 2.5f * x0 + 2.0f * x1 - 0.5f * x2;
+                const float c3 = 0.5f * (x2 - xm1) + 1.5f * (x0 - x1);
+                out[c] = ((c3 * f + c2) * f + c1) * f + x0;
+            }
+            L[i] += out[0] * gl;
+            R[i] += out[1] * gr;
+            livePos += (double) hz[i] * base;
+            if (looped && livePos >= (double) z->loopEnd)
+                livePos -= loopLen;
+        }
+    }
+
+    const LiveInstrument* liveOwner = nullptr;
+    const LiveZone* liveZone = nullptr;
+    double livePos = 0.0;
+    bool liveNeedsZone = true;
+    int liveRoundRobin = 0;
 
     static float saw (float t, float dt) noexcept { return 2.0f * t - 1.0f - dd::polyBlep (t, dt); }
 
@@ -309,6 +395,7 @@ private:
             case Source::Mallet:  y = mallet (v, dt, s); break;
             case Source::Sync:    y = sync (v, dt, s, p.character); break;
             case Source::Electric: y = electric (v, dt); break;
+            case Source::Live:    break;   // rendered by renderLive
         }
         return y;
     }

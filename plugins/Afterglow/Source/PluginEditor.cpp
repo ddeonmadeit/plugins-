@@ -22,7 +22,8 @@ AfterglowEditor::Content::Content (AfterglowProcessor& p)
       topBar (p.presets, "AFTER", "GLOW", "Pads / Textures / Soundscapes"),
       polySwitch (*p.apvts.getParameter ("perfPoly"), "Poly", sunset::amber),
       tapeStop (p.apvts),
-      horizon (p)
+      horizon (p),
+      arpSwitch (*p.apvts.getParameter ("arpOn"), "ARP", sunset::amber)
 {
     const std::tuple<const char*, const char*, juce::Colour, const char*> macroDefs[] = {
         { "mSwell", "Swell", sunset::yellow, "Slower or faster attack" },
@@ -51,6 +52,13 @@ AfterglowEditor::Content::Content (AfterglowProcessor& p)
         addAndMakeVisible (*s);
         switches.push_back (std::move (s));
     }
+
+    // The arpeggiator: on / off and its rate; the preset sets the pattern, octaves and gate.
+    addAndMakeVisible (arpSwitch);
+    arpRate.addItemList (ag::choices::arpRates(), 1);
+    arpRateAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment> (p.apvts, "arpRate", arpRate);
+    dd::gui::tagParam (arpRate, "arpRate", "Arp rate");
+    addAndMakeVisible (arpRate);
 
     polySwitch.setTooltip ("Poly: play chords with any preset. Off: each preset's own mode (mono / legato leads). Stays as you set it when you change presets.");
     topBar.addRight (polySwitch, 96);
@@ -107,12 +115,14 @@ void AfterglowEditor::Content::resized()
     for (auto& k : macros)
         k->setBounds (inner.removeFromLeft (knobW).reduced (6, 0));
 
-    const int rowH = fx.getHeight() / 4;
+    const int rowH = fx.getHeight() / 5;
     for (size_t i = 0; i < switches.size(); ++i)
     {
         const int col = (int) (i / 4), row = (int) (i % 4);
         switches[i]->setBounds (fx.getX() + col * (fx.getWidth() / 2), fx.getY() + row * rowH, fx.getWidth() / 2, rowH);
     }
+    arpSwitch.setBounds (fx.getX(), fx.getY() + 4 * rowH, fx.getWidth() / 2, rowH);
+    arpRate.setBounds (juce::Rectangle<int> (fx.getX() + fx.getWidth() / 2, fx.getY() + 4 * rowH, fx.getWidth() / 2 - 8, rowH).withSizeKeepingCentre (fx.getWidth() / 2 - 8, 24));
 }
 
 //==============================================================================

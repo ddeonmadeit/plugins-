@@ -120,6 +120,14 @@
     "distTone": 0.3,
     "cabOn": true,
     "cabType": "1x12 Combo",
-    "strum": 22.0
+    "strum": 22.0,
+    "aInstr": "String Section",
+    "bInstr": "Grand Piano",
+    "arpOn": false,
+    "arpMode": "Up",
+    "arpRate": "1/16",
+    "arpOctaves": 1,
+    "arpGate": 0.6,
+    "arpSwing": 0.0
   }
 }

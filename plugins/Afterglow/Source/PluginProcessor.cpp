@@ -16,9 +16,14 @@ float bend01 (float v, float m, float ceiling) noexcept { return m >= 0.0f ? v +
 float motionScale (float m) noexcept { return m < 0.0f ? 1.0f + m : 1.0f + 2.0f * m; }
 } // namespace
 
+AfterglowProcessor::~AfterglowProcessor()
+{
+    liveLoader.reset();   // stop the loader thread before the library it reads goes away
+}
+
 const juce::StringArray& AfterglowProcessor::categoryOrder()
 {
-    static const juce::StringArray order { "TAME IMPALA", "MASSIVE ATTACK", "BRENT FAIYAZ", "MIKE DEAN", "TRAVIS SCOTT", "YEEZUS", "MOSHC0RE", "GUITAR", "TRIP HOP", "80S", "2000S", "SOFT", "UNIQUE", "SAFE", "USER" };
+    static const juce::StringArray order { "TAME IMPALA", "MASSIVE ATTACK", "BRENT FAIYAZ", "MIKE DEAN", "TRAVIS SCOTT", "YEEZUS", "MOSHC0RE", "GUITAR", "TRIP HOP", "80S", "2000S", "SOFT", "UNIQUE", "LIVE", "PADS", "ARPS", "SAFE", "USER" };
     return order;
 }
 
@@ -28,6 +33,8 @@ AfterglowProcessor::AfterglowProcessor()
       presets (apvts, categoryOrder(), DD_PLUGIN_COMPANY, DD_PLUGIN_NAME)
 {
     params.attach (apvts);
+    liveLibrary.open (ag::LiveLibrary::findInstalled());
+    liveLoader = std::make_unique<ag::LiveLoader> (liveLibrary);
    #if DD_HAS_PRESET_DATA
     for (int i = 0; i < PresetData::namedResourceListSize; ++i)
     {
@@ -52,6 +59,8 @@ void AfterglowProcessor::prepareToPlay (double sampleRate, int)
 {
     sr = sampleRate;
     engine.prepare (sr);
+    arp.prepare (sr);
+    arpWasOn = false;
     lfo2.prepare (sr);
     dirt.prepare (sr, kChunk);
     tape.prepare (sr);
@@ -151,6 +160,7 @@ ag::VoiceParams AfterglowProcessor::buildVoiceParams (float lfo2v, double bpm) c
         lp.shapeOffset = lfo2v * params.get (P::lfo2Morph) * k * 0.5f;
         lp.pan = get (P::aPan);
         lp.drift = std::min (1.0f, get (P::aDrift) * k);
+        lp.live = lp.source == ag::Source::Live ? liveLoader->get (l) : nullptr;
     }
 
     v.noiseLevel = params.get (P::noiseLevel);
@@ -244,6 +254,35 @@ void AfterglowProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
         }
     if (! hostPlaying)
         hostBeat = freeBeat;
+
+    // Live layers: say which instrument each wants (lock-free); offline renders wait until it is loaded.
+    for (int l = 0; l < 2; ++l)
+    {
+        const bool live = params.getBool (ag::layerParam (l, P::aOn)) && params.getInt (ag::layerParam (l, P::aSource)) == (int) ag::Source::Live;
+        liveLoader->want (l, live ? params.getInt (l == 0 ? P::aInstr : P::bInstr) : -1);
+    }
+    if (isNonRealtime())
+        liveLoader->waitUntilIdle();
+
+    // Arpeggiator: rewrites the block's notes before the voices see them.
+    const bool arpOn = params.getBool (P::arpOn);
+    if (arpOn != arpWasOn)
+    {
+        arp.reset();
+        if (! arpOn)
+            midi.addEvent (juce::MidiMessage::allNotesOff (1), 0);   // what the arp left sounding
+        arpWasOn = arpOn;
+    }
+    if (arpOn)
+    {
+        ag::Arpeggiator::Settings as;
+        as.mode = params.getInt (P::arpMode);
+        as.octaves = params.getInt (P::arpOctaves);
+        as.stepBeats = ag::arpStepBeats (params.getInt (P::arpRate));
+        as.gate = params.get (P::arpGate);
+        as.swing = params.get (P::arpSwing);
+        arp.process (midi, buffer.getNumSamples(), hostBeat, bpm, hostPlaying, as);
+    }
 
     ag::Engine::Settings es;
     // Poly Keys plays chords on any preset; off, the preset's own mode applies (mono / legato leads).

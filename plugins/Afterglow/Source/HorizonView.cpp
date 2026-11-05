@@ -41,6 +41,8 @@ HorizonView::HorizonView (AfterglowProcessor& p) : proc (p)
         { "perfPoly","On: play chords with any preset. Off: each preset's own mode (mono or legato leads). Stays as you set it." },
         { "perfTapeStop", "Tape stop: everything slows to a halt like a tape machine powering down. Automate it at the end of a beat." },
         { "perfTapeTime", "How long the tape stop takes." },
+        { "arpOn",   "Arpeggiator: hold a chord and it plays the notes one at a time, in time with the song. The preset sets the pattern." },
+        { "arpRate", "How fast the arpeggiator steps: quarter notes down to 32nds (T = triplets)." },
     });
     help.onChange = [this] { repaint(); };
     motion = proc.apvts.getParameter ("mMotion");
@@ -357,7 +359,18 @@ void HorizonView::paintText (juce::Graphics& g) const
     {
         const bool on = proc.apvts.getRawParameterValue (l == 0 ? "aOn" : "bOn")->load() >= 0.5f;
         const int src = (int) std::lround (proc.apvts.getRawParameterValue (l == 0 ? "aSource" : "bSource")->load());
-        const juce::String text = juce::String (l == 0 ? "A  " : "B  ") + (on ? ag::choices::sources()[src].toUpperCase() : juce::String ("OFF"));
+        juce::String what = on ? ag::choices::sources()[src].toUpperCase() : juce::String ("OFF");
+        if (on && src == (int) ag::Source::Live)
+        {
+            // A recorded instrument: its name, and whether it is still loading or not installed.
+            const int instr = (int) std::lround (proc.apvts.getRawParameterValue (l == 0 ? "aInstr" : "bInstr")->load());
+            what = ag::choices::liveInstruments()[instr].toUpperCase();
+            if (! proc.liveLibrary.isOpen())
+                what += "  (NOT INSTALLED)";
+            else if (proc.isLiveLoading (l))
+                what += "  (LOADING)";
+        }
+        const juce::String text = juce::String (l == 0 ? "A  " : "B  ") + what;
         const auto f = dd::gui::LookAndFeel::font (12.0f, true).withExtraKerningFactor (0.15f);
         const float bw = juce::GlyphArrangement::getStringWidth (f, text) + 22.0f;
         auto pill = badges.removeFromRight (bw);
