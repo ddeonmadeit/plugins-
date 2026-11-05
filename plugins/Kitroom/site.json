@@ -1,27 +1,32 @@
 {
   "publish": true,
   "tagline": "Real acoustic drum kit, every piece on its own key",
-  "description": "Multi-mic recordings of two real drum kits (close, overhead and room mics), played back with velocity layers and round robin so every hit sounds different. Click any piece of the drawn kit to hear it, swap its sound or move its key; record the whole kit into one piano roll.",
+  "description": "Multi-mic recordings of three real drum kits and real hand claps (close, overhead and room mics), played back with velocity layers and round robin so every hit sounds different. Click any piece of the drawn kit to hear it, swap its sound or move its key; record the whole kit into one piano roll.",
   "accent": "#e8a33d",
   "highlights": [
-    "Kick, snare with sidestick, hi-hat (closed, half-open, open, pedal), 3 toms, 2 crashes, ride with bell, china",
+    "Kick, snare with rimshot and sidestick, hi-hat (closed, half-open, open, pedal), 3 toms, 2 crashes, ride with bell, china, and a clap",
+    "Punch on every piece: a harder attack and a tighter body on the close mics, while the room stays natural. Punchy kicks and snares to swap in (a tight death-metal kit's kicks and cracking snare, the studio kick's front mic)",
+    "Real hand claps (tight three-person, loose gospel group, solo) placed in the studio kit's own room, on their own key or layered on every snare hit",
     "Swap any piece for another recorded sound of its kind, including a full brushes kit",
     "Close, overhead and room mics per piece and for the whole kit, plus tune, decay, glue and width",
     "Kit-bus Drive (8 distortion types), bit Crush and Tone, for anything from warm tape to broken industrial",
     "General MIDI key map shown in FL Studio note names; re-learn any key from your keyboard",
-    "67 kit presets: studio, live room, vintage and jazz, tight funk and soul, big rooms, Yeezus, moshc0re, KING, trip hop, 80s, 2000s, plus SOFT (brushes, soft touch, close and intimate) and UNIQUE (doom, crushed, folded, gong room)",
+    "78 kit presets: studio, live room, vintage and jazz, tight funk and soul, PUNCH (hard-hitting kits with claps), big rooms, Yeezus, moshc0re, KING, trip hop, 80s, 2000s, SOFT and UNIQUE",
     "Favourites: star the presets you love and browse just those; your stars survive updates"
   ],
   "installTips": [
-    "The .pkg also installs the drum sound library (about 230 MB). With the .zip, Install.command copies it for you.",
-    "Keys (FL names): kick C3, snare D3, sidestick C#3, closed hat F#3, pedal hat G#3, open hat A#3, toms C4 / A3 / G3, crashes C#4 / A4, ride D#4, bell F4, china E4."
+    "The .pkg also installs the drum sound library (about 250 MB). With the .zip, Install.command copies it for you.",
+    "Keys (FL names): kick C3, snare D3, rimshot E3, sidestick C#3, clap D#3, closed hat F#3, pedal hat G#3, open hat A#3, toms C4 / A3 / G3, crashes C#4 / A4, ride D#4, bell F4, china E4."
   ],
   "previewNote": "on the same five-bar 96 BPM groove: ghost notes, open hat, a ride bar, a tom fill and crashes ringing out.",
   "whatsNew": {
-    "version": "1.11.0",
+    "version": "1.12.0",
     "items": [
-      "Favourites: press the star key just right of the preset name to star a preset, then find all your starred sounds in FAVOURITES at the top of the category list (the arrows step through just those). Stars are kept across updates, in every project",
-      "15 new kits in two new categories. SOFT (gentle, natural, warm): Brushes Ballad, Feather Touch, Bedroom Close, Soft Jazz Club, Lo-fi Felt, Church Hall, Folk Porch. UNIQUE (instruments and characters you won't find elsewhere in the plugin): Doom Tuned Down, Piccolo Pop, Crushed Box, Smashed Room, Mono 1965, Folded Metal, Junkyard, Gong Room"
+      "Punch knob on every piece: a harder attack and a tighter body on its close mic (half as much on the overheads), while the room mics stay exactly as recorded, so a kit can hit hard and still sound natural",
+      "Punchy pieces to swap in: two tight, knocking kicks and a cracking snare (with real rimshots) from the Aasimonster kit, and the studio kick played from its front mic",
+      "Clap: a new piece on D#3 (the General MIDI clap key), drawn as a sample pad beside the ride. Real hand claps from the Versilian library (tight three-person, loose gospel group, solo), placed in the studio kit's own room. Clap on Snare layers it on every snare hit",
+      "PUNCH: 10 new kits. Punch Studio, Knock Room, Trap Clap, Boom Bap Smack, Gospel Hands, Arena Punch, Soul Clap Pocket, Drill Slap, Muldjord Thump, Dry Punch Funk",
+      "Your projects and presets sound exactly as before: Punch starts at 0 and the clap plays only when you ask for it"
     ]
   }
 }

@@ -6,12 +6,13 @@
 
 namespace kitroom
 {
-/** Per-slot parameters; ids are "<slotId><Suffix>", e.g. "snareTune". */
-enum class SP { Volume, Pan, Tune, Decay, Close, Overheads, Room, count };
+/** Per-slot parameters; ids are "<slotId><Suffix>", e.g. "snareTune". Punch came in 1.12 (appended to the layout). */
+enum class SP { Volume, Pan, Tune, Decay, Close, Overheads, Room, Punch, count };
+constexpr int kClassicSlotParams = (int) SP::Punch;   // the per-slot parameters every version has had
 constexpr int kSlotParams = (int) SP::count;
 
 /** Master parameters. Append only: ids are permanent and old sessions load the defaults for new ones. */
-enum class MP { Close, Overheads, Room, VelCurve, Humanize, Glue, Clip, Width, Output, Drive, DriveType, Crush, Tone, count };
+enum class MP { Close, Overheads, Room, VelCurve, Humanize, Glue, Clip, Width, Output, Drive, DriveType, Crush, Tone, ClapOnSnare, count };
 constexpr int kMasterParams = (int) MP::count;
 
 juce::String slotParamId (int slot, SP p);

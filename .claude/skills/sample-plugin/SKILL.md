@@ -16,6 +16,16 @@ seconds. Kitroom plays multi-mic drum kits with ~10-60 velocity layers per artic
   in the library and the credit line in the UI.
 - Check every license for redistribution in a commercial-or-free plugin. Avoid NC licenses.
 - Record the md5 of each download in `library/sources.json`; the builder verifies it.
+- The Aasimonster (CC BY 4.0, 2.3 GB) adds tight, punchy kicks and a cracking snare. Its overheads and rooms are
+  recorded ~10 ms late (~25 ms on the kicks: the "double hits" its README warns about), so sources.json pulls them
+  forward (`ambientLeadMs`, per kit and per sound) to land 2-5 ms after the close mic; its rooms are also ~10 dB
+  hotter than the other kits' (`roomTrimDb: -10`). Measure both on any new kit (onset of each mic vs the close mic).
+- Hand claps: VCSL (Versilian Community Sample Library, CC0) `Idiophones/Struck Idiophones/Claps`, fetched file by
+  file from raw.githubusercontent.com at a pinned commit (a `"type": "files"` source). There is no close/room
+  recording, so the builder puts them in the DRS room: close mic -> room transfer measured from the built DRS
+  snare (Wiener estimate, then each 1/3 octave scaled to the measured room/close power ratio because the diffuse
+  top end is not coherent with the close mic; it predicts held-out snare rooms within ~1 dB per band and the same
+  decay). The tight clap is real solo claps stacked 6-24 ms apart, a little detuned and spread across the stereo.
 
 ## 2. Library pipeline (`plugins/<Name>/library/`)
 
@@ -64,6 +74,9 @@ Iterate with `--only id,id` (merges into the existing catalog). Full build: ~2 m
   by polling from a UI timer. Show keys in **FL Studio note names** (MIDI 60 = C5).
 - Master: width on M/S with an LR4 high-pass on the side (lows stay mono whatever the rooms do), glue,
   clipper, output gain.
+- Punch (per piece): no detector, since each voice knows where its hit starts. Attack held up to +6 dB for the
+  first few ms (kick 8 ms, cosine out by 26 ms), the body pulled down up to -6 dB (kick from 45 to 150 ms),
+  on the close mic; half of it on the overheads; rooms untouched, so the kit hits harder and still sounds real.
 
 ## 4. UI
 

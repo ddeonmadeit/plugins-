@@ -135,6 +135,20 @@ void DrumEngine::trigger (int slot, int art, float velocity, const SoundData* so
     voice->age = ++stamp;
     voice->active = true;
 
+    // Punch shapes each hit from where it starts (no detector, so nothing lags): the attack held up for
+    // a few ms, then the body pulled down. Times follow the drum: a kick's first cycle is ~15 ms long.
+    struct Times { float hold, end, bodyStart, bodyEnd; };   // ms from the start of the file (2 ms lead-in)
+    const auto cat = kr::slots()[(size_t) slot].category;
+    const Times t = cat == kr::Category::Kick ? Times { 8.0f, 26.0f, 45.0f, 150.0f }
+                  : cat == kr::Category::Snare || cat == kr::Category::Clap ? Times { 5.0f, 18.0f, 45.0f, 170.0f }
+                  : cat == kr::Category::Tom ? Times { 6.0f, 22.0f, 60.0f, 220.0f }
+                  : Times { 4.0f, 12.0f, 80.0f, 320.0f };
+    const auto ms = [this] (float x) { return std::max (1, (int) (x * 0.001f * (float) sr)); };
+    voice->attackHold = ms (t.hold);
+    voice->attackEnd = ms (t.end);
+    voice->bodyStart = ms (t.bodyStart);
+    voice->bodyEnd = ms (t.bodyEnd);
+
     // Decay < 1 shortens the natural ring: an exponential fade that starts after the attack.
     if (mix.decay < 0.995f)
     {
@@ -142,6 +156,26 @@ void DrumEngine::trigger (int slot, int art, float velocity, const SoundData* so
         voice->decayCoef = (float) std::exp (-1.0 / (tau * sr));
         voice->decayDelay = (int) (0.025 * sr);
     }
+}
+
+float DrumEngine::punchGains (const Voice& v, float punch, float& overheads) noexcept
+{
+    const int e = v.elapsed;
+    float attack = 0.0f, body = 1.0f;
+    if (e < v.attackHold)
+        attack = 1.0f;
+    else if (e < v.attackEnd)
+        attack = 0.5f + 0.5f * std::cos (juce::MathConstants<float>::pi * (float) (e - v.attackHold) / (float) (v.attackEnd - v.attackHold));
+    if (e < v.bodyStart)
+        body = 0.0f;
+    else if (e < v.bodyEnd)
+    {
+        const float x = (float) (e - v.bodyStart) / (float) (v.bodyEnd - v.bodyStart);
+        body = x * x * (3.0f - 2.0f * x);
+    }
+    // Full Punch: attack +6 dB, body -6 dB on the close mic; half that on the overheads; the room is left alone.
+    overheads = (1.0f + 0.5f * punch * attack) * (1.0f - 0.25f * punch * body);
+    return (1.0f + punch * attack) * (1.0f - 0.5f * punch * body);
 }
 
 void DrumEngine::render (float* L, float* R, int n, const std::array<SlotMix, kr::kNumSlots>& mixes) noexcept
@@ -207,8 +241,25 @@ void DrumEngine::render (float* L, float* R, int n, const std::array<SlotMix, kr
                 break;
             }
 
-            L[i] += env * (cl * st[0] + gOh * st[1] + gRoom * st[3]);
-            R[i] += env * (cr * st[0] + gOh * st[2] + gRoom * st[4]);
+            if (m.punch > 0.001f && v.elapsed < v.bodyEnd + 1)
+            {
+                float po = 1.0f;
+                const float pc = punchGains (v, m.punch, po);
+                L[i] += env * (pc * cl * st[0] + po * gOh * st[1] + gRoom * st[3]);
+                R[i] += env * (pc * cr * st[0] + po * gOh * st[2] + gRoom * st[4]);
+            }
+            else if (m.punch > 0.001f)
+            {
+                // Past the body: the settled gains of a fully shaped hit.
+                L[i] += env * ((1.0f - 0.5f * m.punch) * cl * st[0] + (1.0f - 0.25f * m.punch) * gOh * st[1] + gRoom * st[3]);
+                R[i] += env * ((1.0f - 0.5f * m.punch) * cr * st[0] + (1.0f - 0.25f * m.punch) * gOh * st[2] + gRoom * st[4]);
+            }
+            else
+            {
+                L[i] += env * (cl * st[0] + gOh * st[1] + gRoom * st[3]);
+                R[i] += env * (cr * st[0] + gOh * st[2] + gRoom * st[4]);
+            }
+            ++v.elapsed;
             v.pos += v.inc;
         }
     }

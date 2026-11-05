@@ -35,5 +35,6 @@ private:
     std::vector<int> soundIndices;
     std::array<ArtRow, kr::kMaxArticulations> rows;
     std::vector<std::unique_ptr<dd::gui::Knob>> knobs;
+    std::unique_ptr<dd::gui::Toggle> clapOnSnare;   // on the snare and clap panels
     juce::String credit;
 };

@@ -86,7 +86,26 @@
     "drive": 0.12,
     "driveType": "Tape",
     "crush": 0.0,
-    "tone": -0.35
+    "tone": -0.35,
+    "clapVolume": 0.0,
+    "clapPan": 0.0,
+    "clapTune": 0.0,
+    "clapDecay": 1.0,
+    "clapClose": 1.0,
+    "clapOverheads": 1.0,
+    "clapRoom": 1.0,
+    "kickPunch": 0.0,
+    "snarePunch": 0.0,
+    "hihatPunch": 0.0,
+    "tom1Punch": 0.0,
+    "tom2Punch": 0.0,
+    "tom3Punch": 0.0,
+    "crash1Punch": 0.0,
+    "crash2Punch": 0.0,
+    "ridePunch": 0.0,
+    "chinaPunch": 0.0,
+    "clapPunch": 0.0,
+    "clapOnSnare": false
   },
   "extra": {
     "kit": {
@@ -99,7 +118,8 @@
       "crash1": "mj_crash_l",
       "crash2": "mj_crash_r",
       "ride": "mj_ride_l",
-      "china": "mj_china"
+      "china": "mj_china",
+      "clap": "vcsl_clap_stack"
     }
   }
 }

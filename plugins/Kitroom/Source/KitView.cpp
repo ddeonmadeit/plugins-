@@ -111,6 +111,12 @@ KitView::KitView (KitroomProcessor& p) : proc (p)
     pieces.push_back (cym (kr::Crash1, S::Crash, 215, 70, 235, 40, { 332, 48 }));
     pieces.push_back (cym (kr::Crash2, S::Crash, 735, 58, 245, 42, { 857, 36 }));
     pieces.push_back (cym (kr::RideSlot, S::Ride, 880, 150, 270, 46, { 1015, 136 }));
+
+    // The clap: a sample pad on its own stand beside the ride, as drummers play claps live.
+    Piece pad { kr::ClapSlot, S::Pad, { 1026, 258, 112, 44 }, 13.0f, { 1082, 407 }, {}, {} };
+    pad.hit.addRoundedRectangle (pad.box.expanded (6.0f, 8.0f).withBottom (pad.box.getBottom() + pad.shellH + 8.0f), 6.0f);
+    pad.outline.addRoundedRectangle (pad.box.withBottom (pad.box.getBottom() + pad.shellH), 6.0f);
+    pieces.push_back (pad);
     pieces.push_back (drum (kr::Tom1, S::RackTom, 440, 122, 120, 34, 70, { 500, 102 }));
     pieces.push_back (drum (kr::Tom2, S::RackTom, 612, 122, 130, 36, 76, { 677, 102 }));
 
@@ -247,9 +253,10 @@ void KitView::drawRoom (juce::Graphics& g) const
     g.drawEllipse (rug.reduced (30.0f, 8.0f), 1.0f);
 
     // Light from straight above: each piece throws a soft shadow right under itself.
-    const std::array<juce::Rectangle<float>, 6> shadows { {
+    const std::array<juce::Rectangle<float>, 7> shadows { {
         { 588 - 130, kFloorY - 12, 260, 26 }, { 875 - 115, kFloorY - 10, 230, 22 }, { 375 - 70, kFloorY - 8, 140, 16 },
-        { 227 - 60, kFloorY - 7, 120, 14 }, { 1015 - 50, kFloorY - 6, 100, 12 }, { 332 - 45, kFloorY - 6, 90, 12 } } };
+        { 227 - 60, kFloorY - 7, 120, 14 }, { 1015 - 50, kFloorY - 6, 100, 12 }, { 332 - 45, kFloorY - 6, 90, 12 },
+        { 1082 - 44, kFloorY - 6, 88, 12 } } };
     for (auto& sh : shadows)
     {
         g.setGradientFill (juce::ColourGradient (juce::Colours::black.withAlpha (0.7f), sh.getCentreX(), sh.getCentreY(),
@@ -506,6 +513,74 @@ void KitView::drawKick (juce::Graphics& g, const Piece& p, float glow) const
     g.fillEllipse (px - pr + 2.0f, py - pr + 2.0f, pr * 2.0f - 4.0f, pr * 2.0f - 4.0f);
 }
 
+void KitView::drawPad (juce::Graphics& g, const Piece& p, float glow) const
+{
+    const auto top = p.box;
+    drawStand (g, top.getCentreX(), top.getBottom() + p.shellH - 2.0f, kFloorY, true);
+
+    // Clamp where the case meets the stand.
+    g.setColour (kChromeDark);
+    g.fillRoundedRectangle (top.getCentreX() - 10.0f, top.getBottom() + p.shellH - 1.0f, 20.0f, 8.0f, 2.0f);
+    g.setColour (kChrome.withAlpha (0.55f));
+    g.drawHorizontalLine ((int) (top.getBottom() + p.shellH), top.getCentreX() - 9.0f, top.getCentreX() + 9.0f);
+
+    // The slab: a matte black case; its front edge catches the light from above, its underside falls dark.
+    const auto edge = top.withY (top.getBottom() - 6.0f).withHeight (p.shellH + 6.0f);
+    g.setColour (juce::Colours::black.withAlpha (0.55f));
+    g.fillRoundedRectangle (edge.translated (0.0f, 3.0f), 6.0f);
+    g.setGradientFill (juce::ColourGradient (juce::Colour (0xff4a4038), 0.0f, edge.getY() + 6.0f,
+                                             juce::Colour (0xff15110e), 0.0f, edge.getBottom(), false));
+    g.fillRoundedRectangle (edge, 6.0f);
+    g.setColour (kChrome.withAlpha (0.35f));
+    g.drawHorizontalLine ((int) top.getBottom() + 1, top.getX() + 6.0f, top.getRight() - 6.0f);
+    g.setColour (juce::Colour (0xfff2e2c8).withAlpha (0.06f));
+    g.drawHorizontalLine ((int) edge.getBottom() - 1, top.getX() + 8.0f, top.getRight() - 8.0f);
+
+    juce::Path face;
+    face.addRoundedRectangle (top, 6.0f);
+    glowAround (g, face, glow * 0.5f);
+    g.setGradientFill (juce::ColourGradient (juce::Colour (0xff3d3630), 0.0f, top.getY(),
+                                             juce::Colour (0xff1e1a16), 0.0f, top.getBottom(), false));
+    g.fillPath (face);
+    g.setColour (kChrome.withAlpha (0.32f));
+    g.strokePath (face, juce::PathStrokeType (0.9f));
+
+    // Six rubber pads; the clap is the middle one nearest the drummer, and it lights when played.
+    constexpr float gap = 5.0f;
+    const float pw = (top.getWidth() - 4.0f * gap) / 3.0f, ph = (top.getHeight() - 3.0f * gap) / 2.0f;
+    for (int row = 0; row < 2; ++row)
+        for (int col = 0; col < 3; ++col)
+        {
+            const juce::Rectangle<float> pr (top.getX() + gap + (float) col * (pw + gap), top.getY() + gap + (float) row * (ph + gap), pw, ph);
+            const bool clap = row == 1 && col == 1;
+            const float lit = clap ? glow : 0.0f;
+            // Each pad sits in a recess: dark lip below, light catching its rounded top edge.
+            g.setColour (juce::Colour (0xff0b0907));
+            g.fillRoundedRectangle (pr.expanded (1.0f).translated (0.0f, 1.0f), 3.5f);
+            g.setGradientFill (juce::ColourGradient (juce::Colour (0xff6a6056).interpolatedWith (dd::gui::sunset::amber, lit * 0.85f), 0.0f, pr.getY(),
+                                                     juce::Colour (0xff342e28).interpolatedWith (kAccent, lit * 0.8f), 0.0f, pr.getBottom(), false));
+            g.fillRoundedRectangle (pr, 3.0f);
+            g.setColour (juce::Colour (0xfff2e2c8).withAlpha (0.22f + 0.4f * lit));
+            g.drawHorizontalLine ((int) pr.getY() + 1, pr.getX() + 3.0f, pr.getRight() - 3.0f);
+            if (clap)
+            {
+                // The clap pad glows faintly even at rest (a lamp under smoked rubber), fully when played.
+                g.setColour (kAccent.withAlpha (0.12f + 0.5f * lit));
+                g.fillRoundedRectangle (pr.reduced (2.0f), 2.0f);
+                g.setColour (kAccent.withAlpha (0.6f + 0.4f * lit));
+                g.drawRoundedRectangle (pr.reduced (0.5f), 3.0f, 1.0f);
+            }
+        }
+
+    // Status LEDs along the back edge.
+    for (int i = 0; i < 3; ++i)
+    {
+        const float x = top.getRight() - 12.0f - (float) i * 6.0f;
+        g.setColour (kAccent.withAlpha (i == 0 ? 0.35f + 0.65f * glow : 0.18f));
+        g.fillEllipse (x, top.getY() + 1.2f, 2.6f, 2.6f);
+    }
+}
+
 void KitView::drawLabel (juce::Graphics& g, const Piece& p) const
 {
     const auto& def = kr::slots()[(size_t) p.slot];
@@ -574,6 +649,9 @@ void KitView::paint (juce::Graphics& g)
             case Shape::RackTom:
             case Shape::FloorTom:
                 drawDrum (g, p, glow);
+                break;
+            case Shape::Pad:
+                drawPad (g, p, glow);
                 break;
         }
     }

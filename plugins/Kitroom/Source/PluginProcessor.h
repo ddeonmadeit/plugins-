@@ -44,6 +44,7 @@ public:
     void setSlotSound (int slot, const juce::String& soundId);
     bool isSlotLoading (int slot) const { return loader->isLoading (slot); }
     void loadDefaultKit();
+    juce::String defaultSound (int slot) const;
 
     // Keys: the primary key of each articulation; GM aliases fill in when free (message thread).
     int getKey (int slot, int art) const { return primaryKeys[(size_t) slot][(size_t) art]; }
@@ -76,6 +77,7 @@ private:
 
     void rebuildNoteMap();
     void handleNote (int note, float velocity);
+    void play (int slot, int art, float velocity, float humanize);
     void processChunk (float* L, float* R, int n);
     juce::var captureKit() const;
     void applyKit (const juce::var& kit);

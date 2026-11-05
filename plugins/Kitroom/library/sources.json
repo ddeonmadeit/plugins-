@@ -55,6 +55,21 @@
           }
         },
         {
+          "id": "drs_kick_punch",
+          "name": "DRS Kick (front mic, punchy)",
+          "category": "kick",
+          "close": [
+            "Kdrum_front",
+            "Kdrum_back"
+          ],
+          "secondaryLevel": 0.25,
+          "articulations": {
+            "hit": [
+              "Kdrum_without_contact"
+            ]
+          }
+        },
+        {
           "id": "drs_snare",
           "name": "DRS Snare",
           "category": "snare",
@@ -491,6 +506,199 @@
           }
         }
       ]
+    },
+    {
+      "id": "aasi",
+      "name": "Aasimonster",
+      "finish": "#2c3440",
+      "dir": "aasimonster2",
+      "kitxml": "aasimonster.xml",
+      "url": "https://drumgizmo.org/kits/Aasimonster/aasimonster2_1.zip",
+      "md5": "910aa5a789d34f85c2e7c4a5c5a6b2f9",
+      "credit": "The Aasimonster by DrumGizmo.org (sampled by Deva; the kit that tracked DIE's \"Rise of the Rotten\"). Drum samples provided by DrumGizmo.org",
+      "license": "CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)",
+      "page": "https://drumgizmo.org/wiki/doku.php?id=kits:the_aasimonster",
+      "overheads": [
+        "OH L",
+        "OH R"
+      ],
+      "room": [
+        "Amb L",
+        "Amb R"
+      ],
+      "ambientLeadMs": 7.5,
+      "sounds": [
+        {
+          "id": "am_kick_l",
+          "name": "Aasimonster Kick L (tight)",
+          "category": "kick",
+          "close": [
+            "Kick L"
+          ],
+          "ambientLeadMs": 21.5,
+          "articulations": {
+            "hit": [
+              "kick_l"
+            ]
+          }
+        },
+        {
+          "id": "am_kick_r",
+          "name": "Aasimonster Kick R (knock)",
+          "category": "kick",
+          "close": [
+            "Kick R"
+          ],
+          "ambientLeadMs": 21.5,
+          "articulations": {
+            "hit": [
+              "kick_r"
+            ]
+          }
+        },
+        {
+          "id": "am_snare",
+          "name": "Aasimonster Snare (crack)",
+          "category": "snare",
+          "close": [
+            "Snare top",
+            "Snare bottom"
+          ],
+          "articulations": {
+            "center": [
+              "snare_on_center"
+            ],
+            "rimshot": [
+              "snare_rim_shot"
+            ]
+          }
+        }
+      ],
+      "roomTrimDb": -10.0
+    },
+    {
+      "id": "vcsl",
+      "name": "VCSL Claps",
+      "type": "files",
+      "finish": "#3a3530",
+      "dir": "VCSL_Claps",
+      "roomFrom": "drs_snare",
+      "credit": "Hand claps from the Versilian Community Sample Library (Versilian Studios), placed in the DRS kit's room",
+      "license": "CC0 1.0 (public domain, https://creativecommons.org/publicdomain/zero/1.0/)",
+      "page": "https://github.com/sgossner/VCSL",
+      "files": [
+        {
+          "name": "Clap_rr1.wav",
+          "url": "https://raw.githubusercontent.com/sgossner/VCSL/c1ea7bcc3c7309650ab0da9d15c9cd1fbc4a4c7e/Idiophones/Struck%20Idiophones/Claps/Clap_rr1.wav",
+          "md5": "dcce80778e4d1fe9c7250d1e1b98a74c"
+        },
+        {
+          "name": "Clap_rr2.wav",
+          "url": "https://raw.githubusercontent.com/sgossner/VCSL/c1ea7bcc3c7309650ab0da9d15c9cd1fbc4a4c7e/Idiophones/Struck%20Idiophones/Claps/Clap_rr2.wav",
+          "md5": "ded64a38ffbd8d31ec4fa26be79162d1"
+        },
+        {
+          "name": "Clap_rr3.wav",
+          "url": "https://raw.githubusercontent.com/sgossner/VCSL/c1ea7bcc3c7309650ab0da9d15c9cd1fbc4a4c7e/Idiophones/Struck%20Idiophones/Claps/Clap_rr3.wav",
+          "md5": "00a0f373951d43d5bbe88dd800372b32"
+        },
+        {
+          "name": "Clap_rr4.wav",
+          "url": "https://raw.githubusercontent.com/sgossner/VCSL/c1ea7bcc3c7309650ab0da9d15c9cd1fbc4a4c7e/Idiophones/Struck%20Idiophones/Claps/Clap_rr4.wav",
+          "md5": "7f5354ec392663c851cf8f3e0e860a8b"
+        },
+        {
+          "name": "Clap_rr5.wav",
+          "url": "https://raw.githubusercontent.com/sgossner/VCSL/c1ea7bcc3c7309650ab0da9d15c9cd1fbc4a4c7e/Idiophones/Struck%20Idiophones/Claps/Clap_rr5.wav",
+          "md5": "d6b49985b5e84cadc6187b37f46a7e59"
+        },
+        {
+          "name": "Clap_rr6.wav",
+          "url": "https://raw.githubusercontent.com/sgossner/VCSL/c1ea7bcc3c7309650ab0da9d15c9cd1fbc4a4c7e/Idiophones/Struck%20Idiophones/Claps/Clap_rr6.wav",
+          "md5": "542bd60293799753094ec1b70c6d5b17"
+        },
+        {
+          "name": "SoloClap_vl1.wav",
+          "url": "https://raw.githubusercontent.com/sgossner/VCSL/c1ea7bcc3c7309650ab0da9d15c9cd1fbc4a4c7e/Idiophones/Struck%20Idiophones/Claps/SoloClap_vl1.wav",
+          "md5": "bc9537b561359d58c8ddb799b9776a71"
+        },
+        {
+          "name": "SoloClap_vl2.wav",
+          "url": "https://raw.githubusercontent.com/sgossner/VCSL/c1ea7bcc3c7309650ab0da9d15c9cd1fbc4a4c7e/Idiophones/Struck%20Idiophones/Claps/SoloClap_vl2.wav",
+          "md5": "1966fe3f9888d8c7c19ebd08385a58fa"
+        },
+        {
+          "name": "SoloClap_vl3.wav",
+          "url": "https://raw.githubusercontent.com/sgossner/VCSL/c1ea7bcc3c7309650ab0da9d15c9cd1fbc4a4c7e/Idiophones/Struck%20Idiophones/Claps/SoloClap_vl3.wav",
+          "md5": "0fec7b329c8cef3e87682739354f9445"
+        },
+        {
+          "name": "SoloClap_vl4.wav",
+          "url": "https://raw.githubusercontent.com/sgossner/VCSL/c1ea7bcc3c7309650ab0da9d15c9cd1fbc4a4c7e/Idiophones/Struck%20Idiophones/Claps/SoloClap_vl4.wav",
+          "md5": "1dc57d76cb85b01684fb7b3b2a6d2c7a"
+        }
+      ],
+      "sounds": [
+        {
+          "id": "vcsl_clap_stack",
+          "name": "Tight Clap (three people)",
+          "category": "clap",
+          "seed": 7,
+          "people": 3,
+          "stack": [
+            [
+              [
+                0,
+                1
+              ],
+              4
+            ],
+            [
+              [
+                2,
+                3
+              ],
+              6
+            ]
+          ],
+          "articulations": {
+            "hit": [
+              "SoloClap_vl1.wav",
+              "SoloClap_vl2.wav",
+              "SoloClap_vl3.wav",
+              "SoloClap_vl4.wav"
+            ]
+          }
+        },
+        {
+          "id": "vcsl_clap",
+          "name": "Group Clap (loose, gospel)",
+          "category": "clap",
+          "articulations": {
+            "hit": [
+              "Clap_rr1.wav",
+              "Clap_rr2.wav",
+              "Clap_rr3.wav",
+              "Clap_rr4.wav",
+              "Clap_rr5.wav",
+              "Clap_rr6.wav"
+            ]
+          }
+        },
+        {
+          "id": "vcsl_clap_solo",
+          "name": "Solo Clap",
+          "category": "clap",
+          "articulations": {
+            "hit": [
+              "SoloClap_vl1.wav",
+              "SoloClap_vl2.wav",
+              "SoloClap_vl3.wav",
+              "SoloClap_vl4.wav"
+            ]
+          }
+        }
+      ]
     }
   ],
   "processing": {
@@ -500,7 +708,8 @@
       "tom": 4.5,
       "hihat": 6.0,
       "cymbal": 10.0,
-      "ride": 10.0
+      "ride": 10.0,
+      "clap": 1.6
     },
     "peakTargetDb": {
       "kick": -2.0,
@@ -508,14 +717,16 @@
       "tom": -3.0,
       "hihat": -9.0,
       "cymbal": -6.0,
-      "ride": -8.0
+      "ride": -8.0,
+      "clap": -3.0
     },
     "closeToOverheadRatio": {
       "kick": 2.2,
       "snare": 1.8,
       "tom": 1.8,
       "hihat": 1.0,
-      "ride": 0.8
+      "ride": 0.8,
+      "clap": 1.0
     },
     "tailFloorDb": -72.0,
     "alignMaxLagSamples": {

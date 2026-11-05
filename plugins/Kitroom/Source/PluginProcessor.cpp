@@ -10,7 +10,7 @@ using kitroom::MP;
 
 const juce::StringArray& KitroomProcessor::categoryOrder()
 {
-    static const juce::StringArray order { "STUDIO", "LIVE ROOM", "VINTAGE", "TIGHT", "BIG", "YEEZUS", "MOSHC0RE", "KING", "TRIP HOP", "80S", "2000S", "SOFT", "UNIQUE", "USER" };
+    static const juce::StringArray order { "STUDIO", "LIVE ROOM", "VINTAGE", "TIGHT", "PUNCH", "BIG", "YEEZUS", "MOSHC0RE", "KING", "TRIP HOP", "80S", "2000S", "SOFT", "UNIQUE", "USER" };
     return order;
 }
 
@@ -59,21 +59,25 @@ KitroomProcessor::~KitroomProcessor()
 //==============================================================================
 void KitroomProcessor::loadDefaultKit()
 {
-    // The DRS studio kit with the Muldjord china; any piece missing from the library falls back to
-    // the first sound of its kind (a different one per slot where there are several).
-    static const char* const defaults[kr::kNumSlots] = { "drs_kick", "drs_snare", "drs_hihat", "drs_tom1", "drs_tom2",
-                                                          "drs_tom3", "drs_crash_beat", "drs_crash_602", "drs_ride", "mj_china" };
-    std::map<kr::Category, int> used;
     for (int s = 0; s < kr::kNumSlots; ++s)
-    {
-        const auto cat = kr::slots()[(size_t) s].category;
-        const auto options = library.soundsFor (cat);
-        const int pick = used[cat]++;
-        if (library.indexOf (defaults[s]) >= 0)
-            setSlotSound (s, defaults[s]);
-        else
-            setSlotSound (s, options.empty() ? juce::String() : library.getSounds()[(size_t) options[(size_t) pick % options.size()]].id);
-    }
+        setSlotSound (s, defaultSound (s));
+}
+
+juce::String KitroomProcessor::defaultSound (int slot) const
+{
+    // The DRS studio kit with the Muldjord china and the tight VCSL clap; any piece missing from the
+    // library falls back to a sound of its kind (a different one per slot where there are several).
+    static const char* const defaults[kr::kNumSlots] = { "drs_kick", "drs_snare", "drs_hihat", "drs_tom1", "drs_tom2",
+                                                          "drs_tom3", "drs_crash_beat", "drs_crash_602", "drs_ride", "mj_china",
+                                                          "vcsl_clap_stack" };
+    if (library.indexOf (defaults[slot]) >= 0)
+        return defaults[slot];
+    const auto cat = kr::slots()[(size_t) slot].category;
+    int pick = 0;
+    for (int s = 0; s < slot; ++s)
+        pick += kr::slots()[(size_t) s].category == cat ? 1 : 0;
+    const auto options = library.soundsFor (cat);
+    return options.empty() ? juce::String() : library.getSounds()[(size_t) options[(size_t) pick % options.size()]].id;
 }
 
 void KitroomProcessor::setSlotSound (int slot, const juce::String& soundId)
@@ -101,6 +105,8 @@ void KitroomProcessor::applyKit (const juce::var& kit)
         const auto id = kit[juce::Identifier (kr::slots()[(size_t) s].id)].toString();
         if (library.indexOf (id) >= 0)
             setSlotSound (s, id);
+        else if (id.isEmpty())
+            setSlotSound (s, defaultSound (s));   // presets and sessions from before the piece existed (the clap)
     }
 }
 
@@ -211,10 +217,21 @@ void KitroomProcessor::handleNote (int note, float velocity)
     if (art >= (int) kr::slots()[(size_t) slot].articulations.size())
         return;
 
-    engine.trigger (slot, art, velocity, loader->get (slot), mixes[(size_t) slot],
-                    params.master (MP::VelCurve), params.master (MP::Humanize));
-    float old = hitLevels[(size_t) slot].load();
-    while (velocity > old && ! hitLevels[(size_t) slot].compare_exchange_weak (old, velocity)) {}
+    play (slot, art, velocity, params.master (MP::Humanize));
+}
+
+void KitroomProcessor::play (int slot, int art, float velocity, float humanize)
+{
+    auto hit = [this, velocity, humanize] (int s, int a)
+    {
+        engine.trigger (s, a, velocity, loader->get (s), mixes[(size_t) s], params.master (MP::VelCurve), humanize);
+        float old = hitLevels[(size_t) s].load();
+        while (velocity > old && ! hitLevels[(size_t) s].compare_exchange_weak (old, velocity)) {}
+    };
+    hit (slot, art);
+    // Clap on Snare: every snare hit (not the sidestick) brings the clap with it.
+    if (slot == kr::Snare && art != kr::kSidestickArt && params.master (MP::ClapOnSnare) >= 0.5f)
+        hit (kr::ClapSlot, 0);
 }
 
 void KitroomProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midi)
@@ -241,6 +258,7 @@ void KitroomProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mid
         m.close = params.slot (s, SP::Close) * params.master (MP::Close);
         m.overheads = params.slot (s, SP::Overheads) * params.master (MP::Overheads);
         m.room = params.slot (s, SP::Room) * params.master (MP::Room);
+        m.punch = params.slot (s, SP::Punch);
     }
     outGainSm.setTargetValue (dd::dbToGain (params.master (MP::Output)));
     widthSm.setTargetValue (params.master (MP::Width));
@@ -248,16 +266,13 @@ void KitroomProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mid
     // Notes from the UI (clicking a drum) join the host's MIDI at the start of the block.
     {
         const auto rd = auditionFifo.read (auditionFifo.getNumReady());
-        auto play = [this] (int packed)
+        auto playQueued = [this] (int packed)
         {
             const int target = packed >> 8;
-            engine.trigger (kr::targetSlot (target), kr::targetArt (target), (float) (packed & 0xff) / 127.0f,
-                            loader->get (kr::targetSlot (target)), mixes[(size_t) kr::targetSlot (target)],
-                            params.master (MP::VelCurve), 0.0f);
-            hitLevels[(size_t) kr::targetSlot (target)].store ((float) (packed & 0xff) / 127.0f);
+            play (kr::targetSlot (target), kr::targetArt (target), (float) (packed & 0xff) / 127.0f, 0.0f);
         };
-        for (int i = 0; i < rd.blockSize1; ++i) play (auditionQueue[(size_t) (rd.startIndex1 + i)]);
-        for (int i = 0; i < rd.blockSize2; ++i) play (auditionQueue[(size_t) (rd.startIndex2 + i)]);
+        for (int i = 0; i < rd.blockSize1; ++i) playQueued (auditionQueue[(size_t) (rd.startIndex1 + i)]);
+        for (int i = 0; i < rd.blockSize2; ++i) playQueued (auditionQueue[(size_t) (rd.startIndex2 + i)]);
     }
 
     const int numSamples = buffer.getNumSamples();
@@ -420,11 +435,20 @@ void KitroomProcessor::setStateInformation (const void* data, int sizeInBytes)
     editorScale = juce::jlimit (0.6f, 1.8f, (float) tree.getProperty ("uiScale", 1.0f));
     applyKit (juce::JSON::parse (tree.getProperty ("kit").toString()));
 
+    // Sessions from before the clap stored 10 slots of keys: those slots keep theirs, the clap keeps its GM key.
     const auto keys = juce::JSON::parse (tree.getProperty ("keys").toString());
-    if (auto* arr = keys.getArray(); arr != nullptr && arr->size() == kr::kNumSlots * kr::kMaxArticulations)
+    if (auto* arr = keys.getArray(); arr != nullptr && arr->size() % kr::kMaxArticulations == 0
+                                     && arr->size() >= kr::kNumClassicSlots * kr::kMaxArticulations
+                                     && arr->size() <= kr::kNumSlots * kr::kMaxArticulations)
     {
+        resetKeys();
         for (int i = 0; i < arr->size(); ++i)
             primaryKeys[(size_t) (i / kr::kMaxArticulations)][(size_t) (i % kr::kMaxArticulations)] = (int) (*arr)[i];
+        // A key an old session gave to another piece wins over the clap's default.
+        for (int a = 0; a < kr::kMaxArticulations && arr->size() < kr::kNumSlots * kr::kMaxArticulations; ++a)
+            for (int i = 0; i < arr->size(); ++i)
+                if ((int) (*arr)[i] == primaryKeys[(size_t) kr::ClapSlot][(size_t) a])
+                    primaryKeys[(size_t) kr::ClapSlot][(size_t) a] = -1;
         rebuildNoteMap();
     }
 }

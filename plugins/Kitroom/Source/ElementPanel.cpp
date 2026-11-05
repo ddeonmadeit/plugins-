@@ -63,12 +63,20 @@ void ElementPanel::setSlot (int s)
     using kitroom::SP;
     const std::pair<SP, const char*> knobDefs[] = {
         { SP::Volume, "Volume" }, { SP::Pan, "Pan" }, { SP::Tune, "Tune" }, { SP::Decay, "Decay" },
-        { SP::Close, "Close Mic" }, { SP::Overheads, "Overheads" }, { SP::Room, "Room" } };
+        { SP::Close, "Close Mic" }, { SP::Overheads, "Overheads" }, { SP::Room, "Room" }, { SP::Punch, "Punch" } };
     for (auto& [param, title] : knobDefs)
     {
         auto k = std::make_unique<dd::gui::Knob> (proc.apvts, kitroom::slotParamId (slot, param), title, kAccent);
         addAndMakeVisible (*k);
         knobs.push_back (std::move (k));
+    }
+
+    clapOnSnare.reset();
+    if (slot == kr::Snare || slot == kr::ClapSlot)
+    {
+        clapOnSnare = std::make_unique<dd::gui::Toggle> (proc.apvts, kitroom::masterParamId (kitroom::MP::ClapOnSnare),
+                                                         "Clap on snare", "LAYERED", "OFF");
+        addAndMakeVisible (*clapOnSnare);
     }
 
     const auto& arts = kr::slots()[(size_t) slot].articulations;
@@ -193,7 +201,13 @@ void ElementPanel::resized()
         rows[(size_t) a].key.setBounds (row.removeFromLeft (124));
     }
 
-    // Knobs: 4 on the first row, 3 on the second.
+    if (clapOnSnare != nullptr)
+    {
+        const int used = (int) kr::slots()[(size_t) slot].articulations.size();
+        clapOnSnare->setBounds (left.getX(), left.getY() - (kr::kMaxArticulations - used) * 40, 160, 44);
+    }
+
+    // Knobs: two rows of 4.
     auto grid = r.withTrimmedLeft (std::max (0, r.getWidth() - 4 * kKnobW) / 2);
     for (size_t i = 0; i < knobs.size(); ++i)
         knobs[i]->setBounds (grid.getX() + (int) (i % 4) * kKnobW, grid.getY() + (int) (i / 4) * kKnobH, kKnobW, kKnobH);

@@ -9,6 +9,11 @@ Build the Kitroom sample library from DrumGizmo kits (CC BY 4.0).
 are missing first. Every hit becomes one 5-channel 16-bit FLAC: [close, overheadL, overheadR, roomL, roomR].
 The mapping from DrumGizmo instruments to Kitroom sounds lives in sources.json next to this script.
 
+Claps come from a "files" source (VCSL, CC0): stereo or mono one-shots. Close = their mono sum, overheads
+= the recording itself, room = the close signal through the DRS kit's own room, measured from the built DRS
+snare (close mic -> room mics, Wiener estimate with its diffuse top end restored), so a clap sits in the same
+room as the drums. That source must come after the DRS kit in sources.json.
+
 Per hit: paired close mics are summed after polarity/time alignment, the silent lead-in and the
 tail below -72 dB are trimmed (cymbals are capped and faded), and loudness of the attack is measured
 for velocity mapping. Per sound: close mics are balanced against the overheads, the whole sound
@@ -43,6 +48,18 @@ def md5(path):
 
 def ensure_kit(kit, kits_dir, download):
     target = os.path.join(kits_dir, kit["dir"])
+    if kit.get("type") == "files":
+        for f in kit["files"]:
+            path = os.path.join(target, f["name"])
+            if os.path.exists(path) and md5(path) == f["md5"]:
+                continue
+            if not download:
+                sys.exit("missing %s (pass --download to fetch it)" % path)
+            os.makedirs(target, exist_ok=True)
+            subprocess.run(["curl", "-sSL", "--retry", "5", "-o", path, f["url"]], check=True)
+            if md5(path) != f["md5"]:
+                sys.exit("checksum mismatch for " + path)
+        return
     if os.path.exists(os.path.join(target, kit["kitxml"])):
         return
     if not download:
@@ -143,6 +160,12 @@ def build_sound(job):
     close_names = sound["close"]
     oh, room = kit["overheads"], kit["room"]
 
+    # Some kits record the overheads and rooms late against the close mics (Aasimonster: ~10 ms, ~25 ms on
+    # the kicks, heard as double hits). Pull them forward so they arrive a few ms after the close mic, as in a room.
+    lead = int(round(sound.get("ambientLeadMs", kit.get("ambientLeadMs", 0.0)) * 0.001 * SR))
+    # Room mics placed close to the kit (Aasimonster) come in ~10 dB hotter than the others: level them.
+    room_trim = 10 ** (kit.get("roomTrimDb", 0.0) / 20.0)
+
     raw = []  # (articulation, stems)
     for art, instr_list in sound["articulations"].items():
         for instr in instr_list:
@@ -150,6 +173,9 @@ def build_sound(job):
                 cols = read_hit(chans, close_names + oh + room)
                 close = cols[:, :len(close_names)] if close_names else None
                 amb = cols[:, len(close_names):]
+                if lead > 0:
+                    amb = np.concatenate([amb[lead:], np.zeros((lead, amb.shape[1]), amb.dtype)])
+                amb[:, len(oh):] *= room_trim
                 if amb.shape[0] < 256 or np.abs(amb).max() < 1e-5:
                     continue  # empty / broken recording
                 raw.append((art, close, amb))
@@ -179,13 +205,19 @@ def build_sound(job):
             for k, (lag, pol) in enumerate(lags, start=1):
                 sec = shift(close[:n, k], -lag) * pol
                 # Secondary mic (snare bottom, kick front) sits under the primary.
-                sec_gain = 0.55 * prim_peak / (np.abs(sec).max() + 1e-9)
+                sec_gain = sound.get("secondaryLevel", 0.55) * prim_peak / (np.abs(sec).max() + 1e-9)
                 c += sec * min(sec_gain, 1.0)
             stems[:, 0] = c
         hits.append([art, stems])
+    return finish_sound(kit, sound, hits, out_dir, proc, bool(close_names))
+
+
+def finish_sound(kit, sound, hits, out_dir, proc, has_close):
+    """Balance, trim, normalize and write the hits ([articulation, (n, 5) stems]) of one sound."""
+    cat = sound["category"]
 
     # Balance close mics against the overheads for this drum type.
-    if close_names:
+    if has_close:
         peak_close = max(np.abs(h[1][:, 0]).max() for h in hits) + 1e-9
         peak_oh = max(np.abs(h[1][:, 1:3]).max() for h in hits) + 1e-9
         ratio = proc["closeToOverheadRatio"].get(cat, 1.0)
@@ -226,7 +258,7 @@ def build_sound(job):
         gain *= 0.98 / stem_peak
 
     entry = {"id": sound["id"], "name": sound["name"], "kit": kit["id"], "category": cat,
-             "sampleRate": SR, "closePan": close_pan(kit, cat, hits) if close_names else 0.0, "articulations": {}}
+             "sampleRate": SR, "closePan": close_pan(kit, cat, hits) if has_close else 0.0, "articulations": {}}
     counters = {}
     for art, st in sorted(hits, key=lambda h: (h[0], np.sqrt(np.mean(mono_mix(h[1])[:int(0.06 * SR)] ** 2)))):
         st = st * gain
@@ -242,6 +274,129 @@ def build_sound(job):
     total = sum(len(v) for v in entry["articulations"].values())
     print("%-24s %3d hits  gain %+.1f dB" % (sound["id"], total, 20 * np.log10(gain)), flush=True)
     return entry
+
+
+def room_response(out_dir, source_id):
+    """Close mic -> overheads and room of the DRS kit's room, from the built hits of `source_id` (its snare):
+    a Wiener estimate (only what is coherent with the close mic), then each 1/3 octave scaled so its energy
+    matches the measured room/close power ratio, since the diffuse top end is not coherent but is real.
+    Returns (4, n) impulse responses [ohL, ohR, roomL, roomR] and the mean room/overhead energy ratio."""
+    import glob
+    files = sorted(glob.glob(os.path.join(out_dir, "sounds", source_id, "center", "*.flac")))
+    if not files:
+        sys.exit("the clap's room comes from %s: build it first (it is missing from %s)" % (source_id, out_dir))
+    n_fft = 1 << 17
+    num = np.zeros((4, n_fft // 2 + 1), complex)
+    den = np.zeros(n_fft // 2 + 1)
+    power = np.zeros((4, n_fft // 2 + 1))
+    room_to_oh = []
+    for f in files:
+        x = sf.read(f, dtype="float64")[0][:n_fft // 2]
+        c = np.fft.rfft(x[:, 0], n_fft)
+        den += np.abs(c) ** 2
+        for k in range(4):
+            y = np.fft.rfft(x[:, 1 + k], n_fft)
+            num[k] += y * np.conj(c)
+            power[k] += np.abs(y) ** 2
+        room_to_oh.append(np.sum(x[:, 3:5] ** 2) / (np.sum(x[:, 1:3] ** 2) + 1e-12))
+    h = num / (den + 1e-2 * den.mean())
+    freqs = np.fft.rfftfreq(n_fft, 1.0 / SR)
+    centres = 63.0 * 2 ** (np.arange(0, 28) / 3.0)
+    centres = centres[centres < 18000.0]
+    for k in range(4):
+        gain_db = []
+        for c in centres:
+            band = (freqs >= c / 2 ** (1 / 6.0)) & (freqs < c * 2 ** (1 / 6.0))
+            want = power[k][band].sum() / (den[band].sum() + 1e-20)
+            got = (np.abs(h[k][band]) ** 2).mean() + 1e-20
+            gain_db.append(np.clip(10 * np.log10(want / got), -3.0, 20.0))
+        curve = np.interp(np.log2(np.maximum(freqs, 20.0)), np.log2(centres), gain_db)
+        h[k] *= 10 ** (curve / 20.0)
+    ir = np.fft.irfft(h, n_fft, axis=1)
+    ir[:, n_fft // 2:] = 0.0           # keep the causal part
+    ir = ir[:, :int(1.6 * SR)]
+    fade = int(0.4 * SR)
+    ir[:, -fade:] *= (np.linspace(1.0, 0.0, fade) ** 2)[None, :]
+    return ir, float(np.median(room_to_oh))
+
+
+def resample_to_sr(x, sr):
+    if sr == SR:
+        return x
+    from math import gcd
+    from scipy.signal import resample_poly
+    g = gcd(SR, sr)
+    return resample_poly(x, SR // g, sr // g, axis=0).astype(np.float32)
+
+
+def read_clap(path):
+    """One recording as float32 (n, 2) at SR, its silent lead-in removed (kept: 2 ms before 1% of peak)."""
+    x, sr = sf.read(path, dtype="float32", always_2d=True)
+    x = resample_to_sr(x, sr)
+    if x.shape[1] == 1:
+        x = np.repeat(x, 2, axis=1)
+    x = x[:, :2]
+    peak = np.abs(x).max()
+    onset = int(np.argmax(np.abs(x).max(axis=1) > peak * 0.01))
+    return x[max(0, onset - int(0.002 * SR)):]
+
+
+def stack_claps(takes, rng, count, people=3):
+    """Several people clapping together, tightly (a real group clap is looser): solo takes layered 6-24 ms
+    apart, each a little higher or lower (a different pair of hands) and placed across the stereo field."""
+    out = []
+    for _ in range(count):
+        n = max(len(t) for t in takes) + int(0.08 * SR)
+        mix = np.zeros((n, 2), np.float32)
+        offsets = [0] + sorted(int(rng.uniform(0.006, 0.024) * SR) for _ in range(people - 1))
+        pans = rng.permutation(np.linspace(-0.6, 0.6, people))
+        for k in range(people):
+            take = takes[rng.integers(len(takes))]
+            speed = 2 ** (rng.uniform(-1.2, 1.2) / 12.0)
+            idx = np.arange(0, len(take) - 1, speed)
+            mono = np.interp(idx, np.arange(len(take)), take.mean(axis=1)).astype(np.float32)
+            g = rng.uniform(0.7, 1.0) * (1.0 if k == 0 else 0.85)
+            a = (pans[k] + 1.0) * np.pi / 4.0
+            seg = mix[offsets[k]:offsets[k] + len(mono)]
+            seg[:, 0] += g * np.cos(a) * mono[:len(seg)] * np.sqrt(2.0)
+            seg[:, 1] += g * np.sin(a) * mono[:len(seg)] * np.sqrt(2.0)
+        out.append(mix)
+    return out
+
+
+def build_files_sound(job):
+    """A clap from one-shot recordings: [close = mono, overheads = the recording, room = through the DRS room]."""
+    from scipy.signal import fftconvolve
+    kit, sound, kits_dir, out_dir, proc, room = job
+    ir, room_to_oh = room
+    base = os.path.join(kits_dir, kit["dir"])
+    rng = np.random.default_rng(sound.get("seed", 1))
+    hits = []
+    for art, names in sound["articulations"].items():
+        takes = [read_clap(os.path.join(base, nm)) for nm in names]
+        if "stack" in sound:
+            groups = sound["stack"]   # [[take indices], count] per loudness layer
+            recs = []
+            for idx, count in groups:
+                recs += stack_claps([takes[i] for i in idx], rng, count, sound.get("people", 3))
+        else:
+            recs = takes
+        for rec in recs:
+            close = rec.mean(axis=1)
+            n = len(close) + ir.shape[1] - 1
+            stems = np.zeros((n, 5), np.float32)
+            stems[:len(close), 0] = close
+            stems[:len(close), 1:3] = rec
+            for k in (2, 3):
+                stems[:, 1 + k] = fftconvolve(close, ir[k])
+            hits.append([art, stems])
+    # The room sits against the overheads as it does for the drum the response was measured on.
+    oh_energy = sum(np.sum(h[1][:, 1:3] ** 2) for h in hits)
+    room_energy = sum(np.sum(h[1][:, 3:5] ** 2) for h in hits) + 1e-12
+    room_gain = np.sqrt(room_to_oh * oh_energy / room_energy) * sound.get("roomLevel", 1.0)
+    for h in hits:
+        h[1][:, 3:5] *= room_gain
+    return finish_sound(kit, sound, hits, out_dir, proc, True)
 
 
 def main():
@@ -269,8 +424,14 @@ def main():
         if not jobs:
             continue
         ensure_kit(kit, args.kits, args.download)
-        with ProcessPoolExecutor(max_workers=args.jobs) as pool:
-            entries += list(pool.map(build_sound, jobs))
+        if kit.get("type") == "files":
+            room = room_response(args.out, kit["roomFrom"])
+            jobs = [j + (room,) for j in jobs]
+            with ProcessPoolExecutor(max_workers=args.jobs) as pool:
+                entries += list(pool.map(build_files_sound, jobs))
+        else:
+            with ProcessPoolExecutor(max_workers=args.jobs) as pool:
+                entries += list(pool.map(build_sound, jobs))
         if args.discard_kits:
             shutil.rmtree(os.path.join(args.kits, kit["dir"]), ignore_errors=True)
 

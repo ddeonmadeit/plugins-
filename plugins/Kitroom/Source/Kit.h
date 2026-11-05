@@ -8,7 +8,7 @@
 namespace kr
 {
 /** Sounds are interchangeable within a category (any tom sound fits any tom slot, etc.). */
-enum class Category { Kick, Snare, HiHat, Tom, Cymbal, Ride };
+enum class Category { Kick, Snare, HiHat, Tom, Cymbal, Ride, Clap };
 
 struct ArticulationDef
 {
@@ -28,11 +28,13 @@ struct SlotDef
     std::vector<ArticulationDef> articulations;
 };
 
-constexpr int kNumSlots = 10;
+constexpr int kNumSlots = 11;
+constexpr int kNumClassicSlots = 10;   // slots before the clap (1.11 and older): their parameters come first
 constexpr int kMaxArticulations = 4;
 constexpr int kHatOpenGroup = 1;
+constexpr int kSidestickArt = 2;        // the snare articulation a layered clap does not follow
 
-enum Slot { Kick, Snare, HiHat, Tom1, Tom2, Tom3, Crash1, Crash2, RideSlot, China };
+enum Slot { Kick, Snare, HiHat, Tom1, Tom2, Tom3, Crash1, Crash2, RideSlot, China, ClapSlot };
 
 /** The kit layout. Order is permanent: parameter ids and saved sessions use the slot ids. */
 inline const std::array<SlotDef, kNumSlots>& slots()
@@ -54,6 +56,7 @@ inline const std::array<SlotDef, kNumSlots>& slots()
         { "ride",   "Ride",      Category::Ride,   { { "bow", "Bow", { 51, 59 }, "", 0, 0 },
                                                      { "bell", "Bell", { 53 }, "bow", 0, 0 } } },
         { "china",  "China",     Category::Cymbal, { { "hit", "China", { 52, 55 }, "", 0, 0 } } },
+        { "clap",   "Clap",      Category::Clap,   { { "hit", "Clap", { 39 }, "", 0, 0 } } },
     }};
     return s;
 }
@@ -68,6 +71,7 @@ inline const char* categoryId (Category c)
         case Category::Tom:    return "tom";
         case Category::Cymbal: return "cymbal";
         case Category::Ride:   return "ride";
+        case Category::Clap:   return "clap";
     }
     return "";
 }

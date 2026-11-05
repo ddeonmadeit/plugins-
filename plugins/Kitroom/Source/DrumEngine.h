@@ -12,6 +12,7 @@ struct SlotMix
 {
     float volume = 1.0f, panL = 1.0f, panR = 1.0f, tuneRatio = 1.0f, decay = 1.0f;
     float close = 1.0f, overheads = 1.0f, room = 1.0f;
+    float punch = 0.0f;   // 0..1: louder attack, tighter body, on the close mic (and half on the overheads)
 };
 
 /**
@@ -48,10 +49,13 @@ private:
         float decayEnv = 1.0f, decayCoef = 1.0f;
         int decayDelay = 0;
         float fade = 1.0f, fadeStep = 0.0f;   // fadeStep > 0 while choking / stealing
+        int elapsed = 0;                      // output samples since the hit, for Punch
+        int attackHold = 0, attackEnd = 1, bodyStart = 0, bodyEnd = 1;
         bool active = false;
     };
 
     const ArticulationData* resolve (const SoundData* sound, int slot, int art) const;
+    static float punchGains (const Voice&, float punch, float& overheads) noexcept;
     Voice* allocate();
     void fadeOut (Voice& v, float seconds) noexcept;
 

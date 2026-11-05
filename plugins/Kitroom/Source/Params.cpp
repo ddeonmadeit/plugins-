@@ -17,6 +17,7 @@ const char* slotSuffix (SP p)
         case SP::Close:     return "Close";
         case SP::Overheads: return "Overheads";
         case SP::Room:      return "Room";
+        case SP::Punch:     return "Punch";
         case SP::count:     break;
     }
     return "";
@@ -39,6 +40,7 @@ const char* masterId (MP p)
         case MP::DriveType: return "driveType";
         case MP::Crush:     return "crush";
         case MP::Tone:      return "tone";
+        case MP::ClapOnSnare: return "clapOnSnare";
         case MP::count:     break;
     }
     return "";
@@ -71,7 +73,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout createLayout()
 {
     juce::AudioProcessorValueTreeState::ParameterLayout layout;
 
-    for (int s = 0; s < kr::kNumSlots; ++s)
+    auto addSlotParams = [&layout] (int s)
     {
         const juce::String n = kr::slots()[(size_t) s].name;
         juce::NormalisableRange<float> vol (-48.0f, 6.0f);
@@ -83,7 +85,11 @@ juce::AudioProcessorValueTreeState::ParameterLayout createLayout()
         layout.add (makeFloat (slotParamId (s, SP::Close), n + " Close Mic", { 0.0f, 1.5f }, 1.0f, percent));
         layout.add (makeFloat (slotParamId (s, SP::Overheads), n + " Overheads", { 0.0f, 1.5f }, 1.0f, percent));
         layout.add (makeFloat (slotParamId (s, SP::Room), n + " Room", { 0.0f, 1.5f }, 1.0f, percent));
-    }
+    };
+
+    // Parameter order is what hosts show; everything added after 1.11 goes at the end.
+    for (int s = 0; s < kr::kNumClassicSlots; ++s)
+        addSlotParams (s);
 
     layout.add (makeFloat (masterId (MP::Close), "Close Mics", { 0.0f, 1.5f }, 1.0f, percent));
     layout.add (makeFloat (masterId (MP::Overheads), "Overheads", { 0.0f, 1.5f }, 0.8f, percent));
@@ -101,6 +107,13 @@ juce::AudioProcessorValueTreeState::ParameterLayout createLayout()
     layout.add (makeFloat (masterId (MP::Crush), "Crush", { 0.0f, 1.0f }, 0.0f, percent));
     layout.add (makeFloat (masterId (MP::Tone), "Tone", { -1.0f, 1.0f }, 0.0f,
                            [] (float v, int) { return std::abs (v) < 0.01f ? juce::String ("Flat") : (v > 0.0f ? "Bright " : "Dark ") + juce::String (juce::roundToInt (std::abs (v) * 100.0f)); }));
+
+    // 1.12: the clap, Punch on every piece, and the clap layered on the snare.
+    for (int s = kr::kNumClassicSlots; s < kr::kNumSlots; ++s)
+        addSlotParams (s);
+    for (int s = 0; s < kr::kNumSlots; ++s)
+        layout.add (makeFloat (slotParamId (s, SP::Punch), juce::String (kr::slots()[(size_t) s].name) + " Punch", { 0.0f, 1.0f }, 0.0f, percent));
+    layout.add (std::make_unique<juce::AudioParameterBool> (juce::ParameterID { masterId (MP::ClapOnSnare), 1 }, "Clap On Snare", false));
     return layout;
 }
 
