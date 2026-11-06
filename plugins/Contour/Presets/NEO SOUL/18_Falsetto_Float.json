@@ -1,0 +1,15 @@
+{
+  "name": "Falsetto Float",
+  "category": "NEO SOUL",
+  "author": "DEON",
+  "description": "Steadies a soft falsetto, calms its vibrato a little and opens the tone slightly so it floats over the track.",
+  "params": {
+    "center": 0.75,
+    "drift": 0.3,
+    "vibrato": 0.8,
+    "transition": 90.0,
+    "formant": 0.8,
+    "transpose": 0,
+    "outGain": 0.2
+  }
+}

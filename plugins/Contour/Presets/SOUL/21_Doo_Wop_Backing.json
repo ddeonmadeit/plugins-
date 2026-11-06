@@ -1,0 +1,15 @@
+{
+  "name": "Doo-Wop Backing",
+  "category": "SOUL",
+  "author": "DEON",
+  "description": "Tight, warm backing harmonies: notes locked like a rehearsed vocal group, the vibrato calmed and the tone a touch darker.",
+  "params": {
+    "center": 0.95,
+    "drift": 0.5,
+    "vibrato": 0.65,
+    "transition": 40.0,
+    "formant": -0.8,
+    "transpose": 0,
+    "outGain": 0.1
+  }
+}

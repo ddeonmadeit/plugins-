@@ -76,7 +76,7 @@ private:
     static constexpr int kChunk = 64;
 
     void rebuildNoteMap();
-    void handleNote (int note, float velocity);
+    void handleNote (int note, float velocity, juce::int64 when = -1);
     void play (int slot, int art, float velocity, float humanize);
     void processChunk (float* L, float* R, int n);
     juce::var captureKit() const;
@@ -94,6 +94,14 @@ private:
 
     juce::AbstractFifo auditionFifo { 64 };
     std::array<int, 64> auditionQueue {};
+
+    // Lay Back: hits waiting to sound a few milliseconds behind the beat (audio thread only).
+    struct Pending { juce::int64 due; int slot, art; float velocity, humanize; };
+    std::array<Pending, 128> pending {};
+    int numPending = 0;
+    juce::int64 sampleClock = 0;
+    void firePending (juce::int64 now);
+    juce::int64 nextPending() const noexcept;
 
     dd::Svf sideLowCut[2];   // LR4 high-pass on the side signal: lows stay mono whatever the rooms do
     dd::GlueCompressor glue;

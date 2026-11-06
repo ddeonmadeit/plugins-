@@ -10,7 +10,7 @@
     "Palm mute (also on the mod wheel), hammer-ons and slides on legato notes, vibrato, humanize, double-tracking for wide stereo guitars",
     "Pedalboard: compressor, overdrive, fuzz, chorus, tempo-synced tremolo and delay; amp with Clean, Crunch and Lead channels, a 1x12 or 4x12 cabinet and mic placement, plus a room",
     "TAPE STOP: slow the guitar to a halt like a tape machine powering down, then automate it at the end of a beat",
-    "60 presets, each a different guitar part: acoustic, clean, crunch and heavy, plus Travis Scott, Mike Dean, Yeezus, moshc0re, trip hop, 80s, 2000s, SOFT, UNIQUE and SAFE",
+    "71 presets, each a different guitar part: acoustic, clean, crunch and heavy, plus Travis Scott, Mike Dean, Yeezus, moshc0re, trip hop, 80s, 2000s, SOFT, UNIQUE, NEO SOUL, SOUL and SAFE",
     "Favourites: star the presets you love and browse just those; your stars survive updates"
   ],
   "installTips": [
@@ -20,10 +20,9 @@
   ],
   "previewNote": "on the same 80 BPM part: strummed Em, C and G chords (down and up strokes), then a single-note riff.",
   "whatsNew": {
-    "version": "1.8.0",
+    "version": "1.9.0",
     "items": [
-      "Hover over any knob or switch and the line under the top bar explains what it does, in plain words",
-      "Knobs sweep to their new positions when you change presets or automate them, instead of jumping"
+      "NEO SOUL and SOUL guitars: Ballad Neck Pickup, Bag Lady Trem, Dusty Nylon Loop, Double Stop Fills, Neo Chorus Wash, Glassy Ninths, plus Memphis Telecaster, Chicago Soul Chime, Hitsville Hollow Chops, Memphis Tremolo and Muscle Shoals Slide"
     ]
   }
 }

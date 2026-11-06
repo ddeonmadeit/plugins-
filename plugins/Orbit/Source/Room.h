@@ -36,10 +36,10 @@ struct RoomDef
     float lateTrim;                 // late reverb level beside the physics (open air has next to none)
 };
 
-inline const std::array<RoomDef, 12>& rooms()
+inline const std::array<RoomDef, 14>& rooms()
 {
     //                         name           W      L      H    RT60   hf   wall  floor ceil   erHz   late
-    static const std::array<RoomDef, 12> r {{
+    static const std::array<RoomDef, 14> r {{
         { "Studio",           5.0f,  6.0f,  3.0f, 0.32f, 0.60f, 0.50f, 0.62f, 0.35f,  9000.0f, 1.00f },
         { "Vocal Booth",      1.8f,  2.2f,  2.4f, 0.14f, 0.45f, 0.40f, 0.65f, 0.35f,  5000.0f, 0.80f },
         { "Living Room",      5.0f,  7.0f,  2.6f, 0.55f, 0.55f, 0.56f, 0.50f, 0.66f,  7000.0f, 1.00f },
@@ -52,6 +52,9 @@ inline const std::array<RoomDef, 12>& rooms()
         { "Arena",           90.0f, 110.0f, 30.0f, 3.20f, 0.50f, 0.78f, 0.60f, 0.60f,  5000.0f, 1.00f },
         { "Cave",            14.0f, 30.0f, 10.0f, 3.80f, 0.45f, 0.86f, 0.86f, 0.86f,  4500.0f, 1.00f },
         { "Open Air",        40.0f, 40.0f, 20.0f, 0.60f, 0.40f, 0.00f, 0.70f, 0.00f,  7000.0f, 0.05f },
+        // 1.1: soul rooms. A concrete echo chamber like Motown's, and an old cinema turned studio like Stax's.
+        { "Echo Chamber",     4.0f,  6.0f,  3.5f, 2.30f, 0.75f, 0.95f, 0.95f, 0.95f, 12000.0f, 1.30f },
+        { "Theater",         22.0f, 30.0f,  9.0f, 1.40f, 0.55f, 0.70f, 0.45f, 0.75f,  6500.0f, 1.00f },
     }};
     return r;
 }

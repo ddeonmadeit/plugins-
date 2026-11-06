@@ -1,0 +1,14 @@
+{
+  "name": "Vintage Soul S",
+  "category": "SOUL",
+  "author": "DEON",
+  "description": "Turns the whole sound down a little on each S, like an old limiter catching them: the soft, darker esses of a 60s soul record.",
+  "params": {
+    "amount": 0.45,
+    "sensitivity": 0.45,
+    "freq": 4200.0,
+    "fade": 6.0,
+    "mode": "Wide",
+    "outGain": 0.1
+  }
+}

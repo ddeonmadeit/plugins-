@@ -7,7 +7,7 @@
 
 const juce::StringArray& HushProcessor::categoryOrder()
 {
-    static const juce::StringArray order { "VOCAL", "RAP", "SINGING", "SPECIAL" };
+    static const juce::StringArray order { "VOCAL", "RAP", "SINGING", "SPECIAL", "NEO SOUL", "SOUL" };
     return order;
 }
 

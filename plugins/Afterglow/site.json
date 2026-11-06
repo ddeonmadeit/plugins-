@@ -11,7 +11,7 @@
     "Dirt (8 distortion types), tape wow and saturation, lo-fi, Juno / Solina ensemble, phaser, dub delay, shimmer reverb, tempo pump and gate",
     "Drag the sun to set Motion and Tone; Swell, Tail, Blend, Grit, Echo and Space reshape any preset",
     "POLY switch: play chords with any preset, even the mono leads",
-    "179 presets: TAME IMPALA, MASSIVE ATTACK, BRENT FAIYAZ, MIKE DEAN, TRAVIS SCOTT, YEEZUS, MOSHC0RE, GUITAR, TRIP HOP, 80S, 2000S, SOFT, UNIQUE, LIVE (real instruments), PADS, ARPS, SAFE",
+    "198 presets: TAME IMPALA, MASSIVE ATTACK, BRENT FAIYAZ, MIKE DEAN, TRAVIS SCOTT, YEEZUS, MOSHC0RE, GUITAR, TRIP HOP, 80S, 2000S, SOFT, UNIQUE, LIVE (real instruments), PADS, ARPS, NEO SOUL (Rhodes, Wurli, organ, vibes), SOUL (Memphis organ, Philly strings, Stax horns), SAFE",
     "TAPE STOP: slow everything to a halt like a tape machine powering down, then automate it at the end of a beat",
     "Favourites: star the presets you love and browse just those; your stars survive updates"
   ],
@@ -25,14 +25,10 @@
   ],
   "previewNote": "on the same 120 BPM phrase: a held Dm9, an arpeggio over Bb, Fmaj7 stabs, then a legato melody. GUITAR presets play strummed Em, C and G chords at 80 BPM and a riff.",
   "whatsNew": {
-    "version": "1.12.0",
+    "version": "1.13.0",
     "items": [
-      "Real instruments: a new LIVE source plays 19 recorded instruments (VSCO 2 and VCSL, public domain): string section, pizzicato and tremolo strings, solo violin, grand and upright piano, harp, flute, clarinet, tenor sax, harmonica, french horn, trumpet, trombone, pipe organ, vibraphone, marimba, glockenspiel and tubular bells. Velocity picks the recorded dynamic; sustained instruments loop seamlessly so you can hold them as long as you like",
-      "LIVE: 24 presets, from Concert Grand and Felt Piano to String Section, Trap Flute, Soul Horns, Strings And Horns and Piano And Strings",
-      "Arpeggiator: ARP on the front panel with its speed beside it; up, down, up-down, random, as played or chord stabs, 1-4 octaves, gate and swing, in time with FL Studio",
-      "ARPS: 12 presets (Upside Arp, Trance Pluck Arp, Harp Cascade, Pizzicato Run, Marimba Rain, Lo-fi Piano Arp...) and PADS: 10 more pads, synth and real (Bowed Swell, Horn Swell, Choir Mist, Glass Cathedral...)",
-      "Hover over any knob or switch and the description in the window explains it in plain words; knobs sweep to new presets instead of jumping",
-      "Your projects sound exactly as before"
+      "NEO SOUL: Voodoo Rhodes, Baduizm Wurli, Dilla Dusty Keys, Rhodes Through Leslie, Neo Organ Swell, Mama's Gun Pad, Silk Synth Lead, Late Night Vibes, Neo Soul Strings, Glasper Stack and Black Radio Piano",
+      "SOUL: Memphis Organ, Philly Strings, Stax Horn Stabs, Motown Vibes, Southern Soul Piano, Superfly Flute, Sunday Choir and Supremes Glock (real recorded strings, horns, vibes, piano, flute and glockenspiel)"
     ]
   }
 }

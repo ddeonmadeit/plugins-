@@ -1,0 +1,15 @@
+{
+  "name": "Vintage 45",
+  "category": "SOUL",
+  "author": "DEON",
+  "description": "Thick grain like a worn record sleeve, a quiet screen, slow scrolling: 60s soul colours.",
+  "params": {
+    "react": 0.6,
+    "grain": 1.0,
+    "digital": 0.2,
+    "speed": 0.35,
+    "eclipse": 0.1,
+    "dunes": 0.5,
+    "heat": 0.55
+  }
+}

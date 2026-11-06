@@ -1,0 +1,15 @@
+{
+  "name": "Neo Soul Runs",
+  "category": "NEO SOUL",
+  "author": "DEON",
+  "description": "Pulls notes gently towards pitch but keeps the scoops and slow slides between them, so runs and melismas stay human.",
+  "params": {
+    "center": 0.6,
+    "drift": 0.1,
+    "vibrato": 1.15,
+    "transition": 120.0,
+    "formant": 0.0,
+    "transpose": 0,
+    "outGain": 0.1
+  }
+}

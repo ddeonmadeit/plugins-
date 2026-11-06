@@ -1,0 +1,14 @@
+{
+  "name": "Belter De-Ess",
+  "category": "SOUL",
+  "author": "DEON",
+  "description": "Firm, quick cuts for loud belted soul and gospel leads, where the S's get harsh at full voice.",
+  "params": {
+    "amount": 0.7,
+    "sensitivity": 0.58,
+    "freq": 6000.0,
+    "fade": 4.0,
+    "mode": "Split",
+    "outGain": -0.0
+  }
+}

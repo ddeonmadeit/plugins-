@@ -1,0 +1,14 @@
+{
+  "name": "Whisper Lead",
+  "category": "NEO SOUL",
+  "author": "DEON",
+  "description": "For a lead sung right on the mic: catches the extra-hissy close-up S's and SH's firmly, keeps the warmth below.",
+  "params": {
+    "amount": 0.6,
+    "sensitivity": 0.6,
+    "freq": 4800.0,
+    "fade": 6.0,
+    "mode": "Split",
+    "outGain": -0.0
+  }
+}

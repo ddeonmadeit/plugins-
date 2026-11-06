@@ -1,0 +1,15 @@
+{
+  "name": "Late Night Neo Soul",
+  "category": "NEO SOUL",
+  "author": "DEON",
+  "description": "Slow and smoky: low dunes, deep reds, the sun half covered, everything moving gently. For laid-back grooves.",
+  "params": {
+    "react": 0.5,
+    "grain": 0.75,
+    "digital": 0.4,
+    "speed": 0.3,
+    "eclipse": 0.5,
+    "dunes": 0.45,
+    "heat": 0.25
+  }
+}

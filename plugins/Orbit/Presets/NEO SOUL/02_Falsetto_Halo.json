@@ -1,0 +1,21 @@
+{
+  "name": "Falsetto Halo",
+  "category": "NEO SOUL",
+  "author": "DEON",
+  "description": "Up high and just behind you, spread wide, drifting very slightly: stacked falsetto backgrounds that hover over the lead.",
+  "params": {
+    "posX": 0.0,
+    "posY": -0.2,
+    "posZ": 0.85,
+    "width": 1.0,
+    "room": "Living Room",
+    "size": 0.6,
+    "roomLevel": 0.55,
+    "motion": "Wander",
+    "motionRate": "8 Bars",
+    "motionAmount": 0.15,
+    "doppler": 0.5,
+    "mix": 1.0,
+    "outGain": -0.9
+  }
+}

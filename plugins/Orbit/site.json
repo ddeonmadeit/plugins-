@@ -6,12 +6,12 @@
   "highlights": [
     "A drawn 3D room you can see into: the sound is a lamp hanging in the space with its shadow and height, your head in the middle, width shown as an arc of light, the first reflections drawn as rays off the walls, rings of light on every hit, and walls that glow while the room rings. Look from behind your head, from above like a map, or from the side; right-drag to turn the view",
     "Real 3D on headphones: head-related filters measured on a KEMAR mannequin (Viking HRTF dataset, four choices of ears), smooth interaural timing and near-ear loudness, so sounds sit behind and above you, not just left and right",
-    "Twelve real rooms with their own size, walls and echo: 24 early reflections per side from the actual room shape, a dense late reverb with the room's own decay, and a Size knob that shrinks or grows the space. Switching rooms keeps your mix level",
+    "Fourteen real rooms (now with a Motown-style echo chamber and a Stax-style theater) with their own size, walls and echo: 24 early reflections per side from the actual room shape, a dense late reverb with the room's own decay, and a Size knob that shrinks or grows the space. Switching rooms keeps your mix level",
     "The fourth dimension: Motion paths locked to your song's tempo (orbit, pendulum, figure 8, fly-by, rise, spiral, wander), how far it travels, and Doppler for the pitch bend of a sound rushing past",
     "Width from the listener's seat: from a single point to a sound spread across half the horizon",
     "Automate everything: dragging the light records Left / Right, Front / Back and Height as automation in FL Studio",
     "Zero latency, mono-safe low end (the bass stays centred), and a Speakers mode for monitors",
-    "40 presets: around you, rooms, motion, Travis Scott ad-libs, Tame Impala swirl, trip hop distance and mix tools",
+    "48 presets: around you, rooms, motion, Travis Scott ad-libs, Tame Impala swirl, trip hop distance, mix tools, neo soul and soul (including the Motown echo chamber)",
     "Head-related filters from The Viking HRTF dataset v2 (Spagnol, Miccini and Unnthorsson, 2020), CC BY 4.0"
   ],
   "installTips": [
@@ -20,5 +20,12 @@
     "Try the EARS choices with a sound placed behind you: the one where it really sounds behind you suits your ears best.",
     "To automate a move in FL Studio, right-click Left / Right, Front / Back or Height and choose Create automation clip, or arm recording and drag the light while the song plays."
   ],
-  "previewNote": "on the test programme. Listen on headphones: Orbit is 3D audio."
+  "previewNote": "on the test programme. Listen on headphones: Orbit is 3D audio.",
+  "whatsNew": {
+    "version": "1.1.0",
+    "items": [
+      "Two soul rooms: Echo Chamber (the bright concrete chamber behind 60s Motown records) and Theater (an old cinema turned studio, like Stax)",
+      "NEO SOUL and SOUL placements: Electric Lady Room, Falsetto Halo, Rhodes Slow Swirl, Basement Session, plus Hitsville Echo Chamber, Stax Theater, Mono Soul 45 and Sunday Church"
+    ]
+  }
 }

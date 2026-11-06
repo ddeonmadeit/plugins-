@@ -10,7 +10,7 @@
     "Analog chain: mic voicing, tube / tape / console / crunch saturation (4x oversampled, tone, parallel mix), a vocal rider, and FET, opto, vintage-limiter or VCA compression with a sidechain filter and gain-reduction meter",
     "Smooth (a resonance suppressor that tames harsh frequencies only while they ring), Air (mid and high air that stays smooth on esses), de-esser, doubler, chorus and Dimension widening, tape, a tape delay that ducks under the voice, plate / room / hall / chamber / gated reverbs and a true-peak limiter",
     "Vocoder that plays the note you sing (and the chord of your key) with string, robot, choir or brass voices: no MIDI needed",
-    "31 presets, each a different record or job: DEON, 80s, 2000s, Travis Scott, Ye, Tame Impala, R&B, trip hop, moshc0re and studio essentials",
+    "39 presets, each a different record or job: DEON, 80s, 2000s, Travis Scott, Ye, Tame Impala, R&B, trip hop, moshc0re, studio essentials, neo soul and 60s soul",
     "Favourites: star the presets you love and browse just those; your stars survive updates"
   ],
   "installTips": [
@@ -20,9 +20,9 @@
   ],
   "previewNote": "on a synthetic sung test phrase (slightly off pitch on purpose), so you hear the chain and the correction, not a real singer.",
   "whatsNew": {
-    "version": "1.3.0",
+    "version": "1.4.0",
     "items": [
-      "Favourites: press the star key just right of the preset name to star a preset, then find all your starred sounds in FAVOURITES at the top of the category list (the arrows step through just those). Stars are kept across updates, in every project"
+      "NEO SOUL and SOUL vocal chains: Baduizm Vocal, Voodoo Stack, Neo Soul Lead, Dusty Sample Vocal, plus Hitsville Lead (Motown echo chamber), Memphis Raw, Philly Silk and Gospel Belt"
     ]
   }
 }

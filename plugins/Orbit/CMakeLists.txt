@@ -2,7 +2,7 @@ dd_add_plugin(Orbit
     PRODUCT_NAME "Orbit"
     PLUGIN_CODE  Orbt
     KIND         EFFECT
-    VERSION      1.0.0
+    VERSION      1.1.0
     PRESETS_DIR  Presets
     SOURCES
         Source/PluginProcessor.cpp

@@ -10,7 +10,7 @@
     "Clean: Split mode crossfades only the part above Freq to a zero-phase low band, so with no cut the vocal comes out sample-for-sample identical, and with a cut nothing below Freq changes. Wide mode turns the whole sound down",
     "Works like Contour: TRANSFER captures the track while your DAW plays, playback follows the song with no latency, and audio not yet captured is de-essed live",
     "Listen switch to hear only what is being taken out; bounce the result to a WAV and drag it into your playlist",
-    "12 presets for natural, firm, rap, airy pop, breathy R&B, high and low voices, a heavy lisp fix and hand-only editing",
+    "16 presets for natural, firm, rap, airy pop, breathy R&B, high and low voices, neo soul and soul, a heavy lisp fix and hand-only editing",
     "Favourites: star the presets you love and browse just those; your stars survive updates"
   ],
   "installTips": [
@@ -20,9 +20,9 @@
   ],
   "previewNote": "on a synthetic sung phrase with S, SH and T consonants of different loudness, captured and played back through each preset.",
   "whatsNew": {
-    "version": "1.1.0",
+    "version": "1.2.0",
     "items": [
-      "Favourites: press the star key just right of the preset name to star a preset, then find all your starred sounds in FAVOURITES at the top of the category list (the arrows step through just those). Stars are kept across updates, in every project"
+      "NEO SOUL and SOUL de-essing: Neo Soul Breath, Whisper Lead, Vintage Soul S (an old limiter catching the S's) and Belter De-Ess"
     ]
   }
 }

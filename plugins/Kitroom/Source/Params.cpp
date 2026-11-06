@@ -41,6 +41,7 @@ const char* masterId (MP p)
         case MP::Crush:     return "crush";
         case MP::Tone:      return "tone";
         case MP::ClapOnSnare: return "clapOnSnare";
+        case MP::LayBack:   return "layBack";
         case MP::count:     break;
     }
     return "";
@@ -114,6 +115,9 @@ juce::AudioProcessorValueTreeState::ParameterLayout createLayout()
     for (int s = 0; s < kr::kNumSlots; ++s)
         layout.add (makeFloat (slotParamId (s, SP::Punch), juce::String (kr::slots()[(size_t) s].name) + " Punch", { 0.0f, 1.0f }, 0.0f, percent));
     layout.add (std::make_unique<juce::AudioParameterBool> (juce::ParameterID { masterId (MP::ClapOnSnare), 1 }, "Clap On Snare", false));
+    // 1.14: the neo-soul pocket. Snare and clap land this late, hats and ride 40 % of it, the kick stays on the grid.
+    layout.add (makeFloat (masterId (MP::LayBack), "Lay Back", { 0.0f, 60.0f }, 0.0f,
+                           [] (float v, int) { return v < 0.5f ? juce::String ("On the grid") : juce::String (juce::roundToInt (v)) + " ms late"; }));
     return layout;
 }
 

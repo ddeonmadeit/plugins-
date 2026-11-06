@@ -37,6 +37,7 @@ std::map<juce::String, juce::String> kitroomHelp()
         { "crush",           "Bit crusher: gritty, lo-fi, sampler-style drums." },
         { "tone",            "Darker or brighter kit." },
         { "clapOnSnare",     "Every snare hit (not the sidestick) also plays the clap, at the same strength." },
+        { "layBack",         "Plays the snare and clap behind the beat (hats and ride a little less, the kick stays on time): the lazy neo-soul pocket. 0 is right on the grid." },
     };
     for (int s = 0; s < kr::kNumSlots; ++s)
     {
@@ -60,7 +61,7 @@ KitroomEditor::Content::Content (KitroomProcessor& p)
       description (topBar.presets()),
       kit (p),
       element (p),
-      mix ("Mix", 6, 3, kMicAccent)
+      mix ("Mix", 7, 3, kMicAccent)
 {
     auto& s = p.apvts;
     // Mic buses, then the bus processing, then playing feel; drive type and the scope on the right.
@@ -78,10 +79,12 @@ KitroomEditor::Content::Content (KitroomProcessor& p)
         mix.place (i % 4, i / 4);
         ++i;
     }
+    mix.add<Knob> (s, "layBack", "Lay Back", kFeelAccent);
+    mix.place (4, 0);
     mix.add<dd::gui::Choice> (s, "driveType", "Drive Type");
-    mix.place (4, 0, 2, 1);
+    mix.place (5, 0, 2, 1);
     mix.add<dd::gui::Scope> (p.scope);
-    mix.place (4, 1, 2, 2);
+    mix.place (4, 1, 3, 2);
 
     kit.onSelect = [this] (int slot) { element.setSlot (slot); };
 

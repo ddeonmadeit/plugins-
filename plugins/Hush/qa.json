@@ -1,5 +1,12 @@
 {
-  "categories": ["VOCAL", "RAP", "SINGING", "SPECIAL"],
+  "categories": [
+    "VOCAL",
+    "RAP",
+    "SINGING",
+    "SPECIAL",
+    "NEO SOUL",
+    "SOUL"
+  ],
   "targetLufs": -15.0,
   "toleranceLu": 1.5,
   "similarBelow": 0.0,

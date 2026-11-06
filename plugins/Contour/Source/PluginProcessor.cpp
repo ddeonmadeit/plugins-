@@ -7,7 +7,7 @@
 
 const juce::StringArray& ContourProcessor::categoryOrder()
 {
-    static const juce::StringArray order { "NATURAL", "TIGHT", "CREATIVE" };
+    static const juce::StringArray order { "NATURAL", "TIGHT", "CREATIVE", "NEO SOUL", "SOUL" };
     return order;
 }
 

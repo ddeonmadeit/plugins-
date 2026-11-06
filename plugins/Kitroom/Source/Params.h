@@ -12,7 +12,7 @@ constexpr int kClassicSlotParams = (int) SP::Punch;   // the per-slot parameters
 constexpr int kSlotParams = (int) SP::count;
 
 /** Master parameters. Append only: ids are permanent and old sessions load the defaults for new ones. */
-enum class MP { Close, Overheads, Room, VelCurve, Humanize, Glue, Clip, Width, Output, Drive, DriveType, Crush, Tone, ClapOnSnare, count };
+enum class MP { Close, Overheads, Room, VelCurve, Humanize, Glue, Clip, Width, Output, Drive, DriveType, Crush, Tone, ClapOnSnare, LayBack, count };
 constexpr int kMasterParams = (int) MP::count;
 
 juce::String slotParamId (int slot, SP p);

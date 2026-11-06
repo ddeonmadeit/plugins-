@@ -5,13 +5,14 @@
   "accent": "#e8a33d",
   "highlights": [
     "Kick, snare with rimshot and sidestick, hi-hat (closed, half-open, open, pedal), 3 toms, 2 crashes, ride with bell, china, and a clap",
+    "Lay Back: one knob drags the snare and clap behind the beat (hats and ride less, kick on time) for the lazy neo-soul pocket",
     "Punch on every piece: a harder attack and a tighter body on the close mics, while the room stays natural. Punchy kicks and snares to swap in (a tight death-metal kit's kicks and cracking snare, the studio kick's front mic)",
     "Real hand claps (tight three-person, loose gospel group, solo) placed in the studio kit's own room, on their own key or layered on every snare hit",
     "Swap any piece for another recorded sound of its kind, including a full brushes kit",
     "Close, overhead and room mics per piece and for the whole kit, plus tune, decay, glue and width",
     "Kit-bus Drive (8 distortion types), bit Crush and Tone, for anything from warm tape to broken industrial",
     "General MIDI key map shown in FL Studio note names; re-learn any key from your keyboard",
-    "78 kit presets: studio, live room, vintage and jazz, tight funk and soul, PUNCH (hard-hitting kits with claps), big rooms, Yeezus, moshc0re, KING, trip hop, 80s, 2000s, SOFT and UNIQUE",
+    "86 kit presets: studio, live room, vintage and jazz, tight funk and soul, PUNCH (hard-hitting kits with claps), big rooms, Yeezus, moshc0re, KING, trip hop, 80s, 2000s, SOFT, UNIQUE, NEO SOUL (laid-back pockets) and SOUL (Motown, Memphis, Philly)",
     "Favourites: star the presets you love and browse just those; your stars survive updates"
   ],
   "installTips": [
@@ -20,11 +21,10 @@
   ],
   "previewNote": "on the same five-bar 96 BPM groove: ghost notes, open hat, a ride bar, a tom fill and crashes ringing out.",
   "whatsNew": {
-    "version": "1.13.0",
+    "version": "1.14.0",
     "items": [
-      "The kit moves: cymbals swing and tip on their stands when you hit them, drum heads ripple and jump, the kick's front head breathes out",
-      "Hover over any knob or switch and the line under the top bar explains what it does, in plain words",
-      "Knobs sweep to their new positions when you change presets or automate them, instead of jumping"
+      "Lay Back: a new knob in the mix panel that plays the snare and clap behind the beat (hats and ride a little less, the kick stays on time), the lazy pocket of D'Angelo, Questlove and Dilla records. 0 = right on the grid",
+      "NEO SOUL and SOUL kits: Voodoo Pocket, Dilla Drunk Kit, Brushed Pocket, Late Night Cross Stick, plus Hitsville Claps (Motown stomp and clap), Memphis Dry Snap, Funk Break Kit and Philly Sweet Kit"
     ]
   }
 }

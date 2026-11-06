@@ -1,0 +1,15 @@
+{
+  "name": "Electric Lady Ring",
+  "category": "NEO SOUL",
+  "author": "DEON",
+  "description": "The moon almost covers the sun so only its glowing ring is left, with warm dunes rolling slowly underneath.",
+  "params": {
+    "react": 0.6,
+    "grain": 0.65,
+    "digital": 0.5,
+    "speed": 0.35,
+    "eclipse": 0.92,
+    "dunes": 0.55,
+    "heat": 0.45
+  }
+}

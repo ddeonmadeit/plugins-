@@ -2,7 +2,7 @@ dd_add_plugin(Mirage
     PRODUCT_NAME "Mirage"
     PLUGIN_CODE  Mrge
     KIND         EFFECT
-    VERSION      1.0.1
+    VERSION      1.1.0
     PRESETS_DIR  Presets
     SOURCES
         Source/PluginProcessor.cpp

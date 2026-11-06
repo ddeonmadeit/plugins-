@@ -1,0 +1,15 @@
+{
+  "name": "Gospel Vibrato",
+  "category": "SOUL",
+  "author": "DEON",
+  "description": "Keeps the pitch honest and widens the vibrato on held notes: the big gospel-soul finish.",
+  "params": {
+    "center": 0.6,
+    "drift": 0.2,
+    "vibrato": 1.6,
+    "transition": 80.0,
+    "formant": 0.0,
+    "transpose": 0,
+    "outGain": 0.1
+  }
+}

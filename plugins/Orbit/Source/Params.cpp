@@ -22,7 +22,7 @@ const std::array<ParamSpec, (size_t) kNumParams>& table()
         { P::posY,         "posY",         "Back / Front", K::Float, -1, 1, 0.5f, 0, U::Depth, nullptr },
         { P::posZ,         "posZ",         "Height",       K::Float, 0, 1, 0.4f, 0, U::Percent, nullptr },
         { P::width,        "width",        "Width",        K::Float, 0, 1, 0.3f, 0, U::Percent, nullptr },
-        { P::room,         "room",         "Room",         K::Choice, 0, 11, 0, 0, U::None, &roomChoices() },
+        { P::room,         "room",         "Room",         K::Choice, 0, 13, 0, 0, U::None, &roomChoices() },
         { P::size,         "size",         "Size",         K::Float, 0, 1, 0.5f, 0, U::Scale, nullptr },
         { P::roomLevel,    "roomLevel",    "Room Level",   K::Float, 0, 1, 0.5f, 0, U::Percent, nullptr },
         { P::motion,       "motion",       "Motion",       K::Choice, 0, 7, 0, 0, U::None, &motionNames() },

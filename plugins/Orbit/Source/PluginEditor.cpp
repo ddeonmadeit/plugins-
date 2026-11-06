@@ -45,6 +45,8 @@ const juce::StringArray& roomHelp()
         "A stadium: enormous and distant, echoes slapping back.",
         "Wet rock: dark, deep and uneven.",
         "Outdoors: only the ground under you, no walls, no echo.",
+        "A bare concrete room with a speaker and a mic: the bright two-second echo on 60s Motown records.",
+        "An old cinema turned studio: wide and warm, the seats soak up the highs. The Memphis soul room.",
     };
     return h;
 }

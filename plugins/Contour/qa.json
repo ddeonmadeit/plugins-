@@ -1,5 +1,11 @@
 {
-  "categories": ["NATURAL", "TIGHT", "CREATIVE"],
+  "categories": [
+    "NATURAL",
+    "TIGHT",
+    "CREATIVE",
+    "NEO SOUL",
+    "SOUL"
+  ],
   "targetLufs": -15.0,
   "toleranceLu": 1.5,
   "similarBelow": 0.0,

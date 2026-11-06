@@ -9,7 +9,7 @@ using orbit::P;
 
 const juce::StringArray& OrbitProcessor::categoryOrder()
 {
-    static const juce::StringArray order { "AROUND YOU", "ROOMS", "MOTION", "TRAVIS SCOTT", "TAME IMPALA", "TRIP HOP", "MIX", "USER" };
+    static const juce::StringArray order { "AROUND YOU", "ROOMS", "MOTION", "TRAVIS SCOTT", "TAME IMPALA", "TRIP HOP", "MIX", "NEO SOUL", "SOUL", "USER" };
     return order;
 }
 

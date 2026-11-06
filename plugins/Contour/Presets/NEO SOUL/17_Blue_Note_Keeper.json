@@ -1,0 +1,15 @@
+{
+  "name": "Blue Note Keeper",
+  "category": "NEO SOUL",
+  "author": "DEON",
+  "description": "Barely there: leaves bent and slightly flat notes alone and only steadies the ones that wander far. For bluesy neo soul phrasing.",
+  "params": {
+    "center": 0.35,
+    "drift": 0.0,
+    "vibrato": 1.0,
+    "transition": 170.0,
+    "formant": 0.0,
+    "transpose": 0,
+    "outGain": 0.1
+  }
+}

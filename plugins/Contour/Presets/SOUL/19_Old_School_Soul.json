@@ -1,0 +1,15 @@
+{
+  "name": "Old School Soul",
+  "category": "SOUL",
+  "author": "DEON",
+  "description": "Anchors the notes very lightly and lets the vibrato bloom a little more: a 60s soul take, steadied but untouched in feel.",
+  "params": {
+    "center": 0.3,
+    "drift": 0.05,
+    "vibrato": 1.25,
+    "transition": 140.0,
+    "formant": 0.0,
+    "transpose": 0,
+    "outGain": 0.1
+  }
+}

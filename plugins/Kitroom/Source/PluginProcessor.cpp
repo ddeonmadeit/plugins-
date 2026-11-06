@@ -10,7 +10,7 @@ using kitroom::MP;
 
 const juce::StringArray& KitroomProcessor::categoryOrder()
 {
-    static const juce::StringArray order { "STUDIO", "LIVE ROOM", "VINTAGE", "TIGHT", "PUNCH", "BIG", "YEEZUS", "MOSHC0RE", "KING", "TRIP HOP", "80S", "2000S", "SOFT", "UNIQUE", "USER" };
+    static const juce::StringArray order { "STUDIO", "LIVE ROOM", "VINTAGE", "TIGHT", "PUNCH", "BIG", "YEEZUS", "MOSHC0RE", "KING", "TRIP HOP", "80S", "2000S", "SOFT", "UNIQUE", "NEO SOUL", "SOUL", "USER" };
     return order;
 }
 
@@ -186,6 +186,8 @@ bool KitroomProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 void KitroomProcessor::prepareToPlay (double sampleRate, int)
 {
     sr = sampleRate;
+    numPending = 0;
+    sampleClock = 0;
     engine.prepare (sr);
     for (auto& f : sideLowCut)
     {
@@ -205,7 +207,7 @@ void KitroomProcessor::prepareToPlay (double sampleRate, int)
     setLatencySamples (dirt.getLatency() + clipper.getLatency());
 }
 
-void KitroomProcessor::handleNote (int note, float velocity)
+void KitroomProcessor::handleNote (int note, float velocity, juce::int64 when)
 {
     if (learnTarget.load() >= 0)
         learnedNote.store (note);
@@ -217,7 +219,40 @@ void KitroomProcessor::handleNote (int note, float velocity)
     if (art >= (int) kr::slots()[(size_t) slot].articulations.size())
         return;
 
+    // Lay Back: the snare (and clap) a little behind the beat, hats and ride less, kick and toms on the grid.
+    const auto category = kr::slots()[(size_t) slot].category;
+    const float share = (category == kr::Category::Snare || category == kr::Category::Clap) ? 1.0f
+                      : (category == kr::Category::HiHat || category == kr::Category::Ride) ? 0.4f : 0.0f;
+    const auto delay = (juce::int64) std::lround (params.master (MP::LayBack) * share * 0.001 * sr);
+    if (when >= 0 && delay > 0 && numPending < (int) pending.size())
+    {
+        pending[(size_t) numPending++] = { when + delay, slot, art, velocity, params.master (MP::Humanize) };
+        return;
+    }
     play (slot, art, velocity, params.master (MP::Humanize));
+}
+
+void KitroomProcessor::firePending (juce::int64 now)
+{
+    for (int i = 0; i < numPending;)
+    {
+        if (pending[(size_t) i].due <= now)
+        {
+            const auto e = pending[(size_t) i];
+            pending[(size_t) i] = pending[(size_t) --numPending];
+            play (e.slot, e.art, e.velocity, e.humanize);
+        }
+        else
+            ++i;
+    }
+}
+
+juce::int64 KitroomProcessor::nextPending() const noexcept
+{
+    juce::int64 next = std::numeric_limits<juce::int64>::max();
+    for (int i = 0; i < numPending; ++i)
+        next = std::min (next, pending[(size_t) i].due);
+    return next;
 }
 
 void KitroomProcessor::play (int slot, int art, float velocity, float humanize)
@@ -294,6 +329,7 @@ void KitroomProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mid
         while (done < n)
         {
             int segEnd = n;
+            const juce::int64 now = sampleClock + pos + done;
             for (; it != midi.cend(); ++it)
             {
                 const auto meta = *it;
@@ -302,10 +338,18 @@ void KitroomProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mid
                 if (t > done) { segEnd = t; break; }
                 const auto m = meta.getMessage();
                 if (m.isNoteOn())
-                    handleNote (m.getNoteNumber(), m.getFloatVelocity());
+                    handleNote (m.getNoteNumber(), m.getFloatVelocity(), now);
                 else if (m.isAllSoundOff())
+                {
                     engine.reset();
+                    numPending = 0;
+                }
             }
+            // Laid-back hits that are due now, and the next one to split the render at.
+            firePending (now);
+            const auto next = nextPending();
+            if (next < sampleClock + pos + segEnd)
+                segEnd = std::max (done + 1, (int) (next - sampleClock - pos));
             engine.render (cl + done, cr + done, segEnd - done, mixes);
             done = segEnd;
         }
@@ -317,6 +361,7 @@ void KitroomProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mid
     }
 
     scope.push (L, R, numSamples);
+    sampleClock += numSamples;
 }
 
 void KitroomProcessor::processChunk (float* L, float* R, int n)

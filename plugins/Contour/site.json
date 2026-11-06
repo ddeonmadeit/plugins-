@@ -10,7 +10,7 @@
     "Pitch-synchronous (PSOLA) processing: each sung pulse is moved whole, so vowels and timbre stay natural; an untouched note comes out sample-for-sample identical to what was sung, with no latency.",
     "Whole-take correction on top: Center pulls every note you haven't moved toward the scale, Drift steadies, Vibrato scales, Transition sets how fast pitch moves between notes (down to the hard-tune effect), plus Formant, Transpose and key detection.",
     "Bounce the edit to a WAV and drag it straight into your playlist. Takes are stored in Music/ddeonmadeit/Contour/Takes and your edits are saved with the project.",
-    "15 correction styles: natural touch-ups, tight pop, straight tone, R&B runs, hard snap, wide vibrato, deeper or brighter voice, octave up or down, a fifth-above harmony.",
+    "21 correction styles: natural touch-ups, tight pop, straight tone, R&B runs, hard snap, wide vibrato, deeper or brighter voice, octave up or down, a fifth-above harmony, plus neo soul and soul styles that keep runs and vibrato human.",
     "Favourites: star the presets you love and browse just those; your stars survive updates"
   ],
   "installTips": [
@@ -20,9 +20,9 @@
   ],
   "previewNote": "on a synthetic sung test phrase (slightly off pitch on purpose), captured and played back through each correction style.",
   "whatsNew": {
-    "version": "1.1.0",
+    "version": "1.2.0",
     "items": [
-      "Favourites: press the star key just right of the preset name to star a preset, then find all your starred sounds in FAVOURITES at the top of the category list (the arrows step through just those). Stars are kept across updates, in every project"
+      "NEO SOUL and SOUL correction styles that keep runs, scoops and vibrato human: Neo Soul Runs, Blue Note Keeper, Falsetto Float, Old School Soul, Gospel Vibrato and Doo-Wop Backing"
     ]
   }
 }

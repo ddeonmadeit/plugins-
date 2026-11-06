@@ -1,0 +1,15 @@
+{
+  "name": "Gospel Sunrise",
+  "category": "SOUL",
+  "author": "DEON",
+  "description": "A full, bright sun and tall dunes that jump with the music: big and joyful.",
+  "params": {
+    "react": 0.85,
+    "grain": 0.6,
+    "digital": 0.45,
+    "speed": 0.55,
+    "eclipse": 0.0,
+    "dunes": 0.8,
+    "heat": 0.75
+  }
+}

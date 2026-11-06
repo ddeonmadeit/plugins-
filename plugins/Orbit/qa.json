@@ -1,5 +1,15 @@
 {
-  "categories": ["AROUND YOU", "ROOMS", "MOTION", "TRAVIS SCOTT", "TAME IMPALA", "TRIP HOP", "MIX"],
+  "categories": [
+    "AROUND YOU",
+    "ROOMS",
+    "MOTION",
+    "TRAVIS SCOTT",
+    "TAME IMPALA",
+    "TRIP HOP",
+    "MIX",
+    "NEO SOUL",
+    "SOUL"
+  ],
   "targetLufs": -16.0,
   "toleranceLu": 2.0,
   "similarBelow": 0.0,

@@ -23,7 +23,7 @@ AfterglowProcessor::~AfterglowProcessor()
 
 const juce::StringArray& AfterglowProcessor::categoryOrder()
 {
-    static const juce::StringArray order { "TAME IMPALA", "MASSIVE ATTACK", "BRENT FAIYAZ", "MIKE DEAN", "TRAVIS SCOTT", "YEEZUS", "MOSHC0RE", "GUITAR", "TRIP HOP", "80S", "2000S", "SOFT", "UNIQUE", "LIVE", "PADS", "ARPS", "SAFE", "USER" };
+    static const juce::StringArray order { "TAME IMPALA", "MASSIVE ATTACK", "BRENT FAIYAZ", "MIKE DEAN", "TRAVIS SCOTT", "YEEZUS", "MOSHC0RE", "GUITAR", "TRIP HOP", "80S", "2000S", "SOFT", "UNIQUE", "LIVE", "PADS", "ARPS", "NEO SOUL", "SOUL", "SAFE", "USER" };
     return order;
 }
 

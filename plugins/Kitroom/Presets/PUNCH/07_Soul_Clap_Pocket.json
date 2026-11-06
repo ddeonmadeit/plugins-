@@ -105,7 +105,8 @@
     "ridePunch": 0.0,
     "chinaPunch": 0.0,
     "clapPunch": 0.0,
-    "clapOnSnare": true
+    "clapOnSnare": true,
+    "layBack": 0.0
   },
   "extra": {
     "kit": {

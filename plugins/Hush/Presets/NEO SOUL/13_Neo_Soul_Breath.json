@@ -1,0 +1,14 @@
+{
+  "name": "Neo Soul Breath",
+  "category": "NEO SOUL",
+  "author": "DEON",
+  "description": "Light, slow-fading cuts that soften the S's without touching the breaths and soft consonants that make the take intimate.",
+  "params": {
+    "amount": 0.35,
+    "sensitivity": 0.5,
+    "freq": 5500.0,
+    "fade": 9.0,
+    "mode": "Split",
+    "outGain": -0.2
+  }
+}

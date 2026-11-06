@@ -1,0 +1,21 @@
+{
+  "name": "Rhodes Slow Swirl",
+  "category": "NEO SOUL",
+  "author": "DEON",
+  "description": "Circles slowly around you once every eight bars, never far: a Rhodes or pad that breathes around the room.",
+  "params": {
+    "posX": 0.0,
+    "posY": 0.45,
+    "posZ": 0.4,
+    "width": 0.6,
+    "room": "Living Room",
+    "size": 0.5,
+    "roomLevel": 0.45,
+    "motion": "Orbit",
+    "motionRate": "8 Bars",
+    "motionAmount": 0.35,
+    "doppler": 0.1,
+    "mix": 1.0,
+    "outGain": -4.0
+  }
+}
