@@ -18,6 +18,9 @@ const std::array<ParamSpec, (size_t) kNumParams>& table()
         { P::eclipse, "eclipse", "Eclipse", K::Float, 0, 1, 0.25f, 0, U::Percent, nullptr },
         { P::dunes,   "dunes",   "Dunes",   K::Float, 0, 1, 0.6f, 0, U::Percent, nullptr },
         { P::heat,    "heat",    "Heat",    K::Float, 0, 1, 0.5f, 0, U::Percent, nullptr },
+        { P::hue,     "hue",     "Hue",     K::Float, -180, 180, 0, 0, U::Deg, nullptr },
+        { P::scene,   "scene",   "Scene",   K::Choice, 0, 4, 0, 0, U::None, &sceneNames() },
+        { P::style,   "style",   "Style",   K::Choice, 0, 2, 0, 0, U::None, &styleNames() },
     }};
     return t;
 }
@@ -32,11 +35,24 @@ juce::String formatValue (Unit unit, float v)
         case U::Db:      return (v > 0.0f ? "+" : "") + juce::String (v, 1) + " dB";
         case U::Semis:   return (v > 0.0f ? "+" : "") + juce::String (juce::roundToInt (v)) + " st";
         case U::Bipolar: return (v > 0.0f ? "+" : "") + juce::String (juce::roundToInt (v * 100.0f));
+        case U::Deg:     return (v > 0.0f ? "+" : "") + juce::String (juce::roundToInt (v)) + juce::String::fromUTF8 ("\xc2\xb0");
         case U::None:    break;
     }
     return juce::String (v, 2);
 }
 } // namespace
+
+const juce::StringArray& sceneNames()
+{
+    static const juce::StringArray n { "Dunes", "Burst", "Terrain", "Figure", "Tunnel" };
+    return n;
+}
+
+const juce::StringArray& styleNames()
+{
+    static const juce::StringArray n { "Film", "CRT", "VHS" };
+    return n;
+}
 
 const char* id (P p)
 {

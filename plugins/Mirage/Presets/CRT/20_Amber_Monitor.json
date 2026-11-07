@@ -1,0 +1,18 @@
+{
+  "name": "Amber Monitor",
+  "category": "CRT",
+  "author": "DEON",
+  "description": "The desert sunset on an old amber monitor: curved glass, phosphor trails and scanlines.",
+  "params": {
+    "react": 0.65,
+    "grain": 0.4,
+    "digital": 0.8,
+    "speed": 0.5,
+    "eclipse": 0.3,
+    "dunes": 0.6,
+    "heat": 0.55,
+    "hue": 0.0,
+    "scene": "Dunes",
+    "style": "CRT"
+  }
+}

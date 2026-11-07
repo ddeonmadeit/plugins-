@@ -3,7 +3,7 @@
 MirageEditor::MirageEditor (MirageProcessor& p) : AudioProcessorEditor (p), proc (p), view (p)
 {
     const int w = p.editorWidth.load(), h = p.editorHeight.load();   // read first: resized() stores every size
-    setLookAndFeel (&look);
+    setLookAndFeel (&view.getPanelLook());   // the resize grip in the panel's colours
     addAndMakeVisible (view);
     setResizable (true, true);
     setResizeLimits (900, 250, 4096, 1400);

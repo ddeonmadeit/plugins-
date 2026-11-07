@@ -1,0 +1,18 @@
+{
+  "name": "Rewind",
+  "category": "VHS",
+  "author": "DEON",
+  "description": "A blue burst played off a chewed-up tape: hard smears to the right and tears that roll through with the drums.",
+  "params": {
+    "react": 0.85,
+    "grain": 0.55,
+    "digital": 0.55,
+    "speed": 0.55,
+    "eclipse": 0.7,
+    "dunes": 0.7,
+    "heat": 0.6,
+    "hue": -160.0,
+    "scene": "Burst",
+    "style": "VHS"
+  }
+}

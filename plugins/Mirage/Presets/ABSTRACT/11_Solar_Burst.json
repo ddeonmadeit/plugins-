@@ -1,0 +1,18 @@
+{
+  "name": "Solar Burst",
+  "category": "ABSTRACT",
+  "author": "DEON",
+  "description": "Shards of light bursting up from the bottom of the screen, each one a part of the song; the whole screen flashes on the hits.",
+  "params": {
+    "react": 0.75,
+    "grain": 0.6,
+    "digital": 0.55,
+    "speed": 0.5,
+    "eclipse": 0.6,
+    "dunes": 0.65,
+    "heat": 0.6,
+    "hue": 0.0,
+    "scene": "Burst",
+    "style": "Film"
+  }
+}

@@ -59,3 +59,18 @@ way). Call `g.setOpacity (1.0f)` right before drawing an image.
 `setResizeLimits` resizes the editor at once, so `resized()` runs before your own `setSize`. If
 `resized()` stores the size in the processor (to keep it in the session), read the stored size into locals
 first, then call `setResizable`, `setResizeLimits` and `setSize` (Mirage's editor).
+
+## Per-pixel loops: no std::floor / std::ceil / std::lround
+
+On plain x86-64 (no SSE4.1, which is what the universal macOS build targets for Intel) `std::floor`,
+`std::ceil` and `std::lround` are library calls, not one instruction. In a loop over every pixel of a
+software-rendered image they cost milliseconds (Mirage's Terrain and Burst scenes: 9 ms down to 3 ms).
+Truncate with `(int) x` when x cannot be negative, or use a branch-based floor, and precompute anything that
+depends only on the row, the column, the angle or the step (`mirage::fastFloor`, Scenes.cpp).
+
+## Menus and call-out boxes in a custom palette
+
+`PopupMenu` takes the colours of the LookAndFeel you hand it (`menu.setLookAndFeel (&look)`), and a
+`CallOutBox` launched with a parent component draws its bubble with that parent's LookAndFeel
+(`drawCallOutBoxBackground`). Mirage's editor and view share one `PanelLook` whose colours follow the hue
+wheel, so the menus, the colour wheel's bubble and the resize grip all turn with the panel.

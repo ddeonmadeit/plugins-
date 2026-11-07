@@ -8,12 +8,13 @@ namespace mirage
 enum class P
 {
     react, grain, digital, speed, eclipse, dunes, heat,
+    hue, scene, style,   // 1.2
     count
 };
 
 constexpr int kNumParams = (int) P::count;
 
-enum class Unit { None, Percent, Hz, Ms, Db, Semis, Bipolar };
+enum class Unit { None, Percent, Hz, Ms, Db, Semis, Bipolar, Deg };
 enum class Kind { Float, Int, Bool, Choice };
 
 struct ParamSpec
@@ -29,6 +30,12 @@ struct ParamSpec
 };
 
 const char* id (P p);
+
+/** What the window shows, and how the screen draws it (choice lists only grow at the end). */
+const juce::StringArray& sceneNames();
+const juce::StringArray& styleNames();
+enum class Scene { dunes, burst, terrain, figure, tunnel };
+enum class Style { film, crt, vhs };
 juce::AudioProcessorValueTreeState::ParameterLayout createLayout();
 
 /** Raw atomic pointers into the APVTS, indexed by P. Read on the audio thread. */

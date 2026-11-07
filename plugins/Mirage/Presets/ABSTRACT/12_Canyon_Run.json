@@ -1,0 +1,18 @@
+{
+  "name": "Canyon Run",
+  "category": "ABSTRACT",
+  "author": "DEON",
+  "description": "Flying low down a grainy valley: the bass builds the hills at the sides, every moment of the song stays in the ground and drifts away.",
+  "params": {
+    "react": 0.7,
+    "grain": 0.75,
+    "digital": 0.5,
+    "speed": 0.6,
+    "eclipse": 0.35,
+    "dunes": 0.6,
+    "heat": 0.5,
+    "hue": 0.0,
+    "scene": "Terrain",
+    "style": "Film"
+  }
+}

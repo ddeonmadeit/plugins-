@@ -1,0 +1,18 @@
+{
+  "name": "Warp Tunnel",
+  "category": "ABSTRACT",
+  "author": "DEON",
+  "description": "Down a tunnel at speed: rings come out of the light as bright as the sound was, the walls glow with the spectrum.",
+  "params": {
+    "react": 0.7,
+    "grain": 0.55,
+    "digital": 0.55,
+    "speed": 0.65,
+    "eclipse": 0.4,
+    "dunes": 0.5,
+    "heat": 0.55,
+    "hue": 0.0,
+    "scene": "Tunnel",
+    "style": "Film"
+  }
+}

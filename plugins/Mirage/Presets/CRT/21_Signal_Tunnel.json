@@ -1,0 +1,18 @@
+{
+  "name": "Signal Tunnel",
+  "category": "CRT",
+  "author": "DEON",
+  "description": "A blue tunnel on a glowing tube, twisting as it goes.",
+  "params": {
+    "react": 0.7,
+    "grain": 0.35,
+    "digital": 0.75,
+    "speed": 0.55,
+    "eclipse": 0.6,
+    "dunes": 0.55,
+    "heat": 0.6,
+    "hue": -150.0,
+    "scene": "Tunnel",
+    "style": "CRT"
+  }
+}

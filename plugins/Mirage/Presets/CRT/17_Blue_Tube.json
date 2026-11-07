@@ -1,0 +1,18 @@
+{
+  "name": "Blue Tube",
+  "category": "CRT",
+  "author": "DEON",
+  "description": "An icy blue picture tube: white shards of light burst up through the glass, glowing trails, scanlines and a flash on every hit.",
+  "params": {
+    "react": 0.8,
+    "grain": 0.35,
+    "digital": 0.7,
+    "speed": 0.5,
+    "eclipse": 0.8,
+    "dunes": 0.75,
+    "heat": 0.65,
+    "hue": -165.0,
+    "scene": "Burst",
+    "style": "CRT"
+  }
+}

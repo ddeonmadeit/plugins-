@@ -1,0 +1,18 @@
+{
+  "name": "Acid Rays",
+  "category": "ABSTRACT",
+  "author": "DEON",
+  "description": "A sharp yellow-green burst with long rays and strong flashes.",
+  "params": {
+    "react": 0.85,
+    "grain": 0.5,
+    "digital": 0.6,
+    "speed": 0.55,
+    "eclipse": 0.8,
+    "dunes": 0.8,
+    "heat": 0.65,
+    "hue": 75.0,
+    "scene": "Burst",
+    "style": "Film"
+  }
+}

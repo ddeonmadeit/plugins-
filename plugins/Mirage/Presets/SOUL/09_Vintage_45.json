@@ -10,6 +10,9 @@
     "speed": 0.35,
     "eclipse": 0.1,
     "dunes": 0.5,
-    "heat": 0.55
+    "heat": 0.55,
+    "hue": 0.0,
+    "scene": "Dunes",
+    "style": "Film"
   }
 }

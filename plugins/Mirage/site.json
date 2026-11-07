@@ -1,28 +1,32 @@
 {
   "publish": true,
-  "tagline": "A wide, animated visualiser of your song: a grainy sunset over dunes that move with the sound, on an orange control panel",
-  "description": "Mirage watches your music and draws it: put it on the master and stretch its window under the tracks while you screen-record FL Studio. A big window shows a grainy sun setting over sand dunes. The near dune is the live waveform, the far dunes are the spectrum drifting away into the distance, the sun swells with the low end and can be eclipsed, and every hit sends a ring of light out. Underneath is a deck of instruments drawn like an old phosphor screen: level meters, an oscilloscope, a scrolling waveform, a spectrum, a stereo field reticle, and a thermal-camera strip of the whole spectrum. Everything is red, orange and a little yellow, nothing else. The sound passes through untouched.",
+  "tagline": "A wide, animated visualiser of your song: sunsets over dunes, shards of light, land, wireframe figures and tunnels, on film, a glowing CRT or worn VHS, in any colour",
+  "description": "Mirage watches your music and draws it: put it on the master and stretch its window under the tracks while you screen-record FL Studio. A big window shows a scene that moves with the sound: a grainy sun setting over dunes (the near dune is the live waveform), shards of light bursting up from the bottom, a grainy land flown over with the song laid into the hills, wireframe figures turning in their cages, or a tunnel whose rings are born as bright as the sound. Each can be drawn on film, on a glowing curved CRT tube (phosphor trails, bloom, scanlines) or on worn VHS tape (smear, tracking tears, dropouts, a camcorder clock). Underneath is a deck of instruments drawn like an old phosphor screen: level meters, an oscilloscope, a scrolling waveform, a spectrum, a stereo field reticle, and a thermal-camera strip of the whole spectrum. Everything goes through one colour ramp, red through orange to a little yellow, and the glowing dot by DEON turns it around the colour wheel. The sound passes through untouched.",
   "accent": "#ff6a1f",
   "highlights": [
     "Made for screen recordings: a wide window you can stretch to any size (it remembers it with the project) to sit under the playlist",
-    "The dune window: a risograph-grainy sunset where the near dune is your live waveform, the far ones the spectrum moments ago, a sun that pulses with the bass, an eclipse, heat shimmer, rings of light on hits",
-    "Phosphor control screen over it: pixel mesh, scanlines, crosshairs and live readouts (peak, low end and its frequency, energy, tempo, bar and time)",
-    "Instrument deck: L / R level meters with peak hold, a triggered oscilloscope, a scrolling waveform history, a 40-band LED spectrum and a stereo field reticle",
-    "Thermal strip: the spectrum as a heat camera, scrolling along the bottom",
-    "Seven automatable controls (React, Grain, Digital, Speed, Eclipse, Dunes, Heat) and ten scenes in the host's preset menu: Desert, Eclipse, Heatwave, Signal, Dust Storm, Dusk, plus neo soul and soul looks",
-    "Strictly red, orange and a little Tarantino yellow: every pixel goes through one colour ramp",
+    "Five scenes: Dunes (a grainy sunset, the near dune your live waveform, an eclipse), Burst (shards of light from the bottom of the screen), Terrain (a grainy valley flown over, the song laid into the hills), Figure (three wireframe figures in cages) and Tunnel",
+    "Three styles: Film (risograph grain and a pixel mesh), CRT (a curved glowing tube with phosphor trails, bloom and scanlines) and VHS (tape smear, tracking tears on the hits, dropouts, rolling bars and a camcorder clock)",
+    "A colour wheel: click the glowing dot by DEON and drag around the ring to turn every colour of the panel, from the original red and orange to icy CRT blue",
+    "25 presets picked from the selector in the middle of the top bar: SCENES, ABSTRACT, CRT, VHS, NEO SOUL and SOUL",
+    "Phosphor control screen over it: scanlines, crosshairs and live readouts (peak, low end and its frequency, energy, tempo, bar and time)",
+    "Instrument deck: L / R level meters with peak hold, a triggered oscilloscope, a scrolling waveform history, a 40-band LED spectrum, a stereo field reticle, and a thermal strip of the spectrum",
     "Zero latency, the audio is not changed at all"
   ],
   "installTips": [
     "Put Mirage on the master insert (FL Studio: Mixer > Master > empty slot > Mirage) so it sees the whole song.",
     "Detach the plugin window (the arrow menu at the top left of the plugin window > Detached), then drag its bottom-right corner to stretch it under the playlist. It keeps its size in the project.",
-    "Drag any of the CONTROL dials up and down to change the look (you can automate them too). The scenes are in FL Studio's preset menu for the plugin (the arrow at the top left of the plugin window > Presets)."
+    "Pick a look from the selector in the middle of the top bar (click the name for the list, or the arrows to step). SCENE and STYLE next to DEON mix any scene with any style, the glowing dot opens the colour wheel, and the CONTROL dials change the rest (you can automate them too)."
   ],
   "previewNote": "Mirage does not change the sound; the preview is the test programme passing through.",
   "whatsNew": {
-    "version": "1.1.0",
+    "version": "1.2.0",
     "items": [
-      "NEO SOUL and SOUL scenes: Late Night Neo Soul, Electric Lady Ring, Vintage 45 and Gospel Sunrise (in the host's preset menu)"
+      "A colour wheel: click the glowing dot next to DEON to turn the hue of the whole plugin",
+      "The preset selector is back in the middle of the top bar, plus SCENE and STYLE keys to mix any scene with any style",
+      "Four new scenes: Burst, Terrain, Figure and Tunnel",
+      "Two new styles: CRT (a glowing curved tube) and VHS (worn tape)",
+      "15 new presets in ABSTRACT, CRT and VHS, including Blue Tube, the icy blue CRT look"
     ]
   }
 }
