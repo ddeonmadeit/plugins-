@@ -74,3 +74,13 @@ depends only on the row, the column, the angle or the step (`mirage::fastFloor`,
 `CallOutBox` launched with a parent component draws its bubble with that parent's LookAndFeel
 (`drawCallOutBoxBackground`). Mirage's editor and view share one `PanelLook` whose colours follow the hue
 wheel, so the menus, the colour wheel's bubble and the resize grip all turn with the panel.
+
+## macOS CI: pluginval aborts in AppleParavirtCommandBuffer
+
+`Assertion failed: (_commandCurrentStorage.currentOffset), function -[AppleParavirtCommandBuffer
+endCurrentChunk]` during pluginval's Editor Automation on the GitHub macOS runner (a VM) comes from
+asynchronous Core Graphics drawing: JUCE makes plugin views layer-backed with `drawsAsynchronously`, so
+the editor's drawing is replayed on the (virtual) GPU inside the host's process. A busy editor (Mirage
+1.2: full-window repaints at 60 Hz with many vector overlays) hit it reproducibly. Override
+`AudioProcessorEditor::wantsLayerBackedView()` to return false: the wrapper then adds the editor with
+`windowRequiresSynchronousCoreGraphicsRendering` and it draws on the CPU.
