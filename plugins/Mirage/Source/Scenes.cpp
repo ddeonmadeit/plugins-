@@ -95,46 +95,48 @@ struct Cam
 } // namespace
 
 //==============================================================================
-void MirageView::polarMaps (float cx, float cy)
+const MirageView::PolarSet& MirageView::polarMaps (int which, float cx, float cy)
 {
     const int w = windowImg.getWidth(), h = windowImg.getHeight();
-    if (std::abs (cx - polarCx) < 0.5f && std::abs (cy - polarCy) < 0.5f && (int) polarA.size() == w * h)
-        return;
-    polarCx = cx;
-    polarCy = cy;
+    auto& p = polar[(size_t) which];
+    if (std::abs (cx - p.cx) < 0.5f && std::abs (cy - p.cy) < 0.5f && p.w == w && p.h == h)
+        return p;
+    p.cx = cx;
+    p.cy = cy;
+    p.w = w;
+    p.h = h;
     const size_t n = (size_t) (w * h);
-    polarA.resize (n);
-    polarR.resize (n);
-    mapA.resize (n);
-    mapB.resize (n);
-    mapC.resize (n);
-    angIdx.resize (n);
+    for (auto* v : { &p.a, &p.r, &p.mapA, &p.mapB, &p.mapC })
+        v->resize (n);
+    p.bin.resize (n);
     // The tunnel is squashed sideways so the wide window fills with rings, not one huge first ring.
-    const bool tunnel = (Scene) scene() == Scene::tunnel;
+    const bool tunnel = which == 1;
     const float squash = tunnel ? 0.45f : 1.0f;
+    auto ex = [this] (float x) { return expLut[(size_t) juce::jlimit (0, 2047, (int) (x * 256.0f))]; };
     for (int y = 0; y < h; ++y)
         for (int x = 0; x < w; ++x)
         {
             const size_t i = (size_t) (y * w + x);
             const float dx = ((float) x + 0.5f - cx) * squash, dy = (float) y + 0.5f - cy;
             const float a = std::atan2 (dx, -dy), r = std::sqrt (dx * dx + dy * dy) / (float) h;
-            polarA[i] = a;
-            polarR[i] = r;
-            angIdx[i] = (juce::uint16) juce::jlimit (0, 1023, (int) ((a + juce::MathConstants<float>::pi) / juce::MathConstants<float>::twoPi * 1024.0f));
+            p.a[i] = a;
+            p.r[i] = r;
+            p.bin[i] = (juce::uint16) juce::jlimit (0, 1023, (int) ((a + juce::MathConstants<float>::pi) / juce::MathConstants<float>::twoPi * 1024.0f));
             if (tunnel)
             {
                 const float z = 0.85f / (r + 0.02f);
-                mapA[i] = z;
-                mapB[i] = 1.0f / (1.0f + 0.035f * z * z);   // fog toward the far end
-                mapC[i] = std::exp (-r * 9.0f);             // the light at the end
+                p.mapA[i] = z;
+                p.mapB[i] = 1.0f / (1.0f + 0.035f * z * z);   // fog toward the far end
+                p.mapC[i] = ex (r * 9.0f);                     // the light at the end
             }
             else
             {
-                mapA[i] = 0.07f + 0.22f * std::exp (-r * 1.6f);   // glow around the source
-                mapB[i] = 0.30f + 0.25f * std::exp (-r);          // how a flash falls off
-                mapC[i] = std::exp (-r * 0.45f);                  // how far the wedges of light reach
+                p.mapA[i] = 0.07f + 0.22f * ex (r * 1.6f);   // glow around the source
+                p.mapB[i] = 0.30f + 0.25f * ex (r);          // how a flash falls off
+                p.mapC[i] = ex (r * 0.45f);                  // how far the wedges of light reach
             }
         }
+    return p;
 }
 
 void MirageView::addLine (float x0, float y0, float x1, float y1, float b)
@@ -351,7 +353,7 @@ void MirageView::sceneBurst()
     // circle, and wide soft wedges and a flash of the whole screen come with the hits.
     const int w = windowImg.getWidth(), h = windowImg.getHeight();
     const float cx = (float) w * 0.5f, cy = (float) h * 1.03f;
-    polarMaps (cx, cy);
+    const auto& pm = polarMaps (0, cx, cy);
     const float react = param ("react"), rays = param ("dunes"), flashAmt = param ("eclipse");
     const float t = (float) an.time;
     constexpr int N = 13;
@@ -403,12 +405,12 @@ void MirageView::sceneBurst()
     for (int y = 0; y < h; ++y)
     {
         const size_t row = (size_t) (y * w);
-        const float* A = polarA.data() + row;
-        const float* Rr = polarR.data() + row;
-        const float* glowMap = mapA.data() + row;
-        const float* flashMap = mapB.data() + row;
-        const float* wedgeMap = mapC.data() + row;
-        const juce::uint16* ai = angIdx.data() + row;
+        const float* A = pm.a.data() + row;
+        const float* Rr = pm.r.data() + row;
+        const float* glowMap = pm.mapA.data() + row;
+        const float* flashMap = pm.mapB.data() + row;
+        const float* wedgeMap = pm.mapC.data() + row;
+        const juce::uint16* ai = pm.bin.data() + row;
         float* out = buf.data() + row;
         for (int x = 0; x < w; ++x)
         {
@@ -479,7 +481,7 @@ void MirageView::drawBurstHud (juce::Graphics& g)
     const float base = w.getBottom() - 16.0f * s;
     for (int i = 0; i <= 360; ++i)
     {
-        const float sample = an.recentL[(size_t) (Analyzer::kRecent - 1440 + i * 4)];
+        const float sample = an.recentL[(size_t) (Analyzer::kRecent - 1441 + i * 4)];
         const juce::Point<float> p (w.getX() + w.getWidth() * (float) i / 360.0f, base - sample * 22.0f * s * param ("react"));
         if (i == 0) wave.startNewSubPath (p); else wave.lineTo (p);
     }
@@ -806,7 +808,7 @@ void MirageView::sceneTunnel()
     // Flying down a tunnel: rings come out of the light at the far end, each as bright as the sound was when
     // it was born; the walls are panels lit by the spectrum around the circle, and the tunnel twists.
     const int w = windowImg.getWidth(), h = windowImg.getHeight();
-    polarMaps ((float) w * 0.5f, (float) h * 0.5f);
+    const auto& pm = polarMaps (1, (float) w * 0.5f, (float) h * 0.5f);
     const float react = param ("react"), twist = param ("eclipse"), rings = param ("dunes");
     const float t = (float) an.time;
     const float freq = 1.0f + 3.5f * rings;
@@ -835,10 +837,10 @@ void MirageView::sceneTunnel()
     for (int y = 0; y < h; ++y)
     {
         const size_t row = (size_t) (y * w);
-        const float* A = polarA.data() + row;
-        const float* Z = mapA.data() + row;
-        const float* fog = mapB.data() + row;
-        const float* light = mapC.data() + row;
+        const float* A = pm.a.data() + row;
+        const float* Z = pm.mapA.data() + row;
+        const float* fog = pm.mapB.data() + row;
+        const float* light = pm.mapC.data() + row;
         float* out = buf.data() + row;
         for (int x = 0; x < w; ++x)
         {

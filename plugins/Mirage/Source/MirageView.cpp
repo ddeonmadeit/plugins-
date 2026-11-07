@@ -393,13 +393,21 @@ MirageView::~MirageView()
 
 void MirageView::updatePalette()
 {
+    // The ramp and the colours of everything drawn live follow at once (cheap). The chassis and the cached
+    // chrome are rebuilt at most four times a second while the hue moves (dragging the wheel, automation),
+    // and once more when it settles, so a moving hue never makes frames slow.
     const float white = style() == (int) Style::film ? 0.0f : 0.85f;
-    if (! pal.build (param ("hue"), white))
-        return;
-    look.setPalette (pal);
-    if (! frameVals.empty())
+    if (pal.build (param ("hue"), white))
+    {
+        look.setPalette (pal);
+        frameDirty = true;
+    }
+    if (frameDirty && ! frameVals.empty() && (lastFrameBuild < 0.0 || an.time - lastFrameBuild > 0.25 || frameImg.isNull()))
+    {
         buildFrame();
-    chromeImg = {};
+        lastFrameBuild = an.time;
+        frameDirty = false;
+    }
 }
 
 void MirageView::updateSceneLabels()
@@ -490,7 +498,6 @@ void MirageView::buildStatics()
     crest.assign ((size_t) (Analyzer::kLayers * ww), 0.0f);
     buf.assign ((size_t) (ww * wh), 0.0f);
     persist.assign ((size_t) (ww * wh), 0.0f);
-    polarCx = polarCy = -1.0f;
     tubeW = tubeH = 0;
     const int tw = std::max (8, (int) thermal.getWidth()), th = std::max (8, (int) thermal.getHeight());
     thermalImg = juce::Image (juce::Image::ARGB, tw, th, true, juce::SoftwareImageType());
@@ -529,6 +536,8 @@ void MirageView::buildFrame()
             px[x] = pal.at (v[x]);
     }
     chromeImg = {};
+    frameDirty = false;
+    lastFrameBuild = an.time;
 }
 
 void MirageView::buildChrome (float scale)
@@ -956,7 +965,7 @@ void MirageView::drawDunesHud (juce::Graphics& g)
         {
             const float u = (float) i / (float) n;
             const int x = juce::jlimit (0, iw - 1, (int) (u * (float) (iw - 1)));
-            const float sample = an.recentL[(size_t) (Analyzer::kRecent - 1440 + i * 4)];
+            const float sample = an.recentL[(size_t) (Analyzer::kRecent - 1441 + i * 4)];
             const auto p = toScreen ((float) x, crest[(size_t) x]).translated (0.0f, -6.0f * s - sample * 26.0f * s * param ("react") + 0.0f * scaleY);
             if (i == 0)
                 wave.startNewSubPath (p);

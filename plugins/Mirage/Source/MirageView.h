@@ -156,6 +156,7 @@ public:
     juce::LookAndFeel& getPanelLook() noexcept { return look; }
 
 private:
+    struct PolarSet;
     void timerCallback() override;
     void advance (float dt);
     void updatePalette();
@@ -172,7 +173,7 @@ private:
     void sceneTerrain();
     void sceneFigure();
     void sceneTunnel();
-    void polarMaps (float cx, float cy);
+    const PolarSet& polarMaps (int which, float cx, float cy);
     void addLine (float x0, float y0, float x1, float y1, float b);
 
     // Styles (Styles.cpp): `buf` to pixels in windowImg.
@@ -216,12 +217,19 @@ private:
     std::vector<float> crest;         // [layer][x] screen y of each dune's ridge
     std::vector<float> expLut, colCrest, colLit, colTop, colGlow, shimSin, shimCos, meshCol, smooth;
     std::vector<float> buf, persist, frameVals, thermVals;
-    std::vector<float> polarA, polarR;   // per window pixel: angle and distance from a scene's centre
-    std::vector<float> mapA, mapB, mapC; // per window pixel: whatever the scene keeps fixed (glows, depth, fog)
-    std::vector<juce::uint16> angIdx;    // per window pixel: angle as a 0..1023 bin
+    /** Per window pixel, fixed for a size: angle and distance from a scene's centre, the angle as a 0..1023
+        bin, and whatever else the scene keeps fixed (glows, depth, fog). Burst and Tunnel keep one each,
+        so switching scenes (or automating the switch) costs nothing after the first time. */
+    struct PolarSet
+    {
+        float cx = -1.0f, cy = -1.0f;
+        int w = 0, h = 0;
+        std::vector<float> a, r, mapA, mapB, mapC;
+        std::vector<juce::uint16> bin;
+    };
+    std::array<PolarSet, 2> polar;   // [0] Burst, [1] Tunnel
     std::array<float, 1024> angLutA {}, angLutB {};
     std::array<juce::uint8, 1024> rayNear {}, rayNext {};
-    float polarCx = -1.0f, polarCy = -1.0f;
     std::vector<int> warp;               // CRT: window pixel -> source pixel (-1 = the tube's black edge)
     std::vector<float> tube, glare, bloom, bloomTmp, bloomXw;
     std::vector<int> bloomX0;
@@ -236,6 +244,8 @@ private:
     double lastTick = 0.0;
     int frames = 0, lastScene = -1, lastStyle = -1;
     float sunPulse = 0.0f, scan = 0.0f, thermalCarry = 0.0f, flash = 0.0f;
+    bool frameDirty = false;          // a new hue or style waits for the next rebuild of the chassis
+    double lastFrameBuild = -1.0;
 
     float s = 1.0f;                   // scale: height / 440
     juce::Rectangle<float> header, window, deck, thermal;
