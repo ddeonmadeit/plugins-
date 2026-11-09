@@ -11,11 +11,12 @@ const juce::Colour kA = sunset::orange;
 
 AircheckEditor::Content::Content (AircheckProcessor& p)
     : proc (p),
-      topBar (p.presets, "AIR", "CHECK", "Vocal Chain + Pitch Correction"),
+      topBar (p.presets, "AIR", "CHECK", "Vocal Chain + Tuning + Pitch Shift"),
       description (topBar.presets()),
-      tune ("Pitch Correction", 7, 4, kA),
+      tune ("Pitch Correction", 5, 4, kA),
+      shift ("Pitch Shift", 2, 4, kA),
       eq ("Equalizer", 11, 4, kA),
-      voice ("Mic & Saturation", 5, 1, kA),
+      voice ("Input & Saturation", 7, 1, kA),
       comp ("Dynamics", 9, 1, kA),
       deess ("De-Esser", 3, 1, kA),
       smooth ("Smooth", 5, 1, kA),
@@ -31,25 +32,31 @@ AircheckEditor::Content::Content (AircheckProcessor& p)
     auto& s = p.apvts;
 
     tune.add<PitchView> (p);
-    tune.place (0, 0, 7, 2);
+    tune.place (0, 0, 5, 2);
     tune.add<Toggle> (s, "tuneOn", "Tune");                     tune.place (0, 2);
     tune.add<Choice> (s, "tuneKey", "Key");                      tune.place (1, 2);
     tune.add<Choice> (s, "tuneScale", "Scale");                  tune.place (2, 2, 2, 1);
     tune.add<Knob> (s, "tuneSpeed", "Retune", kA).getSlider().setTooltip ("How fast notes are pulled in tune. 0 ms = the hard, robotic effect.");
     tune.place (4, 2);
     tune.add<Knob> (s, "tuneHumanize", "Humanize", kA).getSlider().setTooltip ("Corrects held notes more gently so long notes keep their life");
-    tune.place (5, 2);
-    tune.add<Knob> (s, "tuneFlex", "Flex", kA).getSlider().setTooltip ("Leaves notes alone the further they are from the scale (slides, bends, expression)");
-    tune.place (6, 2);
-    tune.add<Knob> (s, "tuneVibrato", "Vibrato", kA).getSlider().setTooltip ("How much of the singer's own vibrato is kept (0 = flattened)");
     tune.place (0, 3);
-    tune.add<Knob> (s, "tuneAmount", "Amount", kA);              tune.place (1, 3);
-    tune.add<Knob> (s, "tuneTranspose", "Transpose", kA);        tune.place (2, 3);
-    tune.add<Knob> (s, "tuneFormant", "Formant", kA).getSlider().setTooltip ("Moves the voice's character (vowels, size) without changing the notes");
-    tune.place (3, 3);
-    tune.add<Knob> (s, "inGain", "Input", kA);                   tune.place (5, 3);
-    tune.add<Knob> (s, "gate", "Gate", kA).getSlider().setTooltip ("Turns down breaths and room noise between phrases. Fully left = off.");
-    tune.place (6, 3);
+    tune.add<Knob> (s, "tuneFlex", "Flex", kA).getSlider().setTooltip ("Leaves notes alone the further they are from the scale (slides, bends, expression)");
+    tune.place (1, 3);
+    tune.add<Knob> (s, "tuneVibrato", "Vibrato", kA).getSlider().setTooltip ("How much of the singer's own vibrato is kept (0 = flattened)");
+    tune.place (2, 3);
+    tune.add<Knob> (s, "tuneAmount", "Amount", kA);              tune.place (3, 3);
+
+    // The pitch shifter: whole periods of the voice moved closer together or further apart, so the
+    // formants (what makes it your voice) stay put. No chipmunk unless Formant follows the pitch up.
+    shift.add<ShiftView> (p);
+    shift.place (0, 0, 2, 2);
+    shift.add<Knob> (s, "pitchShift", "Shift", kA).getSlider().setTooltip ("Moves your voice up or down in semitones (12 = an octave) and keeps it sounding like you, not a chipmunk. Whole semitones snap.");
+    shift.place (0, 2, 2, 1);
+    shift.add<Knob> (s, "pitchFormant", "Formant", kA).getSlider().setTooltip ("The size of the voice: up = younger and smaller, down = bigger and deeper. 0 keeps your own voice; the same as Shift is the chipmunk.");
+    shift.place (0, 3, 2, 1);
+
+    voice.add<Knob> (s, "inGain", "Input", kA);
+    voice.add<Knob> (s, "gate", "Gate", kA).getSlider().setTooltip ("Turns down breaths and room noise between phrases. Fully left = off.");
 
     auto& view = eq.add<EqView> (p);
     eq.place (0, 0, 11, 3);
@@ -123,7 +130,7 @@ AircheckEditor::Content::Content (AircheckProcessor& p)
     addAndMakeVisible (topBar);
     description.setHint (juce::String ("ddeonmadeit  v") + DD_PLUGIN_VERSION);
     addAndMakeVisible (description);
-    for (auto* c : { &tune, &eq, &voice, &comp, &deess, &smooth, &air, &dbl, &chorus, &vocoder, &delay, &reverb, &tapeP, &output })
+    for (auto* c : { &tune, &shift, &eq, &voice, &comp, &deess, &smooth, &air, &dbl, &chorus, &vocoder, &delay, &reverb, &tapeP, &output })
         addAndMakeVisible (c);
     addAndMakeVisible (atmosphere);
 }
@@ -158,7 +165,7 @@ void AircheckEditor::Content::resized()
             x += w + gap;
         }
     };
-    row ({ &tune, &eq });
+    row ({ &tune, &shift, &eq });
     row ({ &voice, &comp, &deess });
     row ({ &smooth, &air, &dbl, &chorus, &vocoder });
     row ({ &delay, &reverb, &tapeP, &output });

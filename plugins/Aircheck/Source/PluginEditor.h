@@ -29,7 +29,7 @@ private:
         AircheckProcessor& proc;
         dd::gui::TopBar topBar;
         dd::gui::DescriptionLine description;
-        dd::gui::Panel tune, eq, voice, comp, deess, smooth, air, dbl, chorus, vocoder, delay, reverb, tapeP, output;
+        dd::gui::Panel tune, shift, eq, voice, comp, deess, smooth, air, dbl, chorus, vocoder, delay, reverb, tapeP, output;
         dd::gui::Atmosphere atmosphere;
     };
 

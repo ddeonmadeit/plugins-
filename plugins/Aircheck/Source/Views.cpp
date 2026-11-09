@@ -24,6 +24,149 @@ void glowStroke (juce::Graphics& g, const juce::Path& p, float width, float glow
 } // namespace
 
 //==============================================================================
+ShiftView::ShiftView (AircheckProcessor& p)
+    : proc (p),
+      shiftAtt (*p.apvts.getParameter ("pitchShift"), [this] (float v) { shift = v; repaint(); }),
+      formantAtt (*p.apvts.getParameter ("pitchFormant"), [this] (float v) { formant = v; repaint(); })
+{
+    shiftAtt.sendInitialUpdate();
+    formantAtt.sendInitialUpdate();
+    setMouseCursor (juce::MouseCursor::CrosshairCursor);
+    setTooltip ("Drag the dot: left / right moves the pitch, up / down the size of the voice. On the lit line you "
+                "stay yourself, only higher or lower; the dashed line is the chipmunk. Double-click resets.");
+    startTimerHz (30);
+}
+
+ShiftView::~ShiftView() { stopTimer(); }
+
+void ShiftView::timerCallback()
+{
+    if (isShowing())
+        repaint();   // the lamp bloom breathes
+}
+
+juce::String ShiftView::describe (float s, float f)
+{
+    if (std::abs (s) < 0.05f && std::abs (f) < 0.05f)
+        return "Off: your voice as sung";
+    if (std::abs (s) < 0.05f)
+        return f > 0.0f ? "Same notes, smaller voice" : "Same notes, bigger voice";
+    if (s > 0.0f && f >= 0.6f * s)
+        return "Chipmunk";
+    if (s < 0.0f && f <= 0.6f * s)
+        return "Slowed-down giant";
+    if (std::abs (f) < 1.0f)
+        return s > 0.0f ? "Higher, still you" : "Lower, still you";
+    return f > 0.0f ? (s > 0.0f ? "Higher and younger" : "Lower, lighter voice")
+                    : (s > 0.0f ? "Higher, fuller voice" : "Lower and bigger");
+}
+
+juce::Rectangle<float> ShiftView::plotArea() const
+{
+    auto r = getLocalBounds().toFloat().reduced (2.0f, 4.0f).reduced (10.0f, 8.0f);
+    r.removeFromTop (22.0f);      // the value
+    r.removeFromBottom (16.0f);   // the verdict
+    return r;
+}
+
+void ShiftView::paint (juce::Graphics& g)
+{
+    const auto r = getLocalBounds().toFloat().reduced (2.0f, 4.0f);
+    dd::gui::paintConsole (g, r, 12.0f, dd::gui::lampBloom (dd::gui::animationTime()));
+    const auto plot = plotArea();
+    auto px = [&] (float st) { return plot.getCentreX() + st / 12.0f * plot.getWidth() * 0.5f; };
+    auto py = [&] (float fm) { return plot.getCentreY() - fm / 7.0f * plot.getHeight() * 0.5f; };
+
+    // Grid: semitone ticks along the natural line, octave ends brighter.
+    for (int st = -12; st <= 12; ++st)
+    {
+        const float x = px ((float) st), h = st % 12 == 0 ? 5.0f : (st % 6 == 0 ? 3.5f : 2.0f);
+        g.setColour (kGlow.withAlpha (st % 12 == 0 ? 0.35f : 0.16f));
+        g.fillRect (x - 0.5f, plot.getCentreY() - h, 1.0f, h * 2.0f);
+    }
+    g.setColour (kGlow.withAlpha (0.08f));
+    g.fillRect (plot.getCentreX() - 0.5f, plot.getY(), 1.0f, plot.getHeight());
+
+    // The chipmunk diagonal (formants follow the pitch), dashed and dim.
+    {
+        juce::Path diag;
+        diag.startNewSubPath (px (-7.0f), py (-7.0f));
+        diag.lineTo (px (7.0f), py (7.0f));
+        juce::Path dashed;
+        const float dashes[] { 3.0f, 3.0f };
+        juce::PathStrokeType (1.0f).createDashedStroke (dashed, diag, dashes, 2);
+        g.setColour (kDimText.withAlpha (0.45f));
+        g.fillPath (dashed);
+    }
+    // The natural line: the voice stays itself.
+    {
+        juce::Path line;
+        line.startNewSubPath (plot.getX(), plot.getCentreY());
+        line.lineTo (plot.getRight(), plot.getCentreY());
+        glowStroke (g, line, 1.0f, 0.10f);
+    }
+    g.setFont (dd::gui::LookAndFeel::font (7.5f, 700));
+    g.setColour (kDimText.withAlpha (0.7f));
+    g.drawText ("CHIPMUNK", juce::Rectangle<float> (px (2.0f), plot.getY() - 1.0f, plot.getRight() - px (2.0f), 10.0f), juce::Justification::centredRight);
+    g.drawText ("GIANT", juce::Rectangle<float> (plot.getX(), plot.getBottom() - 9.0f, px (-2.0f) - plot.getX(), 10.0f), juce::Justification::centredLeft);
+    g.setColour (kLitText.withAlpha (0.55f));
+    g.drawText ("YOU", juce::Rectangle<float> (plot.getX(), plot.getCentreY() - 11.0f, 30.0f, 10.0f), juce::Justification::centredLeft);
+
+    // The dot.
+    const juce::Point<float> dot (px (shift), py (formant));
+    const bool active = std::abs (shift) > 0.05f || std::abs (formant) > 0.05f;
+    g.setGradientFill (juce::ColourGradient (kGlow.withAlpha (active ? 0.55f : 0.25f), dot, kGlow.withAlpha (0.0f), dot.translated (11.0f, 0.0f), true));
+    g.fillEllipse (juce::Rectangle<float> (22.0f, 22.0f).withCentre (dot));
+    g.setColour (active ? kLitText : kDimText);
+    g.fillEllipse (juce::Rectangle<float> (7.0f, 7.0f).withCentre (dot));
+
+    // The value on top, what it sounds like underneath.
+    const auto text = r.reduced (10.0f, 6.0f);
+    const auto value = juce::String (shift > 0.05f ? "+" : "") + juce::String (shift, 1) + " st";
+    dd::gui::drawGlowing (g, value, text.withHeight (20.0f), active ? kLitText : kDimText, dd::gui::LookAndFeel::font (16.0f, 700),
+                          juce::Justification::centredLeft);
+    g.setFont (dd::gui::LookAndFeel::font (8.5f, 600));
+    g.setColour (kDimText);
+    g.drawText ("FORMANT " + juce::String (formant > 0.05f ? "+" : "") + juce::String (formant, 1),
+                text.withHeight (20.0f), juce::Justification::centredRight);
+    g.setColour (active ? kLitText.withAlpha (0.9f) : kDimText);
+    g.setFont (dd::gui::LookAndFeel::font (9.5f, 700));
+    g.drawText (describe (shift, formant).toUpperCase(), text.withTrimmedTop (text.getHeight() - 14.0f), juce::Justification::centred);
+}
+
+void ShiftView::setFrom (juce::Point<float> p)
+{
+    const auto plot = plotArea();
+    float st = (p.x - plot.getCentreX()) / (plot.getWidth() * 0.5f) * 12.0f;
+    float fm = (plot.getCentreY() - p.y) / (plot.getHeight() * 0.5f) * 7.0f;
+    st = juce::jlimit (-12.0f, 12.0f, std::abs (st - std::round (st)) < 0.3f ? std::round (st) : st);
+    fm = juce::jlimit (-7.0f, 7.0f, std::abs (fm) < 0.4f ? 0.0f : fm);   // the natural line is sticky
+    shiftAtt.setValueAsPartOfGesture (st);
+    formantAtt.setValueAsPartOfGesture (fm);
+}
+
+void ShiftView::mouseDown (const juce::MouseEvent& e)
+{
+    shiftAtt.beginGesture();
+    formantAtt.beginGesture();
+    setFrom (e.position);
+}
+
+void ShiftView::mouseDrag (const juce::MouseEvent& e) { setFrom (e.position); }
+
+void ShiftView::mouseUp (const juce::MouseEvent&)
+{
+    shiftAtt.endGesture();
+    formantAtt.endGesture();
+}
+
+void ShiftView::mouseDoubleClick (const juce::MouseEvent&)
+{
+    shiftAtt.setValueAsCompleteGesture (0.0f);
+    formantAtt.setValueAsCompleteGesture (0.0f);
+}
+
+//==============================================================================
 PitchView::PitchView (AircheckProcessor& p) : proc (p)
 {
     setInterceptsMouseClicks (false, false);

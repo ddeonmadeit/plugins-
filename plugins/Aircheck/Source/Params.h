@@ -35,6 +35,8 @@ enum class P
     airMid, airHigh,
     chRate, chDepth, chMix, dimMode, dimMix,
     limit, eqPost,
+    // 1.5: the pitch shifter (Transpose / Formant moved out of the tuner; the tune* ones are kept for old sessions).
+    pitchShift, pitchFormant,
     count
 };
 

@@ -9,7 +9,7 @@ using aircheck::P;
 
 const juce::StringArray& AircheckProcessor::categoryOrder()
 {
-    static const juce::StringArray order { "DEON", "80S", "2000S", "TRAVIS SCOTT", "YE", "TAME IMPALA", "R&B", "TRIP HOP", "MOSHC0RE", "STUDIO", "NEO SOUL", "SOUL" };
+    static const juce::StringArray order { "DEON", "80S", "2000S", "TRAVIS SCOTT", "YE", "TAME IMPALA", "R&B", "TRIP HOP", "MOSHC0RE", "STUDIO", "PITCHED", "NEO SOUL", "SOUL" };
     return order;
 }
 
@@ -20,6 +20,8 @@ AircheckProcessor::AircheckProcessor()
       presets (apvts, categoryOrder(), DD_PLUGIN_COMPANY, DD_PLUGIN_NAME)
 {
     params.attach (apvts);
+    // Presets saved before 1.5 (factory overrides, the user's own) may carry the tuner's old Transpose / Formant.
+    presets.onApplyExtra = [this] (const juce::var&) { migrateLegacyPitch(); };
    #if DD_HAS_PRESET_DATA
     for (int i = 0; i < PresetData::namedResourceListSize; ++i)
     {
@@ -47,7 +49,7 @@ void AircheckProcessor::prepareToPlay (double sampleRate, int)
     sr = sampleRate;
     detector.prepare (sr);
     corrector.prepare (sr, detector.getHopSamples());
-    psola.prepare (sr);
+    psola.prepare (sr, detector.getDelaySamples());
     gate.prepare (sr);
     mic.prepare (sr);
     preamp.prepare (sr, kChunk);
@@ -94,9 +96,12 @@ void AircheckProcessor::readSettings()
     tune.flex = params.get (P::tuneFlex);
     tune.vibrato = params.get (P::tuneVibrato);
     tune.amount = params.get (P::tuneAmount);
-    tune.transpose = (float) params.getInt (P::tuneTranspose);
-    formantRatio = dd::semitonesToRatio (params.get (P::tuneFormant));
-    pitchActive = tuneOn || params.getInt (P::tuneTranspose) != 0 || std::abs (params.get (P::tuneFormant)) > 0.01f;
+    // The Pitch Shift panel, plus the tuner's old Transpose / Formant (only non-zero in automation that
+    // still drives them: sessions and presets are moved over by migrateLegacyPitch).
+    tune.transpose = juce::jlimit (-12.0f, 12.0f, params.get (P::pitchShift) + (float) params.getInt (P::tuneTranspose));
+    const float formantSemis = juce::jlimit (-7.0f, 7.0f, params.get (P::pitchFormant) + params.get (P::tuneFormant));
+    formantRatio = dd::semitonesToRatio (formantSemis);
+    pitchActive = tuneOn || std::abs (tune.transpose) > 0.005f || std::abs (formantSemis) > 0.01f;
 
     // The eight EQ bands (parameters b1On..b8Place, nine per band, in table order).
     for (int i = 0; i < aircheck::ProEq::kBands; ++i)
@@ -428,6 +433,7 @@ void AircheckProcessor::setStateInformation (const void* data, int sizeInBytes)
             auto tree = juce::ValueTree::fromXml (*xml);
             dd::replaceStateExactly (apvts, tree);
             migrateLegacyEq (tree);
+            migrateLegacyPitch();
             presets.readState (tree);
             editorScale = juce::jlimit (0.6f, 1.8f, (float) tree.getProperty ("uiScale", 1.0f));
         }
@@ -454,6 +460,22 @@ void AircheckProcessor::migrateLegacyEq (const juce::ValueTree& saved)
     band (5, std::abs (get ("eq3Gain")) > 0.05f, 0, get ("eq3Freq"), get ("eq3Gain"), get ("eq3Q"), 1);
     band (6, std::abs (get ("eqHsGain")) > 0.05f, 2, get ("eqHsFreq"), get ("eqHsGain"), 0.7f, 1);
     band (7, get ("eqHighCut") < 21500.0f, 4, std::min (get ("eqHighCut"), 20000.0f), 0.0f, 0.71f, 1);
+}
+
+void AircheckProcessor::migrateLegacyPitch()
+{
+    // Up to 1.4 Transpose and Formant sat in the tuner (whole semitones, +-4 st formant). 1.5 has a Pitch
+    // Shift panel: move their values there, so what a session or preset does is what the panel shows.
+    auto* transpose = apvts.getParameter ("tuneTranspose");
+    auto* formant = apvts.getParameter ("tuneFormant");
+    const float t = transpose->convertFrom0to1 (transpose->getValue()), f = formant->convertFrom0to1 (formant->getValue());
+    if (std::abs (t) < 0.5f && std::abs (f) < 0.005f)
+        return;
+    auto set = [this] (const char* id, float v) { if (auto* p = apvts.getParameter (id)) p->setValueNotifyingHost (p->convertTo0to1 (v)); };
+    set ("pitchShift", juce::jlimit (-12.0f, 12.0f, apvts.getRawParameterValue ("pitchShift")->load() + t));
+    set ("pitchFormant", juce::jlimit (-7.0f, 7.0f, apvts.getRawParameterValue ("pitchFormant")->load() + f));
+    set ("tuneTranspose", 0.0f);
+    set ("tuneFormant", 0.0f);
 }
 
 juce::AudioProcessorEditor* AircheckProcessor::createEditor() { return new AircheckEditor (*this); }

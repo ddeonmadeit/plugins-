@@ -151,6 +151,8 @@
     "dimMode": "2",
     "dimMix": 0.5,
     "limit": 0.5,
-    "eqPost": true
+    "eqPost": true,
+    "pitchShift": 0.0,
+    "pitchFormant": 0.0
   }
 }

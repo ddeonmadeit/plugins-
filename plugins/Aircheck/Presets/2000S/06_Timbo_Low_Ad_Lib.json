@@ -14,8 +14,8 @@
     "tuneFlex": 0.0,
     "tuneVibrato": 1.0,
     "tuneAmount": 1.0,
-    "tuneTranspose": -5,
-    "tuneFormant": -2.0,
+    "tuneTranspose": 0,
+    "tuneFormant": 0.0,
     "micType": "Condenser",
     "preType": "Tube",
     "preDrive": 0.15,
@@ -151,6 +151,8 @@
     "dimMode": "Off",
     "dimMix": 0.5,
     "limit": 0.25,
-    "eqPost": false
+    "eqPost": false,
+    "pitchShift": -5.0,
+    "pitchFormant": -2.0
   }
 }

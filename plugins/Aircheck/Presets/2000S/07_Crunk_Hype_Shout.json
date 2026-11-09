@@ -62,7 +62,7 @@
     "revPreDelay": 20.0,
     "revTone": 0.6,
     "mix": 1.0,
-    "outGain": 0.4,
+    "outGain": 0.3,
     "b1On": true,
     "b1Type": "Low Cut",
     "b1Freq": 150.0,
@@ -151,6 +151,8 @@
     "dimMode": "Off",
     "dimMix": 0.5,
     "limit": 0.4,
-    "eqPost": false
+    "eqPost": false,
+    "pitchShift": 0.0,
+    "pitchFormant": 0.0
   }
 }

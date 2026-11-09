@@ -14,8 +14,8 @@
     "tuneFlex": 0.0,
     "tuneVibrato": 1.0,
     "tuneAmount": 1.0,
-    "tuneTranspose": 5,
-    "tuneFormant": 3.0,
+    "tuneTranspose": 0,
+    "tuneFormant": 0.0,
     "micType": "Off",
     "preType": "Tape",
     "preDrive": 0.35,
@@ -62,7 +62,7 @@
     "revPreDelay": 20.0,
     "revTone": 0.35,
     "mix": 1.0,
-    "outGain": -4.9,
+    "outGain": -5.1,
     "b1On": true,
     "b1Type": "Low Cut",
     "b1Freq": 200.0,
@@ -151,6 +151,8 @@
     "dimMode": "Off",
     "dimMix": 0.5,
     "limit": 0.25,
-    "eqPost": false
+    "eqPost": false,
+    "pitchShift": 5.0,
+    "pitchFormant": 3.0
   }
 }

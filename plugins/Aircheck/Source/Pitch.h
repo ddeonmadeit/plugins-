@@ -94,6 +94,8 @@ public:
         count = 0;
         voiced = false;
         hz = 0.0f;
+        prevTau = 0.0f;
+        jumpVotes = 0;
     }
 
     /** Feed one full-rate mono sample; true when a new estimate is ready (every ~2.7 ms). */
@@ -122,6 +124,8 @@ public:
     /** Sample index (since prepare) the latest estimate describes: the middle of its analysis window. */
     int64_t getTime() const noexcept { return count - (int64_t) ((W + maxLag) * decim) / 2; }
     int getHopSamples() const noexcept { return kHop * decim; }
+    /** How long after a moment the estimate describing it arrives (half the window, plus a hop). */
+    int getDelaySamples() const noexcept { return (W + maxLag) * decim / 2 + kHop * decim; }
 
 private:
     static int nextPow2 (int n) { int p = 1; while (p < n) p <<= 1; return p; }
@@ -139,6 +143,7 @@ private:
         if (rmsDb < -52.0f)
         {
             voiced = false;
+            prevTau = 0.0f;
             return;
         }
 
@@ -179,9 +184,36 @@ private:
             if (cmnd[(size_t) best] > (voiced ? 0.42f : 0.3f))
             {
                 voiced = false;
+                prevTau = 0.0f;
                 return;
             }
         }
+
+        // Continuity: a voice does not leap to an overtone (or below its note) in one 2.7 ms hop, but a
+        // breathy or bright voice can make YIN do exactly that. While the previous period still fits nearly
+        // as well, keep following it; a real note change makes it fit badly and is taken at once, and a
+        // new period that keeps winning for four hops is taken anyway. (A wrong period makes the shifter
+        // cut grains a third or a sixth of a real period long: a squeaky buzz, not a voice.)
+        if (voiced && prevTau > 0.0f)
+        {
+            const float ratio = (float) best / prevTau;
+            if (ratio < 0.88f || ratio > 1.12f)
+            {
+                const int lo = std::max (minLag, (int) std::floor (prevTau * 0.88f));
+                const int hi = std::min (maxLag - 2, (int) std::ceil (prevTau * 1.12f));
+                int near = -1;
+                for (int tau = lo; tau <= hi; ++tau)
+                    if (near < 0 || cmnd[(size_t) tau] < cmnd[(size_t) near])
+                        near = tau;
+                if (near >= 0 && cmnd[(size_t) near] < 0.3f && cmnd[(size_t) near] < cmnd[(size_t) best] + 0.12f && ++jumpVotes < 4)
+                    best = near;
+                else
+                    jumpVotes = 0;
+            }
+            else
+                jumpVotes = 0;
+        }
+        prevTau = (float) best;
         clarity = 1.0f - cmnd[(size_t) best];
 
         // Parabolic interpolation (step 5), then refine on the full-rate signal around the same lag.
@@ -237,7 +269,8 @@ private:
     int dmask = 0, fmask = 0, dpos = 0, fpos = 0, dcount = 0, hopCount = 0;
     int64_t count = 0;
     bool voiced = false;
-    float hz = 0.0f, clarity = 0.0f;
+    float hz = 0.0f, clarity = 0.0f, prevTau = 0.0f;
+    int jumpVotes = 0;
 };
 
 //==============================================================================
@@ -392,18 +425,25 @@ private:
 class Psola
 {
 public:
-    static constexpr float kMaxFormant = 1.27f;   // grains are read at most this much faster (+4 st formant)
+    static constexpr float kMaxFormant = 1.5f;    // grains are read at most this much faster (+7 st formant)
     static constexpr int kMaxBlock = 64;
 
     /** What the shifter needs to know about one moment of the input. */
     struct Frame { int64_t time = 0; bool voiced = false; float period = 0.0f, ratio = 1.0f; };
 
-    void prepare (double sampleRate)
+    /** `detectorDelay`: how late the pitch estimate for a moment arrives (PitchDetector::getDelaySamples). */
+    void prepare (double sampleRate, int detectorDelay)
     {
         sr = sampleRate;
         tMax = (float) (sr / PitchDetector::kMinHz);
         tUnvoiced = (float) (0.005 * sr);
-        latency = kMaxBlock + (int) std::ceil (tMax * (1.0f + 0.5f + kMaxFormant + 0.3f)) + 8;
+        lookahead = (int) (0.010 * sr);
+        // Grains read up to a period and a half past their synthesis time, faster with the formant up;
+        // and the marks they come from only exist once the detector has described that moment (plus the
+        // look-ahead that catches note starts).
+        const float readAhead = tMax * (1.0f + 0.5f + kMaxFormant + 0.3f);
+        const float marksReady = tMax * 1.6f + (float) (detectorDelay + lookahead);
+        latency = kMaxBlock + (int) std::ceil (std::max (readAhead, marksReady)) + 8;
         int size = 1;
         while (size < latency * 4 + (int) tMax * 4)
             size <<= 1;
@@ -415,6 +455,7 @@ public:
         }
         mono.assign ((size_t) size, 0.0f);
         wsum.assign ((size_t) size, 0.0f);
+        rsum.assign ((size_t) size, 0.0f);
         reset();
     }
 
@@ -427,13 +468,15 @@ public:
         }
         std::fill (mono.begin(), mono.end(), 0.0f);
         std::fill (wsum.begin(), wsum.end(), 0.0f);
+        std::fill (rsum.begin(), rsum.end(), 0.0f);
         n = 0;
         numMarks = 0;
         markHead = 0;
-        addMark ({ -(int64_t) tUnvoiced, tUnvoiced, false });
+        addMark ({ -(int64_t) tUnvoiced, tUnvoiced, false, 1.0f });
         nextSynth = 0.0;
         numFrames = 0;
         frameHead = 0;
+        knownUntil = std::numeric_limits<int64_t>::min();
     }
 
     int getLatency() const noexcept { return latency; }
@@ -442,6 +485,7 @@ public:
     /** Pitch info from the detector/corrector, stamped with the input time it describes. */
     void pushFrame (const Frame& f) noexcept
     {
+        knownUntil = std::max (knownUntil, f.time);
         frames[(size_t) frameHead] = f;
         frameHead = (frameHead + 1) % kFrames;
         numFrames = std::min (kFrames, numFrames + 1);
@@ -487,11 +531,16 @@ public:
         for (int i = 0; i < len; ++i)
         {
             const int r = (int) ((r0 + i) & mask);
-            const float norm = 1.0f / std::max (wsum[(size_t) r], 0.5f);
+            // Overlapping grains are averaged, so a voice shifted up would lose level as its periods
+            // crowd together (-3.5 dB at +7 st). Keep the loudness instead: more periods each a little
+            // quieter, the same power, as a real voice singing higher with the same effort.
+            const float ws = wsum[(size_t) r];
+            const float localRatio = ws > 1.0e-6f ? rsum[(size_t) r] / ws : 1.0f;
+            const float norm = std::sqrt (std::max (1.0f, localRatio)) / std::max (ws, 0.5f);
             ch0[i] = acc[0][(size_t) r] * norm;
             if (ch1 != nullptr)
                 ch1[i] = acc[1][(size_t) r] * norm;
-            acc[0][(size_t) r] = acc[1][(size_t) r] = wsum[(size_t) r] = 0.0f;
+            acc[0][(size_t) r] = acc[1][(size_t) r] = wsum[(size_t) r] = rsum[(size_t) r] = 0.0f;
         }
     }
 
@@ -499,7 +548,7 @@ public:
     float readInput (int ch, double pos) const noexcept { return hermite (in[(size_t) ch], pos); }
 
 private:
-    struct Mark { int64_t pos; float period; bool voiced; };
+    struct Mark { int64_t pos; float period; bool voiced; float ratio; };
     static constexpr int kMarks = 256, kFrames = 128;
 
     void addMark (Mark m) noexcept
@@ -516,12 +565,26 @@ private:
         for (;;)
         {
             const Mark prev = lastMark();
-            const Frame f = frameAt (prev.pos + (int64_t) prev.period);
-            const bool v = f.voiced && f.period > 8.0f && f.period <= tMax;
+            Frame f = frameAt (prev.pos + (int64_t) prev.period);
+            auto usable = [this] (const Frame& fr) { return fr.voiced && fr.period > 8.0f && fr.period <= tMax; };
+            if (! usable (f))
+            {
+                // A note starts here if the detector hears one a moment later: its window needed to fill
+                // with voice first. Take that period now, so the note is shifted from its first cycle.
+                const Frame ahead = frameAt (prev.pos + (int64_t) prev.period + lookahead);
+                if (usable (ahead))
+                    f = ahead;
+            }
+            const bool v = usable (f);
             const float period = v ? f.period : tUnvoiced;
             const int radius = v ? (int) (period * 0.22f) : 0;
             const int64_t predicted = prev.pos + (int64_t) std::lround (period);
             if (predicted + (int64_t) period + radius + 2 > n)
+                return;
+            // The detector reports a moment about 20 ms after it happens (half its window). Waiting until
+            // it has described this spot keeps note starts from being cut as unvoiced (played at the old
+            // pitch, then snapping to the new one) and note ends from being cut as voiced.
+            if (predicted + lookahead > knownUntil)
                 return;
 
             int64_t pos = predicted;
@@ -539,7 +602,7 @@ private:
                     if (sum > bestC) { bestC = sum; pos = cand; }
                 }
             }
-            addMark ({ pos, period, v });
+            addMark ({ pos, period, v, f.ratio });
         }
     }
 
@@ -562,7 +625,9 @@ private:
     {
         const auto& m = nearestMark (nextSynth);
         const Frame f = frameAt ((int64_t) nextSynth);
-        const float ratio = m.voiced ? juce::jlimit (0.5f, 2.0f, f.ratio) : 1.0f;
+        // The ratio of this moment, unless the detector had not heard the note yet here (a note start
+        // the look-ahead caught): then the ratio that came with the mark's period, not a stale one.
+        const float ratio = m.voiced ? juce::jlimit (0.5f, 2.0f, f.voiced ? f.ratio : m.ratio) : 1.0f;
         const float ta = m.period;
         const float readSpeed = m.voiced ? formant : 1.0f;
         const int half = std::max (2, (int) std::lround (ta));
@@ -580,6 +645,7 @@ private:
             acc[0][(size_t) o] += w * hermite (in[0], src);
             acc[1][(size_t) o] += w * hermite (in[1], src);
             wsum[(size_t) o] += w;
+            rsum[(size_t) o] += w * ratio;
         }
         nextSynth += std::max (8.0, (double) (ta / ratio));
     }
@@ -596,12 +662,13 @@ private:
 
     double sr = 48000.0, nextSynth = 0.0;
     float tMax = 740.0f, tUnvoiced = 240.0f;
-    int latency = 0, mask = 0;
-    std::vector<float> in[2], acc[2], mono, wsum;
+    int latency = 0, mask = 0, lookahead = 480;
+    std::vector<float> in[2], acc[2], mono, wsum, rsum;
     int64_t n = 0;
     std::array<Mark, kMarks> marks {};
     int numMarks = 0, markHead = 0;
     std::array<Frame, kFrames> frames {};
     int numFrames = 0, frameHead = 0;
+    int64_t knownUntil = std::numeric_limits<int64_t>::min();
 };
 } // namespace aircheck

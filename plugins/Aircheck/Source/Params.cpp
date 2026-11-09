@@ -175,6 +175,8 @@ const std::array<ParamSpec, (size_t) kNumParams>& table()
         { P::dimMix,        "dimMix",        "Dim Mix",     K::Float, 0, 1, 0.5f, 0, U::Percent, nullptr },
         { P::limit,         "limit",         "Limit",       K::Float, 0, 1, 0, 0, U::Percent, nullptr },
         { P::eqPost,        "eqPost",        "EQ Post",     K::Bool, 0, 1, 0, 0, U::None, nullptr },
+        { P::pitchShift,    "pitchShift",    "Pitch Shift", K::Float, -12, 12, 0, 0, U::SemisFine, nullptr },
+        { P::pitchFormant,  "pitchFormant",  "Shift Formant", K::Float, -7, 7, 0, 0, U::SemisFine, nullptr },
     }};
     return t;
 }
@@ -217,6 +219,19 @@ juce::AudioProcessorValueTreeState::ParameterLayout createLayout()
                 juce::NormalisableRange<float> range (s.min, s.max);
                 if (s.centre > 0.0f)
                     range.setSkewForCentre (s.centre);
+                if (s.param == P::pitchShift)
+                {
+                    // Whole semitones are magnetic (a drag lands on +4, not +3.97); values between them
+                    // stay possible for a slightly detuned voice.
+                    range = juce::NormalisableRange<float> (s.min, s.max,
+                        [] (float lo, float hi, float t) { return lo + (hi - lo) * t; },
+                        [] (float lo, float hi, float v) { return (v - lo) / (hi - lo); },
+                        [] (float lo, float hi, float v)
+                        {
+                            const float whole = std::round (v);
+                            return juce::jlimit (lo, hi, std::abs (v - whole) < 0.15f ? whole : std::round (v * 100.0f) / 100.0f);
+                        });
+                }
                 const auto unit = s.unit;
                 layout.add (std::make_unique<juce::AudioParameterFloat> (pid, s.name, range, s.def,
                     juce::AudioParameterFloatAttributes().withStringFromValueFunction ([unit] (float v, int) { return formatValue (unit, v); })));

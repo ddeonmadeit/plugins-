@@ -20,6 +20,34 @@ private:
 };
 
 /**
+    The pitch shifter's pad: left / right is the pitch, up / down the voice's size (formants). Along the
+    lit middle line the voice stays itself, only higher or lower; the dashed diagonal is where formants
+    follow the pitch (a chipmunk above, a slowed-down giant below). Drag the dot, double-click resets.
+*/
+class ShiftView : public juce::Component, public juce::SettableTooltipClient, private juce::Timer
+{
+public:
+    explicit ShiftView (AircheckProcessor&);
+    ~ShiftView() override;
+    void paint (juce::Graphics&) override;
+    void mouseDown (const juce::MouseEvent&) override;
+    void mouseDrag (const juce::MouseEvent&) override;
+    void mouseUp (const juce::MouseEvent&) override;
+    void mouseDoubleClick (const juce::MouseEvent&) override;
+
+    /** What a shift / formant pair sounds like, in a few words. */
+    static juce::String describe (float shift, float formant);
+
+private:
+    void timerCallback() override;
+    juce::Rectangle<float> plotArea() const;
+    void setFrom (juce::Point<float>);
+    AircheckProcessor& proc;
+    juce::ParameterAttachment shiftAtt, formantAtt;
+    float shift = 0.0f, formant = 0.0f;
+};
+
+/**
     The visual EQ: eight bands over a live analyzer of the voice before (faint) and after the EQ.
     Click a point to select its band, drag to move it, scroll for Q, right-click to switch it on or off,
     double-click a point to reset its gain, double-click empty space to add a band there.

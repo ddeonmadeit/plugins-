@@ -82,6 +82,7 @@ private:
     void processChunk (float* L, float* R, int n);
     void readSettings();
     void migrateLegacyEq (const juce::ValueTree& savedState);
+    void migrateLegacyPitch();
 
     aircheck::ParamCache params;
     double sr = 44100.0, bpm = 120.0;
