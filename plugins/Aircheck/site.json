@@ -17,7 +17,8 @@
   "installTips": [
     "Put Aircheck first on the vocal track (FL Studio: Mixer > vocal insert > slot 1), then pick a preset.",
     "For pitch correction set Key and Scale to the song; Chromatic works anywhere but snaps to every semitone. Retune 0 ms is the hard robotic effect, 20 to 50 ms sounds natural.",
-    "It delays the sound by about 50 ms so the pitch correction can look ahead; FL Studio compensates automatically. To sing through it live, use a separate low-latency monitor."
+    "For a higher or lower voice use Pitch Shift: leave Formant at 0 and you still sound like you (turn Formant up with it only if you want the chipmunk). The PITCHED presets, including justend, start from there.",
+    "It delays the sound by about 60 ms so the pitch correction and Pitch Shift can look ahead; FL Studio compensates automatically. To sing through it live, use a separate low-latency monitor."
   ],
   "previewNote": "on a synthetic sung test phrase (slightly off pitch on purpose), so you hear the chain and the correction, not a real singer.",
   "whatsNew": {
