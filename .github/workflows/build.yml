@@ -145,7 +145,12 @@ jobs:
       - name: Get pluginval
         if: env.PLUGINS != ''
         run: |
-          curl -sSL -o pluginval.zip https://github.com/Tracktion/pluginval/releases/latest/download/pluginval_Linux.zip
+          # GitHub's asset server now and then answers with something that is not the zip: retry until it is.
+          for i in 1 2 3 4 5; do
+            if curl -fsSL --retry 3 -o pluginval.zip https://github.com/Tracktion/pluginval/releases/latest/download/pluginval_Linux.zip \
+                && unzip -tq pluginval.zip > /dev/null; then break; fi
+            echo "pluginval download $i failed, retrying"; sleep $((i * 5))
+          done
           unzip -q pluginval.zip -d pluginval
 
       - name: QA the plugins
@@ -307,7 +312,12 @@ jobs:
       - name: Validate VST3 (pluginval)
         if: env.PLUGINS != ''
         run: |
-          curl -sSL -o pluginval.zip https://github.com/Tracktion/pluginval/releases/latest/download/pluginval_macOS.zip
+          # GitHub's asset server now and then answers with something that is not the zip: retry until it is.
+          for i in 1 2 3 4 5; do
+            if curl -fsSL --retry 3 -o pluginval.zip https://github.com/Tracktion/pluginval/releases/latest/download/pluginval_macOS.zip \
+                && unzip -tq pluginval.zip > /dev/null; then break; fi
+            echo "pluginval download $i failed, retrying"; sleep $((i * 5))
+          done
           unzip -q pluginval.zip -d pluginval
           for p in $PLUGINS; do
             product=$(python3 -c "import json; print({x['target']: x['product'] for x in json.load(open('dist/plugins.json'))}['$p'])")
