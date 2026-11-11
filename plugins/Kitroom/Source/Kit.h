@@ -37,11 +37,11 @@ constexpr int kSidestickArt = 2;        // the snare articulation a layered clap
 enum Slot { Kick, Snare, HiHat, Tom1, Tom2, Tom3, Crash1, Crash2, RideSlot, China, ClapSlot };
 
 /** 1.15: the log drum, a synthesised piece after the sampled slots. It plays its own key range above the kit's
-    keys and sounds three octaves lower, so in FL Studio's names A5 is the classic low A (55 Hz). */
+    keys and sounds three octaves lower, so MIDI 69 (A5 in FL Studio, A3 in Ableton) is the classic low A (55 Hz). */
 constexpr int kLogDrum = kNumSlots;
 constexpr int kNumPieces = kNumSlots + 1;
 constexpr int kLogLowKey = 60, kLogHighKey = 96, kLogKeyOffset = 36;
-constexpr int kLogAuditionKey = 69;   // A5 in FL names: the classic low A
+constexpr int kLogAuditionKey = 69;   // the classic low A
 
 /** The kit layout. Order is permanent: parameter ids and saved sessions use the slot ids. */
 inline const std::array<SlotDef, kNumSlots>& slots()
@@ -81,15 +81,6 @@ inline const char* categoryId (Category c)
         case Category::Clap:   return "clap";
     }
     return "";
-}
-
-/** FL Studio note naming: MIDI 60 = C5, so MIDI 36 = C3. */
-inline juce::String flNoteName (int note)
-{
-    static const char* names[] = { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" };
-    if (note < 0 || note > 127)
-        return "--";
-    return juce::String (names[note % 12]) + juce::String (note / 12);
 }
 
 /** Packs (slot, articulation) for the key map; -1 = unassigned. */

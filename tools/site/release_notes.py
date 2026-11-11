@@ -18,6 +18,9 @@ plugin, version = sys.argv[1], sys.argv[2]
 meta = json.loads(subprocess.check_output(["python3", os.path.join(ROOT, "tools/ci/plugin_meta.py"), "--only", plugin]))[0]
 site = meta.get("site", {})
 where = "Generators" if meta["kind"] == "SYNTH" else "Effects"
+ableton = ("Ableton Live: Settings (Cmd+,) → Plug-Ins: turn on **Use Audio Units** and **Use VST3 Plug-In System Folders**, then click "
+           "**Rescan**. %s appears in the browser under Plug-Ins (ddeonmadeit folder); drag it onto %s."
+           % (meta["product"], "a MIDI track" if meta["kind"] == "SYNTH" else "a track"))
 
 lines = ["**%s**: %s" % (meta["product"], site.get("tagline", "")), "", site.get("description", ""), ""]
 new = site.get("whatsNew") or {}
@@ -30,6 +33,7 @@ if notarized:
     lines += [
         "1. Download **%s-%s-macOS.pkg** below and double-click it." % (plugin, version),
         "2. FL Studio: Options → Manage plugins → **Find more plugins**. %s appears under %s." % (meta["product"], where),
+        "3. " + ableton,
     ]
 else:
     lines += [
@@ -43,13 +47,15 @@ else:
         "click Done, then System Settings → Privacy & Security → **Open Anyway**, and run the .pkg again." % (plugin, version),
         "",
         "Then in FL Studio: Options → Manage plugins → **Find more plugins**. %s appears under %s." % (meta["product"], where),
+        "",
+        "Or in " + ableton,
     ]
 lines += [
     "",
     "No admin password? Use the .zip: unzip it and run `bash ~/Downloads/%s-%s-macOS/Install.command` in Terminal." % (plugin, version),
     "",
-    "**Updating from an older version:** quit FL Studio, run the new .pkg (it replaces the old version), then reopen. "
-    "Projects keep all their settings; no rescan is needed.",
+    "**Updating from an older version:** quit your DAW, run the new .pkg (it replaces the old version), then reopen. "
+    "Projects keep all their settings; FL Studio needs no rescan (in Ableton, click Rescan if it still shows the old version).",
     "",
 ]
 for t in site.get("installTips", []):

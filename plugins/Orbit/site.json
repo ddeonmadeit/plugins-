@@ -9,16 +9,16 @@
     "Fourteen real rooms (now with a Motown-style echo chamber and a Stax-style theater) with their own size, walls and echo: 24 early reflections per side from the actual room shape, a dense late reverb with the room's own decay, and a Size knob that shrinks or grows the space. Switching rooms keeps your mix level",
     "The fourth dimension: Motion paths locked to your song's tempo (orbit, pendulum, figure 8, fly-by, rise, spiral, wander), how far it travels, and Doppler for the pitch bend of a sound rushing past",
     "Width from the listener's seat: from a single point to a sound spread across half the horizon",
-    "Automate everything: dragging the light records Left / Right, Front / Back and Height as automation in FL Studio",
+    "Automate everything: dragging the light records Left / Right, Front / Back and Height as automation in your DAW",
     "Zero latency, mono-safe low end (the bass stays centred), and a Speakers mode for monitors",
     "48 presets: around you, rooms, motion, Travis Scott ad-libs, Tame Impala swirl, trip hop distance, mix tools, neo soul and soul (including the Motown echo chamber)",
     "Head-related filters from The Viking HRTF dataset v2 (Spagnol, Miccini and Unnthorsson, 2020), CC BY 4.0"
   ],
   "installTips": [
-    "Put Orbit on any mixer insert (FL Studio: Mixer > track > empty slot > Orbit). Drag the light in the room to move the sound; Shift-drag or scroll to raise it.",
+    "Put Orbit on any mixer insert (FL Studio: Mixer > track > empty slot > Orbit; Ableton: drop it on the track). Drag the light in the room to move the sound; Shift-drag or scroll to raise it.",
     "Listen on headphones for full 3D (in front, behind, above). On speakers switch on SPEAKERS in the top bar.",
     "Try the EARS choices with a sound placed behind you: the one where it really sounds behind you suits your ears best.",
-    "To automate a move in FL Studio, right-click Left / Right, Front / Back or Height and choose Create automation clip, or arm recording and drag the light while the song plays."
+    "To automate a move in FL Studio, right-click Left / Right, Front / Back or Height and choose Create automation clip, or arm recording and drag the light while the song plays. In Ableton, turn on Automation Arm, record in Arrangement View and drag the light."
   ],
   "previewNote": "on the test programme. Listen on headphones: Orbit is 3D audio.",
   "whatsNew": {

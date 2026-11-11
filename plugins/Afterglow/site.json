@@ -1,7 +1,7 @@
 {
   "publish": true,
   "tagline": "Pads, keys, arps, real instruments and soundscapes",
-  "description": "A two-layer synth for pads, keys, plucks, leads, bells and soundscapes, now with real recorded instruments (string section, pizzicato and tremolo strings, solo violin, grand and upright piano, harp, flute, clarinet, tenor sax, harmonica, french horn, trumpet, trombone, pipe organ, vibraphone, marimba, glockenspiel, tubular bells) and an arpeggiator that follows FL Studio's tempo. Played from a sunset horizon instead of a wall of knobs: drag the sun for motion and tone, shape the rest with six macros. 179 presets inspired by Tame Impala, Massive Attack, Brent Faiyaz, Mike Dean, Travis Scott, Yeezus, moshc0re, SAFE and trip hop, plus live instruments, pads, arps and a modelled electric guitar.",
+  "description": "A two-layer synth for pads, keys, plucks, leads, bells and soundscapes, now with real recorded instruments (string section, pizzicato and tremolo strings, solo violin, grand and upright piano, harp, flute, clarinet, tenor sax, harmonica, french horn, trumpet, trombone, pipe organ, vibraphone, marimba, glockenspiel, tubular bells) and an arpeggiator that follows your DAW's tempo. Played from a sunset horizon instead of a wall of knobs: drag the sun for motion and tone, shape the rest with six macros. 179 presets inspired by Tame Impala, Massive Attack, Brent Faiyaz, Mike Dean, Travis Scott, Yeezus, moshc0re, SAFE and trip hop, plus live instruments, pads, arps and a modelled electric guitar.",
   "accent": "#ec7d2e",
   "highlights": [
     "Real instruments: 19 recorded instruments (strings, piano, harp, woodwinds, brass, organ, mallets) with their dynamics, looped so held notes sustain forever; layer them with the synth or each other",
@@ -19,16 +19,15 @@
     "The .pkg also installs the live-instrument library (about 100 MB). With the .zip, Install.command copies it for you.",
     "Every macro's centre position is the preset as designed: double-click a knob, or the sun, to go back to it.",
     "ARP (bottom right) arpeggiates whatever you hold; the menu beside it sets the speed. The ARPS presets have it on.",
-    "Pump, gate, delay and synced LFOs follow FL Studio's tempo.",
-    "Guitar presets: play chords as voicings within one or two octaves (like a real neck), around C2-C5 in FL's piano roll; the POLY switch must be on for chords.",
-    "TAPE STOP: in FL Studio, right-click the switch > Create automation clip, then draw it on where the beat should stop. It stays silent until switched off again."
+    "Pump, gate, delay and synced LFOs follow the DAW's tempo (FL Studio, Ableton, ...).",
+    "Guitar presets: play chords as voicings within one or two octaves (like a real neck), around C2-C5 in FL Studio's piano roll (C0-C3 in Ableton's); the POLY switch must be on for chords.",
+    "TAPE STOP: in FL Studio, right-click the switch > Create automation clip, then draw it on where the beat should stop. In Ableton, click the switch once so it appears in the track's automation chooser, then draw it in Arrangement View. It stays silent until switched off again."
   ],
   "previewNote": "on the same 120 BPM phrase: a held Dm9, an arpeggio over Bb, Fmaj7 stabs, then a legato melody. GUITAR presets play strummed Em, C and G chords at 80 BPM and a riff.",
   "whatsNew": {
-    "version": "1.13.0",
+    "version": "1.13.1",
     "items": [
-      "NEO SOUL: Voodoo Rhodes, Baduizm Wurli, Dilla Dusty Keys, Rhodes Through Leslie, Neo Organ Swell, Mama's Gun Pad, Silk Synth Lead, Late Night Vibes, Neo Soul Strings, Glasper Stack and Black Radio Piano",
-      "SOUL: Memphis Organ, Philly Strings, Stax Horn Stabs, Motown Vibes, Southern Soul Piano, Superfly Flute, Sunday Choir and Supremes Glock (real recorded strings, horns, vibes, piano, flute and glockenspiel)"
+      "Ableton Live: TAPE STOP's help says how to automate it in Ableton"
     ]
   }
 }

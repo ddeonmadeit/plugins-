@@ -1,5 +1,5 @@
-INSTALLING ON macOS (FL Studio, Logic, Ableton, ...)
-====================================================
+INSTALLING ON macOS (FL Studio, Ableton Live, Logic, ...)
+=========================================================
 
 Quickest, with no macOS warning: one Terminal command
   Open Terminal (Cmd+Space, type Terminal, Return), paste this line and press Return:
@@ -25,10 +25,20 @@ Option B: install script (no admin password)
 
 THEN, IN FL STUDIO
   Options > Manage plugins > Find more plugins (or "Start scan").
-  The plug-in appears under Generators. Drag it into the Channel Rack.
+  Instruments appear under Generators (drag one into the Channel Rack), effects under Effects.
   If it is not found, make sure the folders above are listed under
   "Plugin search paths" in Manage plugins, then scan again.
 
+OR, IN ABLETON LIVE
+  Settings (Cmd+,) > Plug-Ins: turn on "Use Audio Units" and "Use VST3 Plug-In System Folders",
+  then click Rescan (hold Option while clicking for a full rescan).
+  The plug-in appears in the browser under Plug-Ins, in the ddeonmadeit folder. Drag an
+  instrument onto a MIDI track, an effect onto an audio track.
+  Key names follow the DAW: Ableton calls middle C "C3" where FL Studio says "C5", and the
+  plug-ins show their keys the same way as the piano roll you are using.
+  Contour and Hush: transfer and edit in Arrangement View (Session clips have no fixed place
+  in the song, so the take can't line up with them).
+
 CREDITS
-  Interface font: Barlow Condensed, Copyright 2017 The Barlow Project Authors,
+  Interface font: Instrument Sans, Copyright 2022 The Instrument Sans Project Authors,
   SIL Open Font License 1.1 (https://openfontlicense.org).

@@ -521,7 +521,8 @@ void GuitarView::paint (juce::Graphics& g)
     }
     g.setColour (juce::Colour (0xffa39a8c).withAlpha (0.85f));   // the stage is dark in both themes
     g.setFont (dd::gui::LookAndFeel::font (11.5f));
-    g.drawText ("Noise keys C2-E2:  muted strum  /  knock  /  mute  /  squeak  /  pick", stage.reduced (16.0f, 10.0f).removeFromTop (20.0f),
+    const auto noiseKeys = dd::noteName (sunburst::GuitarEngine::kFxLow) + "-" + dd::noteName (sunburst::GuitarEngine::kFxHigh);
+    g.drawText ("Noise keys " + noiseKeys + ":  muted strum  /  knock  /  mute  /  squeak  /  pick", stage.reduced (16.0f, 10.0f).removeFromTop (20.0f),
                 juce::Justification::topRight);
 }
 

@@ -84,3 +84,15 @@ the editor's drawing is replayed on the (virtual) GPU inside the host's process.
 1.2: full-window repaints at 60 Hz with many vector overlays) hit it reproducibly. Override
 `AudioProcessorEditor::wantsLayerBackedView()` to return false: the wrapper then adds the editor with
 `windowRequiresSynchronousCoreGraphicsRendering` and it draws on the CPU.
+
+## No keys in a macOS VST3 editor (Ableton, FL Studio)
+
+With `EDITOR_WANTS_KEYBOARD_FOCUS FALSE` (the dd_add_plugin default) the VST3 wrapper adds the editor with
+`ComponentPeer::windowIgnoresKeyPresses`, so on macOS its NSView refuses first responder and `keyPressed`
+never runs, whatever `setWantsKeyboardFocus` / `grabKeyboardFocus` say. The AU wrapper doesn't, so shortcuts
+worked in AU and silently did nothing in VST3 (Cmd+Z then undid in the DAW instead). Editors with
+shortcuts pass `WANTS_KEYBOARD` to dd_add_plugin; JUCE hands keys a component doesn't use (`return false`)
+back up the responder chain, so the DAW still gets Space, its computer-keyboard MIDI and so on. Text in
+an `AlertWindow` (preset Save As) always works: it is its own window. Buttons and ComboBoxes want focus by
+default, so after a click they would eat Return / arrows: `dd::gui::giveKeysOnlyTo (root, canvas)` leaves
+focus to the one component that has shortcuts.

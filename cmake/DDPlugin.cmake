@@ -5,6 +5,7 @@
 #     VERSION       1.0.0
 #     SOURCES       Source/a.cpp ...
 #     PRESETS_DIR   Presets           # optional: every *.json below is embedded as factory presets
+#     WANTS_KEYBOARD                  # optional: the editor takes typing once clicked (Contour's shortcuts)
 # )
 #
 # Creates:
@@ -20,7 +21,7 @@ set(DD_BUNDLE_PREFIX "com.ddeonmadeit")
 set(DD_REPO_ROOT "${CMAKE_CURRENT_LIST_DIR}/..")
 
 function(dd_add_plugin target)
-    cmake_parse_arguments(DD "" "PRODUCT_NAME;PLUGIN_CODE;KIND;VERSION;PRESETS_DIR" "SOURCES" ${ARGN})
+    cmake_parse_arguments(DD "WANTS_KEYBOARD" "PRODUCT_NAME;PLUGIN_CODE;KIND;VERSION;PRESETS_DIR" "SOURCES" ${ARGN})
 
     if(NOT DD_VERSION)
         set(DD_VERSION 1.0.0)
@@ -39,6 +40,15 @@ function(dd_add_plugin target)
                       AU_MAIN_TYPE kAudioUnitType_Effect)
     endif()
 
+    # Without keyboard focus a VST3 editor on macOS never becomes first responder, so it gets no keys at all
+    # (they go to the DAW: Space, computer-keyboard MIDI). Editors with their own shortcuts opt in; keys
+    # they don't use still pass on to the DAW.
+    if(DD_WANTS_KEYBOARD)
+        set(wants_keys TRUE)
+    else()
+        set(wants_keys FALSE)
+    endif()
+
     string(TOLOWER "${target}" target_lower)
 
     juce_add_plugin(${target}
@@ -51,7 +61,7 @@ function(dd_add_plugin target)
         FORMATS                  ${formats}
         NEEDS_MIDI_OUTPUT        FALSE
         IS_MIDI_EFFECT           FALSE
-        EDITOR_WANTS_KEYBOARD_FOCUS FALSE
+        EDITOR_WANTS_KEYBOARD_FOCUS ${wants_keys}
         COPY_PLUGIN_AFTER_BUILD  FALSE
         HARDENED_RUNTIME_ENABLED FALSE
         ${kind_args})

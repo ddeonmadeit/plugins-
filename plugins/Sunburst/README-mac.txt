@@ -3,7 +3,8 @@ SUNBURST: PLAYING THE GUITARS
   you; with the .zip, Install.command copies the "Sunburst Library" folder. Without it the plug-in
   opens but shows "SAMPLE LIBRARY NOT FOUND".
 
-  Keys (FL Studio note names, C5 = middle C):
+  Keys (FL Studio note names, C5 = middle C; Ableton names every key two octaves lower,
+  so there the guitar is E1 .. D5 and the noises C0 .. E0):
     E3 .. D7     the guitar (low E string = E3)
     C2           muted strum ("chk")      C#2  body knock
     D2           string mute              D#2  fret squeak        E2  pick scrape
@@ -20,12 +21,13 @@ SUNBURST: PLAYING THE GUITARS
     - DOUBLE: a second take panned opposite, for wide double-tracked guitars.
     - TAPE STOP (top right): the guitar slows to a halt like a tape machine powering down and stays
       silent until switched off; the menu sets how long. Right-click it > Create automation clip in
-      FL Studio to drop it at the end of a beat.
+      FL Studio to drop it at the end of a beat. In Ableton, click it once so it appears in the
+      track's automation chooser, then draw it in Arrangement View.
 
   Samples (all CC0 1.0, credited with thanks): Shinyguitar, Emilyguitar and Black And Green Guitars
   by Karoryfer Samples; Spanish Classical Guitar by the FreePats project. See ATTRIBUTION.txt in the
   library folder.
 
 UPDATING
-  Quit FL Studio, run the new .pkg (it replaces the old version and keeps the sample library up to
+  Quit your DAW, run the new .pkg (it replaces the old version and keeps the sample library up to
   date), then reopen your project. Your settings are kept.

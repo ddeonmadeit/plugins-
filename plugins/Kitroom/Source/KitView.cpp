@@ -693,8 +693,8 @@ void KitView::drawLabel (juce::Graphics& g, const Piece& p) const
 {
     const bool isLog = p.slot == kr::kLogDrum;
     const bool learning = ! isLog && proc.getLearnTarget() >= 0 && kr::targetSlot (proc.getLearnTarget()) == p.slot;
-    const juce::String key = isLog ? kr::flNoteName (kr::kLogLowKey) + "-" + kr::flNoteName (kr::kLogHighKey)
-                                   : learning ? juce::String ("press a key") : kr::flNoteName (proc.getKey (p.slot, 0));
+    const juce::String key = isLog ? dd::noteName (kr::kLogLowKey) + "-" + dd::noteName (kr::kLogHighKey)
+                                   : learning ? juce::String ("press a key") : dd::noteName (proc.getKey (p.slot, 0));
     const juce::String name = isLog ? juce::String ("LOG DRUM") : juce::String (kr::slots()[(size_t) p.slot].name).toUpperCase();
     const bool loading = ! isLog && proc.isSlotLoading (p.slot);
     const bool selected = proc.selectedSlot == p.slot;

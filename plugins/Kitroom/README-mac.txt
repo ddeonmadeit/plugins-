@@ -3,11 +3,15 @@ KITROOM: KEYS AND SOUNDS
   for you; with the .zip, Install.command copies the "Kitroom Library" folder. Without it the plug-in
   opens but shows "Drum samples not found".
 
-  Every piece of the kit is on its own key, General MIDI layout, FL Studio note names (C5 = middle C):
+  Every piece of the kit is on its own key, General MIDI layout. FL Studio names (C5 = middle C):
     C3  Kick            D3  Snare           C#3 Sidestick       E3  Rimshot         D#3 Clap
     F#3 Hi-hat closed   G#3 Hi-hat pedal    A#3 Hi-hat open     B1  Hi-hat half open
     C4  Tom 1           A3  Tom 2           G3  Floor tom
     C#4 Crash L         A4  Crash R         D#4 Ride            F4  Ride bell    E4  China
+  Ableton names the same keys two octaves lower (C3 = middle C): kick C1, snare D1, closed hat F#1,
+  toms C2 / A1 / G1, ride D#2, and so on. The plug-in always shows the names your DAW uses.
+  Log drum: C5 to C8 in FL Studio (C3 to C6 in Ableton), sounding three octaves lower, so A5
+  (Ableton: A3) is the classic low A. Overlap two notes to slide; click the log for its controls.
   Click any piece in the window to hear it and edit it: swap its sound (any recorded snare, kick,
   tom...), re-learn its key from your keyboard, and set its volume, pan, tuning, decay, mics and Punch
   (a harder attack and tighter body on the close mics; the room stays natural). On the snare or clap
@@ -18,5 +22,5 @@ KITROOM: KEYS AND SOUNDS
   from the Versilian Community Sample Library, CC0. See ATTRIBUTION.txt in the library folder.
 
 UPDATING
-  Quit FL Studio, run the new .pkg (it replaces the old version and keeps the sound library up to
+  Quit your DAW, run the new .pkg (it replaces the old version and keeps the sound library up to
   date), then reopen your project. Kits you already used keep all their settings.

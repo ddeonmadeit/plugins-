@@ -15,14 +15,14 @@
   ],
   "installTips": [
     "The .pkg also installs the guitar sample library (about 130 MB). With the .zip, Install.command copies it for you.",
-    "Play between E3 and D7 (FL note names). Mod wheel = palm mute, sustain pedal = let ring, pitch bend = string bend. C2 to E2 play noises: muted strum, body knock, string mute, fret squeak, pick.",
-    "TAPE STOP: in FL Studio, right-click the switch > Create automation clip, then draw it on where the beat should stop. It stays silent until switched off again."
+    "Play between E3 and D7 in FL Studio (E1 to D5 in Ableton). Mod wheel = palm mute, sustain pedal = let ring, pitch bend = string bend. C2 to E2 (Ableton: C0 to E0) play noises: muted strum, body knock, string mute, fret squeak, pick.",
+    "TAPE STOP: in FL Studio, right-click the switch > Create automation clip, then draw it on where the beat should stop. In Ableton, click the switch once so it appears in the track's automation chooser, then draw it in Arrangement View. It stays silent until switched off again."
   ],
   "previewNote": "on the same 80 BPM part: strummed Em, C and G chords (down and up strokes), then a single-note riff.",
   "whatsNew": {
-    "version": "1.9.0",
+    "version": "1.9.1",
     "items": [
-      "NEO SOUL and SOUL guitars: Ballad Neck Pickup, Bag Lady Trem, Dusty Nylon Loop, Double Stop Fills, Neo Chorus Wash, Glassy Ninths, plus Memphis Telecaster, Chicago Soul Chime, Hitsville Hollow Chops, Memphis Tremolo and Muscle Shoals Slide"
+      "Ableton Live: the noise keys are named the way Ableton's piano roll names them, and TAPE STOP's help says how to automate it in Ableton"
     ]
   }
 }

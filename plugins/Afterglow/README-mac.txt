@@ -7,7 +7,7 @@ AFTERGLOW: PLAYING IT
   The lamps switch effects on and off: dirt, tape, ensemble, phaser, delay, reverb, pump and cab
   (a guitar speaker cabinet after the dirt amp).
   GUITAR presets are a modelled electric guitar: play chords as guitar voicings (within an octave
-  or two, around C2-C5 in FL) and they strum lowest string first; quick repeats strum back up.
+  or two, around C2-C5 in FL Studio, C0-C3 in Ableton) and they strum lowest string first; quick repeats strum back up.
   POLY (top right) lets you play chords with any preset, even the mono leads; switch it off to hear
   a lead preset glide and play legato as designed. It stays as you set it when you change presets.
   Pads like held chords and the sustain pedal; leads (mono / legato presets) like overlapping notes.
@@ -20,10 +20,11 @@ AFTERGLOW: PLAYING IT
   TAPE STOP (top right) slows the sound to a halt like a tape machine powering down, then stays
   silent until you switch it off. The menu beside it sets how long the stop takes (2 s is the stop
   at the end of The Wall). To drop it at the end of a beat in FL Studio: right-click the switch >
-  Create automation clip, and draw it on where the stop should start.
+  Create automation clip, and draw it on where the stop should start. In Ableton: click the switch
+  once so it appears in the track's automation chooser, then draw it in Arrangement View.
 
 UPDATING
-  Quit FL Studio, run the new .pkg (it replaces the old version), then reopen your project. Sounds
+  Quit your DAW, run the new .pkg (it replaces the old version), then reopen your project. Sounds
   you already used keep all their settings. Update the same way you first installed (.pkg or zip).
 
   Live instruments: VSCO 2 Community Edition and the Versilian Community Sample Library by

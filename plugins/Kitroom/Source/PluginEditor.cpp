@@ -38,7 +38,7 @@ std::map<juce::String, juce::String> kitroomHelp()
         { "tone",            "Darker or brighter kit." },
         { "clapOnSnare",     "Every snare hit (not the sidestick) also plays the clap, at the same strength." },
         { "layBack",         "Plays the snare and clap behind the beat (hats and ride a little less, the kick stays on time): the lazy neo-soul pocket. 0 is right on the grid." },
-        { "logVolume",       "Volume of the log drum (it plays on the keys C5 to C8)." },
+        { "logVolume",       "Volume of the log drum (it plays on the keys " + dd::noteName (kr::kLogLowKey) + " to " + dd::noteName (kr::kLogHighKey) + ")." },
         { "logTune",         "Moves the whole log drum up or down, in semitones, to sit in your song's key." },
         { "logLength",       "How long each log drum note rings: short and plucky, or long and booming." },
         { "logKnock",        "The woody knock at the start of each note: the quick pitch drop and the click of the mallet." },
@@ -46,7 +46,7 @@ std::map<juce::String, juce::String> kitroomHelp()
         { "logDrive",        "Saturation on the log drum: more grit, and it cuts through on small speakers." },
         { "logSub",          "A clean sine under the log drum for weight in the low end." },
         { "logGlide",        "How long a slide takes: overlap two log drum notes and the second slides up or down into place." },
-        { "logModel",        "Classic: the original FL Studio FM log drum. Woody: more mallet and a hollow knock. Deep: rounder, more sub. Bounce: the bouncy donk." },
+        { "logModel",        "Classic: the original FM log drum (born as an FL Studio preset). Woody: more mallet and a hollow knock. Deep: rounder, more sub. Bounce: the bouncy donk." },
     };
     for (int s = 0; s < kr::kNumSlots; ++s)
     {

@@ -1,6 +1,6 @@
 # ddeonmadeit plugins
 
-Audio plugins for FL Studio on macOS (VST3 + AU, universal: Apple Silicon and Intel).
+Audio plugins for FL Studio and Ableton Live on macOS (VST3 + AU, universal: Apple Silicon and Intel).
 
 **Download: https://ddeonmadeit.github.io/plugins-/** (always the newest version of every plugin,
 with audio previews of the presets).
@@ -127,9 +127,11 @@ the output is always mono, so it hits the same on club systems and phones.
    **System Settings > Privacy & Security**, click **Open Anyway**, then run the `.pkg` again.
    *No admin password?* Unzip the `.zip` and run `bash ~/Downloads/SubGrit-1.0.0-macOS/Install.command` in Terminal.
 3. In FL Studio: **Options > Manage plugins > Find more plugins**. SubGrit shows up under **Generators**.
+   In Ableton Live: **Settings > Plug-Ins**, turn on **Use Audio Units** and **Use VST3 Plug-In System Folders**,
+   click **Rescan**; SubGrit shows up in the browser under **Plug-Ins**.
 
 **Playing:** notes play at their real pitch. In FL Studio's piano roll the classic 808 range is
-**C2–C3** (about 33–65 Hz). Use **Voice > Octave** if you'd rather play higher. Overlap notes to
+**C2–C3** (about 33–65 Hz), in Ableton's **C0–C1** (Ableton numbers octaves two lower). Use **Voice > Octave** if you'd rather play higher. Overlap notes to
 slide on presets with glide; leave gaps for clean re-hits.
 
 User presets are saved to `~/Music/ddeonmadeit/SubGrit/Presets` (SAVE button; "..." menu reveals
@@ -167,7 +169,7 @@ so repeated hits never sound like the same sample.
 ![Kitroom](docs/kitroom.png)
 
 - **The kit on screen**: click any piece to hear it and edit it. Pieces flash when played and show
-  their key in FL Studio note names.
+  their key in the DAW's note names (FL Studio: kick C3; Ableton: kick C1).
 - **Swap any piece**: each slot takes any recorded sound of its kind (four kicks including a deadened
   one, three snares including brushes, three hi-hats, ten toms, five crashes and a china, five rides).
 - **One piano roll**: kick C3, snare D3, sidestick C#3, hi-hat F#3 closed / G#3 pedal / A#3 open / B1

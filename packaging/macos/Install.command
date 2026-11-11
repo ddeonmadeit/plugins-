@@ -39,4 +39,6 @@ killall -9 AudioComponentRegistrar 2>/dev/null || true
 
 echo
 echo "Done. In FL Studio: Options > Manage plugins > Find more plugins (or Start scan),"
-echo "then find the plug-in under Generators."
+echo "then find the plug-in under Generators or Effects."
+echo "In Ableton Live: Settings > Plug-Ins, turn on Use Audio Units and Use VST3 Plug-In"
+echo "System Folders, then click Rescan; it appears in the browser under Plug-Ins."

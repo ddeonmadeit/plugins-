@@ -108,3 +108,11 @@ quarantine flag, so Gatekeeper never assesses them, and `installer` doesn't eith
 - FL Studio: Options > Manage plugins > Find more plugins / Start scan; instruments show under Generators.
   If missing, add the folders above to "Plugin search paths". FL's piano roll names MIDI 60 "C5", so a
   real-pitch 808 lives around FL "C2-C3".
+- Ableton Live: Settings (Cmd+,) > Plug-Ins: "Use Audio Units" and "Use VST3 Plug-In System Folders" on, then
+  Rescan (Option-click = full rescan, Live 12.1+ only scans by itself on first launch). Plug-ins appear in the
+  browser under Plug-Ins. Ableton names MIDI 60 "C3" (two octaves below FL's names): the plugins follow the
+  host via `dd::noteName()`. Live shows a plug-in's parameters in its device panel only up to 64; above that,
+  touching a control in the plug-in window puts it in the automation chooser (or use Configure).
+- Install text lives in tools/site/template.html, tools/site/release_notes.py, tools/site/install.sh,
+  packaging/macos/{README.txt,Install.command} and each plugin's site.json / README-mac.txt: keep FL Studio and
+  Ableton steps side by side.

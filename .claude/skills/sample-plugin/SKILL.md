@@ -71,7 +71,7 @@ Iterate with `--only id,id` (merges into the existing catalog). Full build: ~2 m
 - Kit choice (which sound in each slot) is not a parameter: it lives in the preset JSON under
   `"extra": {"kit": {...}}` via `PresetManager::onApplyExtra / onCaptureExtra`, and in the state XML.
 - Key map: per-articulation primary keys + GM aliases in a `std::array<std::atomic<int>,128>`; MIDI learn
-  by polling from a UI timer. Show keys in **FL Studio note names** (MIDI 60 = C5).
+  by polling from a UI timer. Show keys with `dd::noteName()`: the host's own names (FL Studio MIDI 60 = C5, Ableton C3).
 - Master: width on M/S with an LR4 high-pass on the side (lows stay mono whatever the rooms do), glue,
   clipper, output gain.
 - Punch (per piece): no detector, since each voice knows where its hit starts. Attack held up to +6 dB for the

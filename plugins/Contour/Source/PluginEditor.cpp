@@ -45,6 +45,7 @@ ContourEditor::Content::Content (ContourProcessor& p)
     for (auto* c : { &notes, &correction, &selected, &session })
         addAndMakeVisible (c);
     addAndMakeVisible (atmosphere);
+    dd::gui::giveKeysOnlyTo (*this, editor.getCanvas());
 }
 
 void ContourEditor::Content::paint (juce::Graphics& g)

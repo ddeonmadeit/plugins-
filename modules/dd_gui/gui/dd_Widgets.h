@@ -11,6 +11,11 @@ void setHelp (juce::Component& c, const juce::String& title, const juce::String&
 /** Marks a custom control as bound to a parameter, so its help comes from the plugin's table. */
 void tagParam (juce::Component& c, const juce::String& paramId, const juce::String& title);
 
+/** For editors built with WANTS_KEYBOARD: only `target` takes the keyboard when clicked. Buttons and menus
+    want focus by default, and once one held it Return pressed it again and the arrows changed a menu instead
+    of reaching the DAW. Call once every child exists. */
+void giveKeysOnlyTo (juce::Component& root, juce::Component& target);
+
 class HoverHelp : private juce::MouseListener
 {
 public:
@@ -137,7 +142,7 @@ private:
 
 /**
     TAPE STOP performance control (dd::TapeStop): a switch and the stop length beside it, or below it when
-    the component is taller than one row. Bound to the perf ids, so it stays with the instance and FL Studio
+    the component is taller than one row. Bound to the perf ids, so it stays with the instance and the host
     can automate the switch.
 */
 class TapeStopControl : public juce::Component

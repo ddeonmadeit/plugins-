@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>ddeonmadeit plugins</title>
-<meta name="description" content="Free VST3 and AU plugins for macOS, built for FL Studio.">
+<meta name="description" content="Free VST3 and AU plugins for macOS, for FL Studio and Ableton Live.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -104,7 +104,7 @@ footer { margin-top: 48px; color: var(--dim); font-size: 13px; display: grid; ga
   <header class="site">
     <p class="eyebrow">ddeonmadeit</p>
     <h1>PLUGINS</h1>
-    <p class="lede">Free <b>VST3 + AU</b> instruments and effects for <b>macOS</b> (Apple Silicon and Intel), built for FL Studio. Every download link on this page always points at the newest release.</p>
+    <p class="lede">Free <b>VST3 + AU</b> instruments and effects for <b>macOS</b> (Apple Silicon and Intel), for FL Studio and Ableton Live (and any DAW that loads VST3 or AU). Every download link on this page always points at the newest release.</p>
   </header>
   <section class="quick" id="quick" aria-labelledby="quick-h" hidden>
     <h2 id="quick-h">Install without the macOS warning</h2>
@@ -182,19 +182,23 @@ function pluginCmd(p) { return SITE.installCmd + " -s " + p.product; }
 
 function installSteps(p) {
   const d = el("details", "install");
-  d.append(el("summary", null, "How to install in FL Studio"));
+  d.append(el("summary", null, "How to install (FL Studio, Ableton Live)"));
   const ol = el("ol");
-  const where = "In FL Studio: Options → Manage plugins → Find more plugins. " + p.product + " appears under " + (p.kind === "SYNTH" ? "Generators" : "Effects") + ".";
+  const where = "FL Studio: Options → Manage plugins → Find more plugins. " + p.product + " appears under " + (p.kind === "SYNTH" ? "Generators" : "Effects") + ".";
+  const ableton = "Ableton Live: Settings (⌘,) → Plug-Ins: turn on Use Audio Units and Use VST3 Plug-In System Folders, then click Rescan. "
+    + p.product + " appears in the browser under Plug-Ins (ddeonmadeit folder); drag it onto " + (p.kind === "SYNTH" ? "a MIDI track." : "a track.");
   const steps = p.release && !p.release.notarized ? [
     "Easiest, with no macOS warning: open Terminal, paste the command under the download button, press Return and type your Mac password when asked.",
     "Or download the .pkg and double-click it. macOS says “Apple could not verify…” the first time: click Done, open System Settings → Privacy & Security, click Open Anyway, then run the .pkg again.",
     where,
+    ableton,
   ] : [
     "Download the .pkg and double-click it.",
     where,
+    ableton,
   ];
   steps.push(...(p.installTips || []));
-  steps.push("Updating from an older version: quit FL Studio, run the new .pkg (it replaces the old version), then reopen. Your projects keep all their settings and the new presets appear in the plugin's preset menu.");
+  steps.push("Updating from an older version: quit your DAW, run the new .pkg (it replaces the old version), then reopen. Your projects keep all their settings and the new presets appear in the plugin's preset menu. If Ableton still shows the old version, click Rescan in Settings → Plug-Ins.");
   steps.forEach(s => ol.append(el("li", null, s)));
   const alt = el("li");
   alt.innerHTML = "No admin password? Download the .zip, unzip it, and run <code>bash ~/Downloads/" + p.product + "-*-macOS/Install.command</code> in Terminal.";

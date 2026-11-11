@@ -5,13 +5,6 @@ namespace
 const juce::Colour kCream { 0xffeadcc3 };
 const juce::Colour kChrome { 0xffd9d0c4 };
 constexpr float kPi = juce::MathConstants<float>::pi;
-
-juce::String noteName (int n)
-{
-    // FL Studio naming: MIDI 60 = C5.
-    static const char* names[] = { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" };
-    return n < 0 || n > 127 ? juce::String ("--") : juce::String (names[n % 12]) + juce::String (n / 12);
-}
 } // namespace
 
 SubView::SubView (SubGritProcessor& p) : proc (p)
@@ -240,7 +233,7 @@ void SubView::drawReadout (juce::Graphics& g) const
 
     // The note glows like a lamp while the bass sounds.
     const auto noteRow = r.removeFromTop (78.0f);
-    const auto noteText = note >= 0 ? noteName (note) : juce::String();
+    const auto noteText = note >= 0 ? dd::noteName (note) : juce::String();
     const auto noteFont = dd::gui::LookAndFeel::display (68.0f);
     const float glow = 0.25f + 0.75f * lamp;
     g.setFont (noteFont);

@@ -87,7 +87,7 @@ void ElementPanel::setSlot (int s)
             rows[(size_t) a].key.setVisible (a == 0);
         }
         rows[0].play.setButtonText ("> Play");
-        rows[0].key.setButtonText ("Keys  " + kr::flNoteName (kr::kLogLowKey) + " - " + kr::flNoteName (kr::kLogHighKey));
+        rows[0].key.setButtonText ("Keys  " + dd::noteName (kr::kLogLowKey) + " - " + dd::noteName (kr::kLogHighKey));
         rows[0].key.setToggleState (false, juce::dontSendNotification);
         credit = "Synthesised in Kitroom: an FM knock with a quick pitch drop, the Amapiano way. Overlap two notes to slide.";
         resized();
@@ -163,7 +163,7 @@ void ElementPanel::refreshKeys()
     {
         auto& b = rows[(size_t) a].key;
         const bool isLearning = learning == kr::packTarget (slot, a);
-        b.setButtonText (isLearning ? juce::String ("Press a key...") : "Key  " + kr::flNoteName (proc.getKey (slot, a)));
+        b.setButtonText (isLearning ? juce::String ("Press a key...") : "Key  " + dd::noteName (proc.getKey (slot, a)));
         b.setToggleState (isLearning, juce::dontSendNotification);
     }
 }
@@ -212,10 +212,11 @@ void ElementPanel::paint (juce::Graphics& g)
     const auto title = isLog() ? juce::String ("LOG DRUM") : juce::String (kr::slots()[(size_t) slot].name).toUpperCase();
     dd::gui::drawPrinted (g, title, { 36.0f, 12.0f, 220.0f, 34.0f }, pal.text,
                           dd::gui::LookAndFeel::display (26.0f).withExtraKerningFactor (0.05f), juce::Justification::centredLeft);
-    dd::gui::drawPrinted (g, isLog() ? "PLAYS ITS OWN KEYS (FL NAMES)" : "SOUNDS  /  KEYS (FL NAMES)", { 18.0f, 58.0f, 260.0f, 16.0f }, pal.dim,
+    const auto keysIn = " (" + dd::noteNamesCaption() + ")";
+    dd::gui::drawPrinted (g, (isLog() ? "PLAYS ITS OWN KEYS" : "SOUNDS  /  KEYS") + keysIn, { 18.0f, 58.0f, 260.0f, 16.0f }, pal.dim,
                           dd::gui::LookAndFeel::font (10.5f, true).withExtraKerningFactor (0.07f), juce::Justification::centredLeft);
     if (isLog())
-        dd::gui::drawPrinted (g, kr::flNoteName (kr::kLogLowKey) + " sounds a deep C, " + kr::flNoteName (kr::kLogAuditionKey) + " the classic low A (55 Hz).",
+        dd::gui::drawPrinted (g, dd::noteName (kr::kLogLowKey) + " sounds a deep C, " + dd::noteName (kr::kLogAuditionKey) + " the classic low A (55 Hz).",
                               { 18.0f, 124.0f, 300.0f, 32.0f }, pal.dim, dd::gui::LookAndFeel::font (11.5f), juce::Justification::topLeft);
     dd::gui::drawPrinted (g, credit, juce::Rectangle<int> (18, getHeight() - 28, getWidth() - 36, 18).toFloat(), pal.dim,
                           dd::gui::LookAndFeel::font (11.5f), juce::Justification::centredLeft);

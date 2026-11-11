@@ -16,13 +16,15 @@
   "installTips": [
     "Put Contour FIRST on the vocal's mixer track (before Aircheck or any effects), press play over the part you want to edit, then stop: the notes appear.",
     "After the first capture TRANSFER goes dark and playback plays your edit. If you change or move the vocal clip, press TRANSFER and play that part again.",
-    "To print the edit: BOUNCE, then drag DRAG OUT into the playlist and drop it at bar 1 (the file starts at the song's beginning, so it lines up)."
+    "To print the edit: BOUNCE, then drag DRAG OUT into the playlist and drop it at bar 1 (the file starts at the song's beginning, so it lines up).",
+    "In Ableton, work in Arrangement View (Session clips have no fixed place in the song, so the take can't line up with them). To print, drop DRAG OUT on an audio track at 1.1.1 and switch the clip's Warp off."
   ],
   "previewNote": "on a synthetic sung test phrase (slightly off pitch on purpose), captured and played back through each correction style.",
   "whatsNew": {
-    "version": "1.2.0",
+    "version": "1.2.1",
     "items": [
-      "NEO SOUL and SOUL correction styles that keep runs, scoops and vibrato human: Neo Soul Runs, Blue Note Keeper, Falsetto Float, Old School Soul, Gospel Vibrato and Doo-Wop Backing"
+      "Keyboard shortcuts now work in the VST3 version on Mac (Ableton Live, FL Studio): click the notes, then Cmd+Z undoes, Delete mutes, arrows move, 1-6 pick a tool and Space plays from the cursor. While the song plays, Space still stops your DAW",
+      "In Ableton, the start screen reminds you to transfer in Arrangement View (Session clips have no fixed place in the song)"
     ]
   }
 }

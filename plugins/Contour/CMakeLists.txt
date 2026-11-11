@@ -2,8 +2,9 @@ dd_add_plugin(Contour
     PRODUCT_NAME "Contour"
     PLUGIN_CODE  Cntr
     KIND         EFFECT
-    VERSION      1.2.0
+    VERSION      1.2.1
     PRESETS_DIR  Presets
+    WANTS_KEYBOARD
     SOURCES
         Source/PluginProcessor.cpp
         Source/PluginEditor.cpp

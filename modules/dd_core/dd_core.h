@@ -5,7 +5,7 @@
   vendor:             ddeonmadeit
   version:            1.0.0
   name:               DD Core
-  description:        Preset management, parameter helpers and audio->UI data sharing
+  description:        Preset management, parameter helpers, host info and audio->UI data sharing
   license:            Proprietary
   dependencies:       juce_audio_processors
   minimumCppStandard: 20
@@ -21,5 +21,6 @@
 #include <map>
 #include <mutex>
 
+#include "core/dd_Host.h"
 #include "core/dd_PresetManager.h"
 #include "core/dd_ScopeBuffer.h"

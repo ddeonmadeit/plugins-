@@ -6,7 +6,7 @@
 
 /**
     The drum kit, drawn from the drummer's audience-side view. Every piece is clickable (select +
-    audition), flashes when it is played, and shows its key in FL Studio's note naming. Drum shells
+    audition), flashes when it is played, and shows its key as the host's piano roll names it. Drum shells
     take the finish colour of the kit their current sound comes from, so swaps are visible.
 */
 class KitView : public juce::Component, private juce::Timer

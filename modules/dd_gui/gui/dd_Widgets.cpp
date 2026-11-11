@@ -330,8 +330,11 @@ void LampSwitch::mouseDown (const juce::MouseEvent&) { attachment.setValueAsComp
 TapeStopControl::TapeStopControl (juce::AudioProcessorValueTreeState& state, const juce::String& switchId, const juce::String& timeId)
     : lamp (*state.getParameter (switchId), "Tape Stop", sunset::red)
 {
-    lamp.setTooltip ("Tape stop: the sound slows down to a halt like a tape machine powering off, and stays silent "
-                     "until you switch it off again. In FL Studio, right-click it > Create automation clip to drop it at the end of a beat.");
+    const auto howToAutomate = dd::host().ableton
+        ? "In Ableton, click it once so it appears in the track's automation chooser, then draw it in Arrangement View where the beat should stop."
+        : "In FL Studio, right-click it > Create automation clip to drop it at the end of a beat.";
+    lamp.setTooltip (juce::String ("Tape stop: the sound slows down to a halt like a tape machine powering off, and stays silent "
+                                   "until you switch it off again. ") + howToAutomate);
     addAndMakeVisible (lamp);
 
     if (auto* p = dynamic_cast<juce::AudioParameterChoice*> (state.getParameter (timeId)))
@@ -594,5 +597,17 @@ void Atmosphere::themeChanged()
     fadeStart = juce::Time::getMillisecondCounterHiRes();
     if (auto* p = getParentComponent())
         p->repaint();
+}
+
+//==============================================================================
+void giveKeysOnlyTo (juce::Component& root, juce::Component& target)
+{
+    for (auto* c : root.getChildren())
+    {
+        if (c == &target)
+            continue;
+        c->setWantsKeyboardFocus (false);
+        giveKeysOnlyTo (*c, target);
+    }
 }
 } // namespace dd::gui

@@ -314,7 +314,7 @@ void KitroomProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mid
 {
     juce::ScopedNoDenormals noDenormals;
 
-    // Offline renders (FL export, the QA harness) must not start before the samples are in memory.
+    // Offline renders (exports, freezes, the QA harness) must not start before the samples are in memory.
     if (isNonRealtime())
         loader->waitUntilIdle();
 

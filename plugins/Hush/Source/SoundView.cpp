@@ -436,16 +436,19 @@ void SoundCanvas::paintStatic (juce::Graphics& g)
             case Status::Missing:   title = "TAKE NOT FOUND"; body = proc.engine->getMessage(); break;
             case Status::Listening:
             case Status::Ready:
-                body = "TRANSFER is lit: start playback and Hush captures the vocal on this track (until then it de-esses it live "
-                       "with Amount). Stop, and every sharp sound appears here with its own level.\n\nOr drop a vocal file here, or press LOAD.";
+                // Ableton: the take is tied to the song's timeline, which Session View clips don't follow.
+                body = juce::String ("TRANSFER is lit: start playback")
+                     + (dd::host().ableton ? " in Arrangement View (Session clips have no fixed place in the song)" : "")
+                     + " and Hush captures the vocal on this track (until then it de-esses it live with Amount). Stop, and every "
+                       "sharp sound appears here with its own level.\n\nOr drop a vocal file here, or press LOAD.";
                 break;
         }
         const auto all = wa.getUnion (la);
-        const auto box = all.withSizeKeepingCentre (std::min (580.0f, all.getWidth() - 40.0f), 150.0f);
+        const auto box = all.withSizeKeepingCentre (std::min (580.0f, all.getWidth() - 40.0f), 170.0f);
         dd::gui::drawGlowing (g, title, box.withHeight (36.0f), kHot, LnF::font (24.0f, 700).withExtraKerningFactor (0.14f));
         g.setColour (kCream.withAlpha (0.72f));
         g.setFont (LnF::font (14.0f, 500));
-        g.drawFittedText (body, box.withTrimmedTop (44.0f).toNearestInt(), juce::Justification::centredTop, 6, 0.9f);
+        g.drawFittedText (body, box.withTrimmedTop (44.0f).toNearestInt(), juce::Justification::centredTop, 7, 0.9f);
     }
 }
 
@@ -796,6 +799,9 @@ bool SoundCanvas::keyPressed (const juce::KeyPress& key)
     }
     if (key == juce::KeyPress::spaceKey)
     {
+        // While the song plays, Space belongs to the DAW (it stops the transport).
+        if (proc.engine->isPlaying() && ! proc.engine->isInternalPlaying())
+            return false;
         togglePlay();
         return true;
     }

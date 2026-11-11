@@ -115,7 +115,9 @@ __RELEASES__
     killall -9 AudioComponentRegistrar 2> /dev/null || true
 
     echo
-    echo "Done. If FL Studio is open, restart it. New plug-ins: Options > Manage plugins > Find more plugins."
+    echo "Done. If your DAW is open, restart it."
+    echo "  FL Studio: new plug-ins appear after Options > Manage plugins > Find more plugins."
+    echo "  Ableton Live: Settings > Plug-Ins, turn on Use Audio Units and Use VST3 Plug-In System Folders, click Rescan."
 }
 
 installed_version ()

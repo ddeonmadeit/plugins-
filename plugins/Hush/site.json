@@ -16,13 +16,15 @@
   "installTips": [
     "Put Hush on the vocal's mixer track (after Contour if you use it, before compression and reverb), press play over the part you want to de-ess, then stop: the sounds appear.",
     "After the first capture TRANSFER goes dark and playback plays your levels. If you change the vocal, press TRANSFER and play that part again.",
-    "To print it: BOUNCE, then drag DRAG OUT into the playlist and drop it at bar 1."
+    "To print it: BOUNCE, then drag DRAG OUT into the playlist and drop it at bar 1.",
+    "In Ableton, work in Arrangement View (Session clips have no fixed place in the song, so the take can't line up with them). To print, drop DRAG OUT on an audio track at 1.1.1 and switch the clip's Warp off."
   ],
   "previewNote": "on a synthetic sung phrase with S, SH and T consonants of different loudness, captured and played back through each preset.",
   "whatsNew": {
-    "version": "1.2.0",
+    "version": "1.2.1",
     "items": [
-      "NEO SOUL and SOUL de-essing: Neo Soul Breath, Whisper Lead, Vintage Soul S (an old limiter catching the S's) and Belter De-Ess"
+      "Keyboard shortcuts now work in the VST3 version on Mac (Ableton Live, FL Studio): click a sound, then Cmd+Z undoes, up / down change its cut, left / right step through the sounds and Space plays from the cursor. While the song plays, Space still stops your DAW",
+      "In Ableton, the start screen reminds you to transfer in Arrangement View (Session clips have no fixed place in the song)"
     ]
   }
 }

@@ -1,7 +1,7 @@
 {
   "publish": true,
   "tagline": "A wide, animated visualiser of your song: sunsets over dunes, shards of light, land, wireframe figures and tunnels, on film, a glowing CRT or worn VHS, in any colour",
-  "description": "Mirage watches your music and draws it: put it on the master and stretch its window under the tracks while you screen-record FL Studio. A big window shows a scene that moves with the sound: a grainy sun setting over dunes (the near dune is the live waveform), shards of light bursting up from the bottom, a grainy land flown over with the song laid into the hills, wireframe figures turning in their cages, or a tunnel whose rings are born as bright as the sound. Each can be drawn on film, on a glowing curved CRT tube (phosphor trails, bloom, scanlines) or on worn VHS tape (smear, tracking tears, dropouts, a camcorder clock). Underneath is a deck of instruments drawn like an old phosphor screen: level meters, an oscilloscope, a scrolling waveform, a spectrum, a stereo field reticle, and a thermal-camera strip of the whole spectrum. Everything goes through one colour ramp, red through orange to a little yellow, and the glowing dot by DEON turns it around the colour wheel. The sound passes through untouched.",
+  "description": "Mirage watches your music and draws it: put it on the master and stretch its window under the tracks while you screen-record your DAW. A big window shows a scene that moves with the sound: a grainy sun setting over dunes (the near dune is the live waveform), shards of light bursting up from the bottom, a grainy land flown over with the song laid into the hills, wireframe figures turning in their cages, or a tunnel whose rings are born as bright as the sound. Each can be drawn on film, on a glowing curved CRT tube (phosphor trails, bloom, scanlines) or on worn VHS tape (smear, tracking tears, dropouts, a camcorder clock). Underneath is a deck of instruments drawn like an old phosphor screen: level meters, an oscilloscope, a scrolling waveform, a spectrum, a stereo field reticle, and a thermal-camera strip of the whole spectrum. Everything goes through one colour ramp, red through orange to a little yellow, and the glowing dot by DEON turns it around the colour wheel. The sound passes through untouched.",
   "accent": "#ff6a1f",
   "highlights": [
     "Made for screen recordings: a wide window you can stretch to any size (it remembers it with the project) to sit under the playlist",
@@ -14,7 +14,7 @@
     "Zero latency, the audio is not changed at all"
   ],
   "installTips": [
-    "Put Mirage on the master insert (FL Studio: Mixer > Master > empty slot > Mirage) so it sees the whole song.",
+    "Put Mirage on the master insert (FL Studio: Mixer > Master > empty slot > Mirage; Ableton: drop it on the Main track) so it sees the whole song.",
     "Detach the plugin window (the arrow menu at the top left of the plugin window > Detached), then drag its bottom-right corner to stretch it under the playlist. It keeps its size in the project.",
     "Pick a look from the selector in the middle of the top bar (click the name for the list, or the arrows to step). SCENE and STYLE next to DEON mix any scene with any style, the glowing dot opens the colour wheel, and the CONTROL dials change the rest (you can automate them too)."
   ],

@@ -136,7 +136,7 @@ void SunburstProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
 {
     juce::ScopedNoDenormals noDenormals;
 
-    // Offline renders (FL export, the QA harness) must not start before the guitar is in memory.
+    // Offline renders (exports, freezes, the QA harness) must not start before the guitar is in memory.
     if (isNonRealtime())
         loader->waitUntilIdle();
     const auto* g = loader->get();

@@ -80,6 +80,7 @@ HushEditor::Content::Content (HushProcessor& p)
     for (auto* c : { &sounds, &controls, &selected, &session })
         addAndMakeVisible (c);
     addAndMakeVisible (atmosphere);
+    dd::gui::giveKeysOnlyTo (*this, editor.getCanvas());
 }
 
 void HushEditor::Content::paint (juce::Graphics& g)

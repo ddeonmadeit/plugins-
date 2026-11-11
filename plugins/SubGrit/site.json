@@ -14,12 +14,12 @@
     "Favourites: star the presets you love and browse just those; your stars survive updates"
   ],
   "installTips": [
-    "Notes play at real pitch: the classic 808 range is C2–C3 in FL's piano roll (or use the Octave knob)."
+    "Notes play at real pitch: the classic 808 range is C2–C3 in FL Studio's piano roll, C0–C1 in Ableton's (or use the Octave knob)."
   ],
   "whatsNew": {
-    "version": "1.14.0",
+    "version": "1.14.1",
     "items": [
-      "NEO SOUL and SOUL basses: Voodoo Finger Bass (round, slides, behind the beat), Dilla Moog, Glasper Synth Bass, Chorus Solo Bass, plus Jamerson Flatwound (Motown), Memphis Pick Bass (Stax), Philly Glide Bass and Gospel Pedal Bass"
+      "Ableton Live: the note shown on the speaker is named the way Ableton's piano roll names it (two octaves lower than FL Studio's names)"
     ]
   }
 }

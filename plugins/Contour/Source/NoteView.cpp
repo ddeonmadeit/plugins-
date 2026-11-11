@@ -398,16 +398,18 @@ void NoteCanvas::paintEmpty (juce::Graphics& g, juce::Rectangle<float> area)
         case Status::Listening:
         case Status::Ready:
             title = "PRESS PLAY";
-            body = "TRANSFER is lit: start playback in your DAW and Contour captures the vocal on this track "
-                   "(play the part you want to edit). Stop, and every note appears here, ready to edit.\n\n"
-                   "Or drop a vocal file here, or press LOAD.";
+            // Ableton: the take is tied to the song's timeline, which Session View clips don't follow.
+            body = juce::String ("TRANSFER is lit: start playback ")
+                 + (dd::host().ableton ? "in Arrangement View (Session clips have no fixed place in the song)" : "in your DAW")
+                 + " and Contour captures the vocal on this track (play the part you want to edit). Stop, and every note "
+                   "appears here, ready to edit.\n\nOr drop a vocal file here, or press LOAD.";
             break;
     }
-    const auto box = area.withSizeKeepingCentre (std::min (560.0f, area.getWidth() - 40.0f), 150.0f);
+    const auto box = area.withSizeKeepingCentre (std::min (560.0f, area.getWidth() - 40.0f), 170.0f);
     dd::gui::drawGlowing (g, title, box.withHeight (36.0f), kHot, LnF::font (24.0f, 700).withExtraKerningFactor (0.14f));
     g.setColour (kCream.withAlpha (0.72f));
     g.setFont (LnF::font (14.0f, 500));
-    g.drawFittedText (body, box.withTrimmedTop (44.0f).toNearestInt(), juce::Justification::centredTop, 6, 0.9f);
+    g.drawFittedText (body, box.withTrimmedTop (44.0f).toNearestInt(), juce::Justification::centredTop, 7, 0.9f);
 }
 
 void NoteCanvas::paintStatic (juce::Graphics& g)
@@ -1207,6 +1209,9 @@ bool NoteCanvas::keyPressed (const juce::KeyPress& key)
     }
     if (key == juce::KeyPress::spaceKey)
     {
+        // While the song plays, Space belongs to the DAW (it stops the transport).
+        if (proc.engine->isPlaying() && ! proc.engine->isInternalPlaying())
+            return false;
         togglePlay();
         return true;
     }
