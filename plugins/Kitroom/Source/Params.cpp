@@ -1,4 +1,5 @@
 #include "Params.h"
+#include "LogDrum.h"
 
 #include <dd_dsp/dd_dsp.h>
 
@@ -42,6 +43,15 @@ const char* masterId (MP p)
         case MP::Tone:      return "tone";
         case MP::ClapOnSnare: return "clapOnSnare";
         case MP::LayBack:   return "layBack";
+        case MP::LogVolume: return "logVolume";
+        case MP::LogTune:   return "logTune";
+        case MP::LogLength: return "logLength";
+        case MP::LogKnock:  return "logKnock";
+        case MP::LogTone:   return "logTone";
+        case MP::LogDrive:  return "logDrive";
+        case MP::LogSub:    return "logSub";
+        case MP::LogGlide:  return "logGlide";
+        case MP::LogModel:  return "logModel";
         case MP::count:     break;
     }
     return "";
@@ -118,6 +128,26 @@ juce::AudioProcessorValueTreeState::ParameterLayout createLayout()
     // 1.14: the neo-soul pocket. Snare and clap land this late, hats and ride 40 % of it, the kick stays on the grid.
     layout.add (makeFloat (masterId (MP::LayBack), "Lay Back", { 0.0f, 60.0f }, 0.0f,
                            [] (float v, int) { return v < 0.5f ? juce::String ("On the grid") : juce::String (juce::roundToInt (v)) + " ms late"; }));
+
+    // 1.15: the log drum (Amapiano / Afrobeats), a synthesised piece on its own keys.
+    juce::NormalisableRange<float> logVol (-48.0f, 6.0f);
+    logVol.setSkewForCentre (-12.0f);
+    layout.add (makeFloat (masterId (MP::LogVolume), "Log Drum Volume", logVol, 0.0f, decibels));
+    layout.add (makeFloat (masterId (MP::LogTune), "Log Drum Tune", { -12.0f, 12.0f }, 0.0f, semis));
+    juce::NormalisableRange<float> logLen (40.0f, 1500.0f);
+    logLen.setSkewForCentre (300.0f);
+    layout.add (makeFloat (masterId (MP::LogLength), "Log Drum Length", logLen, 380.0f,
+                           [] (float v, int) { return juce::String (juce::roundToInt (v)) + " ms"; }));
+    layout.add (makeFloat (masterId (MP::LogKnock), "Log Drum Knock", { 0.0f, 1.0f }, 0.6f, percent));
+    layout.add (makeFloat (masterId (MP::LogTone), "Log Drum Tone", { 0.0f, 1.0f }, 0.55f, percent));
+    layout.add (makeFloat (masterId (MP::LogDrive), "Log Drum Drive", { 0.0f, 1.0f }, 0.3f, percent));
+    layout.add (makeFloat (masterId (MP::LogSub), "Log Drum Sub", { 0.0f, 1.0f }, 0.35f, percent));
+    juce::NormalisableRange<float> logGlide (0.0f, 400.0f);
+    logGlide.setSkewForCentre (100.0f);
+    layout.add (makeFloat (masterId (MP::LogGlide), "Log Drum Slide", logGlide, 70.0f,
+                           [] (float v, int) { return v < 1.0f ? juce::String ("No slide") : juce::String (juce::roundToInt (v)) + " ms"; }));
+    layout.add (std::make_unique<juce::AudioParameterChoice> (juce::ParameterID { masterId (MP::LogModel), 1 }, "Log Drum Model",
+                                                              logModelNames(), 0));
     return layout;
 }
 

@@ -6,6 +6,7 @@
 
 #include "DrumEngine.h"
 #include "Library.h"
+#include "LogDrum.h"
 #include "Params.h"
 
 class KitroomProcessor : public juce::AudioProcessor
@@ -60,7 +61,7 @@ public:
     // Play a piece from the UI.
     void audition (int slot, int art, float velocity);
 
-    /** Velocity of the latest hit per slot since the last call (UI flashes), 0 if none. */
+    /** Velocity of the latest hit per piece (slot, or kr::kLogDrum) since the last call (UI flashes), 0 if none. */
     float takeHit (int slot) { return hitLevels[(size_t) slot].exchange (0.0f); }
 
     juce::AudioProcessorValueTreeState apvts;
@@ -77,6 +78,9 @@ private:
 
     void rebuildNoteMap();
     void handleNote (int note, float velocity, juce::int64 when = -1);
+    void handleNoteOff (int note);
+    void playLog (int key, float velocity, bool slide);
+    void readLogSettings();
     void play (int slot, int art, float velocity, float humanize);
     void processChunk (float* L, float* R, int n);
     juce::var captureKit() const;
@@ -90,7 +94,12 @@ private:
     std::array<std::array<int, kr::kMaxArticulations>, kr::kNumSlots> primaryKeys {};
     std::array<std::atomic<int>, 128> noteMap {};
     std::atomic<int> learnTarget { -1 }, learnedNote { -1 };
-    std::array<std::atomic<float>, kr::kNumSlots> hitLevels {};
+    std::array<std::atomic<float>, kr::kNumPieces> hitLevels {};
+
+    // The log drum: its keys held right now decide whether a new note slides (audio thread only).
+    kitroom::LogDrum logDrum;
+    kitroom::LogSettings logSettings;
+    std::array<bool, 128> logHeld {};
 
     juce::AbstractFifo auditionFifo { 64 };
     std::array<int, 64> auditionQueue {};

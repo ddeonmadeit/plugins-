@@ -36,6 +36,13 @@ constexpr int kSidestickArt = 2;        // the snare articulation a layered clap
 
 enum Slot { Kick, Snare, HiHat, Tom1, Tom2, Tom3, Crash1, Crash2, RideSlot, China, ClapSlot };
 
+/** 1.15: the log drum, a synthesised piece after the sampled slots. It plays its own key range above the kit's
+    keys and sounds three octaves lower, so in FL Studio's names A5 is the classic low A (55 Hz). */
+constexpr int kLogDrum = kNumSlots;
+constexpr int kNumPieces = kNumSlots + 1;
+constexpr int kLogLowKey = 60, kLogHighKey = 96, kLogKeyOffset = 36;
+constexpr int kLogAuditionKey = 69;   // A5 in FL names: the classic low A
+
 /** The kit layout. Order is permanent: parameter ids and saved sessions use the slot ids. */
 inline const std::array<SlotDef, kNumSlots>& slots()
 {

@@ -36,5 +36,7 @@ private:
     std::array<ArtRow, kr::kMaxArticulations> rows;
     std::vector<std::unique_ptr<dd::gui::Knob>> knobs;
     std::unique_ptr<dd::gui::Toggle> clapOnSnare;   // on the snare and clap panels
+    std::unique_ptr<dd::gui::Choice> logModel;       // on the log drum panel
+    bool isLog() const noexcept { return slot == kr::kLogDrum; }
     juce::String credit;
 };

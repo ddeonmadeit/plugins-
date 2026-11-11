@@ -1,10 +1,11 @@
 {
   "publish": true,
-  "tagline": "Real acoustic drum kit, every piece on its own key",
+  "tagline": "Real acoustic drum kit, every piece on its own key, plus an Amapiano log drum",
   "description": "Multi-mic recordings of three real drum kits and real hand claps (close, overhead and room mics), played back with velocity layers and round robin so every hit sounds different. Click any piece of the drawn kit to hear it, swap its sound or move its key; record the whole kit into one piano roll.",
   "accent": "#e8a33d",
   "highlights": [
     "Kick, snare with rimshot and sidestick, hi-hat (closed, half-open, open, pedal), 3 toms, 2 crashes, ride with bell, china, and a clap",
+    "Log drum: the Amapiano / Afrobeats log drum, synthesised the way it was born (an FM knock with a quick pitch drop), played as a bassline on its own keys (C5 to C8, A5 is the classic low A). Overlap two notes to slide. Four models (Classic, Woody, Deep, Bounce) with Length, Knock, Tone, Drive, Sub and Slide",
     "Lay Back: one knob drags the snare and clap behind the beat (hats and ride less, kick on time) for the lazy neo-soul pocket",
     "Punch on every piece: a harder attack and a tighter body on the close mics, while the room stays natural. Punchy kicks and snares to swap in (a tight death-metal kit's kicks and cracking snare, the studio kick's front mic)",
     "Real hand claps (tight three-person, loose gospel group, solo) placed in the studio kit's own room, on their own key or layered on every snare hit",
@@ -12,19 +13,20 @@
     "Close, overhead and room mics per piece and for the whole kit, plus tune, decay, glue and width",
     "Kit-bus Drive (8 distortion types), bit Crush and Tone, for anything from warm tape to broken industrial",
     "General MIDI key map shown in FL Studio note names; re-learn any key from your keyboard",
-    "86 kit presets: studio, live room, vintage and jazz, tight funk and soul, PUNCH (hard-hitting kits with claps), big rooms, Yeezus, moshc0re, KING, trip hop, 80s, 2000s, SOFT, UNIQUE, NEO SOUL (laid-back pockets) and SOUL (Motown, Memphis, Philly)",
+    "91 kit presets: studio, live room, vintage and jazz, tight funk and soul, PUNCH (hard-hitting kits with claps), big rooms, Yeezus, moshc0re, KING, trip hop, 80s, 2000s, SOFT, UNIQUE, AMAPIANO and AFROBEATS (log drum kits), NEO SOUL (laid-back pockets) and SOUL (Motown, Memphis, Philly)",
     "Favourites: star the presets you love and browse just those; your stars survive updates"
   ],
   "installTips": [
     "The .pkg also installs the drum sound library (about 250 MB). With the .zip, Install.command copies it for you.",
-    "Keys (FL names): kick C3, snare D3, rimshot E3, sidestick C#3, clap D#3, closed hat F#3, pedal hat G#3, open hat A#3, toms C4 / A3 / G3, crashes C#4 / A4, ride D#4, bell F4, china E4."
+    "Keys (FL names): kick C3, snare D3, rimshot E3, sidestick C#3, clap D#3, closed hat F#3, pedal hat G#3, open hat A#3, toms C4 / A3 / G3, crashes C#4 / A4, ride D#4, bell F4, china E4.",
+    "Log drum (FL names): play it on C5 to C8 in the same pattern as the drums. It sounds three octaves lower, so A5 is the classic low A; overlap two notes to slide between them. Click the log at the front left of the kit for its controls."
   ],
   "previewNote": "on the same five-bar 96 BPM groove: ghost notes, open hat, a ride bar, a tom fill and crashes ringing out.",
   "whatsNew": {
-    "version": "1.14.0",
+    "version": "1.15.0",
     "items": [
-      "Lay Back: a new knob in the mix panel that plays the snare and clap behind the beat (hats and ride a little less, the kick stays on time), the lazy pocket of D'Angelo, Questlove and Dilla records. 0 = right on the grid",
-      "NEO SOUL and SOUL kits: Voodoo Pocket, Dilla Drunk Kit, Brushed Pocket, Late Night Cross Stick, plus Hitsville Claps (Motown stomp and clap), Memphis Dry Snap, Funk Break Kit and Philly Sweet Kit"
+      "Log drum: the Amapiano / Afrobeats log drum, at the front left of the kit. Play it as a bassline on C5 to C8 (A5 is the classic low A), overlap notes to slide; four models (Classic, Woody, Deep, Bounce) and Length, Knock, Tone, Drive, Sub and Slide",
+      "AMAPIANO and AFROBEATS kits: Log Drum Classic, Private School, Bacardi Knock, Afropiano and Lagos Rim"
     ]
   }
 }

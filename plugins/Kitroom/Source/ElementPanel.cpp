@@ -41,6 +41,8 @@ ElementPanel::ElementPanel (KitroomProcessor& p) : proc (p)
         r.key.setTooltip ("Click, then press a key on your MIDI keyboard to assign it");
         r.key.onClick = [this, a]
         {
+            if (isLog())
+                return;   // the log drum's keys are fixed: the range above the kit
             const int t = kr::packTarget (slot, a);
             if (proc.getLearnTarget() == t) proc.cancelLearn();
             else proc.startLearn (slot, a);
@@ -60,6 +62,41 @@ void ElementPanel::setSlot (int s)
     proc.cancelLearn();
 
     knobs.clear();
+    logModel.reset();
+    if (isLog())
+    {
+        // The log drum is synthesised: no sounds to swap, no mics, its own keys.
+        using kitroom::MP;
+        const std::pair<MP, const char*> logDefs[] = {
+            { MP::LogVolume, "Volume" }, { MP::LogTune, "Tune" }, { MP::LogLength, "Length" }, { MP::LogKnock, "Knock" },
+            { MP::LogTone, "Tone" }, { MP::LogDrive, "Drive" }, { MP::LogSub, "Sub" }, { MP::LogGlide, "Slide" } };
+        for (auto& [param, title] : logDefs)
+        {
+            auto k = std::make_unique<dd::gui::Knob> (proc.apvts, kitroom::masterParamId (param), title, kAccent);
+            addAndMakeVisible (*k);
+            knobs.push_back (std::move (k));
+        }
+        logModel = std::make_unique<dd::gui::Choice> (proc.apvts, kitroom::masterParamId (MP::LogModel), "Model");
+        addAndMakeVisible (*logModel);
+        for (auto* c : { (juce::Component*) &soundBox, (juce::Component*) &prevButton, (juce::Component*) &nextButton, (juce::Component*) &resetKeys })
+            c->setVisible (false);
+        clapOnSnare.reset();
+        for (int a = 0; a < kr::kMaxArticulations; ++a)
+        {
+            rows[(size_t) a].play.setVisible (a == 0);
+            rows[(size_t) a].key.setVisible (a == 0);
+        }
+        rows[0].play.setButtonText ("> Play");
+        rows[0].key.setButtonText ("Keys  " + kr::flNoteName (kr::kLogLowKey) + " - " + kr::flNoteName (kr::kLogHighKey));
+        rows[0].key.setToggleState (false, juce::dontSendNotification);
+        credit = "Synthesised in Kitroom: an FM knock with a quick pitch drop, the Amapiano way. Overlap two notes to slide.";
+        resized();
+        repaint();
+        return;
+    }
+    for (auto* c : { (juce::Component*) &soundBox, (juce::Component*) &prevButton, (juce::Component*) &nextButton, (juce::Component*) &resetKeys })
+        c->setVisible (true);
+
     using kitroom::SP;
     const std::pair<SP, const char*> knobDefs[] = {
         { SP::Volume, "Volume" }, { SP::Pan, "Pan" }, { SP::Tune, "Tune" }, { SP::Decay, "Decay" },
@@ -119,6 +156,8 @@ void ElementPanel::refreshSounds()
 
 void ElementPanel::refreshKeys()
 {
+    if (isLog())
+        return;
     const int learning = proc.getLearnTarget();
     for (int a = 0; a < kr::kMaxArticulations; ++a)
     {
@@ -143,6 +182,8 @@ void ElementPanel::timerCallback()
     proc.pollLearn();
     if (proc.selectedSlot != slot)
         setSlot (proc.selectedSlot);
+    if (isLog())
+        return;
     refreshKeys();
 
     // Keep the combo in sync when a preset changes the kit.
@@ -166,14 +207,19 @@ void ElementPanel::paint (juce::Graphics& g)
     if (slot < 0)
         return;
 
-    dd::gui::paintLamp (g, { 24.0f, 30.0f }, 4.0f, kAccent, proc.isSlotLoading (slot) ? 0.35f : 1.0f);
-    dd::gui::drawPrinted (g, juce::String (kr::slots()[(size_t) slot].name).toUpperCase(), { 36.0f, 12.0f, 220.0f, 34.0f }, pal.text,
+    const bool loading = ! isLog() && proc.isSlotLoading (slot);
+    dd::gui::paintLamp (g, { 24.0f, 30.0f }, 4.0f, kAccent, loading ? 0.35f : 1.0f);
+    const auto title = isLog() ? juce::String ("LOG DRUM") : juce::String (kr::slots()[(size_t) slot].name).toUpperCase();
+    dd::gui::drawPrinted (g, title, { 36.0f, 12.0f, 220.0f, 34.0f }, pal.text,
                           dd::gui::LookAndFeel::display (26.0f).withExtraKerningFactor (0.05f), juce::Justification::centredLeft);
-    dd::gui::drawPrinted (g, "SOUNDS  /  KEYS (FL NAMES)", { 18.0f, 58.0f, 200.0f, 16.0f }, pal.dim,
+    dd::gui::drawPrinted (g, isLog() ? "PLAYS ITS OWN KEYS (FL NAMES)" : "SOUNDS  /  KEYS (FL NAMES)", { 18.0f, 58.0f, 260.0f, 16.0f }, pal.dim,
                           dd::gui::LookAndFeel::font (10.5f, true).withExtraKerningFactor (0.07f), juce::Justification::centredLeft);
+    if (isLog())
+        dd::gui::drawPrinted (g, kr::flNoteName (kr::kLogLowKey) + " sounds a deep C, " + kr::flNoteName (kr::kLogAuditionKey) + " the classic low A (55 Hz).",
+                              { 18.0f, 124.0f, 300.0f, 32.0f }, pal.dim, dd::gui::LookAndFeel::font (11.5f), juce::Justification::topLeft);
     dd::gui::drawPrinted (g, credit, juce::Rectangle<int> (18, getHeight() - 28, getWidth() - 36, 18).toFloat(), pal.dim,
                           dd::gui::LookAndFeel::font (11.5f), juce::Justification::centredLeft);
-    if (proc.isSlotLoading (slot))
+    if (loading)
         dd::gui::drawPrinted (g, "loading samples...", { (float) getWidth() - 200.0f, 46.0f, 182.0f, 14.0f }, pal.accent2,
                               dd::gui::LookAndFeel::font (12.0f), juce::Justification::centredRight);
 }
@@ -200,6 +246,9 @@ void ElementPanel::resized()
         row.removeFromLeft (8);
         rows[(size_t) a].key.setBounds (row.removeFromLeft (124));
     }
+
+    if (logModel != nullptr)
+        logModel->setBounds (soundBox.getX() + soundBox.getWidth() - 200, soundBox.getY() - 6, 200, 50);
 
     if (clapOnSnare != nullptr)
     {

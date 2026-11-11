@@ -133,6 +133,12 @@ KitView::KitView (KitroomProcessor& p) : proc (p)
     hat.outline.addEllipse (hat.box.translated (0, 10));
     pieces.push_back (hat);
 
+    // 1.15: the log drum, a carved slit drum on two trestles at the front left, played on its own keys.
+    Piece log { kr::kLogDrum, S::LogDrum, { 30, 340, 166, 32 }, 0.0f, { 113, 407 }, {}, {} };
+    log.hit.addRoundedRectangle (log.box.expanded (6.0f, 10.0f).withBottom (kFloorY), 8.0f);
+    log.outline.addRoundedRectangle (log.box, log.box.getHeight() * 0.5f);
+    pieces.push_back (log);
+
     hitAge.fill (10.0f);
     startTimerHz (60);
 }
@@ -167,7 +173,7 @@ juce::Colour KitView::finishFor (int slot) const
 void KitView::timerCallback()
 {
     bool any = false;
-    for (int s = 0; s < kr::kNumSlots; ++s)
+    for (int s = 0; s < kr::kNumPieces; ++s)
     {
         const float hit = proc.takeHit (s);
         if (hit > 0.0f)
@@ -179,7 +185,7 @@ void KitView::timerCallback()
             hitAge[(size_t) s] += 1.0f / 60.0f;
         flash[(size_t) s] = std::max (flash[(size_t) s] * 0.894f, hit);   // same fade as before, at 60 frames a second
         if (flash[(size_t) s] < 0.01f) flash[(size_t) s] = 0.0f;
-        any = any || flash[(size_t) s] > 0.0f || hitAge[(size_t) s] < 2.5f || proc.isSlotLoading (s);
+        any = any || flash[(size_t) s] > 0.0f || hitAge[(size_t) s] < 2.5f || (s < kr::kNumSlots && proc.isSlotLoading (s));
     }
     if (any || proc.getLearnTarget() >= 0)
         repaint();
@@ -217,7 +223,7 @@ void KitView::mouseDown (const juce::MouseEvent& e)
         return;
     proc.selectedSlot = s;
     // Shift-click plays the second articulation (rimshot, open hat, ride bell).
-    const int art = e.mods.isShiftDown() && kr::slots()[(size_t) s].articulations.size() > 1 ? (s == kr::HiHat ? 2 : 1) : 0;
+    const int art = s < kr::kNumSlots && e.mods.isShiftDown() && kr::slots()[(size_t) s].articulations.size() > 1 ? (s == kr::HiHat ? 2 : 1) : 0;
     proc.audition (s, art, 0.85f);
     if (onSelect)
         onSelect (s);
@@ -276,10 +282,10 @@ void KitView::drawRoom (juce::Graphics& g) const
     g.drawEllipse (rug.reduced (30.0f, 8.0f), 1.0f);
 
     // Light from straight above: each piece throws a soft shadow right under itself.
-    const std::array<juce::Rectangle<float>, 7> shadows { {
+    const std::array<juce::Rectangle<float>, 8> shadows { {
         { 588 - 130, kFloorY - 12, 260, 26 }, { 875 - 115, kFloorY - 10, 230, 22 }, { 375 - 70, kFloorY - 8, 140, 16 },
         { 227 - 60, kFloorY - 7, 120, 14 }, { 1015 - 50, kFloorY - 6, 100, 12 }, { 332 - 45, kFloorY - 6, 90, 12 },
-        { 1082 - 44, kFloorY - 6, 88, 12 } } };
+        { 1082 - 44, kFloorY - 6, 88, 12 }, { 113 - 96, kFloorY - 7, 192, 14 } } };
     for (auto& sh : shadows)
     {
         g.setGradientFill (juce::ColourGradient (juce::Colours::black.withAlpha (0.7f), sh.getCentreX(), sh.getCentreY(),
@@ -604,13 +610,93 @@ void KitView::drawPad (juce::Graphics& g, const Piece& p, float glow) const
     }
 }
 
+void KitView::drawLogDrum (juce::Graphics& g, const Piece& p, float glow, float jump) const
+{
+    const auto body = p.box.translated (0.0f, jump);
+    const juce::Colour woodLight { 0xff9a6a3e }, woodMid { 0xff5e3a1e }, woodDark { 0xff1f1209 };
+
+    // Two trestles of darker wood, crossed, standing on the floor.
+    for (float x : { p.box.getX() + 30.0f, p.box.getRight() - 30.0f })
+    {
+        const float top = p.box.getBottom() - 6.0f;
+        g.setColour (woodDark);
+        g.drawLine (x - 14.0f, kFloorY, x + 9.0f, top, 5.0f);
+        g.drawLine (x + 14.0f, kFloorY, x - 9.0f, top, 5.0f);
+        g.setColour (woodMid.withAlpha (0.55f));
+        g.drawLine (x - 13.0f, kFloorY - 1.0f, x + 8.0f, top + 1.0f, 1.2f);
+        g.drawLine (x + 15.0f, kFloorY - 1.0f, x - 8.0f, top + 1.0f, 1.2f);
+    }
+
+    // The log: a rounded body lit from above, its far end showing the rings of the grain.
+    juce::Path shape;
+    shape.addRoundedRectangle (body, body.getHeight() * 0.5f);
+    glowAround (g, shape, glow * 0.6f);
+    g.setColour (juce::Colours::black.withAlpha (0.5f));
+    g.fillRoundedRectangle (body.translated (0.0f, 3.0f), body.getHeight() * 0.5f);
+    juce::ColourGradient wood (woodLight, 0.0f, body.getY(), woodDark, 0.0f, body.getBottom(), false);
+    wood.addColour (0.28, woodLight.brighter (0.15f));
+    wood.addColour (0.55, woodMid);
+    g.setGradientFill (wood);
+    g.fillPath (shape);
+    {
+        juce::Graphics::ScopedSaveState ss (g);
+        g.reduceClipRegion (shape);
+        juce::Random rnd (4242);
+        for (int k = 0; k < 9; ++k)
+        {
+            const float y = body.getY() + 4.0f + rnd.nextFloat() * (body.getHeight() - 8.0f), ph = rnd.nextFloat() * 6.0f;
+            juce::Path grain;
+            grain.startNewSubPath (body.getX(), y);
+            for (float x = body.getX(); x <= body.getRight(); x += 8.0f)
+                grain.lineTo (x, y + std::sin (x * 0.05f + ph) * 1.2f);
+            g.setColour ((k % 2 ? juce::Colours::black : juce::Colour (0xffe8c49a)).withAlpha (0.10f));
+            g.strokePath (grain, juce::PathStrokeType (0.8f));
+        }
+    }
+    const auto end = juce::Rectangle<float> (body.getHeight() * 0.5f, body.getHeight()).withCentre ({ body.getRight() - body.getHeight() * 0.25f, body.getCentreY() });
+    g.setColour (juce::Colour (0xff7d5532));
+    g.fillEllipse (end);
+    for (int r = 1; r <= 3; ++r)
+    {
+        g.setColour (woodDark.withAlpha (0.45f));
+        g.drawEllipse (end.reduced ((float) r * 2.2f, (float) r * 3.6f), 0.7f);
+    }
+    g.setColour (juce::Colour (0xfff2e2c8).withAlpha (0.18f));
+    g.drawHorizontalLine ((int) body.getY() + 2, body.getX() + body.getHeight() * 0.5f, body.getRight() - body.getHeight() * 0.6f);
+
+    // The carved H of a slit drum: two tongues of different length, lit from inside when it is played.
+    juce::Path slits;
+    const float sy = body.getY() + body.getHeight() * 0.36f;
+    const float x0 = body.getX() + body.getWidth() * 0.18f, x1 = body.getX() + body.getWidth() * 0.80f, mid = body.getX() + body.getWidth() * 0.47f;
+    slits.startNewSubPath (x0, sy - 4.0f); slits.lineTo (x1, sy - 4.0f);
+    slits.startNewSubPath (x0, sy + 4.0f); slits.lineTo (x1, sy + 4.0f);
+    slits.startNewSubPath (mid, sy - 4.0f); slits.lineTo (mid, sy + 4.0f);
+    g.setColour (woodDark);
+    g.strokePath (slits, juce::PathStrokeType (2.6f, juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
+    g.setColour (kAccent.withAlpha (0.10f + 0.85f * glow));
+    g.strokePath (slits, juce::PathStrokeType (1.2f, juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
+
+    // A pair of mallets resting across it.
+    for (int k = 0; k < 2; ++k)
+    {
+        const float mx = body.getX() + body.getWidth() * (0.30f + 0.33f * (float) k), my = body.getY() - 2.0f;
+        g.setColour (juce::Colour (0xffcfb38a));
+        g.drawLine (mx - 22.0f, my + 3.0f, mx + 20.0f, my - 5.0f, 2.0f);
+        g.setColour (juce::Colour (0xff3a2a22));
+        g.fillEllipse (mx + 17.0f, my - 9.0f, 9.0f, 8.0f);
+        g.setColour (juce::Colour (0xfff2e2c8).withAlpha (0.25f));
+        g.fillEllipse (mx + 19.0f, my - 8.0f, 3.0f, 2.5f);
+    }
+}
+
 void KitView::drawLabel (juce::Graphics& g, const Piece& p) const
 {
-    const auto& def = kr::slots()[(size_t) p.slot];
-    const bool learning = proc.getLearnTarget() >= 0 && kr::targetSlot (proc.getLearnTarget()) == p.slot;
-    const juce::String key = learning ? juce::String ("press a key") : kr::flNoteName (proc.getKey (p.slot, 0));
-    const juce::String name = juce::String (def.name).toUpperCase();
-    const bool loading = proc.isSlotLoading (p.slot);
+    const bool isLog = p.slot == kr::kLogDrum;
+    const bool learning = ! isLog && proc.getLearnTarget() >= 0 && kr::targetSlot (proc.getLearnTarget()) == p.slot;
+    const juce::String key = isLog ? kr::flNoteName (kr::kLogLowKey) + "-" + kr::flNoteName (kr::kLogHighKey)
+                                   : learning ? juce::String ("press a key") : kr::flNoteName (proc.getKey (p.slot, 0));
+    const juce::String name = isLog ? juce::String ("LOG DRUM") : juce::String (kr::slots()[(size_t) p.slot].name).toUpperCase();
+    const bool loading = ! isLog && proc.isSlotLoading (p.slot);
     const bool selected = proc.selectedSlot == p.slot;
 
     auto nameFont = dd::gui::LookAndFeel::font (11.0f, true).withExtraKerningFactor (0.08f);
@@ -703,6 +789,14 @@ void KitView::paint (juce::Graphics& g)
             case Shape::Pad:
                 drawPad (g, p, glow);
                 break;
+            case Shape::LogDrum:
+            {
+                // The log hops on its trestles when struck.
+                const float age = hitAge[(size_t) p.slot], v = hitVel[(size_t) p.slot];
+                const float jump = age < 0.5f ? -1.8f * v * std::exp (-age * 10.0f) * std::cos (age * kPi * 2.0f * 7.0f) : 0.0f;
+                drawLogDrum (g, p, glow, jump);
+                break;
+            }
         }
     }
 

@@ -106,7 +106,16 @@
     "chinaPunch": 0.0,
     "clapPunch": 0.0,
     "clapOnSnare": false,
-    "layBack": 14
+    "layBack": 14,
+    "logVolume": 0.0,
+    "logTune": 0.0,
+    "logLength": 380.0,
+    "logKnock": 0.6,
+    "logTone": 0.55,
+    "logDrive": 0.3,
+    "logSub": 0.35,
+    "logGlide": 70.0,
+    "logModel": "Classic"
   },
   "extra": {
     "kit": {

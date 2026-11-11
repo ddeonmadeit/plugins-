@@ -24,7 +24,7 @@ public:
     static constexpr int kW = 1176, kH = 420;
 
 private:
-    enum class Shape { Kick, Snare, RackTom, FloorTom, HiHat, Crash, Ride, China, Pad };
+    enum class Shape { Kick, Snare, RackTom, FloorTom, HiHat, Crash, Ride, China, Pad, LogDrum };
 
     struct Piece
     {
@@ -48,12 +48,13 @@ private:
     void drawKick (juce::Graphics&, const Piece&, float glow) const;
     void drawCymbal (juce::Graphics&, juce::Rectangle<float> r, float glow, bool china) const;
     void drawPad (juce::Graphics&, const Piece&, float glow) const;
+    void drawLogDrum (juce::Graphics&, const Piece&, float glow, float jump) const;
     void drawLabel (juce::Graphics&, const Piece&) const;
 
     KitroomProcessor& proc;
     std::vector<Piece> pieces;            // back to front
-    std::array<float, kr::kNumSlots> flash {};
-    std::array<float, kr::kNumSlots> hitAge {}, hitVel {};   // seconds since the last hit, and how hard: drives the motion
+    std::array<float, kr::kNumPieces> flash {};
+    std::array<float, kr::kNumPieces> hitAge {}, hitVel {};   // seconds since the last hit, and how hard: drives the motion
     juce::AffineTransform swingFor (const Piece&) const;
     juce::Image darkness;                 // static light mask: black except where the spots fall
     int hover = -1;

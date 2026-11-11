@@ -10,7 +10,7 @@ using kitroom::MP;
 
 const juce::StringArray& KitroomProcessor::categoryOrder()
 {
-    static const juce::StringArray order { "STUDIO", "LIVE ROOM", "VINTAGE", "TIGHT", "PUNCH", "BIG", "YEEZUS", "MOSHC0RE", "KING", "TRIP HOP", "80S", "2000S", "SOFT", "UNIQUE", "NEO SOUL", "SOUL", "USER" };
+    static const juce::StringArray order { "STUDIO", "LIVE ROOM", "VINTAGE", "TIGHT", "PUNCH", "BIG", "YEEZUS", "MOSHC0RE", "KING", "TRIP HOP", "80S", "2000S", "SOFT", "UNIQUE", "AMAPIANO", "AFROBEATS", "NEO SOUL", "SOUL", "USER" };
     return order;
 }
 
@@ -189,6 +189,8 @@ void KitroomProcessor::prepareToPlay (double sampleRate, int)
     numPending = 0;
     sampleClock = 0;
     engine.prepare (sr);
+    logDrum.prepare (sr);
+    logHeld.fill (false);
     for (auto& f : sideLowCut)
     {
         f.set (140.0f, 0.7071f, sr);
@@ -214,7 +216,18 @@ void KitroomProcessor::handleNote (int note, float velocity, juce::int64 when)
 
     const int target = noteMap[(size_t) note].load();
     if (target < 0)
+    {
+        // Keys above the kit that no drum has been given play the log drum (on the grid, never laid back).
+        if (note >= kr::kLogLowKey && note <= kr::kLogHighKey)
+        {
+            bool held = false;
+            for (int k = kr::kLogLowKey; k <= kr::kLogHighKey; ++k)
+                held = held || (logHeld[(size_t) k] && k != note);
+            logHeld[(size_t) note] = true;
+            playLog (note, velocity, held);
+        }
         return;
+    }
     const int slot = kr::targetSlot (target), art = kr::targetArt (target);
     if (art >= (int) kr::slots()[(size_t) slot].articulations.size())
         return;
@@ -230,6 +243,34 @@ void KitroomProcessor::handleNote (int note, float velocity, juce::int64 when)
         return;
     }
     play (slot, art, velocity, params.master (MP::Humanize));
+}
+
+void KitroomProcessor::handleNoteOff (int note)
+{
+    if (note >= 0 && note < 128)
+        logHeld[(size_t) note] = false;
+}
+
+void KitroomProcessor::playLog (int key, float velocity, bool slide)
+{
+    logDrum.noteOn (key - kr::kLogKeyOffset, velocity, slide, logSettings);
+    float old = hitLevels[(size_t) kr::kLogDrum].load();
+    while (velocity > old && ! hitLevels[(size_t) kr::kLogDrum].compare_exchange_weak (old, velocity)) {}
+}
+
+void KitroomProcessor::readLogSettings()
+{
+    auto& l = logSettings;
+    const float vol = params.master (MP::LogVolume);
+    l.gain = vol <= -47.9f ? 0.0f : dd::dbToGain (vol);
+    l.tune = params.master (MP::LogTune);
+    l.lengthMs = params.master (MP::LogLength);
+    l.knock = params.master (MP::LogKnock);
+    l.tone = params.master (MP::LogTone);
+    l.drive = params.master (MP::LogDrive);
+    l.sub = params.master (MP::LogSub);
+    l.glideMs = params.master (MP::LogGlide);
+    l.model = (int) std::lround (params.master (MP::LogModel));
 }
 
 void KitroomProcessor::firePending (juce::int64 now)
@@ -297,6 +338,7 @@ void KitroomProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mid
     }
     outGainSm.setTargetValue (dd::dbToGain (params.master (MP::Output)));
     widthSm.setTargetValue (params.master (MP::Width));
+    readLogSettings();
 
     // Notes from the UI (clicking a drum) join the host's MIDI at the start of the block.
     {
@@ -304,7 +346,10 @@ void KitroomProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mid
         auto playQueued = [this] (int packed)
         {
             const int target = packed >> 8;
-            play (kr::targetSlot (target), kr::targetArt (target), (float) (packed & 0xff) / 127.0f, 0.0f);
+            if (kr::targetSlot (target) == kr::kLogDrum)
+                playLog (kr::kLogAuditionKey, (float) (packed & 0xff) / 127.0f, false);
+            else
+                play (kr::targetSlot (target), kr::targetArt (target), (float) (packed & 0xff) / 127.0f, 0.0f);
         };
         for (int i = 0; i < rd.blockSize1; ++i) playQueued (auditionQueue[(size_t) (rd.startIndex1 + i)]);
         for (int i = 0; i < rd.blockSize2; ++i) playQueued (auditionQueue[(size_t) (rd.startIndex2 + i)]);
@@ -339,10 +384,17 @@ void KitroomProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mid
                 const auto m = meta.getMessage();
                 if (m.isNoteOn())
                     handleNote (m.getNoteNumber(), m.getFloatVelocity(), now);
-                else if (m.isAllSoundOff())
+                else if (m.isNoteOff())
+                    handleNoteOff (m.getNoteNumber());
+                else if (m.isAllSoundOff() || m.isAllNotesOff())
                 {
-                    engine.reset();
-                    numPending = 0;
+                    if (m.isAllSoundOff())
+                    {
+                        engine.reset();
+                        logDrum.reset();
+                        numPending = 0;
+                    }
+                    logHeld.fill (false);
                 }
             }
             // Laid-back hits that are due now, and the next one to split the render at.
@@ -351,6 +403,7 @@ void KitroomProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mid
             if (next < sampleClock + pos + segEnd)
                 segEnd = std::max (done + 1, (int) (next - sampleClock - pos));
             engine.render (cl + done, cr + done, segEnd - done, mixes);
+            logDrum.render (cl + done, cr + done, segEnd - done, logSettings);
             done = segEnd;
         }
 
