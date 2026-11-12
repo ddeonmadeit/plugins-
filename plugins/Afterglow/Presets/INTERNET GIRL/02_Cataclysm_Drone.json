@@ -104,7 +104,7 @@
     "highCut": 18000.0,
     "width": 1.3,
     "glue": 0.15,
-    "outGain": 0.1,
+    "outGain": 3.6,
     "mTone": 0.0,
     "mMotion": 0.0,
     "mSpace": 0.0,

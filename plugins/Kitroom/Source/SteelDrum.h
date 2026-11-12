@@ -116,7 +116,7 @@ public:
     /** Adds the steel drum into L / R. */
     void render (float* L, float* R, int n, const SteelSettings& s) noexcept
     {
-        const float outGain = s.gain * 0.85f;
+        const float outGain = s.gain * 0.24f;
         const float rollHz = 9.0f + 9.0f * s.roll;
         for (auto& v : voices)
         {
