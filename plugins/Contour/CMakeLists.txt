@@ -2,7 +2,7 @@ dd_add_plugin(Contour
     PRODUCT_NAME "Contour"
     PLUGIN_CODE  Cntr
     KIND         EFFECT
-    VERSION      1.2.1
+    VERSION      1.3.0
     PRESETS_DIR  Presets
     WANTS_KEYBOARD
     SOURCES

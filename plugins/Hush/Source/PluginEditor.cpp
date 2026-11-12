@@ -48,7 +48,7 @@ HushEditor::Content::Content (HushProcessor& p)
     : proc (p),
       topBar (p.presets, "HU", "SH", "Per-Sound De-Esser"),
       description (topBar.presets()),
-      transfer (p),
+      follow (p),
       sounds ("Sounds", 14, 8, kA),
       controls ("De-Esser", 5, 2, kA),
       selected ("Selected", 5, 3, kA),
@@ -73,7 +73,7 @@ HushEditor::Content::Content (HushProcessor& p)
     session.add<hush::SessionView> (p, state, editor.getCanvas());
     session.place (0, 0, 5, 2);
 
-    topBar.addRight (transfer, 118);
+    topBar.addRight (follow, 118);
     addAndMakeVisible (topBar);
     description.setHint (juce::String ("ddeonmadeit  v") + DD_PLUGIN_VERSION);
     addAndMakeVisible (description);
@@ -116,9 +116,9 @@ HushEditor::HushEditor (HushProcessor& p)
     content = std::make_unique<Content> (p);
     content->setBounds (0, 0, kBaseW, kBaseH);
     addAndMakeVisible (*content);
-    const float savedScale = proc.editorScale;
+    const float savedScale = dd::gui::openingScale (kBaseW, kBaseH, proc.editorScale);
     setResizable (true, true);
-    setResizeLimits ((int) (kBaseW * 0.6f), (int) (kBaseH * 0.6f), (int) (kBaseW * 1.8f), (int) (kBaseH * 1.8f));
+    setResizeLimits ((int) (kBaseW * 0.5f), (int) (kBaseH * 0.5f), (int) (kBaseW * 1.8f), (int) (kBaseH * 1.8f));
     if (auto* c = getConstrainer())
         c->setFixedAspectRatio ((double) kBaseW / (double) kBaseH);
     setSize ((int) std::round (kBaseW * savedScale), (int) std::round (kBaseH * savedScale));

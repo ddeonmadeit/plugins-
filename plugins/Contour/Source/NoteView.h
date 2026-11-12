@@ -170,7 +170,7 @@ private:
     dd::gui::Key resetKey { "Reset" }, snapKey { "Snap" };
 };
 
-/** Transfer status, PLAY, LOAD, BOUNCE + drag-out, CLEAR. */
+/** What the take is doing (following, picking up, analysing), PLAY, LOAD, PRINT + drag-out, CLEAR. */
 class SessionView : public juce::Component, private juce::Timer
 {
 public:
@@ -192,18 +192,19 @@ private:
     ContourProcessor& proc;
     EditorState& state;
     NoteCanvas& canvas;
-    dd::gui::Key playKey { "Play" }, loadKey { "Load" }, bounceKey { "Bounce" }, clearKey { "Clear" }, keyKey { "Detect Key" };
+    dd::gui::Key playKey { "Play" }, loadKey { "Load" }, bounceKey { "Print" }, clearKey { "Clear" }, keyKey { "Detect Key" };
     DragKey dragKey { *this };
     std::unique_ptr<juce::FileChooser> chooser;
     int seenBounces = 0;
     bool dragging = false;
 };
 
-/** TRANSFER in the top bar: lit while Contour is listening for the next playback. */
-class TransferKey : public dd::gui::Key
+/** FOLLOW in the top bar: lit, the take follows the vocal on the track by itself (new or changed audio is
+    captured as the song plays) and the edits play live in the mix. */
+class FollowKey : public dd::gui::Key
 {
 public:
-    explicit TransferKey (ContourProcessor& p);
+    explicit FollowKey (ContourProcessor& p);
 private:
     struct Poll : juce::Timer
     {

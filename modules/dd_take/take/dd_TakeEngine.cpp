@@ -34,11 +34,253 @@ void TakeEngine::prepare (double sampleRate, int)
         rateChangedFrom.store (previous);
     }
     fadeLeft = 0;
+    fol.prepare (sampleRate);
     prepared.store (true);
     notify();
 }
 
 //==============================================================================
+void TakeEngine::Follow::prepare (double rate)
+{
+    // ~21 ms frames, 2.5 s of history (pre-roll and hold-back come from it).
+    frameLen = rate > 60000.0 ? 2048 : 1024;
+    hist.assign ((size_t) juce::nextPowerOfTwo ((int) (rate * 2.5)), 0.0f);
+    const float edges[kBands - 1] = { 200.0f, 500.0f, 1200.0f, 3000.0f, 7000.0f };
+    for (int b = 0; b < kBands - 1; ++b)
+        coef[(size_t) b] = 1.0f - std::exp (-juce::MathConstants<float>::twoPi * edges[b] / (float) rate);
+    confirmFrames = juce::roundToInt (0.3 * rate / frameLen);
+    limit = (int64_t) (rate * 60.0 * 15.0);   // a song; past 15 min (Session View jams) it stops capturing
+    gainStep = (float) (1.0 / (0.01 * rate));
+    gain = 0.0f;
+    nStale = 0;
+    reset();
+}
+
+void TakeEngine::Follow::reset() noexcept
+{
+    lpIn.fill (0.0f);
+    lpTk.fill (0.0f);
+    eIn.fill (0.0);
+    eTk.fill (0.0);
+    eErr = 0.0;
+    zIn = zTk = 0;
+    zPastIn.fill (0);
+    zPastTk.fill (0);
+    frameFill = 0;
+    diffScore = matchRun = mutedRun = 0;
+    expected = -1;
+    histEnd = 0;
+    histLen = 0;
+    capturing = holding = false;
+}
+
+TakeEngine::Follow::Kind TakeEngine::Follow::classify() const noexcept
+{
+    constexpr double floorMs = 3.2e-6;   // -55 dBFS: below this a frame counts as silent
+    double in = 0.0, tk = 0.0;
+    for (int b = 0; b < kBands; ++b)
+    {
+        in += eIn[(size_t) b];
+        tk += eTk[(size_t) b];
+    }
+    in /= frameLen;
+    tk /= frameLen;
+    const bool inLoud = in > floorMs, tkLoud = tk > floorMs;
+    if (! inLoud && ! tkLoud) return Kind::quiet;
+    if (! inLoud)             return Kind::muted;
+    if (! tkLoud)             return Kind::diff;
+    if (eErr / frameLen < 1.0e-3 * std::max (in, tk))
+        return Kind::match;   // the same samples (to -30 dB): the clip as captured
+
+    // Not sample-exact (Ableton re-warps a clip on every play): compare the band envelopes instead.
+    double sum = 0.0, worst = 0.0;
+    int used = 0;
+    for (int b = 0; b < kBands; ++b)
+    {
+        const double a = eIn[(size_t) b] / frameLen, c = eTk[(size_t) b] / frameLen;
+        if (a < floorMs * 0.1 && c < floorMs * 0.1)
+            continue;
+        const double d = std::min (24.0, std::abs (10.0 * std::log10 ((a + floorMs * 0.1) / (c + floorMs * 0.1))));
+        sum += d;
+        worst = std::max (worst, d);
+        ++used;
+    }
+    const double mean = used > 0 ? sum / used : 0.0;
+    // The lows' zero-crossing rate follows the sung pitch: a new take a semitone or two away has the same
+    // vowel envelope but not the same rate (counted over ~85 ms, so a crossing more or less doesn't count).
+    int zi = 0, zt = 0;
+    for (size_t k = 0; k < zPastIn.size(); ++k)
+    {
+        zi += zPastIn[k];
+        zt += zPastTk[k];
+    }
+    const double pitchGap = zi > 16 && zt > 16 ? std::abs (std::log2 ((zi + 1.0) / (zt + 1.0))) : 0.0;
+    if (mean < 3.0 && worst < 9.0 && pitchGap < 0.07) return Kind::match;
+    if (mean > 6.0 || pitchGap > 0.11)                return Kind::diff;
+    return Kind::unsure;
+}
+
+bool TakeEngine::covered (int64_t t) const noexcept
+{
+    if (cur == nullptr)
+        return false;
+    const auto& sp = cur->spans;
+    auto it = std::upper_bound (sp.begin(), sp.end(), t, [] (int64_t v, const Span& s) { return v < s.end; });
+    return it != sp.end() && it->contains (t);
+}
+
+void TakeEngine::pushHistory (int64_t from, int64_t to) noexcept
+{
+    const int64_t histStart = fol.histEnd - fol.histLen;
+    from = std::max (from, histStart);
+    const auto mask = (int64_t) fol.hist.size() - 1;
+    while (from < to)
+    {
+        const int64_t idx = from & mask;
+        const int len = (int) std::min<int64_t> (to - from, (int64_t) fol.hist.size() - idx);
+        fifo.push (from, fol.hist.data() + idx, len);
+        from += len;
+    }
+    fol.pushedTo = std::max (fol.pushedTo, to);
+}
+
+void TakeEngine::endAutoCapture() noexcept
+{
+    if (! fol.capturing)
+        return;
+    const int64_t end = fol.holding ? fol.holdFrom : fol.pushedTo;
+    fifo.flush();
+    if (end > fol.captureStart)
+    {
+        // Until the worker has analysed it, the old snapshot doesn't fit this stretch any more: play it live.
+        if (fol.nStale == (int) fol.stale.size())
+        {
+            std::move (fol.stale.begin() + 1, fol.stale.end(), fol.stale.begin());
+            --fol.nStale;
+        }
+        const auto serial = autoEnded.load (std::memory_order_relaxed) + 1;
+        fol.stale[(size_t) fol.nStale++] = { { fol.captureStart, end }, serial };
+        autoEnded.store (serial, std::memory_order_release);
+    }
+    fol.capturing = fol.holding = false;
+    capturingNow.store (false);
+    captureEnded.store (true);
+}
+
+void TakeEngine::follow (int64_t t, int len) noexcept
+{
+    if (t != fol.expected)
+    {
+        // A jump (loop, seek): what came before isn't the run-up to this any more.
+        endAutoCapture();
+        fol.reset();
+        fol.histEnd = t;
+    }
+    fol.expected = t + len;
+
+    std::array<float, kMaxBlock> tk {};
+    take.read (t, tk.data(), len);
+    const auto mask = (int64_t) fol.hist.size() - 1;
+    for (int i = 0; i < len; ++i)
+    {
+        const int64_t ti = t + i;
+        if (! covered (ti))
+            tk[(size_t) i] = 0.0f;
+        const float x = monoBuf[(size_t) i], y = tk[(size_t) i];
+        fol.hist[(size_t) (ti & mask)] = x;
+
+        // Band energies of what plays and of the take: lows up to 200 Hz ... air above 7 kHz.
+        float px = x, py = y;
+        for (int b = 0; b < kBands - 1; ++b)
+        {
+            fol.lpIn[(size_t) b] += fol.coef[(size_t) b] * (x - fol.lpIn[(size_t) b]);
+            fol.lpTk[(size_t) b] += fol.coef[(size_t) b] * (y - fol.lpTk[(size_t) b]);
+            const float bx = b == 0 ? fol.lpIn[0] : fol.lpIn[(size_t) b] - fol.lpIn[(size_t) b - 1];
+            const float by = b == 0 ? fol.lpTk[0] : fol.lpTk[(size_t) b] - fol.lpTk[(size_t) b - 1];
+            fol.eIn[(size_t) b] += (double) bx * bx;
+            fol.eTk[(size_t) b] += (double) by * by;
+            px = x - fol.lpIn[(size_t) b];
+            py = y - fol.lpTk[(size_t) b];
+        }
+        fol.eIn[kBands - 1] += (double) px * px;
+        fol.eTk[kBands - 1] += (double) py * py;
+        fol.eErr += (double) (x - y) * (x - y);
+        const float lowIn = fol.lpIn[1], lowTk = fol.lpTk[1];
+        if ((lowIn >= 0.0f) != fol.signIn && std::abs (lowIn) > 1.0e-4f) { fol.signIn = ! fol.signIn; ++fol.zIn; }
+        if ((lowTk >= 0.0f) != fol.signTk && std::abs (lowTk) > 1.0e-4f) { fol.signTk = ! fol.signTk; ++fol.zTk; }
+
+        if (++fol.frameFill < fol.frameLen)
+            continue;
+        const int64_t fe = ti + 1, fs = fe - fol.frameLen;
+        fol.zPastIn[(size_t) fol.zSlot] = fol.zIn;
+        fol.zPastTk[(size_t) fol.zSlot] = fol.zTk;
+        fol.zSlot = (fol.zSlot + 1) % (int) fol.zPastIn.size();
+        fol.histEnd = fe;
+        fol.histLen = (int) std::min<int64_t> ((int64_t) fol.hist.size() - kMaxBlock, fol.histLen + fol.frameLen);
+        onFrame (fol.classify(), fs, fe);
+        fol.frameFill = 0;
+        fol.eIn.fill (0.0);
+        fol.eTk.fill (0.0);
+        fol.eErr = 0.0;
+        fol.zIn = fol.zTk = 0;
+    }
+}
+
+void TakeEngine::onFrame (Follow::Kind kind, int64_t fs, int64_t fe) noexcept
+{
+    using K = Follow::Kind;
+    if (! fol.capturing)
+    {
+        // A leaky score, so a few frames of a new take that happen to look like the old one don't reset it.
+        const int before = fol.diffScore;
+        switch (kind)
+        {
+            case K::diff:   ++fol.diffScore; break;
+            case K::match:  fol.diffScore = std::max (0, fol.diffScore - 2); break;
+            case K::quiet:
+            case K::muted:  fol.diffScore = std::max (0, fol.diffScore - 1); break;
+            case K::unsure: break;
+        }
+        fol.mutedRun = kind == K::muted ? fol.mutedRun + 1 : 0;
+        if (before == 0 && fol.diffScore > 0)
+            fol.suspectStart = fs;
+        if (fol.diffScore >= fol.confirmFrames && fs < fol.limit)
+        {
+            // New or changed audio: capture it, from where it began (plus a frame, the detection's slack).
+            fol.capturing = true;
+            fol.holding = false;
+            fol.matchRun = 0;
+            fol.captureStart = std::max (fol.histEnd - fol.histLen, fol.suspectStart - fol.frameLen);
+            fol.pushedTo = fol.captureStart;
+            capturingNow.store (true);
+            pushHistory (fol.captureStart, fe);
+        }
+        return;
+    }
+
+    // Capturing: keep going while it differs; once it plays what the take holds again for a while, stop
+    // there and drop the matching tail (re-capturing it would only reset edits).
+    const bool same = kind == K::match || (kind == K::quiet && fol.holding);
+    if (same)
+    {
+        if (! fol.holding)
+        {
+            fol.holding = true;
+            fol.holdFrom = fol.pushedTo;
+            fol.matchRun = 0;
+        }
+        if (++fol.matchRun >= fol.confirmFrames)
+        {
+            endAutoCapture();
+            fol.diffScore = 0;
+        }
+        return;
+    }
+    fol.holding = false;
+    fol.matchRun = 0;
+    pushHistory (fol.pushedTo, fe);
+}
+
 void TakeEngine::process (juce::AudioBuffer<float>& buffer, juce::AudioPlayHead* playHead, bool nonRealtime) noexcept
 {
     audioInBlock.store (true);
@@ -65,15 +307,22 @@ void TakeEngine::process (juce::AudioBuffer<float>& buffer, juce::AudioPlayHead*
     if (playing)
         internalPlay.store (false);
 
+    // Stale stretches the worker has analysed since play the take again.
+    const auto analysed = autoAnalysed.load (std::memory_order_acquire);
+    for (int k = fol.nStale - 1; k >= 0; --k)
+        if (fol.stale[(size_t) k].serial <= analysed)
+        {
+            std::move (fol.stale.begin() + k + 1, fol.stale.begin() + fol.nStale, fol.stale.begin() + k);
+            --fol.nStale;
+        }
+
     bool endedHere = false;
     for (int off = 0; off < n; off += kMaxBlock)
     {
         const int len = std::min (kMaxBlock, n - off);
         const int64_t t = pos + off;
 
-        if (playing && armed.load() && chs > 0)
-        {
-            // Transfer: record the track (mono) against the timeline; the live input plays on.
+        if (playing && chs > 0)
             for (int i = 0; i < len; ++i)
             {
                 float m = 0.0f;
@@ -81,6 +330,12 @@ void TakeEngine::process (juce::AudioBuffer<float>& buffer, juce::AudioPlayHead*
                     m += buffer.getReadPointer (ch)[off + i];
                 monoBuf[(size_t) i] = m / (float) chs;
             }
+
+        if (playing && armed.load() && chs > 0)
+        {
+            // Transfer: record the track (mono) against the timeline; the live input plays on.
+            endAutoCapture();
+            fol.expected = -1;
             if (! capturing)
             {
                 capturing = true;
@@ -98,6 +353,16 @@ void TakeEngine::process (juce::AudioBuffer<float>& buffer, juce::AudioPlayHead*
             capturingNow.store (false);
             captureEnded.store (true);
             endedHere = true;
+        }
+
+        // Follow: compare what plays with the take; new or changed audio is captured by itself.
+        const bool following = playing && chs > 0 && autoFollow.load() && ! busy.load() && rate > 0.0;
+        if (following)
+            follow (t, len);
+        else
+        {
+            endAutoCapture();
+            fol.expected = -1;
         }
         processLive (buffer, off, len);
 
@@ -152,6 +417,22 @@ void TakeEngine::process (juce::AudioBuffer<float>& buffer, juce::AudioPlayHead*
                 published.release (1);
             }
         }
+
+        // Where the track no longer plays what the take holds (changed, muted, being captured, waiting for
+        // analysis), the live input plays instead; 10 ms ramps either way.
+        if (following || fol.gain > 0.0f)
+        {
+            const bool suspect = fol.capturing || fol.diffScore >= 2 || fol.mutedRun >= 2;
+            for (int i = 0; i < len; ++i)
+            {
+                bool live = following && suspect;
+                for (int k = 0; k < fol.nStale && ! live; ++k)
+                    live = fol.stale[(size_t) k].span.contains (rpos + i);
+                fol.gain = live ? std::min (1.0f, fol.gain + fol.gainStep) : std::max (0.0f, fol.gain - fol.gainStep);
+                coverBuf[(size_t) i] *= 1.0f - fol.gain;
+            }
+        }
+
         const bool live = playing;   // stopped: the host's input is not this take, play the take alone
         for (int ch = 0; ch < chs; ++ch)
         {
@@ -226,11 +507,13 @@ void TakeEngine::run()
                 busy.store (false);
         }
 
+        const auto endedBeforeDrain = autoEnded.load (std::memory_order_acquire);
         fifo.drain ([this] (int64_t p, const float* d, int len)
         {
             take.write (p, d, len);
             captured.add ({ p, p + len });
         });
+        drainedSerial = std::max (drainedSerial, endedBeforeDrain);
         if (captureEnded.exchange (false))
             finalisePending = true;
         if (finalisePending && ! capturingNow.load() && fifo.isEmpty())
@@ -273,12 +556,15 @@ void TakeEngine::finaliseCapture()
 {
     const double rate = sr.load();
     const auto fresh = captured;
+    const auto serial = drainedSerial;
     captured.clear();
     if (fresh.isEmpty())
     {
+        autoAnalysed.store (serial, std::memory_order_release);
         busy.store (false);
         return;
     }
+    analysingNow.store (true);
 
     std::vector<Span> merged;
     {
@@ -301,6 +587,8 @@ void TakeEngine::finaliseCapture()
         version.fetch_add (1);
     }
     rebuild();
+    autoAnalysed.store (serial, std::memory_order_release);
+    analysingNow.store (false);
     armed.store (false);
     busy.store (false);
 }
@@ -328,6 +616,7 @@ void TakeEngine::doLoad()
     lockOutAudio();
     take.clear();
     captured.clear();
+    autoAnalysed.store (autoEnded.load());
     const auto res = takefiles::load (take, at, file, rate, &cancel);
     if (res.ok)
     {
@@ -362,6 +651,7 @@ void TakeEngine::doClear()
     lockOutAudio();
     take.clear();
     captured.clear();
+    autoAnalysed.store (autoEnded.load());
     {
         const juce::ScopedLock sl (modelLock);
         resetAll();
@@ -382,6 +672,8 @@ void TakeEngine::doRestore (const juce::ValueTree& tree)
     captured.clear();
     finalisePending = false;
 
+    autoFollow.store ((bool) tree.getProperty ("follow", true));
+    autoAnalysed.store (autoEnded.load());
     const juce::File file (tree.getProperty ("take").toString());
     const double fileStart = (double) tree.getProperty ("takeStart", 0.0);
     const auto sp = SpanSet::fromString (tree.getProperty ("spans").toString(), rate);
@@ -497,7 +789,7 @@ TakeStatus TakeEngine::getStatus() const noexcept
 {
     if (capturingNow.load())
         return TakeStatus::Capturing;
-    if (busy.load())
+    if (busy.load() || analysingNow.load() || autoAnalysed.load() < autoEnded.load())
         return TakeStatus::Analysing;
     if (missing.load())
         return TakeStatus::Missing;
@@ -562,6 +854,7 @@ juce::File TakeEngine::getLastBounce() const
 juce::ValueTree TakeEngine::makeStateTree (double rate) const
 {
     juce::ValueTree t (tag);
+    t.setProperty ("follow", autoFollow.load(), nullptr);
     if (rate <= 0.0)
         return t;
     t.setProperty ("take", takeFile.getFullPathName(), nullptr);

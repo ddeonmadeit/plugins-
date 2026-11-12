@@ -7,7 +7,7 @@
 
 const juce::StringArray& ContourProcessor::categoryOrder()
 {
-    static const juce::StringArray order { "NATURAL", "TIGHT", "CREATIVE", "NEO SOUL", "SOUL" };
+    static const juce::StringArray order { "NATURAL", "TIGHT", "CREATIVE", "INTERNET GIRL", "NEO SOUL", "SOUL" };
     return order;
 }
 
@@ -107,7 +107,7 @@ void ContourProcessor::setStateInformation (const void* data, int sizeInBytes)
             paramState.removeChild (paramState.getChildWithName ("Contour"), nullptr);
             dd::replaceStateExactly (apvts, paramState);
             presets.readState (paramState);
-            editorScale = juce::jlimit (0.6f, 1.8f, (float) tree.getProperty ("uiScale", 1.0f));
+            editorScale = juce::jlimit (0.5f, 1.8f, (float) tree.getProperty ("uiScale", 1.0f));
         }
 }
 

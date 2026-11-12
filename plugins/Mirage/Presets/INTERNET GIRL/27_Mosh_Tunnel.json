@@ -1,0 +1,18 @@
+{
+  "name": "Mosh Tunnel",
+  "category": "INTERNET GIRL",
+  "author": "DEON",
+  "description": "INTERNET GIRL at full tilt: a red CRT tunnel whose rings are born on every hit, fast and riotous.",
+  "params": {
+    "react": 0.95,
+    "grain": 0.5,
+    "digital": 0.7,
+    "speed": 0.85,
+    "eclipse": 0.35,
+    "dunes": 0.6,
+    "heat": 0.7,
+    "hue": 0.0,
+    "scene": "Tunnel",
+    "style": "CRT"
+  }
+}

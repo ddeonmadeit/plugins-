@@ -12,6 +12,8 @@ KITROOM: KEYS AND SOUNDS
   toms C2 / A1 / G1, ride D#2, and so on. The plug-in always shows the names your DAW uses.
   Log drum: C5 to C8 in FL Studio (C3 to C6 in Ableton), sounding three octaves lower, so A5
   (Ableton: A3) is the classic low A. Overlap two notes to slide; click the log for its controls.
+  Steel drum: C#8 to G10 in FL Studio (C#6 to G8 in Ableton), sounding three octaves lower like a
+  tenor pan. With Roll up, holding a note rolls it. Click the pan (front right) for its controls.
   Click any piece in the window to hear it and edit it: swap its sound (any recorded snare, kick,
   tom...), re-learn its key from your keyboard, and set its volume, pan, tuning, decay, mics and Punch
   (a harder attack and tighter body on the close mics; the room stays natural). On the snare or clap

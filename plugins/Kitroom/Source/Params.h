@@ -15,6 +15,8 @@ constexpr int kSlotParams = (int) SP::count;
 enum class MP { Close, Overheads, Room, VelCurve, Humanize, Glue, Clip, Width, Output, Drive, DriveType, Crush, Tone, ClapOnSnare, LayBack,
                 // 1.15: the log drum.
                 LogVolume, LogTune, LogLength, LogKnock, LogTone, LogDrive, LogSub, LogGlide, LogModel,
+                // 1.16: the steel drum.
+                SteelVolume, SteelTune, SteelLength, SteelBright, SteelShimmer, SteelRoll, SteelModel,
                 count };
 constexpr int kMasterParams = (int) MP::count;
 

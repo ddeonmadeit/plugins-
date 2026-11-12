@@ -144,9 +144,8 @@ void EarsControl::paint (juce::Graphics& g)
 }
 
 //==============================================================================
-OrbitEditor::OrbitEditor (OrbitProcessor& p)
-    : AudioProcessorEditor (p), lnf (palette()),
-      topBar (p.presets, "OR", "BIT", "3D ROOM PLACEMENT"),
+OrbitEditor::Content::Content (OrbitProcessor& p)
+    : topBar (p.presets, "OR", "BIT", "3D ROOM PLACEMENT"),
       description (topBar.presets()),
       speakers (*p.apvts.getParameter ("perfOutput"), "Speakers", palette().accent),
       ears (p.apvts),
@@ -156,7 +155,6 @@ OrbitEditor::OrbitEditor (OrbitProcessor& p)
       motionPanel ("MOTION", 8, 2, palette().accent),
       outputPanel ("OUTPUT", 6, 2, palette().accent)
 {
-    setLookAndFeel (&lnf);
     auto& s = p.apvts;
     const auto a = palette().accent;
 
@@ -206,20 +204,21 @@ OrbitEditor::OrbitEditor (OrbitProcessor& p)
     addAndMakeVisible (description);
     addAndMakeVisible (scene);
     addAndMakeVisible (atmosphere);
-
-    const int bottomW = placePanel.preferredSize().x + motionPanel.preferredSize().x + outputPanel.preferredSize().x + 24;
-    setSize (bottomW + 28, 108 + roomPanel.preferredSize().y + 12 + placePanel.preferredSize().y + 14);
 }
 
-OrbitEditor::~OrbitEditor() { setLookAndFeel (nullptr); }
-
-void OrbitEditor::paint (juce::Graphics& g)
+juce::Point<int> OrbitEditor::Content::naturalSize() const
 {
-    dd::gui::paintBackdrop (g, getLocalBounds(), lnf.palette());
+    const int bottomW = placePanel.preferredSize().x + motionPanel.preferredSize().x + outputPanel.preferredSize().x + 24;
+    return { bottomW + 28, 108 + roomPanel.preferredSize().y + 12 + placePanel.preferredSize().y + 14 };
+}
+
+void OrbitEditor::Content::paint (juce::Graphics& g)
+{
+    dd::gui::paintBackdrop (g, getLocalBounds(), palette());
     dd::gui::paintPanelShadows (g, *this);
 }
 
-void OrbitEditor::resized()
+void OrbitEditor::Content::resized()
 {
     topBar.setBounds (0, 8, getWidth(), dd::gui::TopBar::kHeight);
     description.setBounds (26, topBar.getBottom() + 6, getWidth() - 52, 22);
@@ -235,4 +234,46 @@ void OrbitEditor::resized()
     r.removeFromRight (12);
     motionPanel.setBounds (r);
     atmosphere.setBounds (getLocalBounds());
+}
+
+//==============================================================================
+OrbitEditor::OrbitEditor (OrbitProcessor& p) : AudioProcessorEditor (p), proc (p), lnf (palette())
+{
+    setLookAndFeel (&lnf);
+    content = std::make_unique<Content> (p);
+    const auto natural = content->naturalSize();
+    baseW = natural.x;
+    baseH = natural.y;
+    content->setBounds (0, 0, baseW, baseH);
+    addAndMakeVisible (*content);
+
+    // setResizeLimits() triggers resized(), so read the saved zoom first.
+    const float savedScale = dd::gui::openingScale (baseW, baseH, proc.editorScale);
+    setResizable (true, true);
+    setResizeLimits ((int) (baseW * 0.5f), (int) (baseH * 0.5f), (int) (baseW * 1.8f), (int) (baseH * 1.8f));
+    if (auto* c = getConstrainer())
+        c->setFixedAspectRatio ((double) baseW / (double) baseH);
+    setSize ((int) std::round (baseW * savedScale), (int) std::round (baseH * savedScale));
+    constructed = true;
+}
+
+OrbitEditor::~OrbitEditor()
+{
+    content.reset();
+    setLookAndFeel (nullptr);
+}
+
+void OrbitEditor::paint (juce::Graphics& g)
+{
+    g.fillAll (lnf.palette().background);
+}
+
+void OrbitEditor::resized()
+{
+    if (content == nullptr || baseW <= 0)
+        return;
+    const float scale = (float) getWidth() / (float) baseW;
+    content->setTransform (juce::AffineTransform::scale (scale));
+    if (constructed)
+        proc.editorScale = scale;
 }

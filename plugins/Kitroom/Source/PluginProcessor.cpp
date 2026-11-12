@@ -10,7 +10,7 @@ using kitroom::MP;
 
 const juce::StringArray& KitroomProcessor::categoryOrder()
 {
-    static const juce::StringArray order { "STUDIO", "LIVE ROOM", "VINTAGE", "TIGHT", "PUNCH", "BIG", "YEEZUS", "MOSHC0RE", "KING", "TRIP HOP", "80S", "2000S", "SOFT", "UNIQUE", "AMAPIANO", "AFROBEATS", "NEO SOUL", "SOUL", "USER" };
+    static const juce::StringArray order { "STUDIO", "LIVE ROOM", "VINTAGE", "TIGHT", "PUNCH", "BIG", "YEEZUS", "MOSHC0RE", "KING", "TRIP HOP", "80S", "2000S", "SOFT", "UNIQUE", "AMAPIANO", "AFROBEATS", "CARIBBEAN", "INTERNET GIRL", "NEO SOUL", "SOUL", "USER" };
     return order;
 }
 
@@ -190,6 +190,7 @@ void KitroomProcessor::prepareToPlay (double sampleRate, int)
     sampleClock = 0;
     engine.prepare (sr);
     logDrum.prepare (sr);
+    steelDrum.prepare (sr);
     logHeld.fill (false);
     for (auto& f : sideLowCut)
     {
@@ -226,6 +227,8 @@ void KitroomProcessor::handleNote (int note, float velocity, juce::int64 when)
             logHeld[(size_t) note] = true;
             playLog (note, velocity, held);
         }
+        else if (note >= kr::kSteelLowKey && note <= kr::kSteelHighKey)
+            playSteel (note, velocity);   // the keys above those: the steel drum
         return;
     }
     const int slot = kr::targetSlot (target), art = kr::targetArt (target);
@@ -249,13 +252,26 @@ void KitroomProcessor::handleNoteOff (int note)
 {
     if (note >= 0 && note < 128)
         logHeld[(size_t) note] = false;
+    if (note >= kr::kSteelLowKey && note <= kr::kSteelHighKey)
+        steelDrum.noteOff (note);
+}
+
+void KitroomProcessor::flashPiece (int piece, float velocity)
+{
+    float old = hitLevels[(size_t) piece].load();
+    while (velocity > old && ! hitLevels[(size_t) piece].compare_exchange_weak (old, velocity)) {}
 }
 
 void KitroomProcessor::playLog (int key, float velocity, bool slide)
 {
     logDrum.noteOn (key - kr::kLogKeyOffset, velocity, slide, logSettings);
-    float old = hitLevels[(size_t) kr::kLogDrum].load();
-    while (velocity > old && ! hitLevels[(size_t) kr::kLogDrum].compare_exchange_weak (old, velocity)) {}
+    flashPiece (kr::kLogDrum, velocity);
+}
+
+void KitroomProcessor::playSteel (int key, float velocity)
+{
+    steelDrum.noteOn (key, key - kr::kSteelKeyOffset, velocity, steelSettings);
+    flashPiece (kr::kSteelDrum, velocity);
 }
 
 void KitroomProcessor::readLogSettings()
@@ -271,6 +287,16 @@ void KitroomProcessor::readLogSettings()
     l.sub = params.master (MP::LogSub);
     l.glideMs = params.master (MP::LogGlide);
     l.model = (int) std::lround (params.master (MP::LogModel));
+
+    auto& st = steelSettings;
+    const float steelVol = params.master (MP::SteelVolume);
+    st.gain = steelVol <= -47.9f ? 0.0f : dd::dbToGain (steelVol);
+    st.tune = params.master (MP::SteelTune);
+    st.lengthMs = params.master (MP::SteelLength);
+    st.bright = params.master (MP::SteelBright);
+    st.shimmer = params.master (MP::SteelShimmer);
+    st.roll = params.master (MP::SteelRoll);
+    st.model = (int) std::lround (params.master (MP::SteelModel));
 }
 
 void KitroomProcessor::firePending (juce::int64 now)
@@ -348,6 +374,12 @@ void KitroomProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mid
             const int target = packed >> 8;
             if (kr::targetSlot (target) == kr::kLogDrum)
                 playLog (kr::kLogAuditionKey, (float) (packed & 0xff) / 127.0f, false);
+            else if (kr::targetSlot (target) == kr::kSteelDrum)
+            {
+                // One ringing middle note, released at once (a pan has no damper).
+                playSteel (kr::kSteelAuditionKey, (float) (packed & 0xff) / 127.0f);
+                steelDrum.noteOff (kr::kSteelAuditionKey);
+            }
             else
                 play (kr::targetSlot (target), kr::targetArt (target), (float) (packed & 0xff) / 127.0f, 0.0f);
         };
@@ -392,6 +424,7 @@ void KitroomProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mid
                     {
                         engine.reset();
                         logDrum.reset();
+                        steelDrum.reset();
                         numPending = 0;
                     }
                     logHeld.fill (false);
@@ -404,6 +437,7 @@ void KitroomProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mid
                 segEnd = std::max (done + 1, (int) (next - sampleClock - pos));
             engine.render (cl + done, cr + done, segEnd - done, mixes);
             logDrum.render (cl + done, cr + done, segEnd - done, logSettings);
+            steelDrum.render (cl + done, cr + done, segEnd - done, steelSettings);
             done = segEnd;
         }
 
@@ -530,7 +564,7 @@ void KitroomProcessor::setStateInformation (const void* data, int sizeInBytes)
     auto tree = juce::ValueTree::fromXml (*xml);
     dd::replaceStateExactly (apvts, tree);
     presets.readState (tree);
-    editorScale = juce::jlimit (0.6f, 1.8f, (float) tree.getProperty ("uiScale", 1.0f));
+    editorScale = juce::jlimit (0.5f, 1.8f, (float) tree.getProperty ("uiScale", 1.0f));
     applyKit (juce::JSON::parse (tree.getProperty ("kit").toString()));
 
     // Sessions from before the clap stored 10 slots of keys: those slots keep theirs, the clap keeps its GM key.

@@ -12,7 +12,7 @@
                               [--at 6.5:perfTapeStop=1 ...]   change a parameter at a time in seconds (like automation)
                               --phrase "notes:<note>,<start s>,<length s>,<velocity> ... [end=<s>]"   any notes (one-shots, loops)
       <Plugin>Harness render-all --outdir dir [--phrase demo] [--sr 48000] [--bpm 80]
-      <Plugin>Harness snapshot --out ui.png [--program N] [--scale 1] [--phrase vocal] [--hover x,y]   effects: what to play before the picture
+      <Plugin>Harness snapshot --out ui.png [--program N] [--scale 1] [--phrase vocal] [--hover x,y] [--bench N]   effects: what to play before the picture
       <Plugin>Harness stress  [--seconds 20] [--sr 48000] [--block 128]
       <Plugin>Harness dump-params    current values as preset-style JSON
       <Plugin>Harness param-info     ids, ranges, kinds and choice names (used by tools/qa/preset_lint.py)
@@ -824,6 +824,18 @@ int cmdSnapshot (juce::AudioProcessor& proc, const Args& a)
     }
 
     auto img = ed->createComponentSnapshot (ed->getLocalBounds(), true, scale);
+
+    // --bench N: how long a full repaint of the editor takes (software renderer), the cost of every frame
+    // when the whole window animates.
+    if (a.has ("--bench"))
+    {
+        const int frames = std::max (1, a.get ("--bench").getIntValue());
+        const auto t0 = juce::Time::getMillisecondCounterHiRes();
+        for (int f = 0; f < frames; ++f)
+            img = ed->createComponentSnapshot (ed->getLocalBounds(), true, scale);
+        const double ms = (juce::Time::getMillisecondCounterHiRes() - t0) / frames;
+        std::cout << "full repaint: " << juce::String (ms, 2) << " ms at " << img.getWidth() << "x" << img.getHeight() << "\n";
+    }
     const juce::File out (a.get ("--out", "ui.png"));
     out.deleteFile();
     juce::FileOutputStream fos (out);

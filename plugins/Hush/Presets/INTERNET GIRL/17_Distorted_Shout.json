@@ -1,0 +1,14 @@
+{
+  "name": "Distorted Shout",
+  "category": "INTERNET GIRL",
+  "author": "DEON",
+  "description": "INTERNET GIRL: distortion turns every S into a hiss: firm, fast cuts from 4.2 kHz up that catch the shouted esses and hard T's without dulling the grit.",
+  "params": {
+    "amount": 0.8,
+    "sensitivity": 0.7,
+    "freq": 4200.0,
+    "fade": 2.0,
+    "mode": "Split",
+    "outGain": 0.0
+  }
+}

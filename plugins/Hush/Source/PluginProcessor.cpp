@@ -7,7 +7,7 @@
 
 const juce::StringArray& HushProcessor::categoryOrder()
 {
-    static const juce::StringArray order { "VOCAL", "RAP", "SINGING", "SPECIAL", "NEO SOUL", "SOUL" };
+    static const juce::StringArray order { "VOCAL", "RAP", "SINGING", "SPECIAL", "INTERNET GIRL", "NEO SOUL", "SOUL" };
     return order;
 }
 
@@ -108,7 +108,7 @@ void HushProcessor::setStateInformation (const void* data, int sizeInBytes)
             paramState.removeChild (paramState.getChildWithName ("Hush"), nullptr);
             dd::replaceStateExactly (apvts, paramState);
             presets.readState (paramState);
-            editorScale = juce::jlimit (0.6f, 1.8f, (float) tree.getProperty ("uiScale", 1.0f));
+            editorScale = juce::jlimit (0.5f, 1.8f, (float) tree.getProperty ("uiScale", 1.0f));
         }
 }
 

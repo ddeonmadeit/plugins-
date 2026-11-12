@@ -60,6 +60,7 @@ public:
             std::fill (out[ch].begin(), out[ch].end(), 0.0f);
         }
         std::fill (red.begin(), red.end(), 0.0f);
+        redPeak = 0.0f;
         pos = 0;
         hopCount = 0;
         activity.store (0.0f);
@@ -95,6 +96,22 @@ private:
     void processFrame() noexcept
     {
         const int bins = N / 2 + 1;
+        const int outSize = 2 * N;
+        const bool active = settings.depth > 0.001f;
+        if (! active && redPeak < 1.0e-4f)
+        {
+            // Nothing to take out (Smooth is off and the last reductions have faded): the transforms would only
+            // hand back the windowed frame, so overlap-add that straight away and skip all four FFTs.
+            for (int ch = 0; ch < 2; ++ch)
+                for (int k = 0; k < N; ++k)
+                {
+                    const float w = window[(size_t) k];
+                    out[ch][(size_t) ((pos + k) % outSize)] += in[ch][(size_t) ((pos - N + k + N) % N)] * w * w * 0.5f;
+                }
+            activity.store (0.0f, std::memory_order_relaxed);
+            return;
+        }
+
         // The newest N samples, windowed, into both spectra.
         for (int ch = 0; ch < 2; ++ch)
         {
@@ -105,7 +122,6 @@ private:
             fft->performRealOnlyForwardTransform (f.data(), true);
         }
 
-        const bool active = settings.depth > 0.001f;
         if (active)
         {
             // Mid-channel level per bin, in dB.
@@ -167,15 +183,23 @@ private:
             activity.store (0.0f, std::memory_order_relaxed);
         }
 
+        // The gain per bin, once for both channels (most bins take nothing out).
+        redPeak = 0.0f;
+        for (int k = 0; k < bins; ++k)
+        {
+            const float r = red[(size_t) k];
+            redPeak = std::max (redPeak, r);
+            tmp[(size_t) k] = r > 1.0e-4f ? std::exp2 (r * -0.16609640f) : 1.0f;   // 10^(-r / 20)
+        }
+
         // Apply the same gains to both channels, back to time, window, overlap-add one frame ahead.
         const float norm = invScale * 0.5f;   // sqrt-Hann analysis x synthesis = Hann, which sums to 2 at 75 % overlap
-        const int outSize = 2 * N;
         for (int ch = 0; ch < 2; ++ch)
         {
             auto& f = frame[ch];
             for (int k = 0; k < bins; ++k)
             {
-                const float g = std::pow (10.0f, -red[(size_t) k] * 0.05f);
+                const float g = tmp[(size_t) k];
                 f[(size_t) (2 * k)] *= g;
                 f[(size_t) (2 * k + 1)] *= g;
             }
@@ -191,7 +215,7 @@ private:
     double sr = 48000.0;
     int order = 10, N = 1024, H = 256, hopCount = 0;
     int64_t pos = 0;
-    float relCoef = 0.9f, invScale = 1.0f;
+    float relCoef = 0.9f, invScale = 1.0f, redPeak = 0.0f;
     std::unique_ptr<juce::dsp::FFT> fft;
     std::vector<float> window, in[2], out[2], frame[2], logMag, red, tmp;
     std::vector<double> prefix;

@@ -7,6 +7,7 @@
 #include "DrumEngine.h"
 #include "Library.h"
 #include "LogDrum.h"
+#include "SteelDrum.h"
 #include "Params.h"
 
 class KitroomProcessor : public juce::AudioProcessor
@@ -61,7 +62,7 @@ public:
     // Play a piece from the UI.
     void audition (int slot, int art, float velocity);
 
-    /** Velocity of the latest hit per piece (slot, or kr::kLogDrum) since the last call (UI flashes), 0 if none. */
+    /** Velocity of the latest hit per piece (slot, kr::kLogDrum or kr::kSteelDrum) since the last call (UI flashes), 0 if none. */
     float takeHit (int slot) { return hitLevels[(size_t) slot].exchange (0.0f); }
 
     juce::AudioProcessorValueTreeState apvts;
@@ -80,6 +81,8 @@ private:
     void handleNote (int note, float velocity, juce::int64 when = -1);
     void handleNoteOff (int note);
     void playLog (int key, float velocity, bool slide);
+    void playSteel (int key, float velocity);
+    void flashPiece (int piece, float velocity);
     void readLogSettings();
     void play (int slot, int art, float velocity, float humanize);
     void processChunk (float* L, float* R, int n);
@@ -99,6 +102,8 @@ private:
     // The log drum: its keys held right now decide whether a new note slides (audio thread only).
     kitroom::LogDrum logDrum;
     kitroom::LogSettings logSettings;
+    kitroom::SteelDrum steelDrum;
+    kitroom::SteelSettings steelSettings;
     std::array<bool, 128> logHeld {};
 
     juce::AbstractFifo auditionFifo { 64 };

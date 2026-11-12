@@ -11,7 +11,7 @@
     "Width from the listener's seat: from a single point to a sound spread across half the horizon",
     "Automate everything: dragging the light records Left / Right, Front / Back and Height as automation in your DAW",
     "Zero latency, mono-safe low end (the bass stays centred), and a Speakers mode for monitors",
-    "48 presets: around you, rooms, motion, Travis Scott ad-libs, Tame Impala swirl, trip hop distance, mix tools, neo soul and soul (including the Motown echo chamber)",
+    "50 presets: around you, rooms, motion, Travis Scott ad-libs, Tame Impala swirl, trip hop distance, mix tools, INTERNET GIRL, neo soul and soul (including the Motown echo chamber)",
     "Head-related filters from The Viking HRTF dataset v2 (Spagnol, Miccini and Unnthorsson, 2020), CC BY 4.0"
   ],
   "installTips": [
@@ -22,10 +22,12 @@
   ],
   "previewNote": "on the test programme. Listen on headphones: Orbit is 3D audio.",
   "whatsNew": {
-    "version": "1.1.0",
+    "version": "1.2.0",
     "items": [
-      "Two soul rooms: Echo Chamber (the bright concrete chamber behind 60s Motown records) and Theater (an old cinema turned studio, like Stax)",
-      "NEO SOUL and SOUL placements: Electric Lady Room, Falsetto Halo, Rhodes Slow Swirl, Basement Session, plus Hitsville Echo Chamber, Stax Theater, Mono Soul 45 and Sunday Church"
+      "About a fifth less CPU with exactly the same sound: the head filters work on four samples at a time",
+      "The window can be resized now (drag the corner); it opens at a size that fits your screen",
+      "INTERNET GIRL presets (the Cape Town punk / hyperpop / trap trio): Mosh Pit (right in front of you in a small club) and Drone Orbit (slowly circling through a warehouse)",
+      "Smoother windows: the static panels, shadows and grain are drawn once and reused, so meters and lights no longer redraw the whole window (3 to 4 times less drawing)"
     ]
   }
 }

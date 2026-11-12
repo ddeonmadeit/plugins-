@@ -11,7 +11,7 @@
     "Dirt (8 distortion types), tape wow and saturation, lo-fi, Juno / Solina ensemble, phaser, dub delay, shimmer reverb, tempo pump and gate",
     "Drag the sun to set Motion and Tone; Swell, Tail, Blend, Grit, Echo and Space reshape any preset",
     "POLY switch: play chords with any preset, even the mono leads",
-    "198 presets: TAME IMPALA, MASSIVE ATTACK, BRENT FAIYAZ, MIKE DEAN, TRAVIS SCOTT, YEEZUS, MOSHC0RE, GUITAR, TRIP HOP, 80S, 2000S, SOFT, UNIQUE, LIVE (real instruments), PADS, ARPS, NEO SOUL (Rhodes, Wurli, organ, vibes), SOUL (Memphis organ, Philly strings, Stax horns), SAFE",
+    "201 presets: TAME IMPALA, MASSIVE ATTACK, BRENT FAIYAZ, MIKE DEAN, TRAVIS SCOTT, YEEZUS, MOSHC0RE, GUITAR, TRIP HOP, 80S, 2000S, SOFT, UNIQUE, LIVE (real instruments), PADS, ARPS, INTERNET GIRL, NEO SOUL (Rhodes, Wurli, organ, vibes), SOUL (Memphis organ, Philly strings, Stax horns), SAFE",
     "TAPE STOP: slow everything to a halt like a tape machine powering down, then automate it at the end of a beat",
     "Favourites: star the presets you love and browse just those; your stars survive updates"
   ],
@@ -25,9 +25,11 @@
   ],
   "previewNote": "on the same 120 BPM phrase: a held Dm9, an arpeggio over Bb, Fmaj7 stabs, then a legato melody. GUITAR presets play strummed Em, C and G chords at 80 BPM and a riff.",
   "whatsNew": {
-    "version": "1.13.1",
+    "version": "1.14.0",
     "items": [
-      "Ableton Live: TAPE STOP's help says how to automate it in Ableton"
+      "INTERNET GIRL presets (the Cape Town punk / hyperpop / trap trio): Crushing Synth (a crushed, driven saw wall), Cataclysm Drone (a huge breathing drone), TikTok Flip (a bright chopped pluck like the melody PULL UP was built on)",
+      "Windows open at a size that fits your screen (about 80 % of a laptop's height) and can be dragged bigger; the size you pick is kept",
+      "Smoother windows: the static panels, shadows and grain are drawn once and reused, so meters and lights no longer redraw the whole window (3 to 4 times less drawing)"
     ]
   }
 }

@@ -1,11 +1,12 @@
 {
   "publish": true,
-  "tagline": "Real acoustic drum kit, every piece on its own key, plus an Amapiano log drum",
+  "tagline": "Real acoustic drum kit, every piece on its own key, plus an Amapiano log drum and a steel drum",
   "description": "Multi-mic recordings of three real drum kits and real hand claps (close, overhead and room mics), played back with velocity layers and round robin so every hit sounds different. Click any piece of the drawn kit to hear it, swap its sound or move its key; record the whole kit into one piano roll.",
   "accent": "#e8a33d",
   "highlights": [
     "Kick, snare with rimshot and sidestick, hi-hat (closed, half-open, open, pedal), 3 toms, 2 crashes, ride with bell, china, and a clap",
     "Log drum: the Amapiano / Afrobeats log drum, synthesised the way it was born (an FM knock with a quick pitch drop), played as a bassline on its own keys above the drums (C5 to C8 in FL Studio, C3 to C6 in Ableton). Overlap two notes to slide. Four models (Classic, Woody, Deep, Bounce) with Length, Knock, Tone, Drive, Sub and Slide",
+    "Steel drum: a Trinidad tenor pan, synthesised the way a pan sings (tuned partials that shimmer, a rubber-tipped stick), on its own keys above the log drum (C#8 to G10 in FL Studio, C#6 to G8 in Ableton); hold a note to roll it. Four models (Tenor, Double Second, Cello, Bass) with Ring, Bright, Shimmer and Roll",
     "Lay Back: one knob drags the snare and clap behind the beat (hats and ride less, kick on time) for the lazy neo-soul pocket",
     "Punch on every piece: a harder attack and a tighter body on the close mics, while the room stays natural. Punchy kicks and snares to swap in (a tight death-metal kit's kicks and cracking snare, the studio kick's front mic)",
     "Real hand claps (tight three-person, loose gospel group, solo) placed in the studio kit's own room, on their own key or layered on every snare hit",
@@ -13,20 +14,25 @@
     "Close, overhead and room mics per piece and for the whole kit, plus tune, decay, glue and width",
     "Kit-bus Drive (8 distortion types), bit Crush and Tone, for anything from warm tape to broken industrial",
     "General MIDI key map, shown in your DAW's note names (FL Studio or Ableton); re-learn any key from your keyboard",
-    "91 kit presets: studio, live room, vintage and jazz, tight funk and soul, PUNCH (hard-hitting kits with claps), big rooms, Yeezus, moshc0re, KING, trip hop, 80s, 2000s, SOFT, UNIQUE, AMAPIANO and AFROBEATS (log drum kits), NEO SOUL (laid-back pockets) and SOUL (Motown, Memphis, Philly)",
+    "97 kit presets: studio, live room, vintage and jazz, tight funk and soul, PUNCH (hard-hitting kits with claps), big rooms, Yeezus, moshc0re, KING, trip hop, 80s, 2000s, SOFT, UNIQUE, AMAPIANO and AFROBEATS (log drum kits), CARIBBEAN (steel drum grooves), INTERNET GIRL (punk-meets-trap kits), NEO SOUL (laid-back pockets) and SOUL (Motown, Memphis, Philly)",
     "Favourites: star the presets you love and browse just those; your stars survive updates"
   ],
   "installTips": [
     "The .pkg also installs the drum sound library (about 250 MB). With the .zip, Install.command copies it for you.",
     "Keys (FL Studio names): kick C3, snare D3, rimshot E3, sidestick C#3, clap D#3, closed hat F#3, pedal hat G#3, open hat A#3, toms C4 / A3 / G3, crashes C#4 / A4, ride D#4, bell F4, china E4.",
     "Keys (Ableton names, same keys: Ableton numbers octaves two lower): kick C1, snare D1, rimshot E1, sidestick C#1, clap D#1, closed hat F#1, pedal hat G#1, open hat A#1, toms C2 / A1 / G1, crashes C#2 / A2, ride D#2, bell F2, china E2. The plug-in always shows the names your DAW uses.",
-    "Log drum: play it on C5 to C8 in FL Studio (C3 to C6 in Ableton) in the same pattern as the drums. It sounds three octaves lower, so A5 (Ableton: A3) is the classic low A; overlap two notes to slide between them. Click the log at the front left of the kit for its controls."
+    "Log drum: play it on C5 to C8 in FL Studio (C3 to C6 in Ableton) in the same pattern as the drums. It sounds three octaves lower, so A5 (Ableton: A3) is the classic low A; overlap two notes to slide between them. Click the log at the front left of the kit for its controls.",
+    "Steel drum: play it on C#8 to G10 in FL Studio (C#6 to G8 in Ableton). It sounds three octaves lower, as a tenor pan. Hold a note with Roll up and it rolls. Click the pan at the front right of the kit for its controls."
   ],
   "previewNote": "on the same five-bar 96 BPM groove: ghost notes, open hat, a ride bar, a tom fill and crashes ringing out.",
   "whatsNew": {
-    "version": "1.15.1",
+    "version": "1.16.0",
     "items": [
-      "Ableton Live: every key, and the log drum's range, is named the way Ableton's piano roll names it (kick C1, snare D1, log drum C3 to C6). FL Studio shows the same names as before"
+      "Steel drum: a Trinidad tenor pan on its own keys (C#8 to G10 in FL Studio, C#6 to G8 in Ableton), drawn at the front right of the kit. Four models (Tenor, Double Second, Cello, Bass), Ring, Bright, Shimmer, and Roll for held notes",
+      "CARIBBEAN kits: Steel Band, Soca Road March, Calypso Sunday",
+      "INTERNET GIRL presets (the Cape Town punk / hyperpop / trap trio): Role Model (garage punk in the red), Pull Up (a punchy, crushed trap-punk kit), Cokehead (a riotous room through a wavefolder)",
+      "Windows open at a size that fits your screen (about 80 % of a laptop's height) and can be dragged bigger; the size you pick is kept",
+      "Smoother windows: the static panels, shadows and grain are drawn once and reused, so meters and lights no longer redraw the whole window (3 to 4 times less drawing)"
     ]
   }
 }

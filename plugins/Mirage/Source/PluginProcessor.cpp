@@ -9,7 +9,7 @@ MirageProcessor::MirageProcessor()
     : AudioProcessor (BusesProperties().withInput ("Input", juce::AudioChannelSet::stereo(), true)
                                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)),
       apvts (*this, nullptr, "Mirage", mirage::createLayout()),
-      presets (apvts, { "SCENES", "ABSTRACT", "CRT", "VHS", "NEO SOUL", "SOUL", "USER" }, DD_PLUGIN_COMPANY, DD_PLUGIN_NAME)
+      presets (apvts, { "SCENES", "ABSTRACT", "CRT", "VHS", "INTERNET GIRL", "NEO SOUL", "SOUL", "USER" }, DD_PLUGIN_COMPANY, DD_PLUGIN_NAME)
 {
    #if DD_HAS_PRESET_DATA
     for (int i = 0; i < PresetData::namedResourceListSize; ++i)

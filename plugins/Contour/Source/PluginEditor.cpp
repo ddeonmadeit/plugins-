@@ -11,7 +11,7 @@ ContourEditor::Content::Content (ContourProcessor& p)
     : proc (p),
       topBar (p.presets, "CON", "TOUR", "Note Editor"),
       description (topBar.presets()),
-      transfer (p),
+      follow (p),
       notes ("Notes", 14, 8, kA),
       correction ("Correction", 5, 2, kA),
       selected ("Selected", 5, 3, kA),
@@ -38,7 +38,7 @@ ContourEditor::Content::Content (ContourProcessor& p)
     session.add<contour::SessionView> (p, state, editor.getCanvas());
     session.place (0, 0, 5, 2);
 
-    topBar.addRight (transfer, 118);
+    topBar.addRight (follow, 118);
     addAndMakeVisible (topBar);
     description.setHint (juce::String ("ddeonmadeit  v") + DD_PLUGIN_VERSION);
     addAndMakeVisible (description);
@@ -84,9 +84,9 @@ ContourEditor::ContourEditor (ContourProcessor& p)
     addAndMakeVisible (*content);
 
     // setResizeLimits() triggers resized(), so read the saved zoom first.
-    const float savedScale = proc.editorScale;
+    const float savedScale = dd::gui::openingScale (kBaseW, kBaseH, proc.editorScale);
     setResizable (true, true);
-    setResizeLimits ((int) (kBaseW * 0.6f), (int) (kBaseH * 0.6f), (int) (kBaseW * 1.8f), (int) (kBaseH * 1.8f));
+    setResizeLimits ((int) (kBaseW * 0.5f), (int) (kBaseH * 0.5f), (int) (kBaseW * 1.8f), (int) (kBaseH * 1.8f));
     if (auto* c = getConstrainer())
         c->setFixedAspectRatio ((double) kBaseW / (double) kBaseH);
     setSize ((int) std::round (kBaseW * savedScale), (int) std::round (kBaseH * savedScale));

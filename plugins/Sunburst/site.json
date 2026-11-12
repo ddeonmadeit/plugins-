@@ -10,7 +10,7 @@
     "Palm mute (also on the mod wheel), hammer-ons and slides on legato notes, vibrato, humanize, double-tracking for wide stereo guitars",
     "Pedalboard: compressor, overdrive, fuzz, chorus, tempo-synced tremolo and delay; amp with Clean, Crunch and Lead channels, a 1x12 or 4x12 cabinet and mic placement, plus a room",
     "TAPE STOP: slow the guitar to a halt like a tape machine powering down, then automate it at the end of a beat",
-    "71 presets, each a different guitar part: acoustic, clean, crunch and heavy, plus Travis Scott, Mike Dean, Yeezus, moshc0re, trip hop, 80s, 2000s, SOFT, UNIQUE, NEO SOUL, SOUL and SAFE",
+    "74 presets, each a different guitar part: acoustic, clean, crunch and heavy, plus Travis Scott, Mike Dean, Yeezus, moshc0re, trip hop, 80s, 2000s, SOFT, UNIQUE, INTERNET GIRL, NEO SOUL, SOUL and SAFE",
     "Favourites: star the presets you love and browse just those; your stars survive updates"
   ],
   "installTips": [
@@ -20,9 +20,11 @@
   ],
   "previewNote": "on the same 80 BPM part: strummed Em, C and G chords (down and up strokes), then a single-note riff.",
   "whatsNew": {
-    "version": "1.9.1",
+    "version": "1.10.0",
     "items": [
-      "Ableton Live: the noise keys are named the way Ableton's piano roll names them, and TAPE STOP's help says how to automate it in Ableton"
+      "INTERNET GIRL presets (the Cape Town punk / hyperpop / trap trio): Angsty Riff (crunch amp and a drive pedal, doubled), Scratchy Loud (fuzz into a lead amp, every scrape left in), Bedroom Gloom (the dark, clean bedroom-pop side)",
+      "Windows open at a size that fits your screen (about 80 % of a laptop's height) and can be dragged bigger; the size you pick is kept",
+      "Smoother windows: the static panels, shadows and grain are drawn once and reused, so meters and lights no longer redraw the whole window (3 to 4 times less drawing)"
     ]
   }
 }

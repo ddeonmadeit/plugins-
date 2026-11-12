@@ -9,7 +9,7 @@ using aircheck::P;
 
 const juce::StringArray& AircheckProcessor::categoryOrder()
 {
-    static const juce::StringArray order { "DEON", "80S", "2000S", "TRAVIS SCOTT", "YE", "TAME IMPALA", "R&B", "TRIP HOP", "MOSHC0RE", "STUDIO", "PITCHED", "NEO SOUL", "SOUL" };
+    static const juce::StringArray order { "DEON", "80S", "2000S", "TRAVIS SCOTT", "YE", "TAME IMPALA", "R&B", "TRIP HOP", "MOSHC0RE", "STUDIO", "PITCHED", "INTERNET GIRL", "NEO SOUL", "SOUL" };
     return order;
 }
 
@@ -235,19 +235,26 @@ void AircheckProcessor::processChunk (float* L, float* R, int n)
     for (int i = 0; i < n; ++i)
     {
         const int64_t t = r0 - n + i;
-        dryL[(size_t) i] = psola.readInput (0, (double) t);
-        dryR[(size_t) i] = psola.readInput (1, (double) t);
         const float tm = tuneMixSm.getNextValue();
         const float bl = psola.readInput (0, (double) t), br = psola.readInput (1, (double) t);
+        dryL[(size_t) i] = bl;
+        dryR[(size_t) i] = br;
         L[i] = bl + (L[i] - bl) * tm;
         R[i] = br + (R[i] - br) * tm;
     }
 
+    // The dry path costs as much as the oversampled wet one, so it only runs while Mix is below 100 %. It
+    // starts from silence when Mix comes down, at the moment the blend gives it almost no weight.
+    const bool needDry = mixSm.isSmoothing() || mixSm.getTargetValue() < 0.9999f;
+    if (needDry)
     {
+        if (! dryRunning)
+            dryAlign.reset();
         float* dry[2] = { dryL.data(), dryR.data() };
         juce::dsp::AudioBlock<float> block (dry, 2, (size_t) n);
         dryAlign.process (block);
     }
+    dryRunning = needDry;
 
     // Mic voicing and preamp.
     for (int i = 0; i < n; ++i)
@@ -384,8 +391,16 @@ void AircheckProcessor::processChunk (float* L, float* R, int n)
     {
         const float m = mixSm.getNextValue();
         const float g = outGainSm.getNextValue();
-        L[i] = (dryL[(size_t) i] + (L[i] - dryL[(size_t) i]) * m) * g;
-        R[i] = (dryR[(size_t) i] + (R[i] - dryR[(size_t) i]) * m) * g;
+        if (needDry)
+        {
+            L[i] = (dryL[(size_t) i] + (L[i] - dryL[(size_t) i]) * m) * g;
+            R[i] = (dryR[(size_t) i] + (R[i] - dryR[(size_t) i]) * m) * g;
+        }
+        else
+        {
+            L[i] *= g;
+            R[i] *= g;
+        }
         limiter.process (L[i], R[i], limitAmt);
         if (dd::isBad (L[i]) || dd::isBad (R[i]))
         {
@@ -435,7 +450,7 @@ void AircheckProcessor::setStateInformation (const void* data, int sizeInBytes)
             migrateLegacyEq (tree);
             migrateLegacyPitch();
             presets.readState (tree);
-            editorScale = juce::jlimit (0.6f, 1.8f, (float) tree.getProperty ("uiScale", 1.0f));
+            editorScale = juce::jlimit (0.5f, 1.8f, (float) tree.getProperty ("uiScale", 1.0f));
         }
 }
 

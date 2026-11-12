@@ -403,8 +403,11 @@ void Panel::place (int col, int row, int colSpan, int rowSpan)
 
 void Panel::paint (juce::Graphics& g)
 {
-    paintBrushedMetal (g, getLocalBounds().toFloat(), {}, 14.0f);
-    drawCaption (g, title, getLocalBounds().removeFromTop (kTitleH + 2).withTrimmedLeft (16).withTrimmedRight (16).toFloat().translated (0.0f, 2.0f));
+    paintCached (g, getProperties(), "ddFace", getLocalBounds(), title.hashCode64(), [this] (juce::Graphics& ig)
+    {
+        paintBrushedMetal (ig, getLocalBounds().toFloat(), {}, 14.0f);
+        drawCaption (ig, title, getLocalBounds().removeFromTop (kTitleH + 2).withTrimmedLeft (16).withTrimmedRight (16).toFloat().translated (0.0f, 2.0f));
+    });
 }
 
 void Panel::resized()
@@ -418,6 +421,23 @@ void Panel::resized()
 void markRaised (juce::Component& c, float corner) { c.getProperties().set (kRaised, corner); }
 
 void paintPanelShadows (juce::Graphics& g, juce::Component& parent)
+{
+    // Painted once per layout and theme (the key is every raised child's place), then copied.
+    juce::int64 key = 17;
+    for (auto* c : parent.getChildren())
+        if (c->isVisible() && (c->getProperties().contains (kRaised) || (bool) c->getProperties()["ddRail"]))
+        {
+            const auto b = c->getBounds();
+            for (auto v : { b.getX(), b.getY(), b.getWidth(), b.getHeight() })
+                key = key * 31 + v;
+        }
+    paintCached (g, parent.getProperties(), "ddShadows", parent.getLocalBounds(), key, [&parent] (juce::Graphics& ig)
+    {
+        paintPanelShadowsDirect (ig, parent);
+    });
+}
+
+void paintPanelShadowsDirect (juce::Graphics& g, juce::Component& parent)
 {
     for (auto* c : parent.getChildren())
     {
@@ -463,29 +483,8 @@ void Atmosphere::paint (juce::Graphics& g)
     const auto r = getLocalBounds().toFloat();
     const double now = juce::Time::getMillisecondCounterHiRes();
 
-    // Vignette: the room falls into shadow at the edges (light theme: soft warm grey).
-    {
-        juce::Graphics::ScopedSaveState ss (g);
-        const juce::Point<float> c (r.getCentreX(), r.getY() + r.getHeight() * 0.4f);
-        g.addTransform (juce::AffineTransform::scale (1.0f, 0.84f / 0.96f, c.x, c.y));
-        const float rad = r.getWidth() * 0.6f;
-        juce::ColourGradient v (juce::Colours::transparentBlack, c.x, c.y,
-                                t.light ? juce::Colour ((juce::uint8) 120, (juce::uint8) 108, (juce::uint8) 90, 0.16f) : juce::Colours::black.withAlpha (0.6f),
-                                c.x + rad, c.y, true);
-        v.addColour (t.light ? 0.62 : 0.56, juce::Colours::transparentBlack);
-        v.addColour (t.light ? 0.88 : 0.82, t.light ? juce::Colour ((juce::uint8) 120, (juce::uint8) 108, (juce::uint8) 90, 0.08f) : juce::Colours::black.withAlpha (0.3f));
-        g.setGradientFill (v);
-        g.fillEllipse (c.x - rad, c.y - rad, rad * 2.0f, rad * 2.0f);
-        g.setColour (t.light ? juce::Colour ((juce::uint8) 120, (juce::uint8) 108, (juce::uint8) 90, 0.16f) : juce::Colours::black.withAlpha (0.6f));
-        juce::Path outside;
-        outside.addRectangle (r.expanded (r.getHeight()));
-        outside.addEllipse (c.x - rad, c.y - rad, rad * 2.0f, rad * 2.0f);
-        outside.setUsingNonZeroWinding (false);
-        g.fillPath (outside);
-    }
-
-    // Matte grain over everything.
-    paintGrain (g, getLocalBounds(), 0.11f);
+    // The vignette and the grain only change with the size and the theme: painted once, then copied.
+    paintCached (g, getProperties(), "ddOverlay", getLocalBounds(), 0, [this] (juce::Graphics& ig) { paintOverlay (ig); });
 
     // The pointer's shadow: it floats above the machine.
     if (cursorInside)
@@ -518,6 +517,36 @@ void Atmosphere::paint (juce::Graphics& g)
         g.setColour (t.room.withAlpha (1.0f - open * open * (3.0f - 2.0f * open)));
         g.fillRect (r);
     }
+}
+
+void Atmosphere::paintOverlay (juce::Graphics& g)
+{
+    const auto& t = tokens();
+    const auto r = getLocalBounds().toFloat();
+
+    // Vignette: the room falls into shadow at the edges (light theme: soft warm grey).
+    {
+        juce::Graphics::ScopedSaveState ss (g);
+        const juce::Point<float> c (r.getCentreX(), r.getY() + r.getHeight() * 0.4f);
+        g.addTransform (juce::AffineTransform::scale (1.0f, 0.84f / 0.96f, c.x, c.y));
+        const float rad = r.getWidth() * 0.6f;
+        juce::ColourGradient v (juce::Colours::transparentBlack, c.x, c.y,
+                                t.light ? juce::Colour ((juce::uint8) 120, (juce::uint8) 108, (juce::uint8) 90, 0.16f) : juce::Colours::black.withAlpha (0.6f),
+                                c.x + rad, c.y, true);
+        v.addColour (t.light ? 0.62 : 0.56, juce::Colours::transparentBlack);
+        v.addColour (t.light ? 0.88 : 0.82, t.light ? juce::Colour ((juce::uint8) 120, (juce::uint8) 108, (juce::uint8) 90, 0.08f) : juce::Colours::black.withAlpha (0.3f));
+        g.setGradientFill (v);
+        g.fillEllipse (c.x - rad, c.y - rad, rad * 2.0f, rad * 2.0f);
+        g.setColour (t.light ? juce::Colour ((juce::uint8) 120, (juce::uint8) 108, (juce::uint8) 90, 0.16f) : juce::Colours::black.withAlpha (0.6f));
+        juce::Path outside;
+        outside.addRectangle (r.expanded (r.getHeight()));
+        outside.addEllipse (c.x - rad, c.y - rad, rad * 2.0f, rad * 2.0f);
+        outside.setUsingNonZeroWinding (false);
+        g.fillPath (outside);
+    }
+
+    // Matte grain over everything.
+    paintGrain (g, getLocalBounds(), 0.11f);
 }
 
 void Atmosphere::collectLit (juce::Component& c)
@@ -609,5 +638,22 @@ void giveKeysOnlyTo (juce::Component& root, juce::Component& target)
         c->setWantsKeyboardFocus (false);
         giveKeysOnlyTo (*c, target);
     }
+}
+
+juce::Rectangle<int> screenArea()
+{
+    const auto& displays = juce::Desktop::getInstance().getDisplays();
+    if (const auto* d = displays.getDisplayForPoint (juce::Desktop::getMousePosition().toFloat()))
+        return d->userBounds.toNearestInt();
+    if (const auto* d = displays.getPrimaryDisplay())
+        return d->userBounds.toNearestInt();
+    return { 0, 0, 1440, 875 };
+}
+
+float openingScale (int baseW, int baseH, float saved)
+{
+    const auto area = screenArea();
+    const float fit = std::min (0.8f * (float) area.getHeight() / (float) baseH, 0.9f * (float) area.getWidth() / (float) baseW);
+    return juce::jlimit (0.5f, 1.8f, std::min (saved > 0.0f ? saved : 1.0f, fit));
 }
 } // namespace dd::gui

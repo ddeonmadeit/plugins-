@@ -8,7 +8,7 @@
     "Five scenes: Dunes (a grainy sunset, the near dune your live waveform, an eclipse), Burst (shards of light from the bottom of the screen), Terrain (a grainy valley flown over, the song laid into the hills), Figure (three wireframe figures in cages) and Tunnel",
     "Three styles: Film (risograph grain and a pixel mesh), CRT (a curved glowing tube with phosphor trails, bloom and scanlines) and VHS (tape smear, tracking tears on the hits, dropouts, rolling bars and a camcorder clock)",
     "A colour wheel: click the glowing dot by DEON and drag around the ring to turn every colour of the panel, from the original red and orange to icy CRT blue",
-    "25 presets picked from the selector in the middle of the top bar: SCENES, ABSTRACT, CRT, VHS, NEO SOUL and SOUL",
+    "27 presets picked from the selector in the middle of the top bar: SCENES, ABSTRACT, CRT, VHS, INTERNET GIRL, NEO SOUL and SOUL",
     "Phosphor control screen over it: scanlines, crosshairs and live readouts (peak, low end and its frequency, energy, tempo, bar and time)",
     "Instrument deck: L / R level meters with peak hold, a triggered oscilloscope, a scrolling waveform history, a 40-band LED spectrum, a stereo field reticle, and a thermal strip of the spectrum",
     "Zero latency, the audio is not changed at all"
@@ -20,13 +20,10 @@
   ],
   "previewNote": "Mirage does not change the sound; the preview is the test programme passing through.",
   "whatsNew": {
-    "version": "1.2.0",
+    "version": "1.3.0",
     "items": [
-      "A colour wheel: click the glowing dot next to DEON to turn the hue of the whole plugin",
-      "The preset selector is back in the middle of the top bar, plus SCENE and STYLE keys to mix any scene with any style",
-      "Four new scenes: Burst, Terrain, Figure and Tunnel",
-      "Two new styles: CRT (a glowing curved tube) and VHS (worn tape)",
-      "15 new presets in ABSTRACT, CRT and VHS, including Blue Tube, the icy blue CRT look"
+      "INTERNET GIRL presets (the Cape Town punk / hyperpop / trap trio): Black And White Tape (like the PULL UP video) and Mosh Tunnel",
+      "Opens no wider than your screen (it used to open at 1600 pixels, wider than a 13\" laptop)"
     ]
   }
 }

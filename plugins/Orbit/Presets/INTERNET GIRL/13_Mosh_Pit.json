@@ -1,0 +1,21 @@
+{
+  "name": "Mosh Pit",
+  "category": "INTERNET GIRL",
+  "author": "DEON",
+  "description": "INTERNET GIRL: in the middle of their live show: the sound right in front of you and wide, in a small, sweaty club.",
+  "params": {
+    "posX": 0.0,
+    "posY": 0.2,
+    "posZ": 0.35,
+    "width": 0.9,
+    "room": "Club",
+    "size": 0.35,
+    "roomLevel": 0.55,
+    "motion": "Static",
+    "motionRate": "1 Bar",
+    "motionAmount": 0.5,
+    "doppler": 0.5,
+    "mix": 1.0,
+    "outGain": -5.1
+  }
+}

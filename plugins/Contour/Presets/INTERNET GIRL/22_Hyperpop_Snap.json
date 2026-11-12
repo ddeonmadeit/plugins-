@@ -1,0 +1,15 @@
+{
+  "name": "Hyperpop Snap",
+  "category": "INTERNET GIRL",
+  "author": "DEON",
+  "description": "INTERNET GIRL: the hyperpop sound: every note snapped flat to the scale with instant jumps, no drift, no vibrato. Set the key first (or DETECT KEY).",
+  "params": {
+    "center": 1.0,
+    "drift": 1.0,
+    "vibrato": 0.0,
+    "transition": 3.0,
+    "formant": 0.0,
+    "transpose": 0,
+    "outGain": 0.1
+  }
+}

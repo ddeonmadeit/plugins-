@@ -113,6 +113,17 @@ double animationTime();
 
 /** The room and the instrument resting in it: dark surround, rounded-top chassis with fine vertical striation. */
 void paintBackdrop (juce::Graphics&, juce::Rectangle<int> area, const Palette&);
+/** The same, painted directly (no cached picture). */
+void paintBackdropDirect (juce::Graphics&, juce::Rectangle<int> area, const Palette&);
+
+/**
+    Draws `paint` through a picture kept in `store` (a component's properties, under `slot`) and only paints it
+    again when `key`, the theme, the area or the pixel scale change. For the static layers under things that
+    animate (backdrops, panel faces, shadows, the vignette): a meter's repaint then copies pixels instead of
+    filling every gradient again. The picture is made at the screen's pixel scale, so it stays sharp.
+*/
+void paintCached (juce::Graphics& g, juce::NamedValueSet& store, const juce::Identifier& slot, juce::Rectangle<int> area,
+                  juce::int64 key, const std::function<void (juce::Graphics&)>& paint);
 
 /** Matte molded grain over an area (generated once). */
 void paintGrain (juce::Graphics&, juce::Rectangle<int> area, float amount = 1.0f);

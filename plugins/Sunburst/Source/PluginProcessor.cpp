@@ -9,7 +9,7 @@ using sunburst::P;
 
 const juce::StringArray& SunburstProcessor::categoryOrder()
 {
-    static const juce::StringArray order { "ACOUSTIC", "CLEAN", "CRUNCH", "HEAVY", "TRAVIS SCOTT", "MIKE DEAN", "YEEZUS", "MOSHC0RE", "TRIP HOP", "80S", "2000S", "SOFT", "UNIQUE", "NEO SOUL", "SOUL", "SAFE", "USER" };
+    static const juce::StringArray order { "ACOUSTIC", "CLEAN", "CRUNCH", "HEAVY", "TRAVIS SCOTT", "MIKE DEAN", "YEEZUS", "MOSHC0RE", "TRIP HOP", "80S", "2000S", "SOFT", "UNIQUE", "INTERNET GIRL", "NEO SOUL", "SOUL", "SAFE", "USER" };
     return order;
 }
 
@@ -310,7 +310,7 @@ void SunburstProcessor::setStateInformation (const void* data, int sizeInBytes)
     auto tree = juce::ValueTree::fromXml (*xml);
     dd::replaceStateExactly (apvts, tree);
     presets.readState (tree);
-    editorScale = juce::jlimit (0.6f, 1.8f, (float) tree.getProperty ("uiScale", 1.0f));
+    editorScale = juce::jlimit (0.5f, 1.8f, (float) tree.getProperty ("uiScale", 1.0f));
     requestGuitar();
 }
 

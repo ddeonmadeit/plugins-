@@ -24,7 +24,7 @@ public:
     static constexpr int kW = 1176, kH = 420;
 
 private:
-    enum class Shape { Kick, Snare, RackTom, FloorTom, HiHat, Crash, Ride, China, Pad, LogDrum };
+    enum class Shape { Kick, Snare, RackTom, FloorTom, HiHat, Crash, Ride, China, Pad, LogDrum, SteelDrum };
 
     struct Piece
     {
@@ -49,6 +49,7 @@ private:
     void drawCymbal (juce::Graphics&, juce::Rectangle<float> r, float glow, bool china) const;
     void drawPad (juce::Graphics&, const Piece&, float glow) const;
     void drawLogDrum (juce::Graphics&, const Piece&, float glow, float jump) const;
+    void drawSteelDrum (juce::Graphics&, const Piece&, float glow, float sway) const;
     void drawLabel (juce::Graphics&, const Piece&) const;
 
     KitroomProcessor& proc;

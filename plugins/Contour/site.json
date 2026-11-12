@@ -4,27 +4,30 @@
   "description": "The Melodyne way of tuning, in your DAW: put Contour on the vocal track and press play, and it captures the take. Stop, and every sung note appears as a blob on a piano roll with the pitch line running through it. Drag notes to new pitches (they snap to your key), steady or exaggerate the vibrato and drift of each one, move and stretch them in time, split and join them, change their level and the voice's character. Global Center / Drift / Vibrato controls tune the whole take at once, and playback follows the song.",
   "accent": "#e0793f",
   "highlights": [
-    "Transfer, like Melodyne: Contour records the track while your DAW plays (TRANSFER is lit), finds every note when you stop, and from then on plays your edited take in time with the song. Or drop a vocal file on it.",
+    "Follows the vocal by itself: play the song and Contour picks up the vocal on the track, finds every note, and from then on plays your edited take live in the mix, in time with the song. Change or re-record a part and it picks the new take up as it plays (FOLLOW in the top bar); no record step, no bouncing",
     "Notes you can grab: drag up or down to change the pitch (snaps to the key and scale, Alt for fine), sideways to move it in time, the edges to stretch it; double-click snaps a note to the scale. Arrow keys move the selection, Delete mutes it, Ctrl/Cmd+Z undoes.",
     "Tools for each note: Vibrato (flatten, keep or deepen), Drift (steady the slow wander of held notes), Formant (bigger and darker or smaller and brighter without changing the note), Level, and Split / join.",
     "Pitch-synchronous (PSOLA) processing: each sung pulse is moved whole, so vowels and timbre stay natural; an untouched note comes out sample-for-sample identical to what was sung, with no latency.",
     "Whole-take correction on top: Center pulls every note you haven't moved toward the scale, Drift steadies, Vibrato scales, Transition sets how fast pitch moves between notes (down to the hard-tune effect), plus Formant, Transpose and key detection.",
-    "Bounce the edit to a WAV and drag it straight into your playlist. Takes are stored in Music/ddeonmadeit/Contour/Takes and your edits are saved with the project.",
+    "Optional: PRINT the edit to a WAV and drag it onto a track. Takes are stored in Music/ddeonmadeit/Contour/Takes and your edits are saved with the project.",
     "21 correction styles: natural touch-ups, tight pop, straight tone, R&B runs, hard snap, wide vibrato, deeper or brighter voice, octave up or down, a fifth-above harmony, plus neo soul and soul styles that keep runs and vibrato human.",
     "Favourites: star the presets you love and browse just those; your stars survive updates"
   ],
   "installTips": [
     "Put Contour FIRST on the vocal's mixer track (before Aircheck or any effects), press play over the part you want to edit, then stop: the notes appear.",
-    "After the first capture TRANSFER goes dark and playback plays your edit. If you change or move the vocal clip, press TRANSFER and play that part again.",
-    "To print the edit: BOUNCE, then drag DRAG OUT into the playlist and drop it at bar 1 (the file starts at the song's beginning, so it lines up).",
+    "Your edits play live in the mix: there is nothing to record or drag out. If you change, move or re-record the vocal, just play that part: FOLLOW (lit in the top bar) picks the new take up by itself.",
+    "Optional, to print the edit as audio: PRINT, then drag DRAG OUT into the playlist and drop it at bar 1 (the file starts at the song's beginning, so it lines up).",
     "In Ableton, work in Arrangement View (Session clips have no fixed place in the song, so the take can't line up with them). To print, drop DRAG OUT on an audio track at 1.1.1 and switch the clip's Warp off."
   ],
   "previewNote": "on a synthetic sung test phrase (slightly off pitch on purpose), captured and played back through each correction style.",
   "whatsNew": {
-    "version": "1.2.1",
+    "version": "1.3.0",
     "items": [
-      "Keyboard shortcuts now work in the VST3 version on Mac (Ableton Live, FL Studio): click the notes, then Cmd+Z undoes, Delete mutes, arrows move, 1-6 pick a tool and Space plays from the cursor. While the song plays, Space still stops your DAW",
-      "In Ableton, the start screen reminds you to transfer in Arrangement View (Session clips have no fixed place in the song)"
+      "No record or drag-out step: Contour follows the vocal on the track by itself (FOLLOW in the top bar). Play the song and the notes appear; your edits play live in the mix; change or re-record a part and it picks the new take up as it plays, keeping your edits everywhere else. A muted part plays silent instead of the old take",
+      "PRINT (was BOUNCE) is now optional: only to turn the edit into a WAV",
+      "INTERNET GIRL presets (the Cape Town punk / hyperpop / trap trio): Hyperpop Snap and Raw Punk",
+      "Windows open at a size that fits your screen (about 80 % of a laptop's height) and can be dragged bigger; the size you pick is kept",
+      "Smoother windows: the static panels, shadows and grain are drawn once and reused, so meters and lights no longer redraw the whole window (3 to 4 times less drawing)"
     ]
   }
 }

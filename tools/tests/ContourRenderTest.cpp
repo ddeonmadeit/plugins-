@@ -28,7 +28,7 @@ constexpr double kNoteSec = 0.5, kGapSec = 0.08;
 
 /** A voice: band-limited pulses at the sung pitch (with vibrato) through three vowel formants, a breathy
     consonant in each gap. */
-std::vector<float> sing()
+std::vector<float> sing (const float* notes = kNotes)
 {
     const int len = (int) (kSr * (kNoteSec + kGapSec) * std::size (kNotes) + kSr * 0.2);
     std::vector<float> x ((size_t) len, 0.0f);
@@ -41,7 +41,7 @@ std::vector<float> sing()
         const double inNote = t - k * (kNoteSec + kGapSec);
         if (k < (int) std::size (kNotes) && inNote < kNoteSec)
         {
-            const double midi = kNotes[k] + 0.25 * std::sin (juce::MathConstants<double>::twoPi * 5.5 * t) * std::min (1.0, inNote / 0.15);
+            const double midi = notes[k] + 0.25 * std::sin (juce::MathConstants<double>::twoPi * 5.5 * t) * std::min (1.0, inNote / 0.15);
             const double f0 = 440.0 * std::pow (2.0, (midi - 69.0) / 12.0);
             phase += f0 / kSr;
             double s = 0.0;
@@ -405,6 +405,87 @@ int main()
                    "notes keep their place in time at 96 kHz");
         }
         takeFile.deleteFile();
+    }
+
+    std::cout << "engine: follows the track by itself\n";
+    {
+        std::vector<float> song ((size_t) kStart, 0.0f);
+        song.insert (song.end(), voice.begin(), voice.end());
+        Host host;
+        contour::Engine engine (host.apvts);
+        engine.prepare (kSr, 256);
+        host.play (engine, song, 0, (int64_t) song.size(), true);
+        check (waitFor ([&] { return engine.getStatus() == contour::Status::Ready; }), "first playback captured");
+        auto snap = engine.snapshot();
+        if (snap.notes.size() != std::size (kNotes))
+            return 1;
+        auto edited = snap.notes;
+        edited[1].moved = true;
+        edited[1].pitch = 63.0f - edited[1].centre;   // 62 up to 63
+        edited[1].mod = 0.0f;
+        edited[1].drift = 0.0f;
+        engine.setNotes (edited);
+        engine.commit (snap.notes);
+        check (waitFor ([&] { return engine.snapshot().curve != nullptr; }), "edit table rebuilt");
+        juce::Thread::sleep (50);
+        const auto noteMid = [&] (int i) { return (edited[(size_t) i].start + edited[(size_t) i].end) / 2; };
+
+        auto played = host.play (engine, song, 0, (int64_t) song.size(), false);
+        check (engine.getFollowCaptures() == 0, "the same vocal again: nothing re-captured");
+        check (std::abs (pitchOf (played, noteMid (1) - 1200, noteMid (1) + 1200) - 63.0f) < 0.07f, "and the edit plays");
+
+        // A host that re-renders the clip on every play (Ableton's warp): same sound, different samples.
+        auto warped = song;
+        float xm = 0.0f, ym = 0.0f;
+        for (auto& v : warped)
+        {
+            const float y = -0.35f * v + xm + 0.35f * ym;   // first-order all-pass: every phase moves
+            xm = v;
+            ym = y;
+            v = y;
+        }
+        played = host.play (engine, warped, 0, (int64_t) warped.size(), false);
+        check (engine.getFollowCaptures() == 0, "a re-warped clip (all-pass) is still recognised: nothing re-captured");
+        check (std::abs (pitchOf (played, noteMid (1) - 1200, noteMid (1) + 1200) - 63.0f) < 0.07f, "and the edit still plays");
+
+        // The clip muted over notes 2-3: those play silent, nothing is captured, the edits are kept.
+        auto muted = song;
+        std::fill (muted.begin() + noteMid (0) + 12000, muted.begin() + noteMid (2), 0.0f);
+        played = host.play (engine, muted, 0, (int64_t) muted.size(), false);
+        check (engine.getFollowCaptures() == 0, "a muted stretch is not captured");
+        check (rms (played, noteMid (1) - 2400, noteMid (1) + 2400) < 1.0e-4, "and plays silent (not the old take)");
+        check (engine.snapshot().notes[1].moved, "and the edit survives");
+
+        // A new take over notes 4 and 5 (sung a fifth higher): picked up while it plays, analysed, and then
+        // the new notes play; the edited note 2 earlier in the song is untouched.
+        const float retake[] { kNotes[0], kNotes[1], kNotes[2], kNotes[3] + 7.0f, kNotes[4] + 7.0f };
+        const auto voice2 = sing (retake);
+        auto song2 = song;
+        const auto from3 = (size_t) (kStart + (int64_t) (kSr * (kNoteSec + kGapSec) * 3.0));
+        std::copy (voice2.begin() + (long) (from3 - (size_t) kStart), voice2.end(), song2.begin() + (long) from3);
+        played = host.play (engine, song2, 0, (int64_t) song2.size(), false);
+        check (engine.getFollowCaptures() >= 1, "the new take is captured by itself (" + juce::String ((int) engine.getFollowCaptures()) + " stretch(es))");
+        const int64_t m4 = noteMid (4);
+        check (std::abs (pitchOf (played, m4 - 1200, m4 + 1200) - (kNotes[4] + 7.0f)) < 0.3f, "while it is captured the new take plays (live)");
+        check (waitFor ([&] { return engine.getStatus() == contour::Status::Ready; }), "and analysed");
+        snap = engine.snapshot();
+        check (snap.notes.size() == std::size (kNotes) && std::abs (snap.notes[4].centre - (kNotes[4] + 7.0f)) < 0.1f && std::abs (snap.notes[3].centre - (kNotes[3] + 7.0f)) < 0.1f,
+               "notes 4 and 5 are now the new take's");
+        check (snap.notes.size() > 1 && snap.notes[1].moved, "the edit on note 2 is kept");
+        juce::Thread::sleep (50);
+        played = host.play (engine, song2, 0, (int64_t) song2.size(), false);
+        check (std::abs (pitchOf (played, noteMid (1) - 1200, noteMid (1) + 1200) - 63.0f) < 0.07f, "next playback: note 2's edit plays");
+        const float p4 = pitchOf (played, m4 - 1200, m4 + 1200);
+        float err4 = 0.0f;
+        for (int64_t i = m4 - 4800; i < m4 + 4800; ++i) err4 = std::max (err4, std::abs (played[(size_t) i] - song2[(size_t) i]));
+        check (std::abs (p4 - (kNotes[4] + 7.0f)) < 0.3f && err4 < 1.0e-4f,
+               "and the new take plays from the take (" + juce::String (p4, 2) + ", max error " + juce::String (err4, 6) + ")");
+        const auto before = engine.getFollowCaptures();
+        host.play (engine, song2, 0, (int64_t) song2.size(), false);
+        check (engine.getFollowCaptures() == before, "and nothing more is captured");
+        juce::ValueTree t ("S");
+        engine.writeState (t);
+        juce::File (t.getChildWithName ("Contour").getProperty ("take").toString()).deleteFile();
     }
 
     std::cout << "key detection\n";

@@ -16,6 +16,13 @@ void tagParam (juce::Component& c, const juce::String& paramId, const juce::Stri
     of reaching the DAW. Call once every child exists. */
 void giveKeysOnlyTo (juce::Component& root, juce::Component& target);
 
+/** The free part of the screen the mouse is on (where the host opens the plugin window). */
+juce::Rectangle<int> screenArea();
+
+/** The zoom an editor laid out at baseW x baseH opens at: the instance's saved zoom, but never so big that the window
+    (plus the host's title bar) runs off the screen; a laptop screen gets about 80 % of its height. */
+float openingScale (int baseW, int baseH, float saved);
+
 class HoverHelp : private juce::MouseListener
 {
 public:
@@ -219,6 +226,8 @@ private:
 
 /** Paints the soft cast shadow of every Panel (and any child marked raised) of `parent` onto it. */
 void paintPanelShadows (juce::Graphics&, juce::Component& parent);
+/** The same, painted directly (no cached picture). */
+void paintPanelShadowsDirect (juce::Graphics&, juce::Component& parent);
 /** Marks a component as a raised panel so paintPanelShadows() casts its shadow. */
 void markRaised (juce::Component&, float corner = 14.0f);
 
@@ -244,6 +253,7 @@ private:
     void themeAboutToChange() override;
     void themeChanged() override;
     void collectLit (juce::Component&);
+    void paintOverlay (juce::Graphics&);
 
     juce::Point<float> cursor;
     bool cursorInside = false;

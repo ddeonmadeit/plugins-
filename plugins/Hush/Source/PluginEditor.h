@@ -30,7 +30,7 @@ private:
         hush::EditorState state;
         dd::gui::TopBar topBar;
         dd::gui::DescriptionLine description;
-        hush::TransferKey transfer;
+        hush::FollowKey follow;
         dd::gui::Panel sounds, controls, selected, session;
         dd::gui::Atmosphere atmosphere;
     };

@@ -181,9 +181,9 @@ AircheckEditor::AircheckEditor (AircheckProcessor& p)
     addAndMakeVisible (*content);
 
     // setResizeLimits() triggers resized(), so read the saved zoom first.
-    const float savedScale = proc.editorScale;
+    const float savedScale = dd::gui::openingScale (kBaseW, kBaseH, proc.editorScale);
     setResizable (true, true);
-    setResizeLimits ((int) (kBaseW * 0.6f), (int) (kBaseH * 0.6f), (int) (kBaseW * 1.8f), (int) (kBaseH * 1.8f));
+    setResizeLimits ((int) (kBaseW * 0.5f), (int) (kBaseH * 0.5f), (int) (kBaseW * 1.8f), (int) (kBaseH * 1.8f));
     if (auto* c = getConstrainer())
         c->setFixedAspectRatio ((double) kBaseW / (double) kBaseH);
     setSize ((int) std::round (kBaseW * savedScale), (int) std::round (kBaseH * savedScale));

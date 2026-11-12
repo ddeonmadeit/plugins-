@@ -157,7 +157,7 @@ private:
     dd::gui::Key lessKey { "-1 dB" }, moreKey { "+1 dB" };
 };
 
-/** Transfer status, PLAY, LOAD, BOUNCE + drag-out, CLEAR. */
+/** What the take is doing (following, picking up, analysing), PLAY, LOAD, PRINT + drag-out, CLEAR. */
 class SessionView : public juce::Component, private juce::Timer
 {
 public:
@@ -179,17 +179,18 @@ private:
     HushProcessor& proc;
     EditorState& state;
     SoundCanvas& canvas;
-    dd::gui::Key playKey { "Play" }, loadKey { "Load" }, bounceKey { "Bounce" }, clearKey { "Clear" };
+    dd::gui::Key playKey { "Play" }, loadKey { "Load" }, bounceKey { "Print" }, clearKey { "Clear" };
     DragKey dragKey { *this };
     std::unique_ptr<juce::FileChooser> chooser;
     bool dragging = false;
 };
 
-/** TRANSFER in the top bar: lit while Hush is listening for the next playback. */
-class TransferKey : public dd::gui::Key
+/** FOLLOW in the top bar: lit, the take follows the vocal on the track by itself (new or changed audio is
+    captured as the song plays) and the levels play live in the mix. */
+class FollowKey : public dd::gui::Key
 {
 public:
-    explicit TransferKey (HushProcessor& p);
+    explicit FollowKey (HushProcessor& p);
 private:
     struct Poll : juce::Timer
     {

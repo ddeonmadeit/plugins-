@@ -1,0 +1,21 @@
+{
+  "name": "Drone Orbit",
+  "category": "INTERNET GIRL",
+  "author": "DEON",
+  "description": "INTERNET GIRL: for their drones: the sound slowly circling you over eight bars in a concrete warehouse, a little Doppler as it passes.",
+  "params": {
+    "posX": 0.0,
+    "posY": 0.6,
+    "posZ": 0.5,
+    "width": 0.6,
+    "room": "Warehouse",
+    "size": 0.7,
+    "roomLevel": 0.6,
+    "motion": "Orbit",
+    "motionRate": "8 Bars",
+    "motionAmount": 0.7,
+    "doppler": 0.3,
+    "mix": 1.0,
+    "outGain": 0.6
+  }
+}

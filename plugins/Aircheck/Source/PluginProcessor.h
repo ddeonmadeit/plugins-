@@ -115,6 +115,7 @@ private:
     aircheck::Smooth::Settings smoothSettings;
     aircheck::Compressor::Settings compSettings;
     bool tuneOn = false, pitchActive = false;
+    bool dryRunning = false;   // the dry path only runs while Mix is below 100 % (every preset sits at 100 %)
     float lastCorrection = 0.0f, formantRatio = 1.0f;
     int64_t pitchCounter = 0;
     float duckEnv = 0.0f, gateEnv = 0.0f, revGate = 0.0f;

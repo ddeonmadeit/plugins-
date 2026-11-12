@@ -437,10 +437,10 @@ void SoundCanvas::paintStatic (juce::Graphics& g)
             case Status::Listening:
             case Status::Ready:
                 // Ableton: the take is tied to the song's timeline, which Session View clips don't follow.
-                body = juce::String ("TRANSFER is lit: start playback")
+                body = juce::String ("Play the song")
                      + (dd::host().ableton ? " in Arrangement View (Session clips have no fixed place in the song)" : "")
-                     + " and Hush captures the vocal on this track (until then it de-esses it live with Amount). Stop, and every "
-                       "sharp sound appears here with its own level.\n\nOr drop a vocal file here, or press LOAD.";
+                     + ": Hush de-esses it live with Amount and picks up the vocal by itself, then every sharp sound appears here "
+                       "with its own level. Your levels play live in the mix; nothing to record or drag out.\n\nOr drop a vocal file here, or press LOAD.";
                 break;
         }
         const auto all = wa.getUnion (la);
@@ -1112,8 +1112,9 @@ SessionView::SessionView (HushProcessor& p, EditorState& s, SoundCanvas& c) : pr
         k->setGlowMargin (5);
         addAndMakeVisible (*k);
     }
-    dragKey.setTooltip ("After BOUNCE: drag this into your playlist. The file starts at the song's beginning, so drop it at bar 1.");
-    bounceKey.setTooltip ("Renders the de-essed take to a WAV file in Music/ddeonmadeit/Hush/Bounces");
+    dragKey.setTooltip ("Optional, after PRINT: drag the printed vocal onto a track. The file starts at the song's beginning, so drop it at bar 1.");
+    bounceKey.setTooltip ("Optional: your levels already play live in the mix. PRINT renders the de-essed vocal to a WAV file "
+                          "(Music/ddeonmadeit/Hush/Bounces), e.g. to send it to someone or free the CPU.");
     loadKey.setTooltip ("Load a vocal file (or drop one on the sounds view)");
     startTimerHz (8);
 }
@@ -1154,15 +1155,20 @@ void SessionView::paint (juce::Graphics& g)
     dd::gui::paintConsole (g, screen, 7.0f, 0.5f);
     auto& eng = *proc.engine;
     auto area = screen.reduced (14.0f, 10.0f);
-    dd::gui::drawCaption (g, "TRANSFER", area.removeFromTop (14.0f), juce::Justification::centredLeft, 9.5f);
+    dd::gui::drawCaption (g, "THE VOCAL", area.removeFromTop (14.0f), juce::Justification::centredLeft, 9.5f);
     juce::String word, line;
     float led = 0.0f;
     switch (eng.getStatus())
     {
-        case Status::Listening: word = "LISTENING"; line = eng.hasTake() ? "Next playback replaces what it plays over." : "De-essing live. Press play to capture the vocal."; led = dd::gui::ledPulse (dd::gui::animationTime()); break;
-        case Status::Capturing: word = "CAPTURING"; line = "Recording the track as it plays. Stop when done."; led = 1.0f; break;
+        case Status::Listening: word = "LISTENING"; line = "De-essing live. Play the song: Hush picks up the vocal on this track as it plays."; led = dd::gui::ledPulse (dd::gui::animationTime()); break;
+        case Status::Capturing: word = "PICKING UP"; line = eng.isArmed() ? "Taking in the track as it plays." : "New or changed audio on the track: taking it in as it plays."; led = 1.0f; break;
         case Status::Analysing: word = "FINDING SOUNDS"; line = "Listening for every S, SH and T..."; led = dd::gui::ledPulse (dd::gui::animationTime(), 0.6); break;
-        case Status::Ready:     word = "READY"; line = "Playback plays your levels, in time with the song."; led = 0.0f; break;
+        case Status::Ready:
+            word = eng.isAutoFollow() ? "LIVE" : "READY";
+            line = eng.isAutoFollow() ? "Your levels play live in the mix. Change or re-record the vocal and Hush follows it by itself."
+                                      : "Your levels play in the mix. FOLLOW is off: changes on the track aren't picked up.";
+            led = 0.0f;
+            break;
         case Status::Missing:   word = "TAKE MISSING"; line = eng.getMessage(); led = 1.0f; break;
     }
     const auto msg = eng.getMessage();
@@ -1175,13 +1181,14 @@ void SessionView::paint (juce::Graphics& g)
 }
 
 //==============================================================================
-TransferKey::TransferKey (HushProcessor& p) : Key ("Transfer", true), proc (p)
+FollowKey::FollowKey (HushProcessor& p) : Key ("Follow", true), proc (p)
 {
-    onClick = [this] { proc.engine->setArmed (! proc.engine->isArmed()); };
-    setTooltip ("Lit: the next playback is captured (replacing what it plays over). Unlit: playback plays your levels.");
+    onClick = [this] { proc.engine->setAutoFollow (! proc.engine->isAutoFollow()); };
+    setTooltip ("Lit: Hush follows the vocal on this track by itself. Play the song and it picks up every S, SH and T (and any "
+                "part you change or re-record); your levels play live in the mix, no bouncing needed. Off: the take stays as it is.");
     getProperties().set ("ddFlickerPeriod", 6.1);
-    setLit (proc.engine->isArmed());
-    poll.fn = [this] { setLit (proc.engine->isArmed()); };
+    setLit (proc.engine->isAutoFollow());
+    poll.fn = [this] { setLit (proc.engine->isAutoFollow()); };
     poll.startTimerHz (10);
 }
 } // namespace hush

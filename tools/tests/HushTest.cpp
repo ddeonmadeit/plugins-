@@ -268,6 +268,24 @@ int main()
             const auto a = ed[0].start + 400, b = ed[0].end - 400;
             const double cut = bandDb (song, a, b, 7000.0, 0.0) - bandDb (out, a, b, 7000.0, 0.0);
             check (cut > 15.0, "the hand-set -20 dB plays back (" + juce::String (cut, 1) + " dB off the top)");
+            check (engine.getFollowCaptures() == 0, "playing the same vocal again captures nothing");
+
+            // A new take over the end of the phrase: picked up by itself while it plays, the hand-set level
+            // on the first sound is kept.
+            auto song2 = song;
+            const auto from2 = (size_t) (kStart + (int64_t) (2.9 * kSr));
+            for (size_t i = from2; i < song2.size(); ++i)
+                song2[i] = song[(size_t) kStart + (i - from2)];
+            host.play (engine, song2, false);
+            check (engine.getFollowCaptures() >= 1, "a new take is captured by itself");
+            check (waitFor ([&] { return engine.getStatus() == hush::Status::Ready; }), "and analysed");
+            const auto snap2 = engine.snapshot();
+            bool foundNew = false;
+            for (const auto& sd : snap2.sounds)
+                foundNew = foundNew || (sd.start >= (int64_t) from2 + (int64_t) (0.05 * kSr) && sd.start < (int64_t) from2 + (int64_t) (0.3 * kSr));
+            check (foundNew, "the new take's first ess is found");
+            check (! snap2.sounds.empty() && snap2.sounds[0].manual && std::abs (snap2.sounds[0].userDb + 20.0f) < 1.0e-3f,
+                   "the hand-set level earlier in the song is kept");
             juce::ValueTree parent ("S");
             engine.writeState (parent);
             saved = parent.getChildWithName ("Hush").createCopy();

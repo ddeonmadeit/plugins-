@@ -1,0 +1,14 @@
+{
+  "name": "Hyperpop Air",
+  "category": "INTERNET GIRL",
+  "author": "DEON",
+  "description": "INTERNET GIRL: for bright, pitched-up vocals with lots of air: gentler, higher cuts (6.5 kHz up) that keep the sparkle and only take the sharpest esses.",
+  "params": {
+    "amount": 0.55,
+    "sensitivity": 0.55,
+    "freq": 6500.0,
+    "fade": 4.0,
+    "mode": "Split",
+    "outGain": 0.0
+  }
+}

@@ -54,13 +54,29 @@ public:
     void resized() override;
 
 private:
+    /** Everything is laid out at its natural size inside this, then scaled as one piece. */
+    class Content : public juce::Component
+    {
+    public:
+        explicit Content (OrbitProcessor&);
+        void paint (juce::Graphics&) override;
+        void resized() override;
+        juce::Point<int> naturalSize() const;
+
+    private:
+        dd::gui::TopBar topBar;
+        dd::gui::DescriptionLine description;
+        dd::gui::LampSwitch speakers;
+        EarsControl ears;
+        RoomView scene;
+        dd::gui::Panel roomPanel, placePanel, motionPanel, outputPanel;
+        dd::gui::Atmosphere atmosphere;   // keep last
+    };
+
+    OrbitProcessor& proc;
     dd::gui::LookAndFeel lnf;
     juce::TooltipWindow tooltips { this, 600 };
-    dd::gui::TopBar topBar;
-    dd::gui::DescriptionLine description;
-    dd::gui::LampSwitch speakers;
-    EarsControl ears;
-    RoomView scene;
-    dd::gui::Panel roomPanel, placePanel, motionPanel, outputPanel;
-    dd::gui::Atmosphere atmosphere;   // keep last
+    std::unique_ptr<Content> content;
+    int baseW = 0, baseH = 0;
+    bool constructed = false;
 };

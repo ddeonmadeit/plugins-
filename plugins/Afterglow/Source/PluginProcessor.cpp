@@ -23,7 +23,7 @@ AfterglowProcessor::~AfterglowProcessor()
 
 const juce::StringArray& AfterglowProcessor::categoryOrder()
 {
-    static const juce::StringArray order { "TAME IMPALA", "MASSIVE ATTACK", "BRENT FAIYAZ", "MIKE DEAN", "TRAVIS SCOTT", "YEEZUS", "MOSHC0RE", "GUITAR", "TRIP HOP", "80S", "2000S", "SOFT", "UNIQUE", "LIVE", "PADS", "ARPS", "NEO SOUL", "SOUL", "SAFE", "USER" };
+    static const juce::StringArray order { "TAME IMPALA", "MASSIVE ATTACK", "BRENT FAIYAZ", "MIKE DEAN", "TRAVIS SCOTT", "YEEZUS", "MOSHC0RE", "GUITAR", "TRIP HOP", "80S", "2000S", "SOFT", "UNIQUE", "LIVE", "PADS", "ARPS", "INTERNET GIRL", "NEO SOUL", "SOUL", "SAFE", "USER" };
     return order;
 }
 
@@ -594,7 +594,7 @@ void AfterglowProcessor::setStateInformation (const void* data, int sizeInBytes)
             auto tree = juce::ValueTree::fromXml (*xml);
             dd::replaceStateExactly (apvts, tree);
             presets.readState (tree);
-            editorScale = juce::jlimit (0.6f, 1.8f, (float) tree.getProperty ("uiScale", 1.0f));
+            editorScale = juce::jlimit (0.5f, 1.8f, (float) tree.getProperty ("uiScale", 1.0f));
             dd::keepOldDefault (apvts, tree, "perfPoly", 0.0f);
         }
 }

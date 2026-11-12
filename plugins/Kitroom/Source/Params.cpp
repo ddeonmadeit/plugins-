@@ -1,5 +1,6 @@
 #include "Params.h"
 #include "LogDrum.h"
+#include "SteelDrum.h"
 
 #include <dd_dsp/dd_dsp.h>
 
@@ -52,6 +53,13 @@ const char* masterId (MP p)
         case MP::LogSub:    return "logSub";
         case MP::LogGlide:  return "logGlide";
         case MP::LogModel:  return "logModel";
+        case MP::SteelVolume:  return "steelVolume";
+        case MP::SteelTune:    return "steelTune";
+        case MP::SteelLength:  return "steelLength";
+        case MP::SteelBright:  return "steelBright";
+        case MP::SteelShimmer: return "steelShimmer";
+        case MP::SteelRoll:    return "steelRoll";
+        case MP::SteelModel:   return "steelModel";
         case MP::count:     break;
     }
     return "";
@@ -148,6 +156,22 @@ juce::AudioProcessorValueTreeState::ParameterLayout createLayout()
                            [] (float v, int) { return v < 1.0f ? juce::String ("No slide") : juce::String (juce::roundToInt (v)) + " ms"; }));
     layout.add (std::make_unique<juce::AudioParameterChoice> (juce::ParameterID { masterId (MP::LogModel), 1 }, "Log Drum Model",
                                                               logModelNames(), 0));
+
+    // 1.16: the steel drum (a Trinidad steel pan), synthesised, on the keys above the log drum's.
+    juce::NormalisableRange<float> steelVol (-48.0f, 6.0f);
+    steelVol.setSkewForCentre (-12.0f);
+    layout.add (makeFloat (masterId (MP::SteelVolume), "Steel Drum Volume", steelVol, 0.0f, decibels));
+    layout.add (makeFloat (masterId (MP::SteelTune), "Steel Drum Tune", { -12.0f, 12.0f }, 0.0f, semis));
+    juce::NormalisableRange<float> steelLen (200.0f, 4000.0f);
+    steelLen.setSkewForCentre (1200.0f);
+    layout.add (makeFloat (masterId (MP::SteelLength), "Steel Drum Ring", steelLen, 1400.0f,
+                           [] (float v, int) { return v < 1000.0f ? juce::String (juce::roundToInt (v)) + " ms" : juce::String (v * 0.001f, 1) + " s"; }));
+    layout.add (makeFloat (masterId (MP::SteelBright), "Steel Drum Bright", { 0.0f, 1.0f }, 0.55f, percent));
+    layout.add (makeFloat (masterId (MP::SteelShimmer), "Steel Drum Shimmer", { 0.0f, 1.0f }, 0.4f, percent));
+    layout.add (makeFloat (masterId (MP::SteelRoll), "Steel Drum Roll", { 0.0f, 1.0f }, 0.0f,
+                           [] (float v, int) { return v < 0.005f ? juce::String ("Single hits") : juce::String (juce::roundToInt (v * 100.0f)) + " %"; }));
+    layout.add (std::make_unique<juce::AudioParameterChoice> (juce::ParameterID { masterId (MP::SteelModel), 1 }, "Steel Drum Model",
+                                                              steelModelNames(), 0));
     return layout;
 }
 

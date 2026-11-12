@@ -8,23 +8,26 @@
     "Amount sets them all at once (harsh ones more than soft ones), then you fix the few that need it by hand; ALL S / ALL SH / ALL T select a whole kind, AUTO and BYPASS reset a selection",
     "Click a sound to hear it inside its word; arrow keys step through them; Shift-click or drag a box to move several together; Ctrl/Cmd+Z undoes",
     "Clean: Split mode crossfades only the part above Freq to a zero-phase low band, so with no cut the vocal comes out sample-for-sample identical, and with a cut nothing below Freq changes. Wide mode turns the whole sound down",
-    "Works like Contour: TRANSFER captures the track while your DAW plays, playback follows the song with no latency, and audio not yet captured is de-essed live",
-    "Listen switch to hear only what is being taken out; bounce the result to a WAV and drag it into your playlist",
-    "16 presets for natural, firm, rap, airy pop, breathy R&B, high and low voices, neo soul and soul, a heavy lisp fix and hand-only editing",
+    "Follows the vocal by itself, like Contour: play the song and Hush picks it up and finds every sharp sound; your levels play live in the mix with no latency, changed or re-recorded parts are picked up as they play, and audio not yet picked up is de-essed live",
+    "Listen switch to hear only what is being taken out; optionally PRINT the result to a WAV and drag it onto a track",
+    "18 presets for natural, firm, rap, airy pop, breathy R&B, high and low voices, INTERNET GIRL, neo soul and soul, a heavy lisp fix and hand-only editing",
     "Favourites: star the presets you love and browse just those; your stars survive updates"
   ],
   "installTips": [
     "Put Hush on the vocal's mixer track (after Contour if you use it, before compression and reverb), press play over the part you want to de-ess, then stop: the sounds appear.",
-    "After the first capture TRANSFER goes dark and playback plays your levels. If you change the vocal, press TRANSFER and play that part again.",
-    "To print it: BOUNCE, then drag DRAG OUT into the playlist and drop it at bar 1.",
+    "Your levels play live in the mix: there is nothing to record or drag out. If you change or re-record the vocal, just play that part: FOLLOW (lit in the top bar) picks the new take up by itself.",
+    "Optional, to print it as audio: PRINT, then drag DRAG OUT into the playlist and drop it at bar 1.",
     "In Ableton, work in Arrangement View (Session clips have no fixed place in the song, so the take can't line up with them). To print, drop DRAG OUT on an audio track at 1.1.1 and switch the clip's Warp off."
   ],
   "previewNote": "on a synthetic sung phrase with S, SH and T consonants of different loudness, captured and played back through each preset.",
   "whatsNew": {
-    "version": "1.2.1",
+    "version": "1.3.0",
     "items": [
-      "Keyboard shortcuts now work in the VST3 version on Mac (Ableton Live, FL Studio): click a sound, then Cmd+Z undoes, up / down change its cut, left / right step through the sounds and Space plays from the cursor. While the song plays, Space still stops your DAW",
-      "In Ableton, the start screen reminds you to transfer in Arrangement View (Session clips have no fixed place in the song)"
+      "No record or drag-out step: Hush follows the vocal on the track by itself (FOLLOW in the top bar). Play the song and every S, SH and T appears; your levels play live in the mix; change or re-record a part and it picks the new take up as it plays",
+      "PRINT (was BOUNCE) is now optional: only to turn the result into a WAV",
+      "INTERNET GIRL presets (the Cape Town punk / hyperpop / trap trio): Distorted Shout and Hyperpop Air",
+      "Windows open at a size that fits your screen (about 80 % of a laptop's height) and can be dragged bigger; the size you pick is kept",
+      "Smoother windows: the static panels, shadows and grain are drawn once and reused, so meters and lights no longer redraw the whole window (3 to 4 times less drawing)"
     ]
   }
 }

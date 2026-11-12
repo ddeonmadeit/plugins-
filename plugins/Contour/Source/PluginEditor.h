@@ -30,7 +30,7 @@ private:
         contour::EditorState state;
         dd::gui::TopBar topBar;
         dd::gui::DescriptionLine description;
-        contour::TransferKey transfer;
+        contour::FollowKey follow;
         dd::gui::Panel notes, correction, selected, session;
         dd::gui::Atmosphere atmosphere;
     };

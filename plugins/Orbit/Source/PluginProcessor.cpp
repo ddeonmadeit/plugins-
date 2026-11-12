@@ -9,7 +9,7 @@ using orbit::P;
 
 const juce::StringArray& OrbitProcessor::categoryOrder()
 {
-    static const juce::StringArray order { "AROUND YOU", "ROOMS", "MOTION", "TRAVIS SCOTT", "TAME IMPALA", "TRIP HOP", "MIX", "NEO SOUL", "SOUL", "USER" };
+    static const juce::StringArray order { "AROUND YOU", "ROOMS", "MOTION", "TRAVIS SCOTT", "TAME IMPALA", "TRIP HOP", "MIX", "INTERNET GIRL", "NEO SOUL", "SOUL", "USER" };
     return order;
 }
 
@@ -158,6 +158,7 @@ void OrbitProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
     auto state = apvts.copyState();
     presets.writeState (state);
+    state.setProperty ("uiScale", editorScale, nullptr);
     if (auto xml = state.createXml())
         copyXmlToBinary (*xml, destData);
 }
@@ -170,6 +171,7 @@ void OrbitProcessor::setStateInformation (const void* data, int sizeInBytes)
             auto tree = juce::ValueTree::fromXml (*xml);
             dd::replaceStateExactly (apvts, tree);
             presets.readState (tree);
+            editorScale = juce::jlimit (0.5f, 1.8f, (float) tree.getProperty ("uiScale", 1.0f));
         }
 }
 

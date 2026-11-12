@@ -11,7 +11,7 @@
     "Analog chain: mic voicing, tube / tape / console / crunch saturation (4x oversampled, tone, parallel mix), a vocal rider, and FET, opto, vintage-limiter or VCA compression with a sidechain filter and gain-reduction meter",
     "Smooth (a resonance suppressor that tames harsh frequencies only while they ring), Air (mid and high air that stays smooth on esses), de-esser, doubler, chorus and Dimension widening, tape, a tape delay that ducks under the voice, plate / room / hall / chamber / gated reverbs and a true-peak limiter",
     "Vocoder that plays the note you sing (and the chord of your key) with string, robot, choir or brass voices: no MIDI needed",
-    "42 presets, each a different record or job: DEON, 80s, 2000s, Travis Scott, Ye, Tame Impala, R&B, trip hop, moshc0re, studio essentials, pitched voices (including justend), neo soul and 60s soul",
+    "45 presets, each a different record or job: DEON, 80s, 2000s, Travis Scott, Ye, Tame Impala, R&B, trip hop, moshc0re, studio essentials, pitched voices (including justend), INTERNET GIRL, neo soul and 60s soul",
     "Favourites: star the presets you love and browse just those; your stars survive updates"
   ],
   "installTips": [
@@ -22,12 +22,12 @@
   ],
   "previewNote": "on a synthetic sung test phrase (slightly off pitch on purpose), so you hear the chain and the correction, not a real singer.",
   "whatsNew": {
-    "version": "1.5.0",
+    "version": "1.6.0",
     "items": [
-      "Pitch Shift panel: Shift (up to an octave either way, whole semitones snap) and Formant, with a pad that shows natural vs chipmunk. Your voice stays your voice when you go up",
-      "Cleaner shifting and tuning: note starts are shifted from their first cycle (they used to blip at the old pitch), the pitch detector no longer jumps onto overtones (the squeaky buzz on bright or breathy notes), and a voice shifted up keeps its loudness",
-      "PITCHED presets: justend (the pitched-up vocal from the start of justend & loe4t's \"Hennessy\"), Higher Me and Under Voice",
-      "The old Transpose and Formant knobs moved from Pitch Correction into Pitch Shift; your sessions and presets are moved over automatically. Input and Gate are now in Input & Saturation"
+      "Uses about a quarter less CPU with exactly the same sound: the Mix knob's matching dry path only runs while Mix is below 100 %, and the resonance smoother skips its FFTs when it has nothing to take out",
+      "INTERNET GIRL presets (the Cape Town punk / hyperpop / trap trio): Distorted Lead (crunch preamp and a fast FET), Hyperpop Snap (hard tuning, up a tone, bright and doubled), Mumble Rap (warm, close, gently tuned, ducked echo)",
+      "Windows open at a size that fits your screen (about 80 % of a laptop's height) and can be dragged bigger; the size you pick is kept",
+      "Smoother windows: the static panels, shadows and grain are drawn once and reused, so meters and lights no longer redraw the whole window (3 to 4 times less drawing)"
     ]
   }
 }

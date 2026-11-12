@@ -40,15 +40,45 @@ void hadamard16 (float* v) noexcept
 
 /** y[j] = sum_k h[k] x[j - k] for j in [0, n), x pointing at the first new sample (history before it).
     Written tap by tap so the inner loop is a plain multiply-add over the block, which vectorises. */
+// Four floats in one register on x86 (SSE) and Apple Silicon (NEON), through the compilers' vector extension.
+typedef float Float4 __attribute__ ((vector_size (16)));
+
+inline Float4 load4 (const float* p) noexcept
+{
+    Float4 v;
+    std::memcpy (&v, p, sizeof (v));
+    return v;
+}
+
 inline void fir (const float* h, int taps, const float* x, float* y, int n) noexcept
 {
-    std::fill (y, y + n, 0.0f);
-    for (int k = 0; k < taps; ++k)
+    // Sixteen outputs at a time, held in four registers across all the taps instead of being read and written
+    // back for every tap (the same sums in the same order).
+    int j = 0;
+    for (; j + 16 <= n; j += 16)
     {
-        const float hk = h[k];
-        const float* xp = x - k;
-        for (int j = 0; j < n; ++j)
-            y[j] += hk * xp[j];
+        Float4 a0 {}, a1 {}, a2 {}, a3 {};   // four independent sums keep the adder busy
+        const float* xp = x + j;
+        for (int k = 0; k < taps; ++k)
+        {
+            const float hk = h[k];
+            const float* p = xp - k;
+            a0 += hk * load4 (p);
+            a1 += hk * load4 (p + 4);
+            a2 += hk * load4 (p + 8);
+            a3 += hk * load4 (p + 12);
+        }
+        std::memcpy (y + j, &a0, sizeof (a0));
+        std::memcpy (y + j + 4, &a1, sizeof (a1));
+        std::memcpy (y + j + 8, &a2, sizeof (a2));
+        std::memcpy (y + j + 12, &a3, sizeof (a3));
+    }
+    for (; j < n; ++j)
+    {
+        float acc = 0.0f;
+        for (int k = 0; k < taps; ++k)
+            acc += h[k] * x[j - k];
+        y[j] = acc;
     }
 }
 } // namespace

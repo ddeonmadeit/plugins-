@@ -113,7 +113,7 @@ KitView::KitView (KitroomProcessor& p) : proc (p)
     pieces.push_back (cym (kr::RideSlot, S::Ride, 880, 150, 270, 46, { 1015, 136 }));
 
     // The clap: a sample pad on its own stand beside the ride, as drummers play claps live.
-    Piece pad { kr::ClapSlot, S::Pad, { 1026, 258, 112, 44 }, 13.0f, { 1082, 407 }, {}, {} };
+    Piece pad { kr::ClapSlot, S::Pad, { 1026, 258, 112, 44 }, 13.0f, { 1082, 238 }, {}, {} };
     pad.hit.addRoundedRectangle (pad.box.expanded (6.0f, 8.0f).withBottom (pad.box.getBottom() + pad.shellH + 8.0f), 6.0f);
     pad.outline.addRoundedRectangle (pad.box.withBottom (pad.box.getBottom() + pad.shellH), 6.0f);
     pieces.push_back (pad);
@@ -138,6 +138,12 @@ KitView::KitView (KitroomProcessor& p) : proc (p)
     log.hit.addRoundedRectangle (log.box.expanded (6.0f, 10.0f).withBottom (kFloorY), 8.0f);
     log.outline.addRoundedRectangle (log.box, log.box.getHeight() * 0.5f);
     pieces.push_back (log);
+
+    // 1.16: the steel drum, a chrome tenor pan on its stand at the front right, in front of the clap's stand.
+    Piece pan { kr::kSteelDrum, S::SteelDrum, { 984, 318, 172, 40 }, 20.0f, { 1070, 407 }, {}, {} };
+    pan.hit.addEllipse (pan.box.expanded (6.0f, 8.0f).withBottom (pan.box.getBottom() + pan.shellH + 10.0f));
+    pan.outline.addEllipse (pan.box);
+    pieces.push_back (pan);
 
     hitAge.fill (10.0f);
     startTimerHz (60);
@@ -689,14 +695,98 @@ void KitView::drawLogDrum (juce::Graphics& g, const Piece& p, float glow, float 
     }
 }
 
+void KitView::drawSteelDrum (juce::Graphics& g, const Piece& p, float glow, float sway) const
+{
+    const auto top = p.box.translated (0.0f, sway);
+    const float skirt = p.shellH;
+    const juce::Colour chromeLight { 0xffe9e4dc }, chromeMid { 0xff9a948c }, chromeDark { 0xff2c2926 };
+
+    // The stand: two chrome legs to the floor and a cross bar.
+    for (float x : { top.getX() + 34.0f, top.getRight() - 34.0f })
+    {
+        g.setColour (chromeDark);
+        g.drawLine (x, top.getBottom() + skirt - 4.0f, x + (x < top.getCentreX() ? -10.0f : 10.0f), kFloorY, 3.0f);
+        g.setColour (chromeLight.withAlpha (0.35f));
+        g.drawLine (x + 1.0f, top.getBottom() + skirt - 4.0f, x + (x < top.getCentreX() ? -9.0f : 11.0f), kFloorY, 0.8f);
+    }
+    g.setColour (chromeDark.withAlpha (0.9f));
+    g.drawLine (top.getX() + 30.0f, kFloorY - 26.0f, top.getRight() - 30.0f, kFloorY - 26.0f, 2.0f);
+
+    // The skirt: a short chrome cylinder under the playing surface, lit from the front.
+    // The front half of the rim (9 o'clock round through 6 to 3), down the right side, the front half of the
+    // skirt's bottom edge back, and up again.
+    constexpr float pi = juce::MathConstants<float>::pi;
+    juce::Path skirtPath;
+    skirtPath.addCentredArc (top.getCentreX(), top.getCentreY(), top.getWidth() * 0.5f, top.getHeight() * 0.5f, 0.0f,
+                             1.5f * pi, 0.5f * pi, true);
+    skirtPath.addCentredArc (top.getCentreX(), top.getCentreY() + skirt, top.getWidth() * 0.5f, top.getHeight() * 0.5f, 0.0f,
+                             0.5f * pi, 1.5f * pi, false);
+    skirtPath.closeSubPath();
+    glowAround (g, skirtPath, glow * 0.5f);
+    juce::ColourGradient metal (chromeDark, top.getX(), 0.0f, chromeDark, top.getRight(), 0.0f, false);
+    metal.addColour (0.18, chromeMid);
+    metal.addColour (0.42, chromeLight);
+    metal.addColour (0.55, chromeMid);
+    metal.addColour (0.8, chromeLight.withAlpha (0.8f));
+    g.setGradientFill (metal);
+    g.fillPath (skirtPath);
+    g.setColour (juce::Colours::black.withAlpha (0.35f));
+    g.drawHorizontalLine ((int) (top.getCentreY() + skirt * 0.55f), top.getX() + 6.0f, top.getRight() - 6.0f);
+
+    // The playing surface: a shallow chrome bowl, darker in the dish, bright at the rim.
+    juce::ColourGradient dish (chromeDark.brighter (0.15f), top.getCentreX(), top.getCentreY() + 4.0f, chromeLight, top.getRight(), top.getY(), true);
+    dish.addColour (0.55, chromeMid);
+    g.setGradientFill (dish);
+    g.fillEllipse (top);
+
+    // The note areas: hammered ovals round the outside, smaller ones inside, lit from below when it plays.
+    const auto c = top.getCentre();
+    auto noteArea = [&] (float angle, float radius, float w, float h)
+    {
+        const juce::Point<float> at (c.x + std::cos (angle) * top.getWidth() * 0.5f * radius,
+                                     c.y + std::sin (angle) * top.getHeight() * 0.5f * radius);
+        const auto r = juce::Rectangle<float> (w, h).withCentre (at);
+        g.setColour (juce::Colours::black.withAlpha (0.28f));
+        g.drawEllipse (r, 0.9f);
+        g.setColour (chromeLight.withAlpha (0.35f));
+        g.drawEllipse (r.translated (0.0f, 0.8f), 0.5f);
+        if (glow > 0.01f)
+        {
+            g.setColour (kAccent.withAlpha (0.55f * glow));
+            g.fillEllipse (r.reduced (1.0f));
+        }
+    };
+    for (int k = 0; k < 9; ++k)
+        noteArea (juce::MathConstants<float>::twoPi * (float) k / 9.0f + 0.3f, 0.72f, 26.0f, 8.0f);
+    for (int k = 0; k < 4; ++k)
+        noteArea (juce::MathConstants<float>::twoPi * (float) k / 4.0f + 0.8f, 0.34f, 18.0f, 6.0f);
+    noteArea (0.0f, 0.0f, 14.0f, 5.0f);
+
+    // The rim catching the light, and a pair of rubber-tipped sticks resting on it.
+    g.setColour (chromeLight.withAlpha (0.9f));
+    g.drawEllipse (top, 1.4f);
+    g.setColour (juce::Colours::white.withAlpha (0.35f));
+    g.drawEllipse (top.reduced (3.0f, 1.5f), 0.6f);
+    for (int k = 0; k < 2; ++k)
+    {
+        const float sx = top.getX() + top.getWidth() * (0.30f + 0.28f * (float) k), sy = top.getY() + 6.0f + 3.0f * (float) k;
+        g.setColour (juce::Colour (0xffcfb38a));
+        g.drawLine (sx - 20.0f, sy + 6.0f, sx + 22.0f, sy - 4.0f, 2.0f);
+        g.setColour (juce::Colour (0xff2a1d16));
+        g.fillEllipse (sx + 19.0f, sy - 8.0f, 8.0f, 7.0f);
+    }
+}
+
 void KitView::drawLabel (juce::Graphics& g, const Piece& p) const
 {
-    const bool isLog = p.slot == kr::kLogDrum;
-    const bool learning = ! isLog && proc.getLearnTarget() >= 0 && kr::targetSlot (proc.getLearnTarget()) == p.slot;
+    const bool isLog = p.slot == kr::kLogDrum, isSteel = p.slot == kr::kSteelDrum, synth = isLog || isSteel;
+    const bool learning = ! synth && proc.getLearnTarget() >= 0 && kr::targetSlot (proc.getLearnTarget()) == p.slot;
     const juce::String key = isLog ? dd::noteName (kr::kLogLowKey) + "-" + dd::noteName (kr::kLogHighKey)
-                                   : learning ? juce::String ("press a key") : dd::noteName (proc.getKey (p.slot, 0));
-    const juce::String name = isLog ? juce::String ("LOG DRUM") : juce::String (kr::slots()[(size_t) p.slot].name).toUpperCase();
-    const bool loading = ! isLog && proc.isSlotLoading (p.slot);
+                           : isSteel ? dd::noteName (kr::kSteelLowKey) + "-" + dd::noteName (kr::kSteelHighKey)
+                                     : learning ? juce::String ("press a key") : dd::noteName (proc.getKey (p.slot, 0));
+    const juce::String name = isLog ? juce::String ("LOG DRUM") : isSteel ? juce::String ("STEEL DRUM")
+                                    : juce::String (kr::slots()[(size_t) p.slot].name).toUpperCase();
+    const bool loading = ! synth && proc.isSlotLoading (p.slot);
     const bool selected = proc.selectedSlot == p.slot;
 
     auto nameFont = dd::gui::LookAndFeel::font (11.0f, true).withExtraKerningFactor (0.08f);
@@ -795,6 +885,14 @@ void KitView::paint (juce::Graphics& g)
                 const float age = hitAge[(size_t) p.slot], v = hitVel[(size_t) p.slot];
                 const float jump = age < 0.5f ? -1.8f * v * std::exp (-age * 10.0f) * std::cos (age * kPi * 2.0f * 7.0f) : 0.0f;
                 drawLogDrum (g, p, glow, jump);
+                break;
+            }
+            case Shape::SteelDrum:
+            {
+                // The pan rocks a little on its stand when it rings.
+                const float age = hitAge[(size_t) p.slot], v = hitVel[(size_t) p.slot];
+                const float sway = age < 0.8f ? -1.2f * v * std::exp (-age * 6.0f) * std::sin (age * kPi * 2.0f * 5.0f) : 0.0f;
+                drawSteelDrum (g, p, glow, sway);
                 break;
             }
         }

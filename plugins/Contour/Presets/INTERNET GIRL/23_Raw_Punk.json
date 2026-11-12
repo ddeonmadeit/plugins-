@@ -1,0 +1,15 @@
+{
+  "name": "Raw Punk",
+  "category": "INTERNET GIRL",
+  "author": "DEON",
+  "description": "INTERNET GIRL: keeps the raw, shouted punk delivery: only nudges the notes a little toward the key and steadies the wobbliest ones, vibrato and slides left as sung.",
+  "params": {
+    "center": 0.35,
+    "drift": 0.3,
+    "vibrato": 1.0,
+    "transition": 90.0,
+    "formant": 0.0,
+    "transpose": 0,
+    "outGain": 0.1
+  }
+}

@@ -39,9 +39,17 @@ enum Slot { Kick, Snare, HiHat, Tom1, Tom2, Tom3, Crash1, Crash2, RideSlot, Chin
 /** 1.15: the log drum, a synthesised piece after the sampled slots. It plays its own key range above the kit's
     keys and sounds three octaves lower, so MIDI 69 (A5 in FL Studio, A3 in Ableton) is the classic low A (55 Hz). */
 constexpr int kLogDrum = kNumSlots;
-constexpr int kNumPieces = kNumSlots + 1;
 constexpr int kLogLowKey = 60, kLogHighKey = 96, kLogKeyOffset = 36;
 constexpr int kLogAuditionKey = 69;   // the classic low A
+
+/** 1.16: the steel drum, a synthesised tenor pan on the keys above the log drum's (MIDI 97-127), sounding three
+    octaves lower too: C#4 to G6, the range of a tenor pan. */
+constexpr int kSteelDrum = kNumSlots + 1;
+constexpr int kSteelLowKey = 97, kSteelHighKey = 127, kSteelKeyOffset = 36;
+constexpr int kSteelAuditionKey = 112;   // E7 in FL names: E4 on the pan, a ringing middle note
+
+constexpr int kNumPieces = kNumSlots + 2;
+inline bool isSynthPiece (int piece) { return piece == kLogDrum || piece == kSteelDrum; }
 
 /** The kit layout. Order is permanent: parameter ids and saved sessions use the slot ids. */
 inline const std::array<SlotDef, kNumSlots>& slots()

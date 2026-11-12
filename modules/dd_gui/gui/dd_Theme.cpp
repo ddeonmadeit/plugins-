@@ -606,7 +606,71 @@ void paintGrain (juce::Graphics& g, juce::Rectangle<int> area, float amount)
     g.fillRect (area);
 }
 
-void paintBackdrop (juce::Graphics& g, juce::Rectangle<int> area, const Palette&)
+namespace
+{
+struct CachedPicture : juce::ReferenceCountedObject
+{
+    juce::Image image;
+    juce::int64 key = 0;
+};
+
+juce::int64 hashMix (juce::int64 h, juce::int64 v) noexcept { return (h ^ v) * 1099511628211LL; }
+} // namespace
+
+void paintCached (juce::Graphics& g, juce::NamedValueSet& store, const juce::Identifier& slot, juce::Rectangle<int> area,
+                  juce::int64 key, const std::function<void (juce::Graphics&)>& paint)
+{
+    if (area.isEmpty())
+        return;
+    const float scale = juce::jlimit (1.0f, 4.0f, g.getInternalContext().getPhysicalPixelScaleFactor());
+    juce::int64 k = hashMix ((juce::int64) 1469598103934665603LL, key);
+    for (auto v : { (juce::int64) area.getX(), (juce::int64) area.getY(), (juce::int64) area.getWidth(), (juce::int64) area.getHeight(),
+                    (juce::int64) juce::roundToInt (scale * 100.0f), (juce::int64) (isLightTheme() ? 1 : 0) })
+        k = hashMix (k, v);
+
+    auto* pic = dynamic_cast<CachedPicture*> (store[slot].getObject());
+    if (pic == nullptr)
+    {
+        pic = new CachedPicture();
+        store.set (slot, juce::var (pic));
+    }
+    if (! pic->image.isValid() || pic->key != k)
+    {
+        pic->image = juce::Image (juce::Image::ARGB, std::max (1, juce::roundToInt ((float) area.getWidth() * scale)),
+                                  std::max (1, juce::roundToInt ((float) area.getHeight() * scale)), true);
+        juce::Graphics ig (pic->image);
+        ig.addTransform (juce::AffineTransform::translation ((float) -area.getX(), (float) -area.getY()).scaled (scale));
+        paint (ig);
+        pic->key = k;
+    }
+    g.drawImage (pic->image, area.toFloat());
+}
+
+void paintBackdrop (juce::Graphics& g, juce::Rectangle<int> area, const Palette& palette)
+{
+    // The room and chassis only change with the size and the theme: painted once, then copied. A few sizes are
+    // kept, so several open editors don't keep repainting it for each other.
+    static juce::NamedValueSet store;
+    static int next = 0;
+    const juce::Identifier slots[] { "a", "b", "c", "d" };
+    for (const auto& s : slots)
+        if (auto* pic = dynamic_cast<CachedPicture*> (store[s].getObject()))
+            if (pic->image.isValid() && pic->image.getBounds().getAspectRatio() > 0.0f)
+            {
+                const float scale = juce::jlimit (1.0f, 4.0f, g.getInternalContext().getPhysicalPixelScaleFactor());
+                if (pic->image.getWidth() == juce::roundToInt ((float) area.getWidth() * scale)
+                    && pic->image.getHeight() == juce::roundToInt ((float) area.getHeight() * scale))
+                {
+                    paintCached (g, store, s, area, 0, [&] (juce::Graphics& ig) { paintBackdropDirect (ig, area, palette); });
+                    return;
+                }
+            }
+    const auto& slot = slots[next];
+    next = (next + 1) % (int) std::size (slots);
+    paintCached (g, store, slot, area, 0, [&] (juce::Graphics& ig) { paintBackdropDirect (ig, area, palette); });
+}
+
+void paintBackdropDirect (juce::Graphics& g, juce::Rectangle<int> area, const Palette&)
 {
     const auto& t = tokens();
     const auto r = area.toFloat();

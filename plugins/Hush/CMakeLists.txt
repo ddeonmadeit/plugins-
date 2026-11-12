@@ -2,7 +2,7 @@ dd_add_plugin(Hush
     PRODUCT_NAME "Hush"
     PLUGIN_CODE  Hush
     KIND         EFFECT
-    VERSION      1.2.1
+    VERSION      1.3.0
     PRESETS_DIR  Presets
     WANTS_KEYBOARD
     SOURCES

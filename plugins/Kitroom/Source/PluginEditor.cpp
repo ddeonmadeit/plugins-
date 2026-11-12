@@ -47,6 +47,13 @@ std::map<juce::String, juce::String> kitroomHelp()
         { "logSub",          "A clean sine under the log drum for weight in the low end." },
         { "logGlide",        "How long a slide takes: overlap two log drum notes and the second slides up or down into place." },
         { "logModel",        "Classic: the original FM log drum (born as an FL Studio preset). Woody: more mallet and a hollow knock. Deep: rounder, more sub. Bounce: the bouncy donk." },
+        { "steelVolume",     "Volume of the steel drum (it plays on the keys " + dd::noteName (kr::kSteelLowKey) + " to " + dd::noteName (kr::kSteelHighKey) + ")." },
+        { "steelTune",       "Moves the whole steel drum up or down, in semitones." },
+        { "steelLength",     "How long each note rings (high notes always ring a little shorter, as on a real pan)." },
+        { "steelBright",     "Softer, rounder notes or bright, pingy ones with more of the stick." },
+        { "steelShimmer",    "The shimmer of the hammered metal: each note's partials beating gently against each other." },
+        { "steelRoll",       "Hold a key and the note rolls (fast re-strikes), the way pannists hold long notes. Up for a faster roll; 0 plays single hits." },
+        { "steelModel",      "Tenor: the bright lead pan. Double Second: rounder, for chords. Cello: an octave down. Bass: two octaves down, boomy." },
     };
     for (int s = 0; s < kr::kNumSlots; ++s)
     {
@@ -139,9 +146,9 @@ KitroomEditor::KitroomEditor (KitroomProcessor& p)
     addAndMakeVisible (*content);
 
     // setResizeLimits() triggers resized(), so read the saved zoom first.
-    const float savedScale = proc.editorScale;
+    const float savedScale = dd::gui::openingScale (kBaseW, kBaseH, proc.editorScale);
     setResizable (true, true);
-    setResizeLimits ((int) (kBaseW * 0.6f), (int) (kBaseH * 0.6f), (int) (kBaseW * 1.8f), (int) (kBaseH * 1.8f));
+    setResizeLimits ((int) (kBaseW * 0.5f), (int) (kBaseH * 0.5f), (int) (kBaseW * 1.8f), (int) (kBaseH * 1.8f));
     if (auto* c = getConstrainer())
         c->setFixedAspectRatio ((double) kBaseW / (double) kBaseH);
     setSize ((int) std::round (kBaseW * savedScale), (int) std::round (kBaseH * savedScale));

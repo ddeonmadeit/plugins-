@@ -16,7 +16,7 @@ float bend01 (float v, float m, float ceiling) noexcept { return m >= 0.0f ? v +
 
 const juce::StringArray& SubGritProcessor::categoryOrder()
 {
-    static const juce::StringArray order { "TRAVIS", "MIKE DEAN", "UNTILJAPAN", "YE", "YEEZUS", "MOSHC0RE", "KING", "TRIP HOP", "NEO SOUL", "SOUL", "SAFE", "80s", "2000s", "BOUNCE 808", "SOFT", "UNIQUE" };
+    static const juce::StringArray order { "TRAVIS", "MIKE DEAN", "UNTILJAPAN", "YE", "YEEZUS", "MOSHC0RE", "KING", "TRIP HOP", "INTERNET GIRL", "NEO SOUL", "SOUL", "SAFE", "80s", "2000s", "BOUNCE 808", "SOFT", "UNIQUE" };
     return order;
 }
 
@@ -422,7 +422,7 @@ void SubGritProcessor::setStateInformation (const void* data, int sizeInBytes)
             auto tree = juce::ValueTree::fromXml (*xml);
             dd::replaceStateExactly (apvts, tree);
             presets.readState (tree);
-            editorScale = juce::jlimit (0.6f, 1.8f, (float) tree.getProperty ("uiScale", 1.0f));
+            editorScale = juce::jlimit (0.5f, 1.8f, (float) tree.getProperty ("uiScale", 1.0f));
             allKnobs = (bool) tree.getProperty ("allKnobs", false);
             dd::keepOldDefault (apvts, tree, "perfPoly", 0.0f);
         }

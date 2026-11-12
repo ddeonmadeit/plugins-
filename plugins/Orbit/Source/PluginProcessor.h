@@ -41,6 +41,7 @@ public:
     juce::AudioProcessorValueTreeState apvts;
     dd::PresetManager presets;
     dd::ScopeBuffer scope;
+    float editorScale = 1.0f;   // the editor's zoom, kept with the session
 
     /** What the display shows: where the sound is heard right now (normalised), how loud it is coming
         in, how much the room is ringing, and how far through its motion cycle it is. */

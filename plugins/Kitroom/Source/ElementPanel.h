@@ -36,7 +36,9 @@ private:
     std::array<ArtRow, kr::kMaxArticulations> rows;
     std::vector<std::unique_ptr<dd::gui::Knob>> knobs;
     std::unique_ptr<dd::gui::Toggle> clapOnSnare;   // on the snare and clap panels
-    std::unique_ptr<dd::gui::Choice> logModel;       // on the log drum panel
+    std::unique_ptr<dd::gui::Choice> synthModel;     // on the log and steel drum panels
     bool isLog() const noexcept { return slot == kr::kLogDrum; }
+    bool isSteel() const noexcept { return slot == kr::kSteelDrum; }
+    bool isSynth() const noexcept { return kr::isSynthPiece (slot); }
     juce::String credit;
 };

@@ -115,7 +115,14 @@
     "logDrive": 0.3,
     "logSub": 0.35,
     "logGlide": 70.0,
-    "logModel": "Classic"
+    "logModel": "Classic",
+    "steelVolume": 0.0,
+    "steelTune": 0.0,
+    "steelLength": 1400.0001,
+    "steelBright": 0.55,
+    "steelShimmer": 0.4,
+    "steelRoll": 0.0,
+    "steelModel": "Tenor"
   },
   "extra": {
     "kit": {
