@@ -17,7 +17,10 @@ plugin listed by `tools/ci/plugin_meta.py` (parsed from each `dd_add_plugin()` c
    `BundleIsRelocatable=false`, then productbuild).
 4. `auval -v aumu|aufx <code> Ddeo` after copying the component to `~/Library/Audio/Plug-Ins/Components`
    and killing `AudioComponentRegistrar`.
-5. pluginval strictness 8 on the VST3.
+5. pluginval strictness 8 on the VST3. A plugin is validated a second time only when the first run died in
+   the runner VM's virtual GPU driver (`Assertion failed ... AppleParavirtCommandBuffer endCurrentChunk`
+   during an editor test: the VM's paravirtual Metal driver, which real Macs never load); any other failure
+   fails the job.
 6. Released plugins only, when Developer ID is set up: `tools/ci/notarize_macos.sh` (notarytool submit --wait,
    staple the pkg, staple the bundles inside the zip) and `DD_NOTARIZED=1` for the release notes.
 7. Upload artifact `macOS-installers`; in a release run, `gh release create <Name>-v<version>` (the tag is

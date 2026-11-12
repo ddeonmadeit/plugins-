@@ -321,8 +321,22 @@ jobs:
           unzip -q pluginval.zip -d pluginval
           for p in $PLUGINS; do
             product=$(python3 -c "import json; print({x['target']: x['product'] for x in json.load(open('dist/plugins.json'))}['$p'])")
-            pluginval/pluginval.app/Contents/MacOS/pluginval --strictness-level 8 --validate-in-process \
-              --timeout-ms 600000 --validate "build/plugins/$p/${p}_artefacts/Release/VST3/$product.vst3"
+            for attempt in 1 2; do
+              set +e
+              pluginval/pluginval.app/Contents/MacOS/pluginval --strictness-level 8 --validate-in-process \
+                --timeout-ms 600000 --validate "build/plugins/$p/${p}_artefacts/Release/VST3/$product.vst3" 2>&1 | tee pluginval.log
+              status=${PIPESTATUS[0]}
+              set -e
+              [ "$status" -eq 0 ] && break
+              # The runner VM's virtual GPU driver now and then asserts while an editor draws
+              # ("AppleParavirtCommandBuffer endCurrentChunk"): that is the VM, not the plugin, and real Macs
+              # never load that driver. Validate that plugin once more; any other failure fails the job.
+              if [ "$attempt" -eq 1 ] && grep -q "AppleParavirt" pluginval.log; then
+                echo "::warning::$p: the runner's virtual GPU driver crashed under pluginval; validating once more"
+                continue
+              fi
+              exit "$status"
+            done
           done
 
       - name: Notarize releases
