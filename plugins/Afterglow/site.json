@@ -29,6 +29,7 @@
     "items": [
       "Automate any control the way FL's own plugins do: right-click it and choose Create automation clip (FL Studio's own menu, also Link to controller; Cubase, Bitwig, Reaper and Studio One open its automation lane). In Ableton the right-click menu says where to pick it in the track's automation chooser. A right-click never moves anything.",
       "Right-click the sun to automate Motion or Tone, and the effect lamps, macros and ARP rate the same way.",
+      "ARP can be switched on or off (or automated) in the middle of a held chord: the chord starts arpeggiating straight away, and plays on as a chord when it stops",
       "Point at a control and the line under the presets says RIGHT-CLICK: AUTOMATE."
     ]
   }

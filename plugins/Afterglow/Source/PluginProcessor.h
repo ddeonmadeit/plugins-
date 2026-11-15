@@ -65,6 +65,7 @@ private:
     std::unique_ptr<ag::LiveLoader> liveLoader;
     ag::Arpeggiator arp;
     bool arpWasOn = false;
+    std::array<float, 128> keysDown {};   // velocity of every key held on the keyboard (0 = up), arp or not
     dd::Lfo lfo2;
     double sr = 44100.0, freeBeat = 0.0, hostBeat = 0.0;
     bool hostPlaying = false;

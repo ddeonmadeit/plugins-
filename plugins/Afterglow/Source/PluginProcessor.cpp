@@ -60,6 +60,7 @@ void AfterglowProcessor::prepareToPlay (double sampleRate, int)
     sr = sampleRate;
     engine.prepare (sr);
     arp.prepare (sr);
+    keysDown.fill (0.0f);
     arpWasOn = false;
     lfo2.prepare (sr);
     dirt.prepare (sr, kChunk);
@@ -264,14 +265,30 @@ void AfterglowProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
     if (isNonRealtime())
         liveLoader->waitUntilIdle();
 
-    // Arpeggiator: rewrites the block's notes before the voices see them.
+    // Arpeggiator: rewrites the block's notes before the voices see them. Switching it (automation, a click)
+    // carries the keys already held across: the chord starts arpeggiating, or plays on as a chord when it stops.
     const bool arpOn = params.getBool (P::arpOn);
     if (arpOn != arpWasOn)
     {
         arp.reset();
-        if (! arpOn)
-            midi.addEvent (juce::MidiMessage::allNotesOff (1), 0);   // what the arp left sounding
+        juce::MidiBuffer switched;
+        switched.addEvent (juce::MidiMessage::allNotesOff (1), 0);   // what was sounding, arp notes or the plain chord
+        for (int k = 0; k < 128; ++k)
+            if (keysDown[(size_t) k] > 0.0f)
+                switched.addEvent (juce::MidiMessage::noteOn (1, k, keysDown[(size_t) k]), 0);
+        switched.addEvents (midi, 0, -1, 0);
+        midi.swapWith (switched);
         arpWasOn = arpOn;
+    }
+    for (const auto m : midi)
+    {
+        const auto msg = m.getMessage();
+        if (msg.isNoteOn())
+            keysDown[(size_t) msg.getNoteNumber()] = msg.getFloatVelocity();
+        else if (msg.isNoteOff())
+            keysDown[(size_t) msg.getNoteNumber()] = 0.0f;
+        else if (msg.isAllNotesOff() || msg.isAllSoundOff())
+            keysDown.fill (0.0f);
     }
     if (arpOn)
     {
