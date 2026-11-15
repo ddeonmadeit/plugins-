@@ -65,18 +65,22 @@ fi
 if [[ -n "${PLUGINVAL:-}" && -d "$VST3" ]]; then
     echo "== pluginval"
     if command -v xvfb-run > /dev/null; then RUN=(xvfb-run -a -s "-screen 0 1920x1200x24"); else RUN=(); fi
-    # pluginval's own Linux VST3 host sometimes crashes while tearing down after every test has passed
-    # (a run-loop fd callback fires after its handler map is gone: RunLoop::Impl::registerEventHandler).
-    # A run that fails before "SUCCESS" is a real failure; one that crashes after it is retried, and a
-    # single clean run is required.
+    # pluginval's own Linux VST3 host sometimes crashes while it deletes the plugin after the last test, before
+    # or after printing SUCCESS (a run-loop fd callback fires after its handler map is gone:
+    # RunLoop::Impl::registerEventHandler; backtrace in the juce-gotchas skill). A failed test is a real failure.
+    # A crash (killed by a signal) with no failed test runs again with the same random seed: pluginval's tests
+    # are deterministic for a seed, so a crash of the plugin itself comes back and fails; the host's race doesn't.
+    # A single clean run is required.
+    seed=()
     for attempt in 1 2 3 4; do
-        if "${RUN[@]}" "$PLUGINVAL" --strictness-level 8 --validate-in-process --timeout-ms 600000 --validate "$VST3" > "$OUT/pluginval.log" 2>&1; then
-            break
+        rc=0
+        "${RUN[@]}" "$PLUGINVAL" --strictness-level 8 --validate-in-process --timeout-ms 600000 "${seed[@]}" --validate "$VST3" > "$OUT/pluginval.log" 2>&1 || rc=$?
+        [[ $rc == 0 ]] && break
+        if grep -q "^!!! Test" "$OUT/pluginval.log" || { [[ $rc -lt 128 ]] && ! grep -qx "SUCCESS" "$OUT/pluginval.log"; } || [[ $attempt == 4 ]]; then
+            tail -40 "$OUT/pluginval.log"; echo "pluginval FAILED (exit $rc)"; exit 1
         fi
-        if ! grep -qx "SUCCESS" "$OUT/pluginval.log" || [[ $attempt == 4 ]]; then
-            tail -40 "$OUT/pluginval.log"; echo "pluginval FAILED"; exit 1
-        fi
-        echo "pluginval passed every test but its host crashed on exit (attempt $attempt); running again"
+        seed=(--random-seed "$(grep -m1 -o 'Random seed: 0x[0-9a-fA-F]*' "$OUT/pluginval.log" | awk '{print $3}')")
+        echo "pluginval's host crashed with no failed test (attempt $attempt, exit $rc); running again with ${seed[*]}"
     done
     tail -1 "$OUT/pluginval.log"
 fi

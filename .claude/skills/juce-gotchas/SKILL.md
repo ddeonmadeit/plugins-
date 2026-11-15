@@ -87,6 +87,18 @@ the editor's drawing is replayed on the (virtual) GPU inside the host's process.
 1.3, Nov 2026, same code that had passed the day before), so the macOS pluginval step validates a plugin a
 second time when, and only when, the log shows `AppleParavirt` (real Macs never load that driver).
 
+## Linux pluginval: Segmentation fault right after "Fuzz parameters"
+
+pluginval's own Linux VST3 host crashes now and then while it deletes the plugin after the last test (more
+often on a loaded machine), so the log ends at "Starting tests in: pluginval / Fuzz parameters..." with no
+SUCCESS. gdb shows it is the host, not the plugin: the main thread dies in
+`std::unordered_map<int, std::vector<Steinberg::Linux::IEventHandler*>>::operator[]` called from the fd callback
+lambda in `juce::RunLoop::Impl::registerEventHandler`, while the test thread sits in `deletePluginAsync` (an fd
+callback outlives the run loop's handler map). `run_qa.sh` runs a crash that has no failed test again with the
+same `--random-seed`: pluginval's tests are deterministic per seed, so a crash in the plugin comes back and
+fails; this race doesn't. To get a backtrace: `xvfb-run -a gdb -batch -ex run -ex "thread apply all bt 25"
+--args pluginval --strictness-level 8 --validate-in-process --validate X.vst3`, under load (stress renders).
+
 ## Right-click = the host's automation menu (FL Studio: Create automation clip)
 
 Hosts offer their own menu for a parameter through VST3 `IComponentHandler3::createContextMenu`; JUCE wraps it
