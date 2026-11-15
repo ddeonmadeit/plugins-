@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Full offline QA for one plugin: preset lint -> render every preset -> objective analysis ->
-# randomized stress test -> UI snapshot -> (optional) pluginval.
+# randomized stress test -> UI snapshot -> automation from the editor -> (optional) pluginval.
 #
 #   tools/qa/run_qa.sh SubGrit                 # uses ./build, writes qa-out/SubGrit/
 #   BUILD_DIR=build-ci PLUGINVAL=/path/to/pluginval tools/qa/run_qa.sh SubGrit
@@ -49,6 +49,17 @@ if command -v xvfb-run > /dev/null; then
     xvfb-run -a -s "-screen 0 2560x1600x24" "$HARNESS" snapshot --out "$OUT/ui.png" --phrase "$(cfg phrase demo)" --passes "$(cfg passes 1)"
 else
     "$HARNESS" snapshot --out "$OUT/ui.png" --phrase "$(cfg phrase demo)" --passes "$(cfg passes 1)" || echo "(snapshot skipped: no display)"
+fi
+
+echo "== automation (right-click menus and host gestures on every control)"
+if command -v xvfb-run > /dev/null; then
+    # The editor as shown, plus any other view its state can switch to (qa.json "automationState", e.g. allKnobs=1).
+    xvfb-run -a -s "-screen 0 2560x1600x24" "$HARNESS" automation | tee "$OUT/automation.txt"
+    if [[ -n "$(cfg automationState "")" ]]; then
+        xvfb-run -a -s "-screen 0 2560x1600x24" "$HARNESS" automation --state "$(cfg automationState "")" | tee -a "$OUT/automation.txt"
+    fi
+else
+    echo "(automation check skipped: needs xvfb-run)"
 fi
 
 if [[ -n "${PLUGINVAL:-}" && -d "$VST3" ]]; then

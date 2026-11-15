@@ -26,13 +26,11 @@
   ],
   "previewNote": "on the same five-bar 96 BPM groove: ghost notes, open hat, a ride bar, a tom fill and crashes ringing out.",
   "whatsNew": {
-    "version": "1.16.0",
+    "version": "1.17.0",
     "items": [
-      "Steel drum: a Trinidad tenor pan on its own keys (C#8 to G10 in FL Studio, C#6 to G8 in Ableton), drawn at the front right of the kit. Four models (Tenor, Double Second, Cello, Bass), Ring, Bright, Shimmer, and Roll for held notes",
-      "CARIBBEAN kits: Steel Band, Soca Road March, Calypso Sunday",
-      "INTERNET GIRL presets (the Cape Town punk / hyperpop / trap trio): Role Model (garage punk in the red), Pull Up (a punchy, crushed trap-punk kit), Cokehead (a riotous room through a wavefolder)",
-      "Windows open at a size that fits your screen (about 80 % of a laptop's height) and can be dragged bigger; the size you pick is kept",
-      "Smoother windows: the static panels, shadows and grain are drawn once and reused, so meters and lights no longer redraw the whole window (3 to 4 times less drawing)"
+      "Automate any control the way FL's own plugins do: right-click it and choose Create automation clip (FL Studio's own menu, also Link to controller; Cubase, Bitwig, Reaper and Studio One open its automation lane). In Ableton the right-click menu says where to pick it in the track's automation chooser. A right-click never moves anything.",
+      "Right-click a drum in the kit to automate its volume, tune, decay, punch or pan (the log and steel drums list their own).",
+      "Point at a control and the line under the presets says RIGHT-CLICK: AUTOMATE."
     ]
   }
 }

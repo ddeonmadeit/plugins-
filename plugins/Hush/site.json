@@ -21,13 +21,10 @@
   ],
   "previewNote": "on a synthetic sung phrase with S, SH and T consonants of different loudness, captured and played back through each preset.",
   "whatsNew": {
-    "version": "1.3.0",
+    "version": "1.4.0",
     "items": [
-      "No record or drag-out step: Hush follows the vocal on the track by itself (FOLLOW in the top bar). Play the song and every S, SH and T appears; your levels play live in the mix; change or re-record a part and it picks the new take up as it plays",
-      "PRINT (was BOUNCE) is now optional: only to turn the result into a WAV",
-      "INTERNET GIRL presets (the Cape Town punk / hyperpop / trap trio): Distorted Shout and Hyperpop Air",
-      "Windows open at a size that fits your screen (about 80 % of a laptop's height) and can be dragged bigger; the size you pick is kept",
-      "Smoother windows: the static panels, shadows and grain are drawn once and reused, so meters and lights no longer redraw the whole window (3 to 4 times less drawing)"
+      "Automate any control the way FL's own plugins do: right-click it and choose Create automation clip (FL Studio's own menu, also Link to controller; Cubase, Bitwig, Reaper and Studio One open its automation lane). In Ableton the right-click menu says where to pick it in the track's automation chooser. A right-click never moves anything.",
+      "Point at a control and the line under the presets says RIGHT-CLICK: AUTOMATE."
     ]
   }
 }

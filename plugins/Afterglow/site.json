@@ -25,11 +25,11 @@
   ],
   "previewNote": "on the same 120 BPM phrase: a held Dm9, an arpeggio over Bb, Fmaj7 stabs, then a legato melody. GUITAR presets play strummed Em, C and G chords at 80 BPM and a riff.",
   "whatsNew": {
-    "version": "1.14.0",
+    "version": "1.15.0",
     "items": [
-      "INTERNET GIRL presets (the Cape Town punk / hyperpop / trap trio): Crushing Synth (a crushed, driven saw wall), Cataclysm Drone (a huge breathing drone), TikTok Flip (a bright chopped pluck like the melody PULL UP was built on)",
-      "Windows open at a size that fits your screen (about 80 % of a laptop's height) and can be dragged bigger; the size you pick is kept",
-      "Smoother windows: the static panels, shadows and grain are drawn once and reused, so meters and lights no longer redraw the whole window (3 to 4 times less drawing)"
+      "Automate any control the way FL's own plugins do: right-click it and choose Create automation clip (FL Studio's own menu, also Link to controller; Cubase, Bitwig, Reaper and Studio One open its automation lane). In Ableton the right-click menu says where to pick it in the track's automation chooser. A right-click never moves anything.",
+      "Right-click the sun to automate Motion or Tone, and the effect lamps, macros and ARP rate the same way.",
+      "Point at a control and the line under the presets says RIGHT-CLICK: AUTOMATE."
     ]
   }
 }

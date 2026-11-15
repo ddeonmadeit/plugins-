@@ -83,7 +83,31 @@ asynchronous Core Graphics drawing: JUCE makes plugin views layer-backed with `d
 the editor's drawing is replayed on the (virtual) GPU inside the host's process. A busy editor (Mirage
 1.2: full-window repaints at 60 Hz with many vector overlays) hit it reproducibly. Override
 `AudioProcessorEditor::wantsLayerBackedView()` to return false: the wrapper then adds the editor with
-`windowRequiresSynchronousCoreGraphicsRendering` and it draws on the CPU.
+`windowRequiresSynchronousCoreGraphicsRendering` and it draws on the CPU. Even so it came back once (Mirage
+1.3, Nov 2026, same code that had passed the day before), so the macOS pluginval step validates a plugin a
+second time when, and only when, the log shows `AppleParavirt` (real Macs never load that driver).
+
+## Right-click = the host's automation menu (FL Studio: Create automation clip)
+
+Hosts offer their own menu for a parameter through VST3 `IComponentHandler3::createContextMenu`; JUCE wraps it
+as `editor.getHostContext()->getContextMenuForParameter (param)` and `showNativeMenu (editor.getMouseXYRelative())`.
+FL Studio shows Create automation clip / Link to controller there (VST3 only; FabFilter does the same), Cubase,
+Bitwig, Reaper and Studio One their automation lane; Ableton has no such menu. `dd::gui::showParamMenu` does
+it for every control, with our own menu (reset, how to automate in this host) everywhere else. Traps:
+- JUCE 9 does not null-check the host's answer: Mixcraft, MuLab and DaVinci Resolve hand out IComponentHandler3
+  but return no menu, and the plugin then crashes on it (JUCE issue #1788). Only known-good hosts are asked
+  (`hostHasParamMenus` in dd_Widgets.cpp).
+- A `juce::Slider` starts a drag (a host gesture: beginEdit) on a right-click, a `juce::Button` clicks on one,
+  a `juce::ComboBox` ignores it. Controls must leave right-clicks alone: `dd::gui::paramPopup (*this, e)` first
+  in mouseDown (Knob's slider, Toggle, LampSwitch, Key, scenes), `addParamPopup` on a stock ComboBox. A native
+  host menu is modal and eats the mouse-up, so reset any "this was a popup" flag on the next mouse-down.
+- A top-level `PopupMenu` has no parent to take a LookAndFeel from and draws in JUCE's grey default unless you
+  call `menu.setLookAndFeel (&component.getLookAndFeel())`.
+- `<Plugin>_Harness automation` (in run_qa.sh) puts the editor in a window on Xvfb and sends real mouse events
+  through `ComponentPeer::handleMouseEvent`: a right-click on every tagged control must ask for its menu and
+  change nothing; a drag / click must change values only inside gestures. A bare Xvfb has no window manager, so
+  the WM_* atoms JUCE sets on a new window don't exist and Xlib's default handler exits (BadAtom): the harness
+  installs a forgiving X error handler first (a JUCE app does that itself; the harness is not an app).
 
 ## No keys in a macOS VST3 editor (Ableton, FL Studio)
 

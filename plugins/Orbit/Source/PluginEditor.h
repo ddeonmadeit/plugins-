@@ -38,6 +38,7 @@ public:
     explicit EarsControl (juce::AudioProcessorValueTreeState&);
     void resized() override;
     void paint (juce::Graphics&) override;
+    void mouseDown (const juce::MouseEvent& e) override { dd::gui::paramPopup (*this, e); }
 
 private:
     juce::ComboBox box;

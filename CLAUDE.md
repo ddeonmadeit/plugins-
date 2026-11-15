@@ -48,6 +48,7 @@ modules/dd_take           capture-then-edit plugins (Contour, Hush): TakeEngine 
                           CaptureFifo, Published<T> (hazard-pointer hand-over), SpanSet, offline pitch tracker, FLAC takes
 modules/dd_gui            house look (see "Visual style"): DARK/LITE theme tokens, LookAndFeel, Knob (eases to new values)/Choice/Toggle/LampSwitch,
                           HoverHelp (controls carry their param id; DescriptionLine::setHelpTable explains whatever is under the mouse),
+                          showParamMenu / paramPopup (right-click any control = the host's automation menu, FL: Create automation clip),
                           paintCached (static layers drawn once per size/theme/scale, then copied: backdrop, panel faces, shadows,
                           the Atmosphere overlay), openingScale (editors open at <= 80 % of the screen height, zoom kept per instance),
                           grid Panel, TopBar + PresetBar keys + DescriptionLine, Atmosphere, console Scope, TapeStopControl,
@@ -84,6 +85,7 @@ $H list                                                    # factory presets (= 
 $H render --program 3 --out /tmp/x.wav                     # one preset, demo phrase
 $H render --preset-file p.json --set cutoff=300 --out x.wav  # audition JSON without rebuilding
 xvfb-run -a -s "-screen 0 2560x1600x24" $H snapshot --out ui.png   # look at the editor (--hover x,y: as if pointing there)
+xvfb-run -a -s "-screen 0 2560x1600x24" $H automation   # right-click + use every control as a host sees it (--state allKnobs=1)
 ```
 
 Linux build deps (already present in the dev container image): ninja, libasound2-dev, libx11-dev,
@@ -124,6 +126,11 @@ libfreetype-dev, libfontconfig1-dev, xvfb; Python: numpy, scipy, soundfile, matp
 - Every control explains itself: give the editor's DescriptionLine (or a scene's HoverHelp) a help table with one
   plain-words line per parameter id, and `dd::gui::setHelp` / `tagParam` for custom controls. The owner does not
   read manuals; if a knob needs explaining, its help line is where it goes.
+- **Every control automates like FL's own plugins**: a right-click opens the host's menu for its parameter
+  (`dd::gui::showParamMenu`; FL Studio: Create automation clip). Tag custom controls with `tagParam` and start their
+  mouseDown with `dd::gui::paramPopup (*this, e)` (a scene that moves several parameters calls `showParamMenu` with
+  all of them); a right-click must never change a value or start a gesture, and drags / clicks change values only
+  inside begin / end gestures. `tools/qa/run_qa.sh` checks it (`<Name>_Harness automation`); details in juce-gotchas.
 - **Editors stay light**: anything static goes through `dd::gui::paintCached`; a meter or lamp repaint must not redraw
   gradients under it (`snapshot --bench N` times a full repaint: keep it well under 30 ms). Every editor is zoomable
   (Content + transform, `openingScale`, `uiScale` in the state).
@@ -168,7 +175,8 @@ Every plugin follows it exactly; it replaced the earlier brushed-brown-metal loo
 ## Quality bar (what "done" means for a plugin)
 
 1. `tools/qa/run_qa.sh <Name>` passes: no NaN/Inf, true peak <= 0 dBTP, no DC, sub mono, presets within
-   the plugin's loudness window, no near-duplicate presets, stress test clean at 1 / 128 / 1024 samples and 96 kHz.
+   the plugin's loudness window, no near-duplicate presets, stress test clean at 1 / 128 / 1024 samples and 96 kHz,
+   every control's right-click opens its automation menu and every edit reaches the host inside a gesture.
 2. pluginval strictness 8 passes on Linux (and on macOS in CI), auval passes in CI.
 3. You looked at the UI snapshot and the spectrogram sheet (`qa-out/<Name>/renders/sheet.png`).
 4. The macOS job is green and its artifact contains `<Name>-<ver>-macOS.pkg` and `.zip`.

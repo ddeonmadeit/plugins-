@@ -45,11 +45,12 @@ private:
     AircheckProcessor& proc;
     juce::ParameterAttachment shiftAtt, formantAtt;
     float shift = 0.0f, formant = 0.0f;
+    bool popup = false;   // a right-click opens the automation menu and moves nothing
 };
 
 /**
     The visual EQ: eight bands over a live analyzer of the voice before (faint) and after the EQ.
-    Click a point to select its band, drag to move it, scroll for Q, right-click to switch it on or off,
+    Click a point to select its band, drag to move it, scroll for Q, right-click to switch it on or off or automate it,
     double-click a point to reset its gain, double-click empty space to add a band there.
 */
 class EqView : public juce::Component, private juce::Timer, private juce::AudioProcessorValueTreeState::Listener

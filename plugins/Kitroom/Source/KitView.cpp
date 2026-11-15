@@ -228,6 +228,23 @@ void KitView::mouseDown (const juce::MouseEvent& e)
     if (s < 0)
         return;
     proc.selectedSlot = s;
+    if (e.mods.isPopupMenu())
+    {
+        // Right-click a piece: its panel opens and its main settings can be automated (the host's own menu).
+        if (onSelect)
+            onSelect (s);
+        repaint();
+        juce::StringArray ids;
+        if (s == kr::kLogDrum)
+            ids = { "logVolume", "logTune", "logLength", "logKnock", "logTone", "logGlide" };
+        else if (s == kr::kSteelDrum)
+            ids = { "steelVolume", "steelTune", "steelLength", "steelBright", "steelShimmer", "steelRoll" };
+        else
+            for (auto* what : { "Volume", "Tune", "Decay", "Punch", "Pan" })
+                ids.add (juce::String (kr::slots()[(size_t) s].id) + what);
+        dd::gui::showParamMenu (*this, ids);
+        return;
+    }
     // Shift-click plays the second articulation (rimshot, open hat, ride bell).
     const int art = s < kr::kNumSlots && e.mods.isShiftDown() && kr::slots()[(size_t) s].articulations.size() > 1 ? (s == kr::HiHat ? 2 : 1) : 0;
     proc.audition (s, art, 0.85f);

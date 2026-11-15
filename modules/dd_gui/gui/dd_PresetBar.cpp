@@ -456,12 +456,14 @@ void DescriptionLine::paint (juce::Graphics& g)
     const auto& t = tokens();
     const float rise = juce::jlimit (0.0f, 1.0f, (float) ((juce::Time::getMillisecondCounterHiRes() - changedAt) / 280.0));
     auto r = getLocalBounds().toFloat();
-    if (hint.isNotEmpty())
+    // Over a control the host can automate, the corner says how (the host's own menu, see showParamMenu).
+    const bool automate = help.isActive() && help.isAutomatable();
+    if (const auto corner = automate ? juce::String ("Right-click: automate") : hint; corner.isNotEmpty())
     {
         const auto f = LookAndFeel::font (9.0f, 700).withExtraKerningFactor (0.12f);
-        const auto shown = hint.toUpperCase();
+        const auto shown = corner.toUpperCase();
         g.setFont (f);
-        g.setColour (t.cream500);
+        g.setColour (automate ? t.signalGlow : t.cream500);
         g.drawText (shown, r.removeFromRight (juce::GlyphArrangement::getStringWidth (f, shown) + 4.0f), juce::Justification::centredRight, false);
         r.removeFromRight (16.0f);
     }

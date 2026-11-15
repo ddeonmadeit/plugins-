@@ -22,12 +22,11 @@
   ],
   "previewNote": "on the test programme. Listen on headphones: Orbit is 3D audio.",
   "whatsNew": {
-    "version": "1.2.0",
+    "version": "1.3.0",
     "items": [
-      "About a fifth less CPU with exactly the same sound: the head filters work on four samples at a time",
-      "The window can be resized now (drag the corner); it opens at a size that fits your screen",
-      "INTERNET GIRL presets (the Cape Town punk / hyperpop / trap trio): Mosh Pit (right in front of you in a small club) and Drone Orbit (slowly circling through a warehouse)",
-      "Smoother windows: the static panels, shadows and grain are drawn once and reused, so meters and lights no longer redraw the whole window (3 to 4 times less drawing)"
+      "Automate any control the way FL's own plugins do: right-click it and choose Create automation clip (FL Studio's own menu, also Link to controller; Cubase, Bitwig, Reaper and Studio One open its automation lane). In Ableton the right-click menu says where to pick it in the track's automation chooser. A right-click never moves anything.",
+      "Right-click in the room (without dragging) to automate where the sound is; right-drag still turns the view. The room and motion keys and EARS automate the same way.",
+      "Point at a control and the line under the presets says RIGHT-CLICK: AUTOMATE."
     ]
   }
 }

@@ -22,12 +22,11 @@
   ],
   "previewNote": "on a synthetic sung test phrase (slightly off pitch on purpose), so you hear the chain and the correction, not a real singer.",
   "whatsNew": {
-    "version": "1.6.0",
+    "version": "1.7.0",
     "items": [
-      "Uses about a quarter less CPU with exactly the same sound: the Mix knob's matching dry path only runs while Mix is below 100 %, and the resonance smoother skips its FFTs when it has nothing to take out",
-      "INTERNET GIRL presets (the Cape Town punk / hyperpop / trap trio): Distorted Lead (crunch preamp and a fast FET), Hyperpop Snap (hard tuning, up a tone, bright and doubled), Mumble Rap (warm, close, gently tuned, ducked echo)",
-      "Windows open at a size that fits your screen (about 80 % of a laptop's height) and can be dragged bigger; the size you pick is kept",
-      "Smoother windows: the static panels, shadows and grain are drawn once and reused, so meters and lights no longer redraw the whole window (3 to 4 times less drawing)"
+      "Automate any control the way FL's own plugins do: right-click it and choose Create automation clip (FL Studio's own menu, also Link to controller; Cubase, Bitwig, Reaper and Studio One open its automation lane). In Ableton the right-click menu says where to pick it in the track's automation chooser. A right-click never moves anything.",
+      "Right-click an EQ point to switch its band on or off or automate its frequency, gain, Q or dynamics; right-click the Pitch Shift pad for Shift or Formant.",
+      "Point at a control and the line under the presets says RIGHT-CLICK: AUTOMATE."
     ]
   }
 }

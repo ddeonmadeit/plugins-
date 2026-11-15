@@ -58,6 +58,7 @@ AfterglowEditor::Content::Content (AfterglowProcessor& p)
     arpRate.addItemList (ag::choices::arpRates(), 1);
     arpRateAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment> (p.apvts, "arpRate", arpRate);
     dd::gui::tagParam (arpRate, "arpRate", "Arp rate");
+    dd::gui::addParamPopup (arpRate);
     addAndMakeVisible (arpRate);
 
     polySwitch.setTooltip ("Poly: play chords with any preset. Off: each preset's own mode (mono / legato leads). Stays as you set it when you change presets.");

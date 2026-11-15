@@ -17,11 +17,11 @@
     "Notes play at real pitch: the classic 808 range is C2–C3 in FL Studio's piano roll, C0–C1 in Ableton's (or use the Octave knob)."
   ],
   "whatsNew": {
-    "version": "1.15.0",
+    "version": "1.16.0",
     "items": [
-      "INTERNET GIRL presets (the Cape Town punk / hyperpop / trap trio): Pull Up 808 (a punchy tube-driven trap 808 that cuts through guitars), Thrumming Bass (a picked saw-and-square bass with an amp growl), Piercing Bass (a nasal fuzz bass that stabs through)",
-      "Windows open at a size that fits your screen (about 80 % of a laptop's height) and can be dragged bigger; the size you pick is kept",
-      "Smoother windows: the static panels, shadows and grain are drawn once and reused, so meters and lights no longer redraw the whole window (3 to 4 times less drawing)"
+      "Automate any control the way FL's own plugins do: right-click it and choose Create automation clip (FL Studio's own menu, also Link to controller; Cubase, Bitwig, Reaper and Studio One open its automation lane). In Ableton the right-click menu says where to pick it in the track's automation chooser. A right-click never moves anything.",
+      "Works on the six macros, POLY and every knob under ALL KNOBS.",
+      "Point at a control and the line under the presets says RIGHT-CLICK: AUTOMATE."
     ]
   }
 }

@@ -111,6 +111,8 @@ void GuitarView::resized()
 
 void GuitarView::mouseDown (const juce::MouseEvent& e)
 {
+    if (dd::gui::paramPopup (*this, e))   // right-click: automate which guitar plays
+        return;
     const auto pos = e.position;
     if (prevArrow.contains (pos)) { step (-1); return; }
     if (nextArrow.contains (pos)) { step (1); return; }
@@ -571,6 +573,8 @@ void PedalView::resized()
 
 void PedalView::mouseDown (const juce::MouseEvent& e)
 {
+    if (dd::gui::paramPopup (*this, e))   // right-click: automate the pedal's on / off
+        return;
     if (footswitch.contains (e.position))
         onAttach.setValueAsCompleteGesture (on ? 0.0f : 1.0f);
 }

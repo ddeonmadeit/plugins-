@@ -21,13 +21,10 @@
   ],
   "previewNote": "on a synthetic sung test phrase (slightly off pitch on purpose), captured and played back through each correction style.",
   "whatsNew": {
-    "version": "1.3.0",
+    "version": "1.4.0",
     "items": [
-      "No record or drag-out step: Contour follows the vocal on the track by itself (FOLLOW in the top bar). Play the song and the notes appear; your edits play live in the mix; change or re-record a part and it picks the new take up as it plays, keeping your edits everywhere else. A muted part plays silent instead of the old take",
-      "PRINT (was BOUNCE) is now optional: only to turn the edit into a WAV",
-      "INTERNET GIRL presets (the Cape Town punk / hyperpop / trap trio): Hyperpop Snap and Raw Punk",
-      "Windows open at a size that fits your screen (about 80 % of a laptop's height) and can be dragged bigger; the size you pick is kept",
-      "Smoother windows: the static panels, shadows and grain are drawn once and reused, so meters and lights no longer redraw the whole window (3 to 4 times less drawing)"
+      "Automate any control the way FL's own plugins do: right-click it and choose Create automation clip (FL Studio's own menu, also Link to controller; Cubase, Bitwig, Reaper and Studio One open its automation lane). In Ableton the right-click menu says where to pick it in the track's automation chooser. A right-click never moves anything.",
+      "Point at a control and the line under the presets says RIGHT-CLICK: AUTOMATE."
     ]
   }
 }

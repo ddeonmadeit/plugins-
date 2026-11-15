@@ -20,10 +20,10 @@
   ],
   "previewNote": "Mirage does not change the sound; the preview is the test programme passing through.",
   "whatsNew": {
-    "version": "1.3.0",
+    "version": "1.4.0",
     "items": [
-      "INTERNET GIRL presets (the Cape Town punk / hyperpop / trap trio): Black And White Tape (like the PULL UP video) and Mosh Tunnel",
-      "Opens no wider than your screen (it used to open at 1600 pixels, wider than a 13\" laptop)"
+      "Automate any control the way FL's own plugins do: right-click it and choose Create automation clip (FL Studio's own menu, also Link to controller; Cubase, Bitwig, Reaper and Studio One open its automation lane). In Ableton the right-click menu says where to pick it in the track's automation chooser. A right-click never moves anything.",
+      "Right-click a dial, the hue dot, SCENE or STYLE to automate it, so the visuals can change with the song."
     ]
   }
 }

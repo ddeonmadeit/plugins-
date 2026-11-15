@@ -34,7 +34,8 @@ RoomView::RoomView (OrbitProcessor& p) : proc (p)
     pOutput = s.getParameter ("perfOutput");
 
     dd::gui::setHelp (*this, "Room", "Drag the light to place the sound around your head. Shift-drag or scroll to raise it, "
-                                     "right-drag to turn the view, double-click the light to bring it back in front of you.");
+                                     "right-drag to turn the view, right-click to automate where it is, double-click the light to bring it back in front of you.");
+    dd::gui::markAutomatable (*this);
     for (int i = 0; i < 3; ++i)
     {
         auto* k = viewKeys.add (new dd::gui::Key (viewNames[i], i == 0));
@@ -743,7 +744,7 @@ void RoomView::paintReadouts (juce::Graphics& g, Vec3 s)
 
     g.setFont (dd::gui::LookAndFeel::font (10.0f, 700).withExtraKerningFactor (0.12f));
     g.setColour (kCreamDim.withAlpha (0.75f));
-    g.drawText ("DRAG THE LIGHT  /  SHIFT-DRAG OR SCROLL = HEIGHT  /  RIGHT-DRAG = TURN", area.withTrimmedTop (area.getHeight() - 24.0f),
+    g.drawText ("DRAG THE LIGHT  /  SHIFT-DRAG OR SCROLL = HEIGHT  /  RIGHT-DRAG = TURN  /  RIGHT-CLICK = AUTOMATE", area.withTrimmedTop (area.getHeight() - 24.0f),
                 juce::Justification::bottomLeft, false);
 }
 
@@ -832,8 +833,15 @@ void RoomView::mouseDrag (const juce::MouseEvent& e)
     }
 }
 
-void RoomView::mouseUp (const juce::MouseEvent&)
+void RoomView::mouseUp (const juce::MouseEvent& e)
 {
+    if (drag == Drag::Orbit && ! e.mouseWasDraggedSinceMouseDown())
+    {
+        // A right-click that did not turn the room: automate where the sound is.
+        drag = Drag::None;
+        dd::gui::showParamMenu (*this, { pX->getParameterID(), pY->getParameterID(), pZ->getParameterID() });
+        return;
+    }
     if (drag == Drag::Place)
     {
         pX->endChangeGesture();

@@ -20,11 +20,11 @@
   ],
   "previewNote": "on the same 80 BPM part: strummed Em, C and G chords (down and up strokes), then a single-note riff.",
   "whatsNew": {
-    "version": "1.10.0",
+    "version": "1.11.0",
     "items": [
-      "INTERNET GIRL presets (the Cape Town punk / hyperpop / trap trio): Angsty Riff (crunch amp and a drive pedal, doubled), Scratchy Loud (fuzz into a lead amp, every scrape left in), Bedroom Gloom (the dark, clean bedroom-pop side)",
-      "Windows open at a size that fits your screen (about 80 % of a laptop's height) and can be dragged bigger; the size you pick is kept",
-      "Smoother windows: the static panels, shadows and grain are drawn once and reused, so meters and lights no longer redraw the whole window (3 to 4 times less drawing)"
+      "Automate any control the way FL's own plugins do: right-click it and choose Create automation clip (FL Studio's own menu, also Link to controller; Cubase, Bitwig, Reaper and Studio One open its automation lane). In Ableton the right-click menu says where to pick it in the track's automation chooser. A right-click never moves anything.",
+      "Right-click a pedal's footswitch to automate it on and off, or the guitar's name plate to automate which guitar plays.",
+      "Point at a control and the line under the presets says RIGHT-CLICK: AUTOMATE."
     ]
   }
 }

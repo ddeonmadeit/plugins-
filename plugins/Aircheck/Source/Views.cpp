@@ -147,21 +147,30 @@ void ShiftView::setFrom (juce::Point<float> p)
 
 void ShiftView::mouseDown (const juce::MouseEvent& e)
 {
+    if ((popup = e.mods.isPopupMenu()))
+    {
+        dd::gui::showParamMenu (*this, { "pitchShift", "pitchFormant" });
+        return;
+    }
     shiftAtt.beginGesture();
     formantAtt.beginGesture();
     setFrom (e.position);
 }
 
-void ShiftView::mouseDrag (const juce::MouseEvent& e) { setFrom (e.position); }
+void ShiftView::mouseDrag (const juce::MouseEvent& e) { if (! popup) setFrom (e.position); }
 
 void ShiftView::mouseUp (const juce::MouseEvent&)
 {
+    if (popup)
+        return;
     shiftAtt.endGesture();
     formantAtt.endGesture();
 }
 
-void ShiftView::mouseDoubleClick (const juce::MouseEvent&)
+void ShiftView::mouseDoubleClick (const juce::MouseEvent& e)
 {
+    if (e.mods.isPopupMenu())
+        return;
     shiftAtt.setValueAsCompleteGesture (0.0f);
     formantAtt.setValueAsCompleteGesture (0.0f);
 }
@@ -571,7 +580,18 @@ void EqView::mouseDown (const juce::MouseEvent& e)
         return;
     if (e.mods.isPopupMenu())
     {
-        setValue (bandId (b, "On"), bands[(size_t) b].on ? 0.0f : 1.0f, true);
+        // Switch the band on or off, or automate one of its settings (the host's own menu for it).
+        juce::PopupMenu own;
+        own.addItem (bands[(size_t) b].on ? "Switch band " + juce::String (b + 1) + " off" : "Switch band " + juce::String (b + 1) + " on",
+                     [safe = juce::Component::SafePointer<EqView> (this), b]
+                     {
+                         if (safe != nullptr)
+                             safe->setValue (bandId (b, "On"), safe->bands[(size_t) b].on ? 0.0f : 1.0f, true);
+                     });
+        juce::StringArray ids;
+        for (auto* what : { "Freq", "Gain", "Q", "Dyn", "Thresh", "On" })
+            ids.add (bandId (b, what));
+        dd::gui::showParamMenu (*this, ids, own);
         return;
     }
     setSelected (b);

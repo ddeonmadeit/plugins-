@@ -15,9 +15,14 @@ public:
     void setGlowMargin (int pixels) { glowMargin = pixels; repaint(); }
     void paintButton (juce::Graphics&, bool over, bool down) override;
     bool hitTest (int x, int y) override { return getLocalBounds().reduced (glowMargin).contains (x, y); }
+    // A key that picks a parameter's value (tagged, or inside a tagged control) opens its menu on a right-click.
+    void mouseDown (const juce::MouseEvent& e) override { if (! (popup = paramPopup (*this, e))) juce::Button::mouseDown (e); }
+    void mouseDrag (const juce::MouseEvent& e) override { if (! popup) juce::Button::mouseDrag (e); }
+    void mouseUp (const juce::MouseEvent& e) override   { if (! popup) juce::Button::mouseUp (e); }
 
 private:
     void timerCallback() override;
+    bool popup = false;
     juce::String label;
     bool lit;
     int glowMargin = 0;

@@ -11,6 +11,31 @@ void setHelp (juce::Component& c, const juce::String& title, const juce::String&
 /** Marks a custom control as bound to a parameter, so its help comes from the plugin's table. */
 void tagParam (juce::Component& c, const juce::String& paramId, const juce::String& title);
 
+/**
+    Automation. A right-click (Ctrl-click on a Mac) on any control bound to a parameter opens the host's own menu for
+    that parameter, as on its built-in plugins: FL Studio offers Create automation clip and Link to controller;
+    Cubase, Bitwig, Reaper and Studio One open its automation lane. Hosts without one (Ableton Live, AU, the
+    standalone app) get ours: reset to default and how to automate it there. Several ids (a scene that moves two
+    parameters at once) are listed first and the chosen one's menu follows; extra items (the control's own
+    right-click actions) come first in that list.
+*/
+void showParamMenu (juce::Component& from, const juce::StringArray& paramIds, const juce::PopupMenu& extraItems = {});
+
+/** For a control's mouseDown: a right-click on a component tagged with tagParam (or inside one) opens that
+    parameter's menu and returns true, so the control leaves the click alone (no value change, no gesture). */
+bool paramPopup (juce::Component& c, const juce::MouseEvent& e);
+
+/** Marks a drawn scene whose right-click opens the automation menu itself (it calls showParamMenu for the
+    parameters under the mouse), so hovering it says so like a tagged control. */
+void markAutomatable (juce::Component& c);
+
+/** For a stock JUCE control bound to a parameter (a ComboBox ignores right-clicks): tag it with tagParam, then
+    this makes a right-click on it open the parameter's menu. */
+void addParamPopup (juce::Component& c);
+
+/** Tests and the harness: every showParamMenu request goes here instead of opening a menu. */
+std::function<void (juce::Component&, const juce::StringArray&)>& paramMenuHook();
+
 /** For editors built with WANTS_KEYBOARD: only `target` takes the keyboard when clicked. Buttons and menus
     want focus by default, and once one held it Return pressed it again and the arrows changed a menu instead
     of reaching the DAW. Call once every child exists. */
@@ -31,6 +56,8 @@ public:
 
     void setTable (std::map<juce::String, juce::String> byParamId) { table = std::move (byParamId); }
     bool isActive() const noexcept { return text.isNotEmpty(); }
+    /** The control under the mouse can be automated: a right-click on it opens the automation menu. */
+    bool isAutomatable() const noexcept { return automatable; }
     const juce::String& getTitle() const noexcept { return title; }
     const juce::String& getText() const noexcept { return text; }
 
@@ -49,6 +76,7 @@ private:
     juce::Component& owner;
     std::map<juce::String, juce::String> table;
     juce::String title, text;
+    bool automatable = false;
 };
 
 /** Rotary knob bound to a parameter: caption above, live value below, double-click resets. When the value
@@ -72,9 +100,19 @@ private:
     void valueChanged();
     void timerCallback() override;
 
+    /** Leaves right-clicks to the parameter menu (a plain Slider would start a drag on them). */
+    struct KnobSlider : juce::Slider
+    {
+        void mouseDown (const juce::MouseEvent& e) override       { if (! (popup = paramPopup (*this, e))) juce::Slider::mouseDown (e); }
+        void mouseDrag (const juce::MouseEvent& e) override       { if (! popup) juce::Slider::mouseDrag (e); }
+        void mouseUp (const juce::MouseEvent& e) override         { if (! popup) juce::Slider::mouseUp (e); }
+        void mouseDoubleClick (const juce::MouseEvent& e) override { if (! popup) juce::Slider::mouseDoubleClick (e); }
+        bool popup = false;
+    };
+
     float labelScale = 1.0f;
     juce::RangedAudioParameter* param = nullptr;
-    juce::Slider slider;
+    KnobSlider slider;
     juce::String title, valueText;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> attachment;
     float shown = 0.0f;   // drawn position 0..1, easing toward the real one
@@ -88,6 +126,7 @@ public:
 
     void resized() override;
     void paint (juce::Graphics&) override;
+    void mouseDown (const juce::MouseEvent& e) override { paramPopup (*this, e); }   // the box ignores right-clicks
 
 private:
     juce::String title;
@@ -161,6 +200,8 @@ public:
     void resized() override;
 
 private:
+    void mouseDown (const juce::MouseEvent& e) override { paramPopup (time, e); }   // right-click on the length
+
     LampSwitch lamp;
     juce::ComboBox time;
     std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> attachment;

@@ -80,6 +80,12 @@ doubles as an XY control (`HorizonView`), effect on/off lamps (`LampSwitch`), an
 for big knobs. For big UIs copy SubGrit's scaled `Content` component pattern
 (fixed base size, `setTransform`, aspect-locked resizing, zoom stored in state).
 
+Automation: the owner automates knobs in FL Studio by right-clicking them (Create automation clip). The dd_gui
+controls already do it; a custom control is tagged with `dd::gui::tagParam` and starts its mouseDown with
+`if (dd::gui::paramPopup (*this, e)) return;` (a drawn scene that moves several parameters calls
+`dd::gui::showParamMenu (*this, { ids... })`). Drags change values only between begin / end gestures.
+`xvfb-run -a $H automation` checks every control (run_qa.sh runs it).
+
 Check: `xvfb-run -a -s "-screen 0 2560x1600x24" $H snapshot --out ui.png` and *look at the image*.
 Watch for truncated combo text (keep choice names short) and empty cells.
 

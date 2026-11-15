@@ -122,23 +122,37 @@ void HorizonView::setFromPoint (juce::Point<float> p)
 
 void HorizonView::mouseDown (const juce::MouseEvent& e)
 {
+    if ((popup = e.mods.isPopupMenu()))
+    {
+        // Automation for what the orb moves: Motion (across) and Tone (up and down).
+        juce::StringArray ids;
+        for (auto* p : { motion, tone })
+            if (p != nullptr)
+                ids.add (p->getParameterID());
+        dd::gui::showParamMenu (*this, ids);
+        return;
+    }
     dragging = true;
     if (motion != nullptr) motion->beginChangeGesture();
     if (tone != nullptr) tone->beginChangeGesture();
     setFromPoint (e.position);
 }
 
-void HorizonView::mouseDrag (const juce::MouseEvent& e) { setFromPoint (e.position); }
+void HorizonView::mouseDrag (const juce::MouseEvent& e) { if (! popup) setFromPoint (e.position); }
 
 void HorizonView::mouseUp (const juce::MouseEvent&)
 {
+    if (popup)
+        return;
     dragging = false;
     if (motion != nullptr) motion->endChangeGesture();
     if (tone != nullptr) tone->endChangeGesture();
 }
 
-void HorizonView::mouseDoubleClick (const juce::MouseEvent&)
+void HorizonView::mouseDoubleClick (const juce::MouseEvent& e)
 {
+    if (e.mods.isPopupMenu())
+        return;
     for (auto* p : { motion, tone })
         if (p != nullptr)
         {

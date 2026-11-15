@@ -20,7 +20,7 @@ namespace
 //==============================================================================
 namespace
 {
-    const juce::Identifier kParamProp ("ddParam"), kTitleProp ("ddTitle"), kHelpProp ("ddHelp");
+    const juce::Identifier kParamProp ("ddParam"), kTitleProp ("ddTitle"), kHelpProp ("ddHelp"), kAutoProp ("ddAutomatable");
 }
 
 void tagParam (juce::Component& c, const juce::String& paramId, const juce::String& title)
@@ -29,10 +29,161 @@ void tagParam (juce::Component& c, const juce::String& paramId, const juce::Stri
     c.getProperties().set (kTitleProp, title);
 }
 
+void markAutomatable (juce::Component& c) { c.getProperties().set (kAutoProp, true); }
+
 void setHelp (juce::Component& c, const juce::String& title, const juce::String& text)
 {
     c.getProperties().set (kTitleProp, title);
     c.getProperties().set (kHelpProp, text);
+}
+
+//==============================================================================
+namespace
+{
+    juce::RangedAudioParameter* findParam (juce::AudioProcessor& proc, const juce::String& id)
+    {
+        for (auto* p : proc.getParameters())
+            if (auto* r = dynamic_cast<juce::RangedAudioParameter*> (p); r != nullptr && r->getParameterID() == id)
+                return r;
+        return nullptr;
+    }
+
+    juce::AudioProcessorEditor* editorOf (juce::Component& c)
+    {
+        if (auto* ed = dynamic_cast<juce::AudioProcessorEditor*> (&c))
+            return ed;
+        return c.findParentComponentOfClass<juce::AudioProcessorEditor>();
+    }
+
+    // Some hosts hand out IComponentHandler3 but answer createContextMenu with nothing, and JUCE 9 then
+    // dereferences the null menu (Mixcraft, MuLab, DaVinci Resolve; JUCE issue #1788). Only these hosts are asked.
+    bool hostHasParamMenus()
+    {
+        const juce::PluginHostType h;
+        return h.isFruityLoops() || h.isCubase() || h.isNuendo() || h.isBitwigStudio() || h.isReaper()
+            || h.isStudioOne() || h.isFenderStudioPro() || h.isWavelab();
+    }
+
+    juce::String howToAutomate (const juce::String& name)
+    {
+        const auto& h = dd::host();
+        if (h.ableton)                return "Ableton: in Arrangement View press A, then pick " + name + " in the track's chooser";
+        if (h.name == "FL Studio")    return "FL Studio: Tools > Last tweaked > Create automation clip";
+        if (h.shortName == "Logic")   return "Logic: press A, then pick " + name + " in the track's automation menu";
+        return "Pick " + name + " in your DAW's automation list";
+    }
+
+    void resetToDefault (juce::RangedAudioParameter& p)
+    {
+        p.beginChangeGesture();
+        p.setValueNotifyingHost (p.getDefaultValue());
+        p.endChangeGesture();
+    }
+}
+
+std::function<void (juce::Component&, const juce::StringArray&)>& paramMenuHook()
+{
+    static std::function<void (juce::Component&, const juce::StringArray&)> hook;   // message thread only
+    return hook;
+}
+
+void showParamMenu (juce::Component& from, const juce::StringArray& paramIds, const juce::PopupMenu& extraItems)
+{
+    if (auto& hook = paramMenuHook())
+    {
+        hook (from, paramIds);
+        return;
+    }
+    auto* editor = editorOf (from);
+    if (editor == nullptr)
+        return;
+    juce::StringArray ids;
+    for (auto& id : paramIds)
+        if (findParam (editor->processor, id) != nullptr)
+            ids.add (id);
+    if (ids.isEmpty())
+        return;
+
+    const auto options = juce::PopupMenu::Options().withTargetComponent (&from).withMousePosition();
+    juce::Component::SafePointer<juce::Component> safe (&from);
+
+    if (ids.size() > 1 || extraItems.getNumItems() > 0)
+    {
+        // A control that moves several parameters: pick one, then that one's menu.
+        juce::PopupMenu m (extraItems);
+        if (m.getNumItems() > 0)
+            m.addSeparator();
+        m.addSectionHeader ("AUTOMATE");
+        for (auto& id : ids)
+        {
+            auto* p = findParam (editor->processor, id);
+            m.addItem (p->getName (64) + "  (" + p->getCurrentValueAsText() + ")", [safe, id]
+            {
+                if (safe != nullptr)
+                    showParamMenu (*safe, { id });
+            });
+        }
+        m.setLookAndFeel (&from.getLookAndFeel());
+        m.showMenuAsync (options);
+        return;
+    }
+
+    auto* p = findParam (editor->processor, ids[0]);
+    if (hostHasParamMenus())
+        if (auto* context = editor->getHostContext())
+            if (auto menu = context->getContextMenuForParameter (p))
+            {
+                // The host's own menu, where its automation lives (FL: Create automation clip).
+                menu->showNativeMenu (editor->getMouseXYRelative());
+                return;
+            }
+
+    juce::PopupMenu m;
+    m.addSectionHeader (p->getName (64).toUpperCase() + "   " + p->getCurrentValueAsText());
+    m.addItem ("Reset to " + p->getText (p->getDefaultValue(), 64), [safe, id = ids[0]]
+    {
+        if (auto* ed = safe != nullptr ? editorOf (*safe) : nullptr)
+            if (auto* q = findParam (ed->processor, id))
+                resetToDefault (*q);
+    });
+    m.addSeparator();
+    m.addItem (howToAutomate (p->getName (64)), false, false, nullptr);
+    m.setLookAndFeel (&from.getLookAndFeel());   // the plugin's look (a menu window has no parent to take it from)
+    m.showMenuAsync (options);
+}
+
+void addParamPopup (juce::Component& c)
+{
+    struct Forwarder : juce::MouseListener
+    {
+        void mouseDown (const juce::MouseEvent& e) override
+        {
+            if (e.eventComponent != nullptr)
+                paramPopup (*e.eventComponent, e);
+        }
+    };
+    static Forwarder forwarder;   // message thread only; components drop their listeners when deleted
+    c.addMouseListener (&forwarder, true);
+}
+
+bool paramPopup (juce::Component& c, const juce::MouseEvent& e)
+{
+    if (! e.mods.isPopupMenu())
+        return false;
+    // The nearest tagged control from here up; a component with only its own help text is not a parameter
+    // (a key for one value of a choice can carry both: its help, and the parameter it sets).
+    for (auto* p = &c; p != nullptr; p = p->getParentComponent())
+    {
+        const auto& props = p->getProperties();
+        if (props.contains (kParamProp))
+        {
+            showParamMenu (*p, { props[kParamProp].toString() });
+            return true;
+        }
+        if (props.contains (kHelpProp))
+            return false;
+    }
+    return false;
 }
 
 namespace
@@ -68,6 +219,7 @@ void HoverHelp::simulateHover (juce::Component& c)
 void HoverHelp::update (const juce::MouseEvent& e, bool leaving)
 {
     juce::String newTitle, newText;
+    bool newAutomatable = false;
     auto* c = e.eventComponent;
     // Only this editor's window: every open plugin window shares the desktop's mouse.
     const bool ours = c != nullptr && owner.getTopLevelComponent() != nullptr && c->getTopLevelComponent() == owner.getTopLevelComponent();
@@ -80,6 +232,7 @@ void HoverHelp::update (const juce::MouseEvent& e, bool leaving)
             {
                 newTitle = props[kTitleProp].toString();
                 newText = props[kHelpProp].toString();
+                newAutomatable = props.contains (kParamProp) || props.contains (kAutoProp);
                 break;
             }
             if (props.contains (kParamProp))
@@ -88,6 +241,7 @@ void HoverHelp::update (const juce::MouseEvent& e, bool leaving)
                 {
                     newTitle = props[kTitleProp].toString();
                     newText = it->second;
+                    newAutomatable = true;
                 }
                 break;
             }
@@ -96,10 +250,11 @@ void HoverHelp::update (const juce::MouseEvent& e, bool leaving)
     else if (! ours && text.isEmpty())
         return;
 
-    if (newText != text || newTitle != title)
+    if (newText != text || newTitle != title || newAutomatable != automatable)
     {
         title = newTitle;
         text = newText;
+        automatable = newAutomatable;
         if (onChange)
             onChange();
     }
@@ -196,6 +351,7 @@ Choice::Choice (juce::AudioProcessorValueTreeState& state, const juce::String& p
     if (p != nullptr)
         box.addItemList (p->choices, 1);
     addAndMakeVisible (box);
+    box.addMouseListener (this, true);
     attachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment> (state, paramId, box);
 }
 
@@ -279,7 +435,11 @@ void Toggle::paint (juce::Graphics& g)
     g.drawText ((on ? onText : offText).toUpperCase(), row.withRight (getWidth()), juce::Justification::centredLeft, false);
 }
 
-void Toggle::mouseDown (const juce::MouseEvent&) { attachment.setValueAsCompleteGesture (on ? 0.0f : 1.0f); }
+void Toggle::mouseDown (const juce::MouseEvent& e)
+{
+    if (! paramPopup (*this, e))
+        attachment.setValueAsCompleteGesture (on ? 0.0f : 1.0f);
+}
 
 //==============================================================================
 LampSwitch::LampSwitch (juce::RangedAudioParameter& p, const juce::String& l, juce::Colour)
@@ -324,7 +484,11 @@ void LampSwitch::paint (juce::Graphics& g)
     g.drawText (shown, area, juce::Justification::centredLeft, false);
 }
 
-void LampSwitch::mouseDown (const juce::MouseEvent&) { attachment.setValueAsCompleteGesture (on ? 0.0f : 1.0f); }
+void LampSwitch::mouseDown (const juce::MouseEvent& e)
+{
+    if (! paramPopup (*this, e))
+        attachment.setValueAsCompleteGesture (on ? 0.0f : 1.0f);
+}
 
 //==============================================================================
 TapeStopControl::TapeStopControl (juce::AudioProcessorValueTreeState& state, const juce::String& switchId, const juce::String& timeId)
@@ -340,6 +504,8 @@ TapeStopControl::TapeStopControl (juce::AudioProcessorValueTreeState& state, con
     if (auto* p = dynamic_cast<juce::AudioParameterChoice*> (state.getParameter (timeId)))
         time.addItemList (p->choices, 1);
     time.setTooltip ("How long the tape takes to stop");
+    tagParam (time, timeId, "Tape Stop Length");
+    time.addMouseListener (this, true);
     addAndMakeVisible (time);
     attachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment> (state, timeId, time);
 }

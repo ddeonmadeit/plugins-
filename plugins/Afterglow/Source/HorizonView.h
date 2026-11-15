@@ -51,6 +51,6 @@ private:
     std::array<float, kRidge> ridge {}, nearBase {}, midBase {}, farBase {};
     std::vector<juce::Point<float>> stars;
     float level = 0.0f, time = 0.0f;
-    bool dragging = false, overSun = false;
+    bool dragging = false, overSun = false, popup = false;
     dd::gui::HoverHelp help { *this };   // the description gives way to what the control under the mouse does
 };

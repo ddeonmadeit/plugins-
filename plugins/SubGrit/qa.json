@@ -21,5 +21,6 @@
   "targetLufs": -9.5,
   "toleranceLu": 1.5,
   "similarBelow": 0.2,
-  "phrase": "demo"
+  "phrase": "demo",
+  "automationState": "allKnobs=1"
 }

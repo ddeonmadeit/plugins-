@@ -67,6 +67,7 @@ private:
     juce::String label, paramId;
     const Palette& pal;
     float value = 0.0f, dragStart = 0.0f;
+    bool popup = false;   // a right-click opens the automation menu and moves nothing
 };
 
 /** A dot-matrix key on the header: framed text, lit under the mouse, does something when clicked. */
@@ -78,9 +79,10 @@ public:
         setMouseCursor (juce::MouseCursor::PointingHandCursor);
     }
     void paint (juce::Graphics&) override;
+    void mouseDown (const juce::MouseEvent& e) override { popup = dd::gui::paramPopup (*this, e); }
     void mouseUp (const juce::MouseEvent& e) override
     {
-        if (onClick && e.mouseWasClicked() && getLocalBounds().contains (e.getPosition()))
+        if (! popup && onClick && e.mouseWasClicked() && getLocalBounds().contains (e.getPosition()))
             onClick();
     }
     void mouseEnter (const juce::MouseEvent&) override { repaint(); }
@@ -93,6 +95,7 @@ public:
 private:
     const Palette& pal;
     std::function<juce::String()> text;
+    bool popup = false;
 };
 
 /** The little glowing dot next to DEON: click it for the colour wheel. */
@@ -101,9 +104,10 @@ class HueDot : public juce::Component
 public:
     explicit HueDot (const Palette& p) : pal (p) { setMouseCursor (juce::MouseCursor::PointingHandCursor); }
     void paint (juce::Graphics&) override;
+    void mouseDown (const juce::MouseEvent& e) override { popup = dd::gui::paramPopup (*this, e); }
     void mouseUp (const juce::MouseEvent& e) override
     {
-        if (onClick && e.mouseWasClicked())
+        if (! popup && onClick && e.mouseWasClicked())
             onClick();
     }
     void mouseEnter (const juce::MouseEvent&) override { repaint(); }
@@ -114,6 +118,7 @@ public:
 
 private:
     const Palette& pal;
+    bool popup = false;
 };
 
 /** The colour wheel: drag around the ring to turn the hue of the whole panel, double-click for the original. */

@@ -16,6 +16,9 @@
       <Plugin>Harness stress  [--seconds 20] [--sr 48000] [--block 128]
       <Plugin>Harness dump-params    current values as preset-style JSON
       <Plugin>Harness param-info     ids, ranges, kinds and choice names (used by tools/qa/preset_lint.py)
+      <Plugin>Harness controls       every control in the editor and the parameter it is bound to
+      <Plugin>Harness automation     right-click and use every control as a host would see it (xvfb-run)
+      any command: [--state name=value,...]   set attributes of the saved state first (SubGrit: allKnobs=1)
 */
 
 #include <juce_audio_formats/juce_audio_formats.h>
@@ -25,7 +28,13 @@
 #include <dd_gui/dd_gui.h>
 
 #include <chrono>
+#include <cxxabi.h>
+#if JUCE_LINUX
+ #include <dlfcn.h>
+#endif
 #include <iostream>
+#include <set>
+#include <typeinfo>
 
 namespace
 {
@@ -850,6 +859,315 @@ int cmdSnapshot (juce::AudioProcessor& proc, const Args& a)
     return 0;
 }
 
+juce::String className (const juce::Component& c)
+{
+    int status = 0;
+    char* d = abi::__cxa_demangle (typeid (c).name(), nullptr, nullptr, &status);
+    juce::String s (status == 0 && d != nullptr ? d : typeid (c).name());
+    std::free (d);
+    return s;
+}
+
+// Every control in the editor: what it is, where, and which parameter it is bound to (its "ddParam" tag);
+// then the parameters no visible control is tagged with.
+int cmdControls (juce::AudioProcessor& proc)
+{
+    proc.setPlayConfigDetails (2, 2, 48000.0, 256);
+    proc.prepareToPlay (48000.0, 256);
+    std::unique_ptr<juce::AudioProcessorEditor> ed (proc.createEditorAndMakeActive());
+    if (ed == nullptr)
+        return 1;
+    ed->setVisible (true);
+    std::set<juce::String> tagged;
+    std::function<void (juce::Component&, int)> walk = [&] (juce::Component& c, int depth)
+    {
+        const auto& props = c.getProperties();
+        const auto param = props["ddParam"].toString();
+        const bool interactive = dynamic_cast<juce::Slider*> (&c) != nullptr || dynamic_cast<juce::Button*> (&c) != nullptr
+                              || dynamic_cast<juce::ComboBox*> (&c) != nullptr;
+        if (param.isNotEmpty() || props.contains ("ddHelp") || interactive || (c.getNumChildComponents() == 0 && c.getWidth() * c.getHeight() > 3000))
+        {
+            const auto r = ed->getLocalArea (&c, c.getLocalBounds());
+            std::cout << juce::String::repeatedString ("  ", depth) << className (c) << "  [" << r.toString() << "]"
+                      << (c.isShowing() ? "" : "  hidden") << (param.isNotEmpty() ? "  param=" + param : juce::String())
+                      << (props.contains ("ddTitle") ? "  \"" + props["ddTitle"].toString() + "\"" : juce::String()) << "\n";
+        }
+        if (param.isNotEmpty())
+            tagged.insert (param);
+        for (auto* child : c.getChildren())
+            walk (*child, depth + 1);
+    };
+    walk (*ed, 0);
+    std::cout << "\nparameters without a tagged control:";
+    for (auto* p : proc.getParameters())
+        if (auto* wid = dynamic_cast<juce::AudioProcessorParameterWithID*> (p); wid != nullptr && tagged.count (wid->paramID) == 0)
+            std::cout << " " << wid->paramID;
+    std::cout << "\n";
+    proc.editorBeingDeleted (ed.get());
+    return 0;
+}
+
+// What the host hears while the editor is used: gestures (VST3 beginEdit / endEdit) and value changes.
+struct GestureLog : juce::AudioProcessorListener
+{
+    std::map<int, int> open;
+    int changes = 0, outside = 0, unbalanced = 0, begins = 0;
+    std::set<int> changed;
+    void audioProcessorParameterChanged (juce::AudioProcessor*, int i, float) override
+    {
+        ++changes;
+        changed.insert (i);
+        if (open[i] <= 0)
+            ++outside;
+    }
+    void audioProcessorParameterChangeGestureBegin (juce::AudioProcessor*, int i) override { ++open[i]; ++begins; }
+    void audioProcessorParameterChangeGestureEnd (juce::AudioProcessor*, int i) override   { if (--open[i] < 0) ++unbalanced; }
+    void audioProcessorChanged (juce::AudioProcessor*, const ChangeDetails&) override {}
+    bool balanced() const
+    {
+        for (auto& [i, depth] : open)
+            if (depth != 0)
+                return false;
+        return unbalanced == 0;
+    }
+    void reset() { open.clear(); changes = outside = unbalanced = begins = 0; changed.clear(); }
+};
+
+// Automation from the editor, as a host sees it. The editor goes on a (virtual) screen and gets real mouse events.
+// Every control bound to a parameter: a right-click asks for that parameter's menu (the host's own, where FL Studio
+// offers Create automation clip) and changes nothing; a drag or click changes values only inside gestures, so the
+// host can record it and knows what was last tweaked. The drawn scenes are right-clicked all over (never a change)
+// and dragged once. Prints the parameters no right-click reaches.
+int cmdAutomation (juce::AudioProcessor& proc, const Args& args)
+{
+    proc.setPlayConfigDetails (2, 2, 48000.0, 256);
+    proc.prepareToPlay (48000.0, 256);
+    std::unique_ptr<juce::AudioProcessorEditor> ed (proc.createEditorAndMakeActive());
+    if (ed == nullptr)
+        return 1;
+   #if JUCE_LINUX
+    // A bare Xvfb has no window manager, so the WM_* atoms JUCE sets on a new window do not exist and Xlib's
+    // default error handler would end the process (a JUCE app installs a forgiving one; this is not an app).
+    if (auto* x11 = dlopen ("libX11.so.6", RTLD_LAZY | RTLD_NOLOAD))
+        if (auto* setHandler = reinterpret_cast<void* (*) (int (*) (void*, void*))> (dlsym (x11, "XSetErrorHandler")))
+            setHandler ([] (void*, void*) { return 0; });
+   #endif
+
+    // In a plain window, as a host or pluginval shows it.
+    auto window = std::make_unique<juce::DocumentWindow> ("automation", juce::Colours::black, 0);
+    window->setUsingNativeTitleBar (false);
+    window->setTitleBarHeight (0);
+    window->setContentNonOwned (ed.get(), true);
+    window->setTopLeftPosition (0, 0);
+    window->addToDesktop();
+    window->setVisible (true);
+    auto* peer = window->getPeer();
+    if (peer == nullptr)
+    {
+        std::cerr << "automation: no window (run under xvfb-run)\n";
+        return 1;
+    }
+
+    std::vector<juce::StringArray> menus;
+    dd::gui::paramMenuHook() = [&menus] (juce::Component&, const juce::StringArray& ids) { menus.push_back (ids); };
+    GestureLog log;
+    proc.addListener (&log);
+
+    juce::int64 clock = juce::Time::currentTimeMillis();
+    auto send = [&] (juce::Point<float> p, juce::ModifierKeys mods)
+    {
+        clock += 40;
+        p = peer->getComponent().getLocalPoint (ed.get(), p);
+        peer->handleMouseEvent (juce::MouseInputSource::InputSourceType::mouse, p, mods, juce::MouseInputSource::defaultPressure,
+                                juce::MouseInputSource::defaultOrientation, clock);
+    };
+    const auto none = juce::ModifierKeys();
+    const auto left = juce::ModifierKeys (juce::ModifierKeys::leftButtonModifier);
+    const auto right = juce::ModifierKeys (juce::ModifierKeys::rightButtonModifier);
+    auto settle = [&]
+    {
+        clock += 1000;   // no double-clicks between tests
+        juce::PopupMenu::dismissAllActiveMenus();
+    };
+    auto rightClick = [&] (juce::Point<float> p) { send (p, none); send (p, right); send (p, none); };
+    auto at = [&] (juce::Component& c) { return ed->getLocalPoint (&c, c.getLocalBounds().getCentre().toFloat()); };
+    auto idOf = [] (juce::Component& c) { return c.getProperties()["ddParam"].toString(); };
+    // A point where the control itself gets the mouse (not a control inside it with its own parameter): the
+    // centre when that works, else the first such point on a grid (a pedal's footswitch under its knobs).
+    auto spotOn = [&] (juce::Component& c)
+    {
+        auto owns = [&] (juce::Point<float> p)
+        {
+            for (auto* hit = ed->getComponentAt (p.roundToInt()); hit != nullptr; hit = hit->getParentComponent())
+            {
+                if (hit == &c)
+                    return true;
+                if (idOf (*hit).isNotEmpty())
+                    return false;
+            }
+            return false;
+        };
+        if (owns (at (c)))
+            return at (c);
+        for (int y = 2; y < c.getHeight(); y += 6)
+            for (int x = 2; x < c.getWidth(); x += 6)
+                if (const auto p = ed->getLocalPoint (&c, juce::Point<float> ((float) x, (float) y)); owns (p))
+                    return p;
+        return at (c);
+    };
+
+    // Controls tagged with a parameter (knobs, choices, switches, keys, dials), as shown.
+    std::vector<juce::Component::SafePointer<juce::Component>> tagged;
+    std::function<void (juce::Component&)> collect = [&] (juce::Component& c)
+    {
+        if (idOf (c).isNotEmpty() && c.isShowing() && ! c.getLocalBounds().isEmpty())
+            tagged.emplace_back (&c);
+        for (auto* child : c.getChildren())
+            collect (*child);
+    };
+    collect (*ed);
+
+    std::set<juce::String> reached;
+    juce::StringArray failures;
+    int tested = 0;
+    for (auto& sp : tagged)
+    {
+        if (sp == nullptr || ! sp->isShowing())
+            continue;
+        auto& c = *sp;
+        const auto id = idOf (c);
+        const auto where = className (c) + " " + id;
+        ++tested;
+
+        menus.clear();
+        log.reset();
+        const auto p = spotOn (c);
+        rightClick (p);
+        const bool asked = ! menus.empty() && menus.back().contains (id);
+        if (! asked)
+            failures.add (where + ": right-click opened no menu for it");
+        if (log.changes > 0 || log.begins > 0)
+            failures.add (where + ": right-click changed a value or started a gesture");
+        for (auto& m : menus)
+            for (auto& i : m)
+                reached.insert (i);
+        settle();
+
+        // Use it: drag a knob or dial, click a switch or key. Choices only open their list.
+        log.reset();
+        const bool isSwitch = dynamic_cast<dd::gui::Toggle*> (&c) != nullptr || dynamic_cast<dd::gui::LampSwitch*> (&c) != nullptr
+                           || dynamic_cast<dd::gui::Key*> (&c) != nullptr;
+        if (dynamic_cast<dd::gui::Knob*> (&c) != nullptr || className (c).contains ("HudDial") || isSwitch)
+        {
+            send (p, none);
+            send (p, left);
+            if (! isSwitch)
+                for (int k = 1; k <= 8; ++k)
+                    send (p.translated (0.0f, (float) (k <= 4 ? -8 * k : -8 * (8 - k))), left);
+            send (p, none);
+            // A key for the value already chosen changes nothing, so it needs no gesture.
+            if (log.begins == 0 && dynamic_cast<dd::gui::Key*> (&c) == nullptr)
+                failures.add (where + ": using it started no gesture");
+            if (log.outside > 0)
+                failures.add (where + ": " + juce::String (log.outside) + " change(s) outside a gesture");
+            if (! log.balanced())
+                failures.add (where + ": gestures not closed");
+        }
+        settle();
+    }
+
+    // Drawn scenes: right-click everywhere (a menu or nothing, never a change), then one drag through the middle.
+    int sceneClicks = 0;
+    for (auto* name : { "HorizonView", "ShiftView", "EqView", "RoomView", "KitView", "GuitarView", "PedalView" })
+    {
+        std::vector<juce::Component::SafePointer<juce::Component>> scenes;
+        std::function<void (juce::Component&)> find = [&] (juce::Component& c)
+        {
+            if (className (c).endsWith (name) && c.isShowing())
+                scenes.emplace_back (&c);
+            for (auto* child : c.getChildren())
+                find (*child);
+        };
+        find (*ed);
+        for (auto& sp : scenes)
+        {
+            for (int y = 4; sp != nullptr && y < sp->getHeight(); y += 12)
+                for (int x = 4; sp != nullptr && x < sp->getWidth(); x += 12)
+                {
+                    const auto p = ed->getLocalPoint (sp.getComponent(), juce::Point<float> ((float) x, (float) y));
+                    if (ed->getComponentAt (p.roundToInt()) != sp.getComponent())
+                        continue;   // a control on top of the scene: tested above
+                    menus.clear();
+                    log.reset();
+                    rightClick (p);
+                    ++sceneClicks;
+                    for (auto& m : menus)
+                        for (auto& i : m)
+                            reached.insert (i);
+                    if (log.changes > 0 || log.begins > 0)
+                        failures.add (juce::String (name) + ": right-click at " + p.toString() + " changed a value or started a gesture");
+                    settle();
+                }
+            if (sp == nullptr)
+                continue;
+            log.reset();
+            const auto c = at (*sp);
+            send (c, none);
+            send (c, left);
+            for (int k = 1; k <= 6; ++k)
+                send (c.translated ((float) (10 * k), (float) (-6 * k)), left);
+            send (c.translated (60.0f, -36.0f), none);
+            if (log.outside > 0)
+                failures.add (juce::String (name) + ": dragging changed " + juce::String (log.outside) + " value(s) outside a gesture");
+            if (! log.balanced())
+                failures.add (juce::String (name) + ": dragging left a gesture open");
+            settle();
+        }
+    }
+
+    proc.removeListener (&log);
+    dd::gui::paramMenuHook() = nullptr;
+
+    // --menu-shot out.png: the menu a right-click on the first knob opens without a host menu (Ableton, AU, the
+    // standalone app; DD_HOST picks the host named in it), as a picture.
+    if (args.has ("--menu-shot"))
+        for (auto& sp : tagged)
+            if (sp != nullptr && dynamic_cast<dd::gui::Knob*> (sp.getComponent()) != nullptr && sp->isShowing())
+            {
+                rightClick (spotOn (*sp));
+                auto& desktop = juce::Desktop::getInstance();
+                for (int i = desktop.getNumComponents(); --i >= 0;)
+                    if (auto* top = desktop.getComponent (i); top != nullptr && top != window.get() && top->isVisible())
+                    {
+                        const auto img = top->createComponentSnapshot (top->getLocalBounds(), true, 2.0f);
+                        const juce::File out (args.get ("--menu-shot"));
+                        out.deleteFile();
+                        juce::FileOutputStream fos (out);
+                        juce::PNGImageFormat().writeImageToStream (img, fos);
+                        std::cout << "menu: " << out.getFullPathName() << " (" << top->getWidth() << "x" << top->getHeight() << ")\n";
+                        break;
+                    }
+                juce::PopupMenu::dismissAllActiveMenus();
+                break;
+            }
+
+    juce::StringArray unreached;
+    for (auto* prm : proc.getParameters())
+        if (auto* wid = dynamic_cast<juce::AudioProcessorParameterWithID*> (prm); wid != nullptr && reached.count (wid->paramID) == 0)
+            unreached.add (wid->paramID);
+    std::cout << "automation: " << tested << " controls, " << sceneClicks << " right-clicks on drawn scenes, "
+              << (int) reached.size() << " of " << proc.getParameters().size() << " parameters reachable by right-click\n";
+    if (unreached.size() > 0)
+        std::cout << "  no control on screen: " << unreached.joinIntoString (" ") << "\n";
+    for (auto& f : failures)
+        std::cout << "  FAIL " << f << "\n";
+    window->clearContentComponent();
+    window = nullptr;
+    proc.editorBeingDeleted (ed.get());
+    ed = nullptr;
+    return failures.isEmpty() ? 0 : 2;
+}
+
 int cmdStress (juce::AudioProcessor& proc, const Args& a)
 {
     const double sr = a.get ("--sr", "48000").getDoubleValue();
@@ -971,6 +1289,24 @@ int main (int argc, char* argv[])
             if (auto* rp = dynamic_cast<juce::AudioParameterBool*> (p); rp != nullptr && dd::isPerformanceParam (rp->getParameterID()))
                 rp->setValueNotifyingHost (0.0f);
 
+    // --state name=value,...: set attributes of the saved state (an XML state's root), e.g. a view switch the
+    // editor keeps there (SubGrit: --state allKnobs=1).
+    if (a.has ("--state"))
+    {
+        juce::MemoryBlock mb;
+        proc->getStateInformation (mb);
+        if (auto xml = juce::AudioProcessor::getXmlFromBinary (mb.getData(), (int) mb.getSize()))
+        {
+            for (auto& kv : juce::StringArray::fromTokens (a.get ("--state"), ",", ""))
+                xml->setAttribute (kv.upToFirstOccurrenceOf ("=", false, false), kv.fromFirstOccurrenceOf ("=", false, false));
+            juce::MemoryBlock patched;
+            juce::AudioProcessor::copyXmlToBinary (*xml, patched);
+            proc->setStateInformation (patched.getData(), (int) patched.getSize());
+        }
+        else
+            std::cerr << "--state: this plugin's state is not XML, ignored\n";
+    }
+
     int rc = 0;
     if (cmd == "list")             rc = cmdList (*proc);
     else if (cmd == "dump-params") rc = cmdDumpParams (*proc);
@@ -979,9 +1315,11 @@ int main (int argc, char* argv[])
     else if (cmd == "render-all")  rc = cmdRenderAll (*proc, a);
     else if (cmd == "snapshot")    rc = cmdSnapshot (*proc, a);
     else if (cmd == "stress")      rc = cmdStress (*proc, a);
+    else if (cmd == "controls")    rc = cmdControls (*proc);
+    else if (cmd == "automation")  rc = cmdAutomation (*proc, a);
     else
     {
-        std::cerr << "unknown command '" << cmd << "' (list | dump-params | param-info | render | render-all | snapshot | stress)\n";
+        std::cerr << "unknown command '" << cmd << "' (list | dump-params | param-info | render | render-all | snapshot | stress | controls | automation)\n";
         rc = 64;
     }
 

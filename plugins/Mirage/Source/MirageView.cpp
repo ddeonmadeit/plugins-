@@ -162,14 +162,22 @@ void HudDial::paint (juce::Graphics& g)
                    isMouseOverOrDragging() ? pal.orange : pal.red, juce::Justification::centred, 0.5f);
 }
 
-void HudDial::mouseDown (const juce::MouseEvent&) { dragStart = value; attachment.beginGesture(); }
+void HudDial::mouseDown (const juce::MouseEvent& e)
+{
+    if ((popup = dd::gui::paramPopup (*this, e)))
+        return;
+    dragStart = value;
+    attachment.beginGesture();
+}
 void HudDial::mouseDrag (const juce::MouseEvent& e)
 {
+    if (popup)
+        return;
     const float v = juce::jlimit (0.0f, 1.0f, dragStart - (float) e.getDistanceFromDragStartY() / 180.0f);
     attachment.setValueAsPartOfGesture (param.convertFrom0to1 (v));
 }
-void HudDial::mouseUp (const juce::MouseEvent&) { attachment.endGesture(); }
-void HudDial::mouseDoubleClick (const juce::MouseEvent&) { attachment.setValueAsCompleteGesture (param.convertFrom0to1 (param.getDefaultValue())); }
+void HudDial::mouseUp (const juce::MouseEvent&) { if (! popup) attachment.endGesture(); }
+void HudDial::mouseDoubleClick (const juce::MouseEvent& e) { if (! e.mods.isPopupMenu()) attachment.setValueAsCompleteGesture (param.convertFrom0to1 (param.getDefaultValue())); }
 
 //==============================================================================
 void HeaderKey::paint (juce::Graphics& g)

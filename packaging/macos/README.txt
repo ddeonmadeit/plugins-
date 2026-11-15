@@ -36,8 +36,15 @@ OR, IN ABLETON LIVE
   instrument onto a MIDI track, an effect onto an audio track.
   Key names follow the DAW: Ableton calls middle C "C3" where FL Studio says "C5", and the
   plug-ins show their keys the same way as the piano roll you are using.
-  Contour and Hush: transfer and edit in Arrangement View (Session clips have no fixed place
+  Contour and Hush: use them in Arrangement View (Session clips have no fixed place
   in the song, so the take can't line up with them).
+
+AUTOMATING A KNOB
+  Right-click any knob, switch or menu in the plug-in (a right-click never moves it).
+  FL Studio (VST3): FL's own menu opens; choose "Create automation clip" (or "Link to controller").
+    With the AU version, move the knob, then Tools > Last tweaked > Create automation clip.
+  Ableton Live: in Arrangement View press A, then pick the control by name in the track's
+    automation chooser (or arm Automation and move it while the song plays).
 
 CREDITS
   Interface font: Instrument Sans, Copyright 2022 The Instrument Sans Project Authors,

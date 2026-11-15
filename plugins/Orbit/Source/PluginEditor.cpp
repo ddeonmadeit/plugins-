@@ -85,6 +85,7 @@ ChoiceKeys::ChoiceKeys (juce::RangedAudioParameter& p, int columns, const juce::
         k->setFlickerPeriod (4.3 + 0.37 * (i % 5));
         k->onClick = [this, i] { attachment.setValueAsCompleteGesture ((float) i); };
         dd::gui::setHelp (*k, names[i], help[i]);
+        k->getProperties().set ("ddParam", p.getParameterID());   // right-click: automate the choice
         addAndMakeVisible (k);
     }
     attachment.sendInitialUpdate();
@@ -131,6 +132,7 @@ EarsControl::EarsControl (juce::AudioProcessorValueTreeState& s)
 {
     dd::gui::tagParam (*this, "perfHead", "Ears");
     dd::gui::tagParam (box, "perfHead", "Ears");
+    box.addMouseListener (this, true);   // the box ignores right-clicks: they open the automation menu
     addAndMakeVisible (box);
 }
 
