@@ -57,6 +57,12 @@ branch pushes are fine, hence the version-bump model.
    `https://github.com/ddeonmadeit/plugins-/releases/download/<Name>-v<ver>/<Name>-<ver>-macOS.pkg`
    answers `curl -sI` with 302; https://ddeonmadeit.github.io/plugins-/ shows the version.
 
+If the macOS job is cancelled before any step ran (annotation "The job was not acquired by Runner of type
+hosted even after multiple attempts": GitHub ran out of macOS runners), nothing is released, and from this
+container a re-run or dispatch gets 403. The release is still due, so the next push to `main` releases it
+(`pick_plugins.sh` adds every plugin whose VERSION has no release): push the next real commit, never an
+empty one. A main run whose `libraries` cache was evicted (7 days unused) rebuilds it first (~1h45).
+
 The repo is public, so release assets download without a GitHub login. Never delete a release tag that
 users may have linked to; ship a new version instead. Releases made by CI do not trigger other workflows
 (GITHUB_TOKEN events never do), which is why the site job lives in the same workflow.
