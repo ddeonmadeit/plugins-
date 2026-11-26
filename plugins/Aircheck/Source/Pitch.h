@@ -71,6 +71,8 @@ public:
         W = (int) (0.024 * dsr);
         maxLag = (int) std::ceil (dsr / kMinHz) + 2;
         minLag = std::max (2, (int) std::floor (dsr / kMaxHz));
+        minWin = (int) std::lround (0.010 * dsr);
+        hopSec = (float) (kHop / dsr);
         lp1.set (dd::Biquad::Type::LowPass, 2400.0f, 0.5412f, 0.0f, sr);
         lp2.set (dd::Biquad::Type::LowPass, 2400.0f, 1.3066f, 0.0f, sr);
         hp.set (dd::Biquad::Type::HighPass, 55.0f, 0.707f, 0.0f, sr);
@@ -96,6 +98,7 @@ public:
         hz = 0.0f;
         prevTau = 0.0f;
         jumpVotes = 0;
+        recentDb = -100.0f;
     }
 
     /** Feed one full-rate mono sample; true when a new estimate is ready (every ~2.7 ms). */
@@ -132,15 +135,23 @@ private:
 
     void analyse() noexcept
     {
-        const int N = W + maxLag;
+        const int N = W + maxLag, c = N / 2;
         for (int j = 0; j < N; ++j)
             frame[(size_t) j] = dbuf[(size_t) ((dpos - N + j + dmask + 1) & dmask)];
 
+        // The window: 2.5 periods of the voice being followed (10 ms at the least), all of W while searching,
+        // and for every lag centred on the same moment (the middle of the frame). A long window, or one whose
+        // centre moves with the lag, smears legato note changes and fast vibrato: the voice reads as unvoiced
+        // there, and the shifter lets go of the note for a moment at every change.
+        const int Wv = voiced && prevTau > 0.0f ? juce::jlimit (minWin, W, (int) std::lround (prevTau * 2.5f)) : W;
         float energy = 0.0f;
-        for (int j = maxLag; j < N; ++j)
+        for (int j = c - Wv / 2; j < c + Wv / 2; ++j)
             energy += frame[(size_t) j] * frame[(size_t) j];
-        const float rmsDb = dd::gainToDb (std::sqrt (energy / (float) W));
-        if (rmsDb < -52.0f)
+        const float rmsDb = dd::gainToDb (std::sqrt (energy / (float) Wv));
+        // Silence is judged against how loud the take has been lately (falling 6 dB a second), not a fixed
+        // level: a vocal recorded quietly, or the soft end of a note, is still a voice to follow.
+        recentDb = std::max (rmsDb, recentDb - 6.0f * hopSec);
+        if (rmsDb < std::max (-75.0f, recentDb - 48.0f))
         {
             voiced = false;
             prevTau = 0.0f;
@@ -153,10 +164,12 @@ private:
         cmnd[0] = 1.0f;
         for (int tau = 1; tau <= maxLag - 1; ++tau)
         {
+            const float* a = x + c - (Wv + tau) / 2;
+            const float* b = a + tau;
             float d = 0.0f;
-            for (int j = 0; j < W; ++j)
+            for (int j = 0; j < Wv; ++j)
             {
-                const float e = x[j] - x[j + tau];
+                const float e = a[j] - b[j];
                 d += e * e;
             }
             diff[(size_t) tau] = d;
@@ -164,49 +177,58 @@ private:
             cmnd[(size_t) tau] = running > 0.0f ? d * (float) tau / running : 1.0f;
         }
 
-        // First dip under the threshold (step 4), else the global minimum if it is clear enough.
-        const float threshold = voiced ? 0.2f : 0.13f;
-        int best = -1;
-        for (int tau = minLag; tau < maxLag - 2; ++tau)
-            if (cmnd[(size_t) tau] < threshold)
+        // The period is the deepest dip, or the shortest dip nearly as deep (a period's multiples dip as
+        // deep as it does). Plain YIN takes the first dip under a fixed threshold instead, which lands on
+        // the 2nd or 3rd harmonic whenever a vowel's first formant makes that harmonic loud ("ah" sung low):
+        // the shifter then cuts grains a third of a period long, a buzz an octave or more off.
+        int deepest = -1;
+        for (int tau = minLag; tau < maxLag - 1; ++tau)
+            if (cmnd[(size_t) tau] <= cmnd[(size_t) tau - 1] && cmnd[(size_t) tau] < cmnd[(size_t) tau + 1]
+                && (deepest < 0 || cmnd[(size_t) tau] < cmnd[(size_t) deepest]))
+                deepest = tau;
+        if (deepest < 0 || cmnd[(size_t) deepest] > (voiced ? 0.42f : 0.3f))
+        {
+            voiced = false;
+            prevTau = 0.0f;
+            return;
+        }
+        const float gmin = cmnd[(size_t) deepest];
+        const float accept = gmin + 0.07f * (1.0f - gmin);
+        int best = deepest;
+        for (int tau = minLag; tau < deepest; ++tau)
+            if (cmnd[(size_t) tau] <= cmnd[(size_t) tau - 1] && cmnd[(size_t) tau] < cmnd[(size_t) tau + 1] && cmnd[(size_t) tau] <= accept)
             {
-                while (tau + 1 < maxLag - 1 && cmnd[(size_t) tau + 1] < cmnd[(size_t) tau])
-                    ++tau;
                 best = tau;
                 break;
             }
-        if (best < 0)
-        {
-            best = minLag;
-            for (int tau = minLag; tau < maxLag - 1; ++tau)
-                if (cmnd[(size_t) tau] < cmnd[(size_t) best])
-                    best = tau;
-            if (cmnd[(size_t) best] > (voiced ? 0.42f : 0.3f))
-            {
-                voiced = false;
-                prevTau = 0.0f;
-                return;
-            }
-        }
 
         // Continuity: a voice does not leap to an overtone (or below its note) in one 2.7 ms hop, but a
-        // breathy or bright voice can make YIN do exactly that. While the previous period still fits nearly
-        // as well, keep following it; a real note change makes it fit badly and is taken at once, and a
-        // new period that keeps winning for four hops is taken anyway. (A wrong period makes the shifter
-        // cut grains a third or a sixth of a real period long: a squeaky buzz, not a voice.)
+        // breathy or bright voice, or a consonant between two notes, can make YIN do exactly that. While the
+        // previous period still fits nearly as well, keep following it; a jump is taken when the new period
+        // is cleanly periodic and fits clearly better, or keeps winning for four hops. A jump onto a period
+        // that only fits loosely is a consonant, not a note: unvoiced. (A wrong period makes the shifter cut
+        // grains a third or a sixth of a real period long: a squeaky buzz, not a voice.)
         if (voiced && prevTau > 0.0f)
         {
             const float ratio = (float) best / prevTau;
             if (ratio < 0.88f || ratio > 1.12f)
             {
+                const bool clean = cmnd[(size_t) best] < 0.2f;
                 const int lo = std::max (minLag, (int) std::floor (prevTau * 0.88f));
                 const int hi = std::min (maxLag - 2, (int) std::ceil (prevTau * 1.12f));
                 int near = -1;
                 for (int tau = lo; tau <= hi; ++tau)
                     if (near < 0 || cmnd[(size_t) tau] < cmnd[(size_t) near])
                         near = tau;
-                if (near >= 0 && cmnd[(size_t) near] < 0.3f && cmnd[(size_t) near] < cmnd[(size_t) best] + 0.12f && ++jumpVotes < 4)
+                if (near >= 0 && cmnd[(size_t) near] < 0.42f && (! clean || cmnd[(size_t) near] < cmnd[(size_t) best] + 0.12f) && ++jumpVotes < 4)
                     best = near;
+                else if (! clean)
+                {
+                    voiced = false;
+                    prevTau = 0.0f;
+                    jumpVotes = 0;
+                    return;
+                }
                 else
                     jumpVotes = 0;
             }
@@ -220,17 +242,16 @@ private:
         float tauD = (float) best;
         if (best > 1 && best < maxLag - 1)
         {
-            const float a = cmnd[(size_t) best - 1], b = cmnd[(size_t) best], c = cmnd[(size_t) best + 1];
-            const float den = a - 2.0f * b + c;
+            const float a = cmnd[(size_t) best - 1], b = cmnd[(size_t) best], cc = cmnd[(size_t) best + 1];
+            const float den = a - 2.0f * b + cc;
             if (den > 1.0e-9f)
-                tauD += juce::jlimit (-0.5f, 0.5f, 0.5f * (a - c) / den);
+                tauD += juce::jlimit (-0.5f, 0.5f, 0.5f * (a - cc) / den);
         }
         const float lagF = tauD * (float) decim;
         const int lo = std::max (2, (int) std::floor (lagF) - decim);
         const int hi = std::min ((maxLag - 1) * decim, (int) std::ceil (lagF) + decim);
-        const int WF = W * decim;
-        const int span = WF + hi;
-        const int base = fpos - span;   // oldest sample of the full-rate window
+        const int WF = Wv * decim;
+        const int centre = fpos - (N - c) * decim;   // the frame's middle in the full-rate buffer
         float bestD = 1.0e30f, dm = 0.0f, dp = 0.0f;
         int bestL = lo;
         std::array<float, 64> dl {};
@@ -238,6 +259,7 @@ private:
         for (int k = 0; k < nl; ++k)
         {
             const int L = lo + k;
+            const int base = centre - (WF + L) / 2;
             float d = 0.0f;
             for (int j = 0; j < WF; j += 1)
             {
@@ -263,13 +285,13 @@ private:
 
     static constexpr int kHop = 32;   // decimated samples between estimates
     double sr = 48000.0, dsr = 12000.0;
-    int decim = 4, W = 288, maxLag = 187, minLag = 11;
+    int decim = 4, W = 288, maxLag = 187, minLag = 11, minWin = 120;
     dd::Biquad lp1, lp2, hp;
     std::vector<float> dbuf, full, frame, diff, cmnd;
     int dmask = 0, fmask = 0, dpos = 0, fpos = 0, dcount = 0, hopCount = 0;
     int64_t count = 0;
     bool voiced = false;
-    float hz = 0.0f, clarity = 0.0f, prevTau = 0.0f;
+    float hz = 0.0f, clarity = 0.0f, prevTau = 0.0f, recentDb = -100.0f, hopSec = 0.0027f;
     int jumpVotes = 0;
 };
 
@@ -302,7 +324,7 @@ public:
     void reset()
     {
         shift = 0.0f;
-        centre = -1.0f;
+        centre = noteSel = -1.0f;
         target = -1;
         noteAge = 0.0f;
         unvoicedFor = 1.0f;
@@ -319,7 +341,7 @@ public:
             if (unvoicedFor > 0.06f)
             {
                 histN = 0;
-                centre = -1.0f;
+                centre = noteSel = -1.0f;
             }
             return shift + s.transpose;
         }
@@ -349,12 +371,21 @@ public:
         }
         const float follow = centre + (midi - centre) * (1.0f - s.vibrato);   // what we correct
 
+        // What picks the note: with vibrato kept, its centre; with it flattened, the pitch over the last
+        // 30 ms. Never the raw pitch: a held note sung between two semitones wobbles across the boundary,
+        // and the output would flip between them (the warble of a cheap hard tune).
+        if (noteSel < 0.0f || onset || std::abs (midi - noteSel) > 0.9f)
+            noteSel = midi;
+        else
+            noteSel += (midi - noteSel) * (1.0f - std::exp (-hopSec / 0.03f));
+        const float judge = centre + (noteSel - centre) * (1.0f - s.vibrato);
+
         // Target: nearest note of the scale, kept until another one is clearly closer.
         const uint16_t mask = scaleMask (s.scale);
-        const int candidate = nearestInScale (follow, s.key, mask);
+        const int candidate = nearestInScale (judge, s.key, mask);
         if (target < 0 || onset)
             target = candidate;
-        else if (candidate != target && std::abs (follow - (float) candidate) + 0.1f < std::abs (follow - (float) target))
+        else if (candidate != target && std::abs (judge - (float) candidate) + 0.2f < std::abs (judge - (float) target))
             target = candidate;
         if (! inScale (target, s.key, mask))
             target = candidate;
@@ -409,7 +440,7 @@ private:
         return best;
     }
 
-    float hopSec = 0.0027f, shift = 0.0f, centre = -1.0f, settle = 0.0f, noteAge = 0.0f, unvoicedFor = 1.0f, inputMidi = 0.0f;
+    float hopSec = 0.0027f, shift = 0.0f, centre = -1.0f, noteSel = -1.0f, settle = 0.0f, noteAge = 0.0f, unvoicedFor = 1.0f, inputMidi = 0.0f;
     int target = -1, lastTarget = -1, histN = 0;
     float hist[3] {};
 };
@@ -417,10 +448,11 @@ private:
 //==============================================================================
 /**
     Real-time TD-PSOLA for up to two channels sharing one set of pitch marks (from the mono sum).
-    Analysis marks follow the glottal periods (each one aligned to its predecessor by correlation);
-    synthesis marks are spaced by period / ratio, and each takes the Hann-windowed grain of the
-    nearest analysis mark. Unvoiced sound uses fixed 5 ms grains at ratio 1 (perfect reconstruction).
-    Fixed latency, reported to the host.
+    Analysis marks follow the glottal periods: a voiced stretch starts on the loudest part of a period
+    (the pulse), and each later mark is aligned to its predecessor by correlation, to a fraction of a
+    sample. Synthesis marks are spaced by the sung period / ratio; each takes the grain of the nearest
+    analysis mark, windowed from the previous mark to the next, so at ratio 1 the grains add back up to
+    the input. Unvoiced sound uses fixed 5 ms grains at ratio 1. Fixed latency, reported to the host.
 */
 class Psola
 {
@@ -438,6 +470,8 @@ public:
         tMax = (float) (sr / PitchDetector::kMinHz);
         tUnvoiced = (float) (0.005 * sr);
         lookahead = (int) (0.010 * sr);
+        maxHold = (float) (0.035 * sr);
+        corrBuf.assign ((size_t) (2 * (int) (tMax * 0.22f) + 4), 0.0f);
         // Grains read up to a period and a half past their synthesis time, faster with the formant up;
         // and the marks they come from only exist once the detector has described that moment (plus the
         // look-ahead that catches note starts).
@@ -472,11 +506,12 @@ public:
         n = 0;
         numMarks = 0;
         markHead = 0;
-        addMark ({ -(int64_t) tUnvoiced, tUnvoiced, false, 1.0f });
+        addMark ({ -(double) tUnvoiced, tUnvoiced, false, 1.0f });
         nextSynth = 0.0;
         numFrames = 0;
         frameHead = 0;
         knownUntil = std::numeric_limits<int64_t>::min();
+        heldFor = 0.0f;
     }
 
     int getLatency() const noexcept { return latency; }
@@ -548,7 +583,7 @@ public:
     float readInput (int ch, double pos) const noexcept { return hermite (in[(size_t) ch], pos); }
 
 private:
-    struct Mark { int64_t pos; float period; bool voiced; float ratio; };
+    struct Mark { double pos; float period; bool voiced; float ratio; };
     static constexpr int kMarks = 256, kFrames = 128;
 
     void addMark (Mark m) noexcept
@@ -565,20 +600,44 @@ private:
         for (;;)
         {
             const Mark prev = lastMark();
-            Frame f = frameAt (prev.pos + (int64_t) prev.period);
+            const int64_t prevAt = (int64_t) std::lround (prev.pos);
+            Frame f = frameAt (prevAt + (int64_t) prev.period);
             auto usable = [this] (const Frame& fr) { return fr.voiced && fr.period > 8.0f && fr.period <= tMax; };
             if (! usable (f))
             {
                 // A note starts here if the detector hears one a moment later: its window needed to fill
                 // with voice first. Take that period now, so the note is shifted from its first cycle.
-                const Frame ahead = frameAt (prev.pos + (int64_t) prev.period + lookahead);
+                const Frame ahead = frameAt (prevAt + (int64_t) prev.period + lookahead);
                 if (usable (ahead))
                     f = ahead;
             }
-            const bool v = usable (f);
-            const float period = v ? f.period : tUnvoiced;
+            bool v = usable (f);
+            float period = v ? f.period : tUnvoiced, ratio = f.ratio;
+            if (! v && prev.voiced && heldFor < maxHold
+                && prevAt + (int64_t) (prev.period * 1.6f) + 2 <= n && periodicity (prevAt, prev.period) > 0.6f)
+            {
+                // The detector lets go of a note a little before it ends (its window must be mostly voice).
+                // While the waveform still repeats at the last period, keep shifting it: otherwise each note's
+                // tail plays at the old pitch, a chirp at the end of every word.
+                v = true;
+                period = prev.period;
+                ratio = prev.ratio;
+                heldFor += period;
+            }
+            else if (v)
+                heldFor = 0.0f;
+            if (v && prev.voiced && (period > prev.period * 1.4f || period < prev.period / 1.4f)
+                && prevAt + (int64_t) (std::max (period, prev.period) * 1.6f) + 2 <= n)
+            {
+                // A jump of an octave or so in one period: check it against the waveform itself. A period
+                // twice too long fits about as well as the right one; one half too short fits worse. Real
+                // note changes pass (the old period no longer fits, or the new one fits as well).
+                const float pNew = periodicity (prevAt, period), pOld = periodicity (prevAt, prev.period);
+                if (period > prev.period ? pOld >= pNew - 0.05f : pNew < pOld - 0.1f)
+                    period = prev.period;
+            }
             const int radius = v ? (int) (period * 0.22f) : 0;
-            const int64_t predicted = prev.pos + (int64_t) std::lround (period);
+            const int64_t predicted = (int64_t) std::lround (prev.pos + (double) period);
             if (predicted + (int64_t) period + radius + 2 > n)
                 return;
             // The detector reports a moment about 20 ms after it happens (half its window). Waiting until
@@ -587,58 +646,123 @@ private:
             if (predicted + lookahead > knownUntil)
                 return;
 
-            int64_t pos = predicted;
+            double pos = prev.pos + (double) period;
+            const int half = (int) (period * 0.5f);
             if (v && prev.voiced && radius > 0)
             {
-                // Align to the previous grain: the candidate whose waveform matches it best.
-                const int half = (int) period;
-                float bestC = -1.0e30f;
-                for (int c = -radius; c <= radius; c += 1)
+                // Align to the previous grain: the offset whose waveform matches it best, to a fraction of a
+                // sample (whole-sample marks jitter the pitch: one sample is 10 cents of a 300 Hz voice).
+                const int span = (int) period;
+                auto& corr = corrBuf;
+                const int r = std::min (radius, (int) corrBuf.size() / 2 - 1);
+                int best = 0;
+                for (int c = -r; c <= r; ++c)
                 {
                     float sum = 0.0f;
                     const int64_t cand = predicted + c;
-                    for (int k = -half; k < half; k += 2)
-                        sum += mono[(size_t) ((cand + k) & mask)] * mono[(size_t) ((prev.pos + k) & mask)];
-                    if (sum > bestC) { bestC = sum; pos = cand; }
+                    for (int k = -span; k < span; k += 2)
+                        sum += mono[(size_t) ((cand + k) & mask)] * mono[(size_t) ((prevAt + k) & mask)];
+                    corr[(size_t) (c + r)] = sum;
+                    if (sum > corr[(size_t) (best + r)]) best = c;
+                }
+                double off = (double) best;
+                if (best > -r && best < r)
+                {
+                    const float a = corr[(size_t) (best + r - 1)], b = corr[(size_t) (best + r)], cc = corr[(size_t) (best + r + 1)];
+                    const float den = a - 2.0f * b + cc;
+                    if (den < -1.0e-12f)
+                        off += juce::jlimit (-0.5, 0.5, 0.5 * (double) (a - cc) / (double) den);
+                }
+                // The offsets were measured between whole-sample windows: keep the previous mark's fraction.
+                pos = (double) predicted + off + (prev.pos - (double) prevAt);
+            }
+            else if (v && half > 2)
+            {
+                // A voiced stretch starts: centre its first grain on the loudest part of the period (the
+                // glottal pulse). A grain centred between pulses carries two half pulses, which a shift pulls
+                // apart into a buzz, worst going down where grains barely overlap.
+                const int m = std::max (1, half / 4);
+                float bestE = -1.0f;
+                for (int c = -half; c <= half; ++c)
+                {
+                    float e = 0.0f;
+                    for (int k = -m; k <= m; ++k)
+                    {
+                        const float x = mono[(size_t) ((predicted + c + k) & mask)];
+                        e += x * x;
+                    }
+                    if (e > bestE) { bestE = e; pos = (double) (predicted + c); }
                 }
             }
-            addMark ({ pos, period, v, f.ratio });
+            addMark ({ pos, period, v, ratio });
         }
     }
 
-    const Mark& nearestMark (double t) const noexcept
+    /** Normalised correlation between the period around `pos` and the next one (1 = repeats exactly). */
+    float periodicity (int64_t pos, float period) const noexcept
+    {
+        const int p = (int) std::lround (period), half = p / 2;
+        float xy = 0.0f, xx = 1.0e-12f, yy = 1.0e-12f;
+        for (int k = -half; k < half; ++k)
+        {
+            const float a = mono[(size_t) ((pos + k) & mask)], b = mono[(size_t) ((pos + k + p) & mask)];
+            xy += a * b; xx += a * a; yy += b * b;
+        }
+        return xy / std::sqrt (xx * yy);
+    }
+
+    int nearestMark (double t) const noexcept
     {
         int best = (markHead - 1 + kMarks) % kMarks;
         double bestD = 1.0e30;
         for (int k = 0; k < numMarks; ++k)
         {
             const int idx = (markHead - 1 - k + kMarks) % kMarks;
-            const double d = std::abs ((double) marks[(size_t) idx].pos - t);
+            const double d = std::abs (marks[(size_t) idx].pos - t);
             if (d < bestD) { bestD = d; best = idx; }
-            else if ((double) marks[(size_t) idx].pos < t - (double) tMax * 2.0)
+            else if (marks[(size_t) idx].pos < t - (double) tMax * 2.0)
                 break;   // marks only get further away from here
         }
-        return marks[(size_t) best];
+        return best;
     }
 
     void placeGrain (float formant) noexcept
     {
-        const auto& m = nearestMark (nextSynth);
+        const int idx = nearestMark (nextSynth);
+        const auto& m = marks[(size_t) idx];
         const Frame f = frameAt ((int64_t) nextSynth);
         // The ratio of this moment, unless the detector had not heard the note yet here (a note start
         // the look-ahead caught): then the ratio that came with the mark's period, not a stale one.
         const float ratio = m.voiced ? juce::jlimit (0.5f, 2.0f, f.voiced ? f.ratio : m.ratio) : 1.0f;
-        const float ta = m.period;
+
+        // The grain spans from the previous mark to the next (the cycles as they were actually sung, not
+        // the detector's smoothed period): at ratio 1 the grains then add back up to the input exactly.
+        float left = m.period, right = m.period;
+        if (m.voiced)
+        {
+            auto spacing = [&m] (const Mark& o)
+            {
+                const float d = (float) std::abs (m.pos - o.pos);
+                return o.voiced && d > 0.6f * m.period && d < 1.6f * m.period ? d : m.period;
+            };
+            if (numMarks > 1 && idx != (markHead - numMarks + kMarks) % kMarks)
+                left = spacing (marks[(size_t) ((idx - 1 + kMarks) % kMarks)]);
+            if (idx != (markHead - 1 + kMarks) % kMarks)
+                right = spacing (marks[(size_t) ((idx + 1) % kMarks)]);
+        }
         const float readSpeed = m.voiced ? formant : 1.0f;
-        const int half = std::max (2, (int) std::lround (ta));
         const int64_t centre = (int64_t) std::floor (nextSynth);
         const double frac = nextSynth - (double) centre;
-        const float invHalf = 1.0f / (float) half;
-        for (int k = -half + 1; k < half; ++k)
+        const int lo = -(int) std::ceil (left), hi = (int) std::ceil (right);
+        const float invL = 1.0f / left, invR = 1.0f / right;
+        for (int k = lo; k <= hi; ++k)
         {
-            const float x = (float) k * invHalf;
-            const float w = 0.5f + 0.5f * std::cos (dd::kPi * x);
-            const double src = (double) m.pos + ((double) k - frac) * readSpeed;
+            const float x = (float) ((double) k - frac);
+            const float u = x < 0.0f ? x * invL : x * invR;
+            if (u <= -1.0f || u >= 1.0f)
+                continue;
+            const float w = 0.5f + 0.5f * std::cos (dd::kPi * u);
+            const double src = m.pos + (double) x * readSpeed;
             if (src > (double) (n - 3))
                 break;   // only at the very lowest notes with formant up: never read past the input
             const int o = (int) ((centre + k) & mask);
@@ -647,7 +771,7 @@ private:
             wsum[(size_t) o] += w;
             rsum[(size_t) o] += w * ratio;
         }
-        nextSynth += std::max (8.0, (double) (ta / ratio));
+        nextSynth += std::max (8.0, (double) (right / ratio));
     }
 
     float hermite (const std::vector<float>& b, double pos) const noexcept
@@ -661,9 +785,9 @@ private:
     }
 
     double sr = 48000.0, nextSynth = 0.0;
-    float tMax = 740.0f, tUnvoiced = 240.0f;
+    float tMax = 740.0f, tUnvoiced = 240.0f, maxHold = 1680.0f, heldFor = 0.0f;
     int latency = 0, mask = 0, lookahead = 480;
-    std::vector<float> in[2], acc[2], mono, wsum, rsum;
+    std::vector<float> in[2], acc[2], mono, wsum, rsum, corrBuf;
     int64_t n = 0;
     std::array<Mark, kMarks> marks {};
     int numMarks = 0, markHead = 0;

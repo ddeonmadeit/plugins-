@@ -62,7 +62,7 @@
     "revPreDelay": 20.0,
     "revTone": 0.6,
     "mix": 1.0,
-    "outGain": -2.9,
+    "outGain": -1.5,
     "b1On": true,
     "b1Type": "Low Cut",
     "b1Freq": 110.0,

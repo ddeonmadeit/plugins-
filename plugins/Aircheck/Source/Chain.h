@@ -289,6 +289,41 @@ private:
 };
 
 //==============================================================================
+/** Largest value of the last `length` samples (monotonic queue: O(1) a sample, no allocation after prepare). */
+class MovingMax
+{
+public:
+    void prepare (int length)
+    {
+        len = std::max (1, length);
+        vals.assign ((size_t) len + 1, 0.0f);
+        idx.assign ((size_t) len + 1, 0);
+        reset();
+    }
+    void reset() noexcept { head = tail = 0; t = 0; }
+
+    float push (float x) noexcept
+    {
+        const int cap = (int) vals.size();
+        while (head != tail && vals[(size_t) ((tail - 1 + cap) % cap)] <= x)
+            tail = (tail - 1 + cap) % cap;
+        vals[(size_t) tail] = x;
+        idx[(size_t) tail] = t;
+        tail = (tail + 1) % cap;
+        while (idx[(size_t) head] <= t - len)
+            head = (head + 1) % cap;
+        ++t;
+        return vals[(size_t) head];
+    }
+
+private:
+    std::vector<float> vals;
+    std::vector<int64_t> idx;
+    int len = 1, head = 0, tail = 0;
+    int64_t t = 0;
+};
+
+//==============================================================================
 /**
     Vocal compressor with four characters: FET (fast, bright, aggressive), Opto (smooth, program-
     dependent two-stage release), Old Limiter (cheap and gritty, the 1981 vocal sound: let the front
@@ -307,12 +342,14 @@ public:
         for (auto& d : dc) d.prepare (sr);
         lookahead = std::max (1, (int) std::lround (0.0015 * sr));
         for (auto& d : delay) d.prepare (lookahead + 4);
+        peakHold.prepare ((int) std::lround (0.006 * sr));
         reset();
     }
 
     void reset()
     {
         gr = 0.0f; rms = 0.0f; memory = 0.0f;
+        peakHold.reset();
         for (auto& d : dc) d.reset();
         for (auto& d : delay) d.reset();
         for (auto& f : scHp) f.reset();
@@ -358,7 +395,12 @@ public:
             level = dd::gainToDb (std::sqrt (rms) * 1.41f);
         }
         else
-            level = dd::gainToDb (std::max (std::abs (dl), std::abs (dr)));
+        {
+            // Peak sensing that holds each peak for 6 ms: a sample-by-sample peak lets the gain ride the
+            // waveform of low notes (the release eases off between the peaks of a 100 Hz cycle), which is
+            // distortion a hardware compressor's smoothed detector does not make.
+            level = dd::gainToDb (peakHold.push (std::max (std::abs (dl), std::abs (dr))));
+        }
 
         const float knee = s.type == 1 ? 10.0f : (s.type == 0 ? 2.0f : (s.type == 2 ? 3.0f : 6.0f));
         const float ratio = s.type == 1 ? std::min (s.ratio, 6.0f) : s.ratio;
@@ -410,59 +452,109 @@ private:
     dd::DcBlocker dc[2];
     dd::DelayBuffer delay[2];
     dd::Biquad scHp[2];
+    MovingMax peakHold;
 };
 
 //==============================================================================
-/** Split-band de-esser: only the band above `hz` is turned down, and only on sibilants. */
+/**
+    Split-band de-esser. The voice is split at `hz` into two bands that add back up to it exactly (a
+    2nd-order low-pass and the rest), and only the top band is turned down, only on sibilants. A sibilant
+    is judged against the voice itself, not a fixed level: the top band rising above the body of the
+    voice (the low band) and near the take's recent loudness. So the same Amount works on a quiet take
+    and a slammed one, vowels keep their air (no lisp), and breaths are left alone. It listens to the
+    signal before the compressor, which reaches it 1.5 ms earlier than the compressor's output: the
+    reduction is already there when an S starts, with no extra latency.
+*/
 class DeEsser
 {
 public:
     void prepare (double newSr)
     {
         sr = newSr;
-        att = dd::onePoleCoef (0.0008f, sr);
-        rel = dd::onePoleCoef (0.06f, sr);
+        att = dd::onePoleCoef (0.0004f, sr);
+        relH = dd::onePoleCoef (0.012f, sr);
+        relL = dd::onePoleCoef (0.06f, sr);
+        gainAtt = dd::onePoleCoef (0.0008f, sr);
+        gainRel = dd::onePoleCoef (0.05f, sr);
+        loudFall = (float) (8.0 / sr);   // the recent loudness falls 8 dB a second
         lastHz = -1.0f;
         reset();
     }
 
-    void reset() { for (auto& h : hp) h.reset(); envS = envF = 0.0f; gainDb = 0.0f; }
+    void reset()
+    {
+        for (auto& f : split) f.reset();
+        envH = envL = 0.0f;
+        gainDb = 0.0f;
+        loudDb = -100.0f;
+    }
 
-    void process (float& l, float& r, float amount, float hz) noexcept
+    /** `detL` / `detR`: what to listen to (the same voice, a little ahead of l / r). */
+    void process (float& l, float& r, float detL, float detR, float amount, float hz) noexcept
     {
         if (std::abs (hz - lastHz) > 1.0f)
         {
             lastHz = hz;
-            for (auto& h : hp) h.set (dd::Biquad::Type::HighPass, hz, 0.707f, 0.0f, sr);
+            for (auto& f : split) f.set (hz, sr);
         }
-        const float hl = hp[0].process (l), hr = hp[1].process (r);
-        if (amount <= 0.001f)
+        const float lowL = split[0].low (l), lowR = split[1].low (r);
+        const float d = 0.5f * (detL + detR), dLow = split[2].low (d), dHigh = d - dLow;
+        float target = 0.0f;
+        if (amount > 0.001f)
+        {
+            const float ah = std::abs (dHigh), al = std::abs (dLow);
+            envH = ah > envH ? ah + (envH - ah) * att : ah + (envH - ah) * relH;
+            envL = al > envL ? al + (envL - al) * att : al + (envL - al) * relL;
+            const float hDb = dd::gainToDb (envH + 1.0e-9f), lDb = dd::gainToDb (envL + 1.0e-9f);
+            loudDb = std::max (std::max (hDb, lDb), loudDb - loudFall);
+
+            // How far the top band pokes above what this Amount allows: relative to the body of the voice, and
+            // only for sounds within reach of the take's loudness (not breaths or room tone).
+            const float overBody = hDb - (lDb + 6.0f - 18.0f * amount);
+            const float overFloor = hDb - (loudDb - 22.0f - 14.0f * amount);
+            target = juce::jlimit (0.0f, 4.0f + 16.0f * amount, std::min (overBody, overFloor) * (0.6f + 0.4f * amount));
+        }
+        else if (gainDb < 0.01f)
         {
             gainDb = 0.0f;
             return;
         }
-        const float s = std::max (std::abs (hl), std::abs (hr));
-        const float f = std::max (std::abs (l), std::abs (r));
-        envS = s + (envS - s) * (s > envS ? att : rel);
-        envF = f + (envF - f) * (f > envF ? att : rel);
-        // Sibilant when the top band carries most of the energy and is loud enough.
-        const float sideDb = dd::gainToDb (envS);
-        const float share = envS / (envF + 1.0e-6f);
-        const float thr = -16.0f - 24.0f * amount;
-        float target = std::max (0.0f, sideDb - thr) * (0.5f + 0.5f * amount) * juce::jlimit (0.0f, 1.0f, (share - 0.25f) / 0.35f);
-        target = std::min (target, 4.0f + 16.0f * amount);
-        gainDb = target + (gainDb - target) * (target > gainDb ? 0.3f : 0.995f);
-        const float g = dd::dbToGain (-gainDb) - 1.0f;
-        l += hl * g;
-        r += hr * g;
+        gainDb = target + (gainDb - target) * (target > gainDb ? gainAtt : gainRel);   // switched off: eases back
+
+        const float g = dd::dbToGain (-gainDb);
+        l = lowL + (l - lowL) * g;
+        r = lowR + (r - lowR) * g;
     }
 
     float getReductionDb() const noexcept { return gainDb; }
 
 private:
+    /** Trapezoidal state-variable low-pass (the top band is the input minus it: the two add back exactly). */
+    struct Split
+    {
+        float g = 0.0f, a1 = 0.0f, a2 = 0.0f, a3 = 0.0f, ic1 = 0.0f, ic2 = 0.0f;
+        void set (float hz, double rate) noexcept
+        {
+            constexpr float k = 1.41421356f;
+            g = (float) std::tan (juce::MathConstants<double>::pi * std::min ((double) hz, rate * 0.45) / rate);
+            a1 = 1.0f / (1.0f + g * (g + k));
+            a2 = g * a1;
+            a3 = g * a2;
+        }
+        void reset() noexcept { ic1 = ic2 = 0.0f; }
+        float low (float x) noexcept
+        {
+            const float v3 = x - ic2, v1 = a1 * ic1 + a2 * v3, v2 = ic2 + a2 * ic1 + a3 * v3;
+            ic1 = 2.0f * v1 - ic1;
+            ic2 = 2.0f * v2 - ic2;
+            return v2;
+        }
+    };
+
     double sr = 48000.0;
-    dd::Biquad hp[2];
-    float att = 0.0f, rel = 0.0f, envS = 0.0f, envF = 0.0f, gainDb = 0.0f, lastHz = -1.0f;
+    Split split[3];   // L, R, detector
+    float att = 0.0f, relH = 0.0f, relL = 0.0f, gainAtt = 0.0f, gainRel = 0.0f, loudFall = 0.0f;
+    float envH = 0.0f, envL = 0.0f, gainDb = 0.0f, loudDb = -100.0f, lastHz = -1.0f;
 };
 
 //==============================================================================

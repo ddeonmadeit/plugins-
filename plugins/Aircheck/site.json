@@ -22,11 +22,13 @@
   ],
   "previewNote": "on a synthetic sung test phrase (slightly off pitch on purpose), so you hear the chain and the correction, not a real singer.",
   "whatsNew": {
-    "version": "1.7.0",
+    "version": "1.8.0",
     "items": [
-      "Automate any control the way FL's own plugins do: right-click it and choose Create automation clip (FL Studio's own menu, also Link to controller; Cubase, Bitwig, Reaper and Studio One open its automation lane). In Ableton the right-click menu says where to pick it in the track's automation chooser. A right-click never moves anything.",
-      "Right-click an EQ point to switch its band on or off or automate its frequency, gain, Q or dynamics; right-click the Pitch Shift pad for Shift or Formant.",
-      "Point at a control and the line under the presets says RIGHT-CLICK: AUTOMATE."
+      "Cleaner pitch correction and Pitch Shift, measured on real singers against Rubber Band, the pro shifter in many DAWs: as accurate (about 1 cent off on held notes), with fewer octave glitches and the voice's character kept better. The tuner no longer grabs a harmonic on loud low vowels, stays on the note through legato note changes and word endings, and hard tune no longer flips between two notes when you sing between them.",
+      "Big shifts sound like a voice, not a buzz: each grain now starts on the voice's own pulse, so -12 and +7 stay clean.",
+      "The de-esser judges esses against your voice instead of a fixed level, listens 1.5 ms ahead and leaves vowels alone: it now actually catches esses on real recordings, at any recording level.",
+      "Smooth finds real resonances (whistles, harsh bands) instead of turning every harmonic down, so it no longer dulls the voice. The compressors no longer ripple on low notes.",
+      "Every preset was checked on real voices: esses now sit under the vowels (DEON's de-esser was set above where esses live and now catches them), and all presets are level-matched."
     ]
   }
 }

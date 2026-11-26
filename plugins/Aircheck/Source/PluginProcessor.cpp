@@ -281,8 +281,9 @@ void AircheckProcessor::processChunk (float* L, float* R, int n)
     for (int i = 0; i < n; ++i)
     {
         rider.process (L[i], R[i], riderAmt);
+        const float aheadL = L[i], aheadR = R[i];   // the compressor delays its output by 1.5 ms
         comp.process (L[i], R[i], compSettings);
-        deesser.process (L[i], R[i], deessAmt, deessHz);
+        deesser.process (L[i], R[i], aheadL, aheadR, deessAmt, deessHz);
     }
     if (eqPost)
         runEq();

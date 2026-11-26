@@ -39,6 +39,7 @@ public:
         }
         const int bins = N / 2 + 1;
         logMag.assign ((size_t) bins, 0.0f);
+        env.assign ((size_t) bins, 0.0f);
         prefix.assign ((size_t) bins + 1, 0.0);
         red.assign ((size_t) bins, 0.0f);
         tmp.assign ((size_t) bins, 0.0f);
@@ -132,27 +133,55 @@ private:
                 logMag[(size_t) k] = 10.0f * std::log10 (re * re + im * im + 1.0e-20f);
             }
             prefix[0] = 0.0;
-            for (int k = 0; k < bins; ++k)
-                prefix[(size_t) k + 1] = prefix[(size_t) k] + logMag[(size_t) k];
 
-            // Envelope: the average level over a band a fraction of an octave wide around each bin.
-            const float widthOct = juce::jmap (settings.sharpness, 1.6f, 0.25f);
-            const float r = std::exp2 (widthOct * 0.5f);
+            // A voice's spectrum is a comb of harmonics: compared bin by bin with its own average, every
+            // harmonic would look like a resonance, and turning them all down only dulls the voice. So trace
+            // the envelope through the harmonic peaks first (the loudest bin within 160 Hz, then averaged
+            // over the same span), and look for where that envelope pokes out above its broad trend: a
+            // whistle, a harsh band, a ringing mode. Formants poke out too, a little less, which is why the
+            // threshold sits a few dB up and drops as Smooth is turned up.
             const float binHz = (float) sr / (float) N;
+            const int M = std::max (1, (int) std::ceil (160.0f / binHz));
+            for (int k = 0; k < bins; ++k)
+            {
+                float mx = -200.0f;
+                for (int j = std::max (0, k - M); j <= std::min (bins - 1, k + M); ++j)
+                    mx = std::max (mx, logMag[(size_t) j]);
+                tmp[(size_t) k] = mx;
+            }
+            prefix[0] = 0.0;
+            for (int k = 0; k < bins; ++k)
+                prefix[(size_t) k + 1] = prefix[(size_t) k] + tmp[(size_t) k];
+            for (int k = 0; k < bins; ++k)
+            {
+                const int lo = std::max (0, k - M), hi = std::min (bins - 1, k + M);
+                env[(size_t) k] = (float) ((prefix[(size_t) hi + 1] - prefix[(size_t) lo]) / (double) (hi - lo + 1));
+            }
+            prefix[0] = 0.0;
+            for (int k = 0; k < bins; ++k)
+                prefix[(size_t) k + 1] = prefix[(size_t) k] + env[(size_t) k];
+
+            // The trend: the envelope averaged over a band a fraction of an octave wide (narrower = only
+            // narrow peaks count).
+            const float widthOct = juce::jmap (settings.sharpness, 1.4f, 0.45f);
+            const float r = std::exp2 (widthOct * 0.5f);
             const float maxRed = 14.0f * settings.depth;
-            const float floorDb = 20.0f * std::log10 ((float) N * 0.25f) - 75.0f;   // ignore bins near silence
+            float frameMax = -200.0f;
+            for (int k = 1; k < bins; ++k)
+                frameMax = std::max (frameMax, env[(size_t) k]);
+            const float floorDb = std::max (frameMax - 60.0f, 20.0f * std::log10 ((float) N * 0.25f) - 90.0f);   // ignore bins near silence
             float peak = 0.0f;
             for (int k = 1; k < bins; ++k)
             {
                 const float hz = (float) k * binHz;
                 const int lo = std::max (1, (int) ((float) k / r)), hi = std::min (bins - 1, (int) std::ceil ((float) k * r));
-                const float env = (float) ((prefix[(size_t) hi + 1] - prefix[(size_t) lo]) / (double) (hi - lo + 1));
-                const float excess = logMag[(size_t) k] - env;
+                const float trend = (float) ((prefix[(size_t) hi + 1] - prefix[(size_t) lo]) / (double) (hi - lo + 1));
+                const float excess = env[(size_t) k] - trend;
                 // Focus range with soft third-octave edges.
                 const float edgeLo = juce::jlimit (0.0f, 1.0f, std::log2 (hz / settings.lowHz) * 3.0f + 1.0f);
                 const float edgeHi = juce::jlimit (0.0f, 1.0f, std::log2 (settings.highHz / hz) * 3.0f + 1.0f);
-                float want = juce::jlimit (0.0f, maxRed, (excess - 2.5f) * 0.85f * settings.depth) * edgeLo * edgeHi;
-                if (logMag[(size_t) k] < floorDb)
+                float want = juce::jlimit (0.0f, maxRed, (excess - (5.0f - 2.5f * settings.depth)) * (0.4f + 0.6f * settings.depth)) * edgeLo * edgeHi;
+                if (env[(size_t) k] < floorDb)
                     want = 0.0f;
                 tmp[(size_t) k] = want;
             }
@@ -217,7 +246,7 @@ private:
     int64_t pos = 0;
     float relCoef = 0.9f, invScale = 1.0f, redPeak = 0.0f;
     std::unique_ptr<juce::dsp::FFT> fft;
-    std::vector<float> window, in[2], out[2], frame[2], logMag, red, tmp;
+    std::vector<float> window, in[2], out[2], frame[2], logMag, env, red, tmp;
     std::vector<double> prefix;
     Settings settings;
     std::atomic<float> activity { 0.0f };

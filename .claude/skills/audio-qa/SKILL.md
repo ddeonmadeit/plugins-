@@ -103,6 +103,36 @@ with `ffmpeg -b:a 128k`, and publish an Artifact page whose audio files go in th
 real settings as tags, draw waveform peaks precomputed in Python on a canvas with play progress.
 SubGrit's page: https://claude.ai/artifact/DTxARTUxVBPbuiynMGdjh3
 
+## Real voices (Aircheck and other vocal effects)
+
+The harness's `vocal` phrase is synthetic: it hides what separates a pro tuner or de-esser from a cheap one.
+`tools/qa/vocal/` measures on real singers instead (needs `pip install pyworld`; `apt install rubberband-cli`
+for the reference shifter):
+
+```bash
+python3 tools/qa/vocal/fetch_vocalset.py        # 25 VocalSet takes (CC BY 4.0) -> qa-out/vocals, 48 kHz, -20 dBFS RMS
+python3 tools/qa/vocal/pitch_eval.py --rubberband   # shifts / hard / natural tune: cents, octave slips, roughness vs Rubber Band R3
+python3 tools/qa/vocal/chain_eval.py            # de-esser (also 14 dB quieter), Smooth on planted resonances, comp THD
+python3 tools/qa/vocal/preset_eval.py           # every preset: LUFS, esses vs vowels, effective EQ
+```
+
+What it taught (Aircheck 1.8):
+- YIN's "first dip under a threshold" locks onto the 2nd / 3rd harmonic on loud low vowels (F1 on that
+  harmonic); take the deepest dip, or the shortest within 0.07 x (1 - depth) of it. Centre the difference window
+  on one instant for every lag (a lag-dependent centre is a timing error of up to 6 ms on high voices) and keep
+  it ~2.5 periods while following, or legato note changes read as unvoiced and the shifter lets go.
+- PSOLA grains must start on the glottal pulse (loudest part of the period) or big shifts turn half-shifted and
+  buzzy; whole-sample marks add pitch jitter (1 sample = 10 cents at 300 Hz); grains windowed from the previous
+  mark to the next make ratio 1 an identity.
+- Judge a tuner's long-term spectrum frame by frame: a compressor changes which notes dominate the average and
+  poses as an EQ change of several dB.
+- A de-esser with a fixed threshold does nothing on a normally tracked vocal; compare the top band with the
+  voice's own body. Compression raises esses against vowels: check `sibil` in preset_eval after any comp change
+  (dry VocalSet -14 dB; bright leads -10, smooth styles -11.5).
+- A resonance suppressor comparing bins with their own average treats every harmonic as a resonance and dulls
+  the whole voice: trace the envelope through the harmonic peaks first.
+- Never ship the VocalSet takes; publish listening pages only with the CC BY credit.
+
 ## Drums and other sample players
 
 - Phrases: `--phrase drums` (5 bars of real-drummer groove on the GM map) and `--phrase drumvel`

@@ -81,8 +81,8 @@ AircheckEditor::Content::Content (AircheckProcessor& p)
     comp.add<Knob> (s, "compMix", "Mix", kA).getSlider().setTooltip ("Blend the compressed voice with the uncompressed one (parallel compression)");
     comp.add<GrMeter> ("GR", [&p] { return p.compGr.load(); });
 
-    deess.add<Knob> (s, "deess", "Amount", kA);
-    deess.add<Knob> (s, "deessFreq", "Freq", kA);
+    deess.add<Knob> (s, "deess", "Amount", kA).getSlider().setTooltip ("Turns esses down, judged against your own voice rather than a fixed level, so the same setting works on a quiet take and a loud one. 50-70 % suits most vocals.");
+    deess.add<Knob> (s, "deessFreq", "Freq", kA).getSlider().setTooltip ("Where the esses start: 4.5-5.5 kHz catches S and SH on most voices, 6-8 kHz only the brightest hiss");
     deess.add<GrMeter> ("Ess", [&p] { return p.deessGr.load(); });
 
     smooth.add<Knob> (s, "smoothDepth", "Smooth", kA).getSlider().setTooltip ("Finds harsh resonances as they happen and turns down only those frequencies, only while they ring");

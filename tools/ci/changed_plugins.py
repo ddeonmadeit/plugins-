@@ -15,7 +15,7 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # Paths that change no plugin binary, installer or QA result.
-NO_BUILD = (".github/workflows/", "tools/ci/", "tools/site/", ".claude/", "CLAUDE.md", "README")
+NO_BUILD = (".github/workflows/", "tools/ci/", "tools/site/", "tools/qa/vocal/", ".claude/", "CLAUDE.md", "README")   # tools/qa/vocal: local listening QA, CI never runs it
 
 
 def all_plugins():
